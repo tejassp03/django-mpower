@@ -1,0 +1,165 @@
+
+<div class="pxp-preloader"> 
+    <div class="pxp-logo">
+    <a href="index.html" class="pxp-animate" style=" font-size:35px !important;"><span style="color: var(--pxpMainColor);">m</span>power</a>
+</div></div>
+
+<header class="pxp-header fixed-top">
+    <div class="pxp-container">
+        <div class="pxp-header-container">
+            <div class="pxp-logo">
+                <a href="{% url 'main:index' %}" class="pxp-animate"><span style="color: var(--pxpMainColor)">m</span>power</a>
+            </div>
+            <div class="pxp-nav-trigger navbar d-xl-none flex-fill">
+                <a role="button" data-bs-toggle="offcanvas" data-bs-target="#pxpMobileNav" aria-controls="pxpMobileNav">
+                    <div class="pxp-line-1"></div>
+                    <div class="pxp-line-2"></div>
+                    <div class="pxp-line-3"></div>
+                </a>
+                <div class="offcanvas offcanvas-start pxp-nav-mobile-container" tabindex="-1" id="pxpMobileNav">
+                    <div class="offcanvas-header">
+                        <div class="pxp-logo">
+                            <a                 <a href="{% url 'main:index' %}" class="pxp-animate"><span style="color: var(--pxpMainColor)">m</span>power</a>
+                            class="pxp-animate"><span style="color: var(--pxpMainColor)">j</span>obster</a>
+                        </div>
+                        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                    </div>
+                    <div class="offcanvas-body">
+                        <nav class="pxp-nav-mobile">
+                            <ul class="navbar-nav justify-content-end flex-grow-1">
+                                <li class="nav-item dropdown">
+                                    <a role="button" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="{% url 'main:index' %}">Home</a>
+                                    <!-- <ul class="dropdown-menu">
+                                        <li class="pxp-dropdown-header">Home Page Versions</li>
+                                        <li class="nav-item"><a href="index.html">Hero with Animated Cards</a></li>
+                                        <li class="nav-item"><a href="index-2.html">Center Image Rotator Hero</a></li>
+                                        <li class="nav-item"><a href="index-3.html">Hero with Illustration</a></li>
+                                        <li class="nav-item"><a href="index-4.html">Boxed Hero with Animation</a></li>
+                                        <li class="nav-item"><a href="index-5.html">Full Image Background Hero</a></li>
+                                        <li class="nav-item"><a href="index-6.html">Full Image with Top Search</a></li>
+                                        <li class="nav-item"><a href="index-7.html">Hero With Image Card</a></li>
+                                    </ul> -->
+                                </li>
+                                <li class="nav-item dropdown">
+                                    <a role="button" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Find Jobs</a>
+                                    
+                                </li>
+                                <li class="nav-item dropdown">
+                                    <a role="button" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Companies</a>
+                                    <ul class="dropdown-menu">
+                                        <li class="nav-item dropdown">
+                                            <a role="button" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Companies List</a>
+                                            <ul class="dropdown-menu">
+                                                <li class="nav-item"><a href="companies-list-1.html">Top Search</a></li>
+                                                <li class="nav-item"><a href="companies-list-2.html">Left Search Side Panel</a></li>
+                                                <li class="nav-item"><a href="companies-list-3.html">Top Search Light</a></li>
+                                            </ul>
+                                        </li>
+                                        <li class="nav-item dropdown">
+                                            <a role="button" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Single Company</a>
+                                            <ul class="dropdown-menu">
+                                                <li class="nav-item"><a href="single-company-1.html">Wide Content</a></li>
+                                                <li class="nav-item"><a href="single-company-2.html">Right Side Panel</a></li>
+                                                <li class="nav-item"><a href="single-company-3.html">Center Boxed Content</a></li>
+                                            </ul>
+                                        </li>
+                                        <li class="nav-item"><a href="company-dashboard.html">Company Dashboard</a></li>
+                                    </ul>
+                                </li>
+                                <li class="nav-item dropdown">
+                                    <a role="button" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Candidates</a>
+                                    <ul class="dropdown-menu">
+                                        <li class="nav-item dropdown">
+                                            <a role="button" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Candidates List</a>
+                                            <ul class="dropdown-menu">
+                                                <li class="nav-item"><a href="candidates-list-1.html">Top Search</a></li>
+                                                <li class="nav-item"><a href="candidates-list-2.html">Left Search Side Panel</a></li>
+                                                <li class="nav-item"><a href="candidates-list-3.html">Top Search Light</a></li>
+                                            </ul>
+                                        </li>
+                                        <li class="nav-item dropdown">
+                                            <a role="button" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Single Candidate</a>
+                                            <ul class="dropdown-menu">
+                                                <li class="nav-item"><a href="single-candidate-1.html">Wide Content</a></li>
+                                                <li class="nav-item"><a href="single-candidate-2.html">Right Side Panel</a></li>
+                                                <li class="nav-item"><a href="single-candidate-3.html">Center Boxed Content</a></li>
+                                            </ul>
+                                        </li>
+                                        <li class="nav-item"><a href="candidate-dashboard.html">Candidate Dashboard</a></li>
+                                    </ul>
+                                </li>
+                                <li class="nav-item dropdown">
+                                    <a role="button" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Blog</a>
+                                    <ul class="dropdown-menu">
+                                        <li class="nav-item"><a href="blog-list-1.html">Articles Cards</a></li>
+                                        <li class="nav-item"><a href="blog-list-2.html">Articles List</a></li>
+                                        <li class="nav-item"><a href="blog-list-3.html">Articles Boxed</a></li>
+                                        <li class="nav-item"><a href="{% url 'main:blog' %}">Single Article</a></li>
+                                    </ul>
+                                </li>
+                                <li class="nav-item dropdown">
+                                    <a role="button" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Pages</a>
+                                    <ul class="dropdown-menu">
+                                        <li class="nav-item"><a href="about-us.html">About Us</a></li>
+                                        <li class="nav-item"><a href="pricing.html">Pricing</a></li>
+                                        <li class="nav-item"><a href="faqs.html">FAQs</a></li>
+                                        <li class="nav-item"><a href="contact-us.html">Contact Us</a></li>
+                                        <li class="nav-item"><a href="sign-in.html">Sign In</a></li>
+                                        <li class="nav-item"><a href="sign-up.html">Sign Up</a></li>
+                                        <li class="nav-item"><a href="404.html">404 Page</a></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Desktop Header Starts -->
+            <nav class="pxp-nav dropdown-hover-all d-none d-xl-block">
+                <ul>
+                    <li class="dropdown">
+                        <a href="{% url 'main:index' %}" class="dropdown-toggle" >Home</a>
+                        
+                    </li>
+                    <li class="dropdown">
+                        <a href="{% url 'main:jobs' %}" class="dropdown-toggle" >Find Jobs</a>
+                        
+                    </li>
+                    <li class="dropdown">
+                        <a href="{% url 'main:companies' %}" class="dropdown-toggle" >Companies</a>
+                        
+                    </li>
+                    <li class="dropdown">
+                        <a href="{% url 'main:candidates' %}" class="dropdown-toggle" >Candidates</a>
+                        
+                    </li>
+                    <li class="dropdown">
+                        <a href="{% url 'main:blog' %}" class="dropdown-toggle" >Blog</a>
+                       
+                    </li>
+                    
+                </ul>
+            </nav>
+            <nav class="pxp-user-nav d-none d-sm-flex">
+                <a ref="{% url 'main:postjob' %}" class="btn rounded-pill pxp-nav-btn">Post a Job</a>
+                
+                {% if 'session_id' in request.session %}
+               <div class="dropdown pxp-user-nav-dropdown">
+                    <a href="index.html" class="dropdown-toggle" data-bs-toggle="dropdown">
+                        <div class="pxp-user-nav-avatar pxp-cover" style="background-image: url(/static/images/ph-small.jpg);"></div>
+                        <div class="pxp-user-nav-name d-none d-md-block">Derek Cotner</div>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="candidate-dashboard.html">Dashboard</a></li>
+                        <li><a class="dropdown-item" href="candidate-dashboard-profile.html">Edit profile</a></li>
+                        <li><a class="dropdown-item" href="index.html">Logout</a></li>
+                    </ul>
+                </div>
+                {% else %}
+                <a class="btn rounded-pill pxp-user-nav-trigger pxp-on-light"  href="{% url 'main:user_login' %}" role="button">Sign in</a>
+                {% endif%}
+            </nav>
+        </div>
+    </div>
+</header>
