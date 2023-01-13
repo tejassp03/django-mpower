@@ -1,0 +1,538 @@
+{% load static %}
+{% block content %}
+<!doctype html>
+<html lang="en" class="pxp-root">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
+        <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-beta.2/css/bootstrap.css'>
+        <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/12.1.2/css/intlTelInput.css'>
+        <link rel='stylesheet' href='https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css'>
+        <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/jquery-nice-select/1.1.0/css/nice-select.min.css'>
+     
+        <link rel="shortcut icon" href="{% static 'images/favicon.png' %}" type="image/x-icon">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600;700&display=swap" rel="stylesheet">
+        <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+        <link rel="stylesheet" href="{% static 'css/font-awesome.min.css' %}">
+        <link rel="stylesheet" href="{% static 'css/owl.carousel.min.css' %}">
+        <link rel="stylesheet" href="{% static 'css/owl.theme.default.min.css' %}">
+        <link rel="stylesheet" href="{% static 'css/animate.css' %}">
+        <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+        <title>mpower - Profile Completion</title>
+        <style>
+            #signin
+            {
+                display: none;
+            }
+            .pxp-nav-trigger
+            {
+                display: none !important;
+            }
+            .pxp-nav{
+                display: none !important;
+            }
+            .pxp-user-nav{
+                display: none !important;
+            }
+            #questioneer
+            {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+            .individualQuestion, .individualQuestiona
+            {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                margin: 10px 10px;
+            }
+        </style>
+    </head>
+   
+    <body>
+        {% include "indexheader.html" %}
+        {% if messages %}
+        {% for message in messages %}
+         {% if message.tags %}  
+         <script>alert('{{ message }}')</script>
+        {% endif %}
+
+        {% endfor %}
+
+        {% endif %}
+            <article>
+          
+                <!-- Start Multiform HTML -->
+            <section class="multi_step_form">  
+            <form id="msform" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+              <!-- progressbar -->
+              <ul id="progressbar">
+                <li class="active">Verify Phone</li>
+                <li>Personal Information</li>
+                <li>Work Profile</li>
+                <li>Upload Documents</li> 
+              </ul>
+              <!-- fieldsets -->
+
+              <fieldset>
+                <h3>Setup your phone</h3>
+                <div class="form-row"> 
+                  <div class="form-group col-md-6">  
+                    <input type="tel" id="phone" class="form-control" placeholder="+880" name="code"> 
+                  </div>  
+                  <div class="form-group col-md-6"> 
+                    <input type="text" class="form-control" placeholder="0000000000" name="mobile" id="phone2">
+                  </div>
+                </div>
+                <button type="button" class="action-but">Get OTP</button>
+                <div id="hider" class="finde">
+                <div class="done_text">
+                  <h6>A secret code is sent to your phone. <br>Please enter it here.</h6> 
+                </div>
+                <div class="code_group"> 
+                  <input type="text" class="form-control" placeholder="0" name="digit" id="otp_val1">
+                  <input type="text" class="form-control" placeholder="0" name="digit" id="otp_val2">
+                  <input type="text" class="form-control" placeholder="0" name="digit" id="otp_val3">
+                  <input type="text" class="form-control" placeholder="0" name="digit" id="otp_val4">
+                  <input type="text" class="form-control" placeholder="0" name="digit" id="otp_val5">
+                  <input type="text" class="form-control" placeholder="0" name="digit" id="otp_val6">
+                </div>
+                <button type="button" class="action-but2">Verify</button>
+            </div>
+                <button type="button" class="next action-button">Continue</button>  
+              </fieldset>
+
+
+              <fieldset>
+                <h3>Please enter details</h3> 
+                <div class="form-group fg_2"> 
+                  <input type="text" class="form-control" placeholder="Address" name="address">
+                </div> 
+                <div class="form-group fg_2" style="display: flex; justify-content: center; align-items: center">
+                  <input class="form-control textbox-n" placeholder="Date of birth" name="dob" type="text" onfocus="(this.type='date')" id="date">
+                </div>
+                  <div class="form-group fg_2">
+                    <input type="text" class="form-control" placeholder="Basic Education" name="basic">
+                  </div> 
+                  <div class="form-group fg_2"> 
+                    <input type="text" class="form-control" placeholder="Master Education" name="master">
+                  </div> 
+                  <div class="form-group fg_2"> 
+                    <input type="text" class="form-control" placeholder="Other Qualifications" name="other">
+                  </div> 
+                <button type="button" class="action-button previous previous_button">Back</button> 
+                <button type="button" class="next action-button">Continue</button>   
+              </fieldset>
+
+
+              <fieldset>
+                <h3>Please enter details</h3> 
+                <div class="form-group fg_2"> 
+                    <input style="border: none; display: none;" id="QuestionCount" name="question_count" value=1>
+                    <input style="border: none; display: none;" id="radioCount" name="radio_count" value=2>
+                    <input style="border: none; display: none;" id="rdc" name="rdc">
+                    <section class="questionInput" class="container">
+                        <div id="questioneer" class="row">
+                            <div id="sq1" class="single_question1 Ques col-6">
+                                <div class="individualQuestion">
+                                    <input class="form-control specialInputQuestions" type="text" placeholder="Skill" name="skill" id="question1">
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" id="addQuestions" class="btn btn-primary" onclick="addQuestion('skills')" style="margin: 20px 20px">+</button>
+                    </section>
+                </div>
+                <div class="form-group fg_2"> 
+                    <input style="border: none; display: none;" id="QuestionCounta" name="question_counta" value=1>
+                    <input style="border: none; display: none;" id="radioCounta" name="radio_counta" value=2>
+                    <input style="border: none; display: none;" id="rdca" name="rdca">
+                    <section class="questionInputa" class="container">
+                        <div id="questioneera" class="row">
+                            <div id="eq1" class="single_question1a Ques">
+                                <div class="individualQuestiona">
+                                    <input class="form-control specialInputQuestionsa" type="text" placeholder="Experience (Role, company, timespan)" name="experience" id="question1a">
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" id="addQuestionsa" class="btn btn-primary" onclick="addQuestion('experience')" style="margin: 20px 20px">+</button>
+                    </section>
+                </div> 
+                <button type="button" class="action-button previous previous_button" style="margin-bottom: 30px">Back</button> 
+                <button type="button" class="next action-button" style="margin-bottom: 30px">Continue</button>   
+              </fieldset>
+
+
+              <fieldset>
+                <h3>Verify Your Identity</h3>
+                <h4 style="text-align: center">Resume (in PDF only)</h4>
+                <div class="form-group fg_2">
+                    <input type="file" class="form-control" id="pxp-signin-page-email" placeholder="Upload Resume" name="resume" multiple="multiple" accept="application/pdf">
+                </div>
+                <h4 style="text-align: center">Photo</h4>
+                <div class="form-group fg_2">
+                    <input type="file" class="form-control" id="pxp-signin-page-email" placeholder="Upload Photo" name="photo" multiple="multiple" accept="image/*">
+                </div>
+                <button type="button" class="action-button previous previous_button">Back</button>
+                <button  class="action-button" type="submit">Finish</button>
+              </fieldset>   
+            </form>  
+          </section> 
+                <!-- END Multiform HTML -->
+            </article>
+        
+        <script src="{% static 'js/jquery-3.4.1.min.js' %}"></script>
+        <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+        <script src="{% static 'js/owl.carousel.min.js' %}"></script>
+        <script src="{% static 'js/nav.js' %}"></script>
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-beta/js/bootstrap.min.js'></script>
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.3/jquery.easing.min.js'></script>
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/12.1.2/js/intlTelInput.js'></script>
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js'></script>
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery-nice-select/1.1.0/js/jquery.nice-select.min.js'></script>
+        <script src="{% static 'js/main.js' %}"></script>
+        <script>
+            (function($) {
+                "use strict";  
+                
+                //* Form js
+                function verificationForm(){
+                    //jQuery time
+                    var current_fs, next_fs, previous_fs; //fieldsets
+                    var left, opacity, scale; //fieldset properties which we will animate
+                    var animating; //flag to prevent quick multi-click glitches
+            
+                    $(".next").click(function () {
+                        if (animating) return false;
+                        animating = true;
+            
+                        current_fs = $(this).parent();
+                        next_fs = $(this).parent().next();
+            
+                        //activate next step on progressbar using the index of next_fs
+                        $("#progressbar li").eq($("fieldset").index(next_fs)).addClass("active");
+            
+                        //show the next fieldset
+                        next_fs.show();
+                        //hide the current fieldset with style
+                        current_fs.animate({
+                            opacity: 0
+                        }, {
+                            step: function (now, mx) {
+                                //as the opacity of current_fs reduces to 0 - stored in "now"
+                                //1. scale current_fs down to 80%
+                                scale = 1 - (1 - now) * 0.2;
+                                //2. bring next_fs from the right(50%)
+                                left = (now * 50) + "%";
+                                //3. increase opacity of next_fs to 1 as it moves in
+                                opacity = 1 - now;
+                                current_fs.css({
+                                    'transform': 'scale(' + scale + ')',
+                                    'position': 'absolute'
+                                });
+                                next_fs.css({
+                                    'left': left,
+                                    'opacity': opacity
+                                });
+                            },
+                            duration: 800,
+                            complete: function () {
+                                current_fs.hide();
+                                animating = false;
+                            },
+                            //this comes from the custom easing plugin
+                            easing: 'easeInOutBack'
+                        });
+                    });
+            
+                    $(".previous").click(function () {
+                        if (animating) return false;
+                        animating = true;
+            
+                        current_fs = $(this).parent();
+                        previous_fs = $(this).parent().prev();
+            
+                        //de-activate current step on progressbar
+                        $("#progressbar li").eq($("fieldset").index(current_fs)).removeClass("active");
+            
+                        //show the previous fieldset
+                        previous_fs.show();
+                        //hide the current fieldset with style
+                        current_fs.animate({
+                            opacity: 0
+                        }, {
+                            step: function (now, mx) {
+                                //as the opacity of current_fs reduces to 0 - stored in "now"
+                                //1. scale previous_fs from 80% to 100%
+                                scale = 0.8 + (1 - now) * 0.2;
+                                //2. take current_fs to the right(50%) - from 0%
+                                left = ((1 - now) * 50) + "%";
+                                //3. increase opacity of previous_fs to 1 as it moves in
+                                opacity = 1 - now;
+                                current_fs.css({
+                                    'left': left
+                                });
+                                previous_fs.css({
+                                    'transform': 'scale(' + scale + ')',
+                                    'opacity': opacity
+                                });
+                            },
+                            duration: 800,
+                            complete: function () {
+                                current_fs.hide();
+                                animating = false;
+                            },
+                            //this comes from the custom easing plugin
+                            easing: 'easeInOutBack'
+                        });
+                    });
+            
+                    $(".submit").click(function () {
+                        return false;
+                    })
+                }; 
+                
+                //* Add Phone no select
+                function phoneNoselect(){
+                    if ( $('#msform').length ){   
+                        $("#phone").intlTelInput(); 
+                        $("#phone").intlTelInput("setNumber", "+880"); 
+                    };
+                }; 
+                //* Select js
+                function nice_Select(){
+                    if ( $('.product_select').length ){ 
+                        $('select').niceSelect();
+                    };
+                }; 
+                /*Function Calls*/  
+                verificationForm ();
+                phoneNoselect ();
+                nice_Select ();
+            })(jQuery);
+
+
+            var count = 1;
+            var radioCount = 2;
+            var totalRadioCount = 2;
+            var questionRadioCount = "2";
+            var totalQuestionCount = 1;
+            var latestQuestionID = 1;
+            var questionRadioCountArray = [[1, 2]];
+            var counta = 1;
+            var radioCounta = 2;
+            var totalRadioCounta = 2;
+            var questionRadioCounta = "2";
+            var totalQuestionCounta = 1;
+            var latestQuestionIDa = 1;
+            var questionRadioCountArraya = [[1, 2]];
+            function addQuestion(targetval) {
+                if(targetval=="skills")
+                {
+                    count++;
+                    totalQuestionCount++;
+                    latestQuestionID++;
+                    radioCount = 1;
+                    totalRadioCount++;
+                    updateCountOnForm(count, "QuestionCount");
+                    latestQuestionID = Math.max(latestQuestionID, totalQuestionCount);
+                }
+                else
+                {
+                    counta++;
+                    totalQuestionCounta++;
+                    latestQuestionIDa++;
+                    radioCounta = 1;
+                    totalRadioCounta++;
+                    updateCountOnForm(counta, "QuestionCounta");
+                    latestQuestionID = Math.max(latestQuestionIDa, totalQuestionCounta);
+                }
+                const questionDiv = document.createElement('div');
+                const individualQuestion = document.createElement('div');
+                const question = document.createElement('input');
+                question.setAttribute('type', 'text');
+                const deleteButton = document.createElement('a');
+                deleteButton.setAttribute('class', 'btn delete_button');
+                const deleteIcon = document.createElement('i');
+                deleteButton.setAttribute('class', 'fa fa-close fa-2x');
+                if(targetval=="skills")
+                {
+                    questionDiv.setAttribute('id', `sq${totalQuestionCount}`);
+                    questionDiv.setAttribute('class', `single_question${totalQuestionCount} Ques col-6`);
+                    individualQuestion.setAttribute('class', 'individualQuestion');
+                    question.setAttribute('class', 'form-control specialInputQuestions');
+                    question.setAttribute('placeholder', 'Skill');
+                    question.setAttribute('id', `question${totalQuestionCount}`);
+                    question.setAttribute('name', `skill`);
+                    deleteButton.setAttribute('id', `${totalQuestionCount}`);
+                    deleteButton.setAttribute('onclick', 'deleteQuestion(this.id, "sq")');
+                }
+                else
+                {
+                    questionDiv.setAttribute('id', `eq${totalQuestionCounta}`);
+                    questionDiv.setAttribute('class', `single_question${totalQuestionCounta}a Ques`);
+                    individualQuestion.setAttribute('class', 'individualQuestiona');
+                    question.setAttribute('class', 'form-control specialInputQuestionsa');
+                    question.setAttribute('placeholder', 'Experience');
+                    question.setAttribute('id', `question${totalQuestionCounta}a`);
+                    question.setAttribute('name', `experience`);
+                    deleteButton.setAttribute('id', `${totalQuestionCounta}`);
+                    deleteButton.setAttribute('onclick', 'deleteQuestion(this.id, "eq")');
+                }
+                deleteButton.appendChild(deleteIcon);
+                individualQuestion.appendChild(question);
+                individualQuestion.appendChild(deleteButton);
+                questionDiv.appendChild(individualQuestion);
+                var quest;
+                if(targetval=="skills")
+                {
+                    updateRadioCountOnForm(totalRadioCount, "radioCount");
+                    quest=document.getElementById('questioneer');
+                    questionRadioCountArray.push([totalQuestionCount, radioCount]);
+                    rdc(questionRadioCountArray, "rdc");
+                }
+                else
+                {
+                    updateRadioCountOnForm(totalRadioCounta, "radioCounta");
+                    quest=document.getElementById('questioneera');
+                    questionRadioCountArraya.push([totalQuestionCounta, radioCounta]);
+                    rdc(questionRadioCountArraya, "rdca");
+                }
+                quest.appendChild(questionDiv);
+            }
+            function updateCountOnForm(count, targetval) {
+                var countKeeper = document.getElementById(targetval);
+                countKeeper.value = count; 
+            }
+            function updateRadioCountOnForm(totalRadioCount, targetval) {
+                var countKeeper = document.getElementById(targetval);
+                countKeeper.value = totalRadioCount; 
+            }
+            function rdc(questionRadioCountArray, targetval) {
+                var questionRadioCountString = document.getElementById(targetval);
+                questionRadioCountString.value = questionRadioCountArray;
+            }
+            function deleteQuestion(questionID, targetval) {
+                var classNameOfQuestionToRemove = targetval + questionID;
+                const element = document.getElementById(classNameOfQuestionToRemove);
+                element.remove();
+                questionID = parseInt(questionID);
+                var firstArray = [];
+                var firstArraya = [];
+                if(targetval=="sq")
+                {
+                    count--;
+                    updateCountOnForm(count, "QuestionCount");
+                    totalRadioCount = totalRadioCount - radioCount;
+                    updateRadioCountOnForm(totalRadioCount, "radioCount");
+                    if (questionID == totalQuestionCount) {
+                        totalQuestionCount--;
+                    }
+                    for (var i = 0; i < questionRadioCountArray.length; i++) {
+                        firstArray.push(questionRadioCountArray[i][0]);
+                    }
+                    var index = firstArray.indexOf(questionID);
+                    questionRadioCountArray.splice(index, 1);
+                    latestQuestionID = parseInt(questionRadioCountArray[questionRadioCountArray.length-1][0]);
+                    var double = questionRadioCountArray.pop();
+                    double.push(radioCount);
+                    questionRadioCountArray.push(double);
+                    rdc(questionRadioCountArray, "rdc");
+                }
+                else
+                {
+                    counta--;
+                    updateCountOnForm(count, "QuestionCounta");
+                    totalRadioCounta = totalRadioCounta - radioCounta;
+                    updateRadioCountOnForm(totalRadioCount, "radioCounta");
+                    if (questionID == totalQuestionCounta) {
+                        totalQuestionCounta--;
+                    }
+                    for (var i = 0; i < questionRadioCountArraya.length; i++) {
+                        firstArraya.push(questionRadioCountArraya[i][0]);
+                    }
+                    var indexa = firstArraya.indexOf(questionID);
+                    questionRadioCountArraya.splice(indexa, 1);
+                    latestQuestionID = parseInt(questionRadioCountArraya[questionRadioCountArraya.length-1][0]);
+                    var doublea = questionRadioCountArraya.pop();
+                    doublea.push(radioCounta);
+                    questionRadioCountArraya.push(doublea); 
+                    rdc(questionRadioCountArray, "rdca");
+                }
+            }
+
+            $('.action-but').click(function(){
+                if(document.getElementById('phone2').value=="")
+                {
+                    alert("Please enter a valid phone number");
+                    return;
+                }
+                if(!document.getElementById('hider').matches('finde'))
+                {
+                    document.getElementById('hider').setAttribute('class', 'finde2');
+                }
+                let text1 = document.getElementById('phone').value;
+                let text2 = document.getElementById('phone2').value;
+                let result = text1+text2
+                $.ajax(
+                {
+                    type:"GET",
+                    url: "http://localhost:8000/get_otp",
+                    data:{
+                        'code': document.getElementById('phone').value,
+                        'phone': document.getElementById('phone2').value
+                    },
+                    success: function( data ) 
+                    {
+                        alert(`OTP is ${data.OTP}`)
+                    }
+                 })
+                })
+            
+            $('.action-but2').click(function(){
+                let text1 = document.getElementById('phone').value;
+                let text2 = document.getElementById('phone2').value;
+                let result = text1+text2
+                let code1 = document.getElementById('otp_val1').value;
+                let code2 = document.getElementById('otp_val2').value;
+                let code3 = document.getElementById('otp_val3').value;
+                let code4 = document.getElementById('otp_val4').value;
+                let code5 = document.getElementById('otp_val5').value;
+                let code6 = document.getElementById('otp_val6').value;
+                if(code1=="" | code2=="" | code3=="" | code4=="" | code5=="" | code6=="")
+                {
+                    alert("Please enter all the digits of OTP");
+                    return;
+                }
+                let res1 = code1 + code2 + code3 + code4 + code5 + code6
+                $.ajax(
+                {
+                    type:"POST",
+                    url: "http://localhost:8000/post_otp/",
+                    data:{
+                        'phone': text2,
+                        'OTP': res1
+                    },
+                    success: function( data ) 
+                    {
+                        if(data.message=='Please enter correct OTP')
+                        {
+                            alert('Please enter correct OTP or Generate a new one')
+                        }
+                        else
+                        {
+                            alert('Phone number verified');
+                        }
+                    }
+                    })
+                })
+
+        </script>
+    </body>
+</html>
+{% endblock %}

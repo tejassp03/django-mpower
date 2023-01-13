@@ -1,0 +1,243 @@
+{% extends 'candidate-index.html' %}
+{% block content %}
+{% load static %}
+
+<div class="pxp-dashboard-content-details">
+    <h1>Edit Profile</h1>
+    <p class="pxp-text-light">Edit your candidate profile page info.</p>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="row mt-4 mt-lg-5">
+            <div class="col-xxl-8">
+                <div class="mb-3">
+                    <label for="pxp-candidate-name" class="form-label">Name</label>
+                    <input type="text" id="pxp-candidate-name" class="form-control" placeholder="Add your name" name="name" value="{{ user.name }}">
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="mb-3">
+                            <label for="pxp-candidate-title" class="form-label">Title</label>
+                            <input type="text" id="pxp-candidate-title" class="form-control" placeholder="E.g. Web Designer">
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="mb-3">
+                            <label for="pxp-candidate-location" class="form-label"></label>
+                            <input type="tel" id="pxp-candidate-location" class="form-control" placeholder="E.g. San Francisco, CA" name="location" value="{{ user.location }}">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="mb-3">
+                            <label for="pxp-candidate-email" class="form-label">Email</label>
+                            <input type="email" id="pxp-candidate-email" class="form-control" placeholder="candidate@email.com" name="email" value="{{ log.email }}">
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="mb-3">
+                            <label for="pxp-candidate-phone" class="form-label">Phone</label>
+                            <input type="tel" id="pxp-candidate-phone" class="form-control" placeholder="(+12) 345 6789" name="phone" value="{{ user.phone }}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xxl-4">
+                <div class="form-label">&nbsp;</div>
+                <div class="pxp-candidate-cover mb-3">
+                    <input type="file" id="pxp-candidate-cover-choose-file" accept="image/*" width="100%" height="166px" name="photo">
+                    {% if user.photo.url %}
+                        <label for="pxp-candidate-cover-choose-file" class="pxp-cover" style="background-image: url('{{ user.photo.url }}')"><span>Upload Cover Image</span></label>
+                    {% else %}
+                        <label for="pxp-candidate-cover-choose-file" class="pxp-cover"><span>Upload Photo</span></label>
+                    {% endif %}
+                {% comment %} </div>
+                <div class="pxp-candidate-photo mb-3">
+                    <input type="file" id="pxp-candidate-photo-choose-file" accept="image/*">
+                    <label for="pxp-candidate-photo-choose-file" class="pxp-cover"><span>Upload<br>Photo</span></label>
+                </div> {% endcomment %}
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label for="pxp-candidate-about" class="form-label">About you</label>
+            <textarea class="form-control" id="pxp-candidate-about" placeholder="Type your info here..."></textarea>
+        </div>
+
+        <div class="mt-4 mt-lg-5">
+            <h2>Skills</h2>
+            <div class="pxp-candidate-dashboard-skills mb-3">
+                <ul class="list-unstyled">
+                    {% for i in skills %}
+                    <li>{{ i }}<span class="fa fa-trash-o"></span></li>
+                    {% endfor %}
+                    <li>Work from home<span class="fa fa-trash-o"></span></li>
+                    <li>Part-time<span class="fa fa-trash-o"></span></li>
+                    <li>Administration<span class="fa fa-trash-o"></span></li>
+                    <li>Finance<span class="fa fa-trash-o"></span></li>
+                    <li>Retail<span class="fa fa-trash-o"></span></li>
+                    <li>IT<span class="fa fa-trash-o"></span></li>
+                    <li>Engineering<span class="fa fa-trash-o"></span></li>
+                    <li>Sales<span class="fa fa-trash-o"></span></li>
+                    <li>Manufacturing<span class="fa fa-trash-o"></span></li>
+                </ul>
+            </div>
+            <div class="input-group mb-3">
+                <input type="text" class="form-control" placeholder="Skill">
+                <button class="btn">Add Skill</button>
+            </div>
+        </div>
+
+        <div class="mt-4 mt-lg-5">
+            <h2>Work Experience</h2>
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <tr>
+                        <td style="width: 30%;"><div class="pxp-candidate-dashboard-experience-title">Senior UI/UX Designer</div></td>
+                        <td style="width: 25%;"><div class="pxp-candidate-dashboard-experience-company">Adobe Corporation</div></td>
+                        <td style="width: 25%;"><div class="pxp-candidate-dashboard-experience-time">2005 - 2013</div></td>
+                        <td>
+                            <div class="pxp-dashboard-table-options">
+                                <ul class="list-unstyled">
+                                    <li><button title="Edit"><span class="fa fa-pencil"></span></button></li>
+                                    <li><button title="Delete"><span class="fa fa-trash-o"></span></button></li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 30%;"><div class="pxp-candidate-dashboard-experience-title">Senior UI/UX Designer</div></td>
+                        <td style="width: 25%;"><div class="pxp-candidate-dashboard-experience-company">Adobe Corporation</div></td>
+                        <td style="width: 25%;"><div class="pxp-candidate-dashboard-experience-time">2005 - 2013</div></td>
+                        <td>
+                            <div class="pxp-dashboard-table-options">
+                                <ul class="list-unstyled">
+                                    <li><button title="Edit"><span class="fa fa-pencil"></span></button></li>
+                                    <li><button title="Delete"><span class="fa fa-trash-o"></span></button></li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 30%;"><div class="pxp-candidate-dashboard-experience-title">Senior UI/UX Designer</div></td>
+                        <td style="width: 25%;"><div class="pxp-candidate-dashboard-experience-company">Adobe Corporation</div></td>
+                        <td style="width: 25%;"><div class="pxp-candidate-dashboard-experience-time">2005 - 2013</div></td>
+                        <td>
+                            <div class="pxp-dashboard-table-options">
+                                <ul class="list-unstyled">
+                                    <li><button title="Edit"><span class="fa fa-pencil"></span></button></li>
+                                    <li><button title="Delete"><span class="fa fa-trash-o"></span></button></li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="row mt-3 mt-lg-4">
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label for="pxp-candidate-work-title" class="form-label">Job title</label>
+                        <input type="text" id="pxp-candidate-work-title" class="form-control" placeholder="E.g. Web Designer">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label for="pxp-candidate-work-company" class="form-label">Company</label>
+                        <input type="text" id="pxp-candidate-work-company" class="form-control" placeholder="Company name">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label for="pxp-candidate-work-time" class="form-label">Time period</label>
+                        <input type="text" id="pxp-candidate-work-time" class="form-control" placeholder="E.g. 2005 - 2013">
+                    </div>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label for="pxp-candidate-work-about" class="form-label">Description</label>
+                <textarea class="form-control pxp-smaller" id="pxp-candidate-work-about" placeholder="Type a short description here..."></textarea>
+            </div>
+            <button class="btn rounded-pill pxp-subsection-cta">Add Experience</button>
+        </div>
+
+        <div class="mt-4 mt-lg-5">
+            <h2>Education & Training</h2>
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <tr>
+                        <td style="width: 30%;"><div class="pxp-candidate-dashboard-experience-title">Architecure</div></td>
+                        <td style="width: 25%;"><div class="pxp-candidate-dashboard-experience-school">Politehnica University of Timisoara: Bachelor of Architecture</div></td>
+                        <td style="width: 25%;"><div class="pxp-candidate-dashboard-experience-time">2011 - 2017</div></td>
+                        <td>
+                            <div class="pxp-dashboard-table-options">
+                                <ul class="list-unstyled">
+                                    <li><button title="Edit"><span class="fa fa-pencil"></span></button></li>
+                                    <li><button title="Delete"><span class="fa fa-trash-o"></span></button></li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 30%;"><div class="pxp-candidate-dashboard-experience-title">Front End Web Developer</div></td>
+                        <td style="width: 25%;"><div class="pxp-candidate-dashboard-experience-school">Udacity Nanodegree Program</div></td>
+                        <td style="width: 25%;"><div class="pxp-candidate-dashboard-experience-time">2020 - 2020</div></td>
+                        <td>
+                            <div class="pxp-dashboard-table-options">
+                                <ul class="list-unstyled">
+                                    <li><button title="Edit"><span class="fa fa-pencil"></span></button></li>
+                                    <li><button title="Delete"><span class="fa fa-trash-o"></span></button></li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 30%;"><div class="pxp-candidate-dashboard-experience-title">Build Responsive Real World Websites with HTML5 and CSS3</div></td>
+                        <td style="width: 25%;"><div class="pxp-candidate-dashboard-experience-company">Udemy</div></td>
+                        <td style="width: 25%;"><div class="pxp-candidate-dashboard-experience-time">2021 - 2021</div></td>
+                        <td>
+                            <div class="pxp-dashboard-table-options">
+                                <ul class="list-unstyled">
+                                    <li><button title="Edit"><span class="fa fa-pencil"></span></button></li>
+                                    <li><button title="Delete"><span class="fa fa-trash-o"></span></button></li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="row mt-3 mt-lg-4">
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label for="pxp-candidate-edu-title" class="form-label">Title</label>
+                        <input type="text" id="pxp-candidate-edu-title" class="form-control" placeholder="E.g. Architecure">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label for="pxp-candidate-edu-school" class="form-label">School</label>
+                        <input type="text" id="pxp-candidate-edu-school" class="form-control" placeholder="School name">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label for="pxp-candidate-edu-time" class="form-label">Time period</label>
+                        <input type="text" id="pxp-candidate-edu-time" class="form-control" placeholder="E.g. 2005 - 2013">
+                    </div>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label for="pxp-candidate-edu-about" class="form-label">Description</label>
+                <textarea class="form-control pxp-smaller" id="pxp-candidate-edu-about" placeholder="Type a short description here..."></textarea>
+            </div>
+            <button class="btn rounded-pill pxp-subsection-cta">Add Education</button>
+        </div>
+
+        <div class="mt-4 mt-lg-5">
+            <button class="btn rounded-pill pxp-subsection-cta">Save Profile</button>
+        </div>
+    </form>
+</div>
+{% endblock content %}
