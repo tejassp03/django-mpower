@@ -14,7 +14,7 @@ def user_login(request):
 		if request.method == 'POST':
 			username = request.POST['email']
 			password = request.POST['pass']
-			user = authenticate(request, username=username, password=password)
+			user = authenticate(request, username='username', password=password)
 			if user is not None:
 				login(request, user)
 				return redirect('main:candidates')
@@ -35,6 +35,9 @@ def companies(request):
 
 def candidates(request):
 	return render(request, 'candidates-list-3.html')
+
+def candidate_dashboard(request):
+	return render(request, 'candidate-dashboard.html')
 
 def postjob(request):
 	return render(request, 'company-dashboard-new-job.html')

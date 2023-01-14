@@ -11,5 +11,6 @@ urlpatterns = [
 	path('jobs/', views.findjobs, name ='jobs'),
 	path('companies/', views.companies, name ='companies'),
 	path('candidates/', views.candidates, name ='candidates'),
+	path('candidate-dashboard/', views.candidate_dashboard, name ='candidate-dashboard'),
 	path('postjob/', views.postjob, name ='postjob'),
 ]
