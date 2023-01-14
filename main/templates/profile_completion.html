@@ -10,6 +10,7 @@
         <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/12.1.2/css/intlTelInput.css'>
         <link rel='stylesheet' href='https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css'>
         <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/jquery-nice-select/1.1.0/css/nice-select.min.css'>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.css"></link>
      
         <link rel="shortcut icon" href="{% static 'images/favicon.png' %}" type="image/x-icon">
         <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -76,7 +77,7 @@
                 <li class="active">Verify Phone</li>
                 <li>Personal Information</li>
                 <li>Work Profile</li>
-                <li>Upload Documents</li> 
+                <li>Upload Resume</li>
               </ul>
               <!-- fieldsets -->
 
@@ -96,21 +97,25 @@
                   <h6>A secret code is sent to your phone. <br>Please enter it here.</h6> 
                 </div>
                 <div class="code_group"> 
-                  <input type="text" class="form-control" placeholder="0" name="digit" id="otp_val1">
-                  <input type="text" class="form-control" placeholder="0" name="digit" id="otp_val2">
-                  <input type="text" class="form-control" placeholder="0" name="digit" id="otp_val3">
-                  <input type="text" class="form-control" placeholder="0" name="digit" id="otp_val4">
-                  <input type="text" class="form-control" placeholder="0" name="digit" id="otp_val5">
-                  <input type="text" class="form-control" placeholder="0" name="digit" id="otp_val6">
+                  <input type="text" class="form-control" placeholder="0" name="digit" id="otp_val1" maxlength=1 onkeyup="onKeyUpEvent(1, event)" onfocus="onFocusEvent(1)">
+                  <input type="text" class="form-control" placeholder="0" name="digit" id="otp_val2" maxlength=1 onkeyup="onKeyUpEvent(2, event)" onfocus="onFocusEvent(2)">
+                  <input type="text" class="form-control" placeholder="0" name="digit" id="otp_val3" maxlength=1 onkeyup="onKeyUpEvent(3, event)" onfocus="onFocusEvent(3)">
+                  <input type="text" class="form-control" placeholder="0" name="digit" id="otp_val4" maxlength=1 onkeyup="onKeyUpEvent(4, event)" onfocus="onFocusEvent(4)">
+                  <input type="text" class="form-control" placeholder="0" name="digit" id="otp_val5" maxlength=1 onkeyup="onKeyUpEvent(5, event)" onfocus="onFocusEvent(5)">
+                  <input type="text" class="form-control" placeholder="0" name="digit" id="otp_val6" maxlength=1 onkeyup="onKeyUpEvent(6, event)" onfocus="onFocusEvent(6)">
                 </div>
-                <button type="button" class="action-but2">Verify</button>
+                <button type="button" class="action-but2" style="color: green; background: white; border: 1px solid green">Verify</button>
             </div>
-                <button type="button" class="next action-button">Continue</button>  
+                <button type="button" class="next action-button" style="display: none" id="verifier">Continue</button>
               </fieldset>
 
 
               <fieldset>
-                <h3>Please enter details</h3> 
+                <h3>Please enter details</h3>
+                <div class="pxp-candidate-cover1 mb-3" style="display: flex; justify-content: center; align-items: center">
+                    <input type="file" id="pxp-candidate-cover-choose-file1" accept="image/*" name="photo">
+                    <label for="pxp-candidate-cover-choose-file1" class="pxp-cover" style="border-radius: 100%; width: 10rem"><span>Upload Photo</span></label>
+                </div>
                 <div class="form-group fg_2"> 
                   <input type="text" class="form-control" placeholder="Address" name="address">
                 </div> 
@@ -126,8 +131,8 @@
                   <div class="form-group fg_2"> 
                     <input type="text" class="form-control" placeholder="Other Qualifications" name="other">
                   </div> 
-                <button type="button" class="action-button previous previous_button">Back</button> 
-                <button type="button" class="next action-button">Continue</button>   
+                <button type="button" class="action-button previous previous_button" style="margin-bottom: 30px">Back</button> 
+                <button type="button" class="next action-button" style="margin-bottom: 30px">Continue</button>   
               </fieldset>
 
 
@@ -169,14 +174,16 @@
 
 
               <fieldset>
-                <h3>Verify Your Identity</h3>
-                <h4 style="text-align: center">Resume (in PDF only)</h4>
-                <div class="form-group fg_2">
+                <h4 style="text-align: center">Resume</h4>
+                {% comment %} <div class="form-group fg_2">
                     <input type="file" class="form-control" id="pxp-signin-page-email" placeholder="Upload Resume" name="resume" multiple="multiple" accept="application/pdf">
-                </div>
-                <h4 style="text-align: center">Photo</h4>
-                <div class="form-group fg_2">
-                    <input type="file" class="form-control" id="pxp-signin-page-email" placeholder="Upload Photo" name="photo" multiple="multiple" accept="image/*">
+                </div> {% endcomment %}
+                {% comment %} <div class="progress-bar1 mb-3">
+                    <span class="progress-bar-fill" style="width: 0%"></span>
+                </div> {% endcomment %}
+                <div class="pxp-candidate-cover2 mb-3" style="display: flex; justify-content: center; align-items: center">
+                    <input type="file" id="pxp-candidate-cover-choose-file2" accept="application/pdf" name="resume">
+                    <label for="pxp-candidate-cover-choose-file2" class="pxp-cover" style="border-radius: 1rem; width: 90%; height: 10vh"><span>Upload Resume</span></label>
                 </div>
                 <button type="button" class="action-button previous previous_button">Back</button>
                 <button  class="action-button" type="submit">Finish</button>
@@ -378,7 +385,7 @@
                     questionDiv.setAttribute('class', `single_question${totalQuestionCounta}a Ques`);
                     individualQuestion.setAttribute('class', 'individualQuestiona');
                     question.setAttribute('class', 'form-control specialInputQuestionsa');
-                    question.setAttribute('placeholder', 'Experience');
+                    question.setAttribute('placeholder', 'Experience (Role, company, timespan)');
                     question.setAttribute('id', `question${totalQuestionCounta}a`);
                     question.setAttribute('name', `experience`);
                     deleteButton.setAttribute('id', `${totalQuestionCounta}`);
@@ -490,6 +497,13 @@
                     success: function( data ) 
                     {
                         alert(`OTP is ${data.OTP}`)
+                        $('.action-but2').css('display', 'inline-block');
+                        document.getElementById('otp_val1').value="";
+                        document.getElementById('otp_val2').value="";
+                        document.getElementById('otp_val3').value="";
+                        document.getElementById('otp_val4').value="";
+                        document.getElementById('otp_val5').value="";
+                        document.getElementById('otp_val6').value="";
                     }
                  })
                 })
@@ -527,10 +541,36 @@
                         else
                         {
                             alert('Phone number verified');
+                            $('.action-but2').css('display', 'none');
+                            $('#verifier').click();
                         }
                     }
                     })
                 })
+
+                function getCodeBoxElement(index) {
+                    return document.getElementById('otp_val' + index);
+                  }
+                  function onKeyUpEvent(index, event) {
+                    const eventCode = event.which || event.keyCode;
+                    if (getCodeBoxElement(index).value.length === 1) {
+                      if (index !== 6) {
+                        getCodeBoxElement(index+ 1).focus();
+                      }
+                    }
+                    if (eventCode === 8 && index !== 1) {
+                      getCodeBoxElement(index - 1).focus();
+                    }
+                  }
+                  function onFocusEvent(index) {
+                    for (item = 1; item < index; item++) {
+                      const currentElement = getCodeBoxElement(item);
+                      if (!currentElement.value) {
+                          currentElement.focus();
+                          break;
+                      }
+                    }
+                  }
 
         </script>
     </body>

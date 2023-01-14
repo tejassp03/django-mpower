@@ -57,7 +57,11 @@
                 <div class="pxp-dashboard-side-user-nav">
                     <div class="dropdown pxp-dashboard-side-user-nav-dropdown dropup">
                         <a role="button" class="dropdown-toggle" data-bs-toggle="dropdown">
-                            <div class="pxp-dashboard-side-user-nav-avatar pxp-cover" style="background-image: url('{{ user.photo.url }}')"></div>
+                            {% if user.photo %}
+                                <div class="pxp-dashboard-side-user-nav-avatar pxp-cover" style="background-image: url('{{ user.photo.url }}')"></div>
+                            {% else %}
+                            <div class="pxp-dashboard-side-user-nav-avatar pxp-cover" style="background-image: url()"></div>
+                            {% endif %}
                             <div class="pxp-dashboard-side-user-nav-name">{{ user.name }}</div>
                         </a>
                         <ul class="dropdown-menu">
@@ -130,7 +134,11 @@
                     </div>
                     <div class="dropdown pxp-user-nav-dropdown">
                         <a role="button" class="dropdown-toggle" data-bs-toggle="dropdown">
-                            <div class="pxp-user-nav-avatar pxp-cover" style="background-image: url('{{ user.photo.url }}')"></div>
+                            {% if user.photo %}
+                                <div class="pxp-user-nav-avatar pxp-cover" style="background-image: url('{{ user.photo.url }}')"></div>
+                            {% else %}
+                            <div class="pxp-user-nav-avatar pxp-cover"  style="background-image: url()"></div>
+                            {% endif %}
                             <div class="pxp-user-nav-name d-none d-md-block">{{ user.name }}</div>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">

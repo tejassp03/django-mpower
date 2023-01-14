@@ -6907,10 +6907,10 @@ input[type=date]:focus::-webkit-datetime-edit {
     font: 500 13px/1 "Roboto", sans-serif;
   }
   .multi_step_form #msform #progressbar li:nth-child(2):before {
-    content: "\f12f";
+    content: '\f419';
   }
   .multi_step_form #msform #progressbar li:nth-child(3):before {
-    content: "\f12f";
+    content: "\f119";
   }
   .multi_step_form #msform #progressbar li:nth-child(4):before {
     content: "\f12f";
@@ -7201,4 +7201,69 @@ main.show {
 
 .finde{
     display: none;
+}
+
+.pxp-candidate-cover1 {
+    position: relative;
+}
+#pxp-candidate-cover-choose-file1{
+    height: 0;
+    width: 0;
+    overflow: hidden;
+    position: absolute;
+}
+#pxp-candidate-cover-choose-file1 + label{
+    display: flex;
+    border: 1px dashed rgba(0,0,0,1);
+    border-radius: 30px;
+    width: 100%;
+    height: 166px;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    text-align: center;
+}
+
+
+.pxp-candidate-cover2 {
+    position: relative;
+}
+#pxp-candidate-cover-choose-file2{
+    height: 0;
+    width: 0;
+    overflow: hidden;
+    position: absolute;
+}
+#pxp-candidate-cover-choose-file2 + label{
+    display: flex;
+    border: 1px dashed rgba(0,0,0,1);
+    border-radius: 30px;
+    width: 100%;
+    height: 166px;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    text-align: center;
+}
+
+.progress-bar1 {
+    width: calc(100% - 6px);
+    height: 23px;
+    padding: 3px;
+    border-radius: 3px;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, .2);
+    display: none;
+}
+
+.progress-bar-fill {
+    display: block;
+    height: 16px;
+    background: var(--pxpMainColor);
+    border-radius: 3px;
+    /*transition: width 250ms ease-in-out;*/
+    transition: width 5s ease-in-out;
 }

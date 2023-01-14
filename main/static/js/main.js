@@ -635,6 +635,47 @@
             }
         });
     }
+    // Upload candidate cover photo and logo
+    if ($('#pxp-candidate-cover-choose-file2').length > 0) {
+        const chooseCandidateCoverFile = document.getElementById('pxp-candidate-cover-choose-file2');
+
+        chooseCandidateCoverFile.addEventListener('change', function() {
+            const files = chooseCandidateCoverFile.files[0];
+
+            if (files) {
+                const fileReader = new FileReader();
+                fileReader.readAsDataURL(files);
+                fileReader.addEventListener("load", function() {
+                    $('#pxp-candidate-cover-choose-file2').next('label').text(files.name).find('span').hide();
+                    $('.progress-bar1').delay(0).queue(function () {
+                        $(this).css('display', 'block')
+                    });
+                    $('.progress-bar-fill').delay(1000).queue(function () {
+                        $(this).css('width', '100%')
+                    });
+                });
+            }
+        });
+    }
+    if ($('#pxp-candidate-cover-choose-file1').length > 0) {
+        const chooseCandidateCoverFile = document.getElementById('pxp-candidate-cover-choose-file1');
+
+        chooseCandidateCoverFile.addEventListener('change', function() {
+            const files = chooseCandidateCoverFile.files[0];
+
+            if (files) {
+                const fileReader = new FileReader();
+
+                fileReader.readAsDataURL(files);
+                fileReader.addEventListener("load", function() {
+                    $('#pxp-candidate-cover-choose-file1').next('label').css({
+                        'background-image': 'url(' + this.result + ')',
+                        'border': '0 none'
+                    }).find('span').hide();
+                });
+            }
+        });
+    }
     if ($('#pxp-candidate-photo-choose-file').length > 0) {
         const chooseCandidatePhotoFile = document.getElementById('pxp-candidate-photo-choose-file');
 
@@ -654,6 +695,7 @@
             }
         });
     }
+
 
     // Toogle side filter on mobile
     $('.pxp-list-side-filter-header a').on('click', function() {

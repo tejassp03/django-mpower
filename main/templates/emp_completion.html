@@ -51,6 +51,29 @@
                 align-items: center;
                 margin: 10px 10px;
             }
+            .multi_step_form #msform #progressbar li:nth-child(2):before {
+                content: '\f149';
+              }
+              .multi_step_form #msform #progressbar li:nth-child(3):before {
+                content: "\f276";
+              }
+              .multi_step_form #msform #progressbar li:nth-child(4):before {
+                content: "\f119";
+              }
+              .multi_step_form #msform #progressbar li:nth-child(5):before {
+                content: "\f276";
+              }
+              .multi_step_form #msform #progressbar li:before {
+                content: "\f1fa";
+                font: normal normal normal 30px/50px Ionicons;
+                width: 50px;
+                height: 50px;
+                line-height: 50px;
+                display: block;
+                background: #eaf0f4;
+                border-radius: 50%;
+                margin: 0 auto 10px auto;
+              }
         </style>
     </head>
    
@@ -110,6 +133,10 @@
 
               <fieldset>
                 <h3>Please enter details</h3> 
+                <div class="pxp-candidate-cover1 mb-3" style="display: flex; justify-content: center; align-items: center">
+                    <input type="file" id="pxp-candidate-cover-choose-file1" accept="image/*" name="logo">
+                    <label for="pxp-candidate-cover-choose-file1" class="pxp-cover" style="border-radius: 100%; width: 10rem"><span>Upload Logo</span></label>
+                </div>
                 <div class="form-group fg_2"> 
                   <input type="text" class="form-control" placeholder="Employer Type" name="etype">
                 </div>
@@ -119,10 +146,7 @@
                   <div class="form-group fg_2"> 
                     <input type="text" class="form-control" placeholder="Executive" name="executive">
                   </div>
-                  <div class="form-group fg_2">
-                    <label style="width: 25;
-                    padding: 0 20px; padding: 0px 20px">Upload Logo</label><input type="file" class="form-control" id="pxp-signin-page-email" placeholder="Upload Logo" name="logo" multiple="multiple" accept="image/*">
-                </div>
+                  
                 <button type="button" class="action-button previous previous_button">Back</button> 
                 <button type="button" class="next action-button">Continue</button>   
               </fieldset>
@@ -461,6 +485,13 @@
                     success: function( data ) 
                     {
                         alert(`OTP is ${data.OTP}`)
+                        $('.action-but2').css('display', 'inline-block');
+                        document.getElementById('otp_val1').value="";
+                        document.getElementById('otp_val2').value="";
+                        document.getElementById('otp_val3').value="";
+                        document.getElementById('otp_val4').value="";
+                        document.getElementById('otp_val5').value="";
+                        document.getElementById('otp_val6').value="";
                     }
                  })
                 })
@@ -498,6 +529,7 @@
                         else
                         {
                             alert('Phone number verified');
+                            $('.action-but2').css('display', 'none');
                         }
                     }
                     })

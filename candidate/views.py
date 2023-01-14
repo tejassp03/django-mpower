@@ -3,9 +3,10 @@ from main.models import JobSeeker, Employer, Jobs, Application, Selection, Login
 from json import dumps
 # Create your views here.
 def dashboard(request, pk):
-    context = JobSeeker.objects.get(log_id=pk)
-    applics = list(Application.objects.filter(user_id=context.user_id).values())
-    fordates = Application.objects.filter(user_id=context.user_id).order_by('-date_applied')
+    # print(request.session['email'])
+    context = JobSeeker.objects.get(user_id=pk)
+    applics = list(Application.objects.filter(user_id=pk).values())
+    fordates = Application.objects.filter(user_id=pk).order_by('-date_applied')
     for i in applics:
         emplo = list(Employer.objects.filter(eid=i.emp_id).values())
         jobo = list(Jobs.objects.filter(jobid=i.job_id).values())
@@ -19,8 +20,8 @@ def dashboard(request, pk):
     return render(request, 'dashboard-candidate.html', {'user': context, 'applications': applics, 'pk': pk})
 
 def edit_profile(request, pk):
-    context = JobSeeker.objects.get(log_id=pk)
-    email = Login.objects.get(log_id=pk)
+    context = JobSeeker.objects.get(user_id=pk)
+    email = Login(context.log_id)
     skills=context.skills.split(",")
     for i in skills:
         if i=="":

@@ -4,6 +4,7 @@ from django.contrib import messages
 from .models import JobSeeker, Login, Employer
 import random
 import re
+from django.contrib.auth.hashers import make_password, check_password
 
 from datetime import datetime
 from django.core.exceptions import ObjectDoesNotExist
@@ -20,8 +21,13 @@ def index(request):
 				messages.error(request, "Invalid credentials")
 				return render(request, 'index.html')
 			else:
-				if(user[0].password == request.POST['c_pass']):
-					return redirect("candidate:dashboard", pk=user[0].log_id)
+				if(check_password(request.POST['c_pass'], user[0].password)):
+					jobseeker=JobSeeker.objects.get(log_id=user[0].log_id)
+					if((jobseeker.phone==None or jobseeker.phone=="") and (jobseeker.location==None or jobseeker.location=="") and (jobseeker.experience==None or jobseeker.experience=="") and (jobseeker.skills==None or jobseeker.skills=="") and (jobseeker.basic_edu==None or jobseeker.basic_edu=="") and (jobseeker.master_edu==None or jobseeker.master_edu=="") and (jobseeker.other_qual==None or jobseeker.other_qual=="") and (jobseeker.dob==None or jobseeker.dob=="") and (jobseeker.Resume=="" or jobseeker.Resume==None) and (jobseeker.photo=="" or jobseeker.photo==None)):
+						return redirect('main:profilecompletion', pk=user[0].log_id)
+					request.session['email'] = request.POST['c_email']
+					request.session['password'] = request.POST['c_pass']
+					return redirect("candidate:dashboard", pk=jobseeker.user_id)
 				else:
 					messages.error(request, "Invalid credentials")
 		else:
@@ -52,6 +58,10 @@ def register(request):
 		if request.POST['name']=="" or request.POST['email']=="" or request.POST['password']=="" or request.POST['conpass']=="":
 			messages.error(request, "Dont forget to fill out every field with the appropriate information")
 			return redirect('main:index')
+		all_login = Login.objects.filter(email = request.POST['email'])
+		if(len(all_login)!=0):
+			messages.success(request, 'Email address already in use, please enter some other email')
+			return redirect('main:index')
 		if(request.POST['password']!=request.POST['conpass']):
 			messages.error(request, "Both your password and your confirmation password must be exactly same")
 			return redirect('main:index')
@@ -60,7 +70,7 @@ def register(request):
 			return redirect('main:index')
 		user=Login()
 		user.email = request.POST['email']
-		user.password = request.POST['password']
+		user.password = make_password(request.POST['password'])
 		user.user_type = request.POST['user']
 		user.save()
 		if(request.POST['user']=="candidate"):
@@ -103,6 +113,17 @@ def findjobs(request):
 
 def profile_completion(request, pk):
 	if request.method=='POST':
+		flag=True
+		for i in request.POST.getlist('skill'):
+			if i!="":
+				flag=False
+		flag1=True
+		for i in request.POST.getlist('experience'):
+			if i!="":
+				flag1=False
+		if(request.POST['mobile']=="" and request.POST['address']=="" and request.POST['dob']=="" and request.POST['basic']=="" and request.POST['master']=="" and request.POST['other']=="" and flag==True and flag1==True and len(request.FILES)==0):
+			messages.success(request, 'Please enter at least one of the fields')
+			return redirect('main:profilecompletion', pk=pk)
 		jobseeker=JobSeeker.objects.get(log_id=pk)
 		jobseeker.phone=request.POST['code']+request.POST['mobile']
 		jobseeker.location=request.POST['address']
@@ -152,11 +173,20 @@ def profile_completion(request, pk):
 		except:
 			filev=None
 		jobseeker.save()
+		loger = Login.objects.get(log_id=pk)
+		request.session['email'] = loger.email
+		request.session['password'] = loger.password
+		return redirect("candidate:dashboard", pk=jobseeker.user_id)
+	if(len(Login.objects.filter(log_id=pk, user_type="candidate"))==0):
+		return redirect('main:index')
 	return render(request, 'profile_completion.html')
 
 
 def emp_completion(request, pk):
 	if request.method=="POST":
+		if(request.POST['code']=="" and request.POST['mobile']=="" and request.POST['etype']=="" and request.POST['industry']=="" and request.POST['executive']==""  and len(request.FILES)==0 and request.POST['address']=="" and request.POST['pincode']=="" and request.POST['location']=="" and request.POST['profile']==""):
+			messages.success(request, 'Please enter at least one of the fields')
+			return redirect('main:eprofile', pk=pk)
 		employer=Employer.objects.get(log_id=pk)
 		employer.phone=request.POST['code']+request.POST['mobile']
 		employer.etype=request.POST['etype']
@@ -175,6 +205,8 @@ def emp_completion(request, pk):
 		employer.location=request.POST['location']
 		employer.profile=request.POST['profile']
 		employer.save()
+	if(len(Login.objects.filter(log_id=pk, user_type="employer"))==0):
+		return redirect('main:index')
 	return render(request, 'emp_completion.html')
 
 
