@@ -13,25 +13,36 @@ import base64
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 
+@csrf_exempt
 def index(request):
 	if request.method == 'POST':
-		if request.POST['user'] == 'candidate':
-			user=Login.objects.filter(email=request.POST['c_email'])
-			if(len(user)==0):
-				messages.error(request, "Invalid credentials")
-				return render(request, 'index.html')
-			else:
-				if(check_password(request.POST['c_pass'], user[0].password)):
-					jobseeker=JobSeeker.objects.get(log_id=user[0].log_id)
-					if((jobseeker.phone==None or jobseeker.phone=="") and (jobseeker.location==None or jobseeker.location=="") and (jobseeker.experience==None or jobseeker.experience=="") and (jobseeker.skills==None or jobseeker.skills=="") and (jobseeker.basic_edu==None or jobseeker.basic_edu=="") and (jobseeker.master_edu==None or jobseeker.master_edu=="") and (jobseeker.other_qual==None or jobseeker.other_qual=="") and (jobseeker.dob==None or jobseeker.dob=="") and (jobseeker.Resume=="" or jobseeker.Resume==None) and (jobseeker.photo=="" or jobseeker.photo==None)):
-						return redirect('main:profilecompletion', pk=user[0].log_id)
-					request.session['email'] = request.POST['c_email']
-					request.session['password'] = request.POST['c_pass']
-					return redirect("candidate:dashboard", pk=jobseeker.user_id)
-				else:
-					messages.error(request, "Invalid credentials")
+		user=Login.objects.filter(email=request.POST['c_email'])
+		if(len(user)==0):
+			return JsonResponse({'message': 'X'})
 		else:
-			print("employer")
+			if(check_password(request.POST['c_pass'], user[0].password)):
+				if(request.POST['user'] == 'candidate'):
+					jobseeker=JobSeeker.objects.get(log_id=user[0].log_id)
+					if((jobseeker.phone==None or jobseeker.phone=="" or len(jobseeker.phone)<=4) and (jobseeker.location==None or jobseeker.location=="") and (jobseeker.experience==None or jobseeker.experience=="") and (jobseeker.skills==None or jobseeker.skills=="") and (jobseeker.basic_edu==None or jobseeker.basic_edu=="") and (jobseeker.master_edu==None or jobseeker.master_edu=="") and (jobseeker.other_qual==None or jobseeker.other_qual=="") and (jobseeker.dob==None or jobseeker.dob=="") and (jobseeker.Resume=="" or jobseeker.Resume==None) and (jobseeker.photo=="" or jobseeker.photo==None)):
+						urlval="profile_completion/"+str(user[0].log_id)
+						return JsonResponse({'message': 'Y', 'url': urlval})
+					# return redirect('main:profilecompletion', pk=user[0].log_id)
+				elif(request.POST['user'] == 'employer'):
+					employer=Employer.objects.get(log_id=user[0].log_id)
+					if((employer.etype==None or employer.etype=="") and (employer.industry==None or employer.industry=="") and (employer.address==None or employer.address=="") and (employer.pincode==None or employer.pincode=="") and (employer.executive==None or employer.executive=="") and (employer.phone==None or employer.phone=="" or len(employer.phone)<=4) and (employer.location==None or employer.location=="") and (employer.profile==None or employer.profile=="") and (employer.logo=="" or employer.logo==None)):
+						urlval="emp_completion/"+str(user[0].log_id)
+						return JsonResponse({'message': 'Y', 'url': urlval})
+				request.session['email'] = request.POST['c_email']
+				request.session['password'] = request.POST['c_pass']
+				empls=JobSeeker.objects.get(log_id=user[0].log_id)
+				request.session['name']=empls.name
+				if(request.POST['user'] == 'candidate'):
+					urlval="candidate/"+str(jobseeker.user_id)
+					return JsonResponse({'message': 'Y', 'url': urlval})
+				else:
+					return JsonResponse({'message': 'Y', 'url': "/"})
+			else:
+				return JsonResponse({'message': 'X'})
 	return render(request, 'index.html')
 
 def view_function(request):
@@ -113,15 +124,11 @@ def findjobs(request):
 
 def profile_completion(request, pk):
 	if request.method=='POST':
-		flag=True
-		for i in request.POST.getlist('skill'):
-			if i!="":
-				flag=False
 		flag1=True
 		for i in request.POST.getlist('experience'):
 			if i!="":
 				flag1=False
-		if(request.POST['mobile']=="" and request.POST['address']=="" and request.POST['dob']=="" and request.POST['basic']=="" and request.POST['master']=="" and request.POST['other']=="" and flag==True and flag1==True and len(request.FILES)==0):
+		if(request.POST['mobile']=="" and request.POST['address']=="" and request.POST['dob']=="" and request.POST['basic']=="" and request.POST['master']=="" and request.POST['other']=="" and len(request.POST.getlist('skills'))==0 and flag1==True and len(request.FILES)==0):
 			messages.success(request, 'Please enter at least one of the fields')
 			return redirect('main:profilecompletion', pk=pk)
 		jobseeker=JobSeeker.objects.get(log_id=pk)
@@ -131,7 +138,7 @@ def profile_completion(request, pk):
 		jobseeker.basic_edu=request.POST['basic']
 		jobseeker.master_edu=request.POST['master']
 		jobseeker.other_qual=request.POST['other']
-		skills = request.POST.getlist('skill')
+		skills = request.POST.getlist('skills')
 		all_skills=""
 		if(len(skills)==1):
 			all_skills=skills[0]

@@ -7,7 +7,7 @@ app_name = 'candidate'
 
 urlpatterns = [
 	path('', views.dashboard, name ='dashboard'),
-	path('edit_profile/', views.edit_profile, name='edit')
+	path('edit_profile/', views.edit_profile, name='edit'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 # if settings.DEBUG:

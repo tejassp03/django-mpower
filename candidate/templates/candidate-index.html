@@ -62,7 +62,7 @@
                             {% else %}
                             <div class="pxp-dashboard-side-user-nav-avatar pxp-cover" style="background-image: url()"></div>
                             {% endif %}
-                            <div class="pxp-dashboard-side-user-nav-name">{{ user.name }}</div>
+                            <div class="pxp-dashboard-side-user-nav-name">{{ request.session.name }}</div>
                         </a>
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="{% url 'candidate:dashboard' pk=pk %}">Dashboard</a></li>
@@ -139,7 +139,7 @@
                             {% else %}
                             <div class="pxp-user-nav-avatar pxp-cover"  style="background-image: url()"></div>
                             {% endif %}
-                            <div class="pxp-user-nav-name d-none d-md-block">{{ user.name }}</div>
+                            <div class="pxp-user-nav-name d-none d-md-block">{{ request.session.name }}</div>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li><a class="dropdown-item" href="{% url 'candidate:dashboard' pk=pk %}">Dashboard</a></li>

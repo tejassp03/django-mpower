@@ -597,9 +597,11 @@
                     <div class="modal-header" style="padding: 20px">
                         {% comment %} <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> {% endcomment %}
                         <div class="tabs activer" id="tab01">
+                            <input value="candidate" style="display: none" name="user"/>
                             <h6 class="font-weight-bold" style="margin-bottom: 0px !important">Candidate</h6>
                         </div>
                         <div class="tabs" id="tab02">
+                            <input value="employer" style="display: none" name="user"/>
                             <h6 class="text-muted" style="margin-bottom: 0px !important">Employer</h6>
                         </div>
                     </div>
@@ -608,10 +610,13 @@
                             <div class="pxp-user-modal-fig text-center">
                                 <img src="{% static 'images/signin-fig.png' %}" alt="Sign in">
                             </div>
+                            <div>
+                                <p id="signer"></p>
+                            </div>
                         <h5 class="modal-title text-center mt-4" id="signinModal">Candidate Sign-In</h5>
                         <form class="mt-4" method="post">
                             {% csrf_token %}
-                            <input value="candidate" style="display: none" name="user"/>
+                            {% comment %} <input value="candidate" style="display: none" name="user"/> {% endcomment %}
                             <div class="form-floating mb-3">
                                 <input type="email" class="form-control" name="c_email" id="pxp-signin-email" placeholder="Email address">
                                 <label for="pxp-signin-email">Email address</label>
@@ -622,7 +627,7 @@
                                 <label for="pxp-signin-password">Password</label>
                                 <span class="fa fa-lock"></span>
                             </div>
-                            <input type="submit" value="Sign in" class="btn rounded-pill pxp-modal-cta" style="width: 100%">
+                            <input type="button" value="Sign in" class="btn rounded-pill pxp-modal-cta signinbut" style="width: 100%">
                             <div class="mt-4 text-center pxp-modal-small">
                                 <a href="#" class="pxp-modal-link">Forgot password</a>
                             </div>
@@ -637,21 +642,24 @@
                         <div class="pxp-user-modal-fig text-center">
                             <img src="{% static 'images/signin-fig.png' %}" alt="Sign in">
                         </div>
+                        <div>
+                            <p id="signer2"></p>
+                        </div>
                         <h5 class="modal-title text-center mt-4" id="empModal">Employer Sign-In</h5>
                         <form class="mt-4" method="post">
                             {% csrf_token %}
-                            <input value="employer" style="display: none" name="user"/>
+                            {% comment %} <input value="employer" style="display: none" name="user"/> {% endcomment %}
                             <div class="form-floating mb-3">
-                                <input type="email" class="form-control" id="pxp-signin-email" placeholder="Email address">
+                                <input type="email" class="form-control" id="pxp-signin-email" placeholder="Email address" name="e_email">
                                 <label for="pxp-signin-email">Email address</label>
                                 <span class="fa fa-envelope-o"></span>
                             </div>
                             <div class="form-floating mb-3">
-                                <input type="password" class="form-control" id="pxp-signin-password" placeholder="Password">
+                                <input type="password" class="form-control" id="pxp-signin-password" placeholder="Password" name="e_pass">
                                 <label for="pxp-signin-password">Password</label>
                                 <span class="fa fa-lock"></span>
                             </div>
-                            <input type="submit" value="Log in" class="btn rounded-pill pxp-modal-cta" style="width: 100%">
+                            <input type="button" value="Log in" class="btn rounded-pill pxp-modal-cta signinbut" style="width: 100%"></input>
                             <div class="mt-4 text-center pxp-modal-small">
                                 <a href="#" class="pxp-modal-link">Forgot password</a>
                             </div>
@@ -854,6 +862,63 @@
                     }
                 });
             });
+
+            $('.signinbut').click(function(){
+                let user=$('.activer input').val();
+                if(user=="candidate")
+                {
+                    c_email=$('[name="c_email"]').val();
+                    c_pass=$('[name="c_pass"]').val();
+                }
+                else
+                {
+                    c_email=$('[name="e_email"]').val();
+                    c_pass=$('[name="e_pass"]').val();
+                }
+                $.ajax(
+                {
+                    type:"POST",
+                    url: "/",
+                    data:{
+                            user: user,
+                            c_email: c_email,
+                            c_pass: c_pass,
+                    },
+                    success: function( data ) 
+                    {
+                        if(data['message']=='X')
+                        {
+                            if($('.activer').attr("id")=="tab01")
+                            {
+                                $('#signer').text('Invalid credentials')
+                                $('#signer').css({'display': 'block'})
+                            }
+                            else
+                            {
+                                $('#signer2').text('Invalid credentials')
+                                $('#signer2').css({'display': 'block'})
+                            }
+                        }
+                        if(data['message']=='Y')
+                        {
+                            if($('.activer').attr("id")=="tab01")
+                            {
+                                $('#signer').css({'display': 'block'})
+                                $('#signer').text('Login Successful')
+                                $('#signer').css({'background': 'green', 'border': '1px solid green'})
+                            }
+                            else
+                            {
+                                $('#signer2').css({'display': 'block'})
+                                $('#signer2').text('Login Successful')
+                                $('#signer2').css({'background': 'green', 'border': '1px solid green'})
+                            }
+                            setTimeout(() => {FetchData();}, 1000)
+                            window.location = data['url'];
+                        }
+                    }
+                 })
+                 })
         </script>
     </body>
 </html>

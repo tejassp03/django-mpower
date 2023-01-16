@@ -27,6 +27,8 @@ class JobSeeker(models.Model):
     dob = models.CharField(max_length=50, default=None, null=True)
     Resume = models.FileField(upload_to='resumes/', default=None, null=True)
     photo = models.ImageField(upload_to='photos/', default=None, null=True)
+    title = models.CharField(max_length=200, default=None, null=True)
+    about = models.CharField(max_length=700, default=None, null=True)
     def pass_to_list(self):
         return self.skills.split(',')
     class Meta:
@@ -86,4 +88,23 @@ class Selection(models.Model):
     class Meta:
         db_table = "selection"
 
+class ExperienceJob(models.Model):
+    exp_id = models.AutoField(primary_key=True)
+    user_id = models.ForeignKey(JobSeeker, default=None, null=True, on_delete=models.CASCADE)
+    job_title = models.CharField(max_length=100, default=None, null=True)
+    company = models.CharField(max_length=200, default=None, null=True)
+    time_period = models.CharField(max_length=50, default=None, null=True)
+    description = models.CharField(max_length=500, default=None, null=True)
+    class Meta:
+        db_table = "experiencejob"
+
+class Education(models.Model):
+    edu_id = models.AutoField(primary_key=True)
+    user_id = models.ForeignKey(JobSeeker, default=None, null=True, on_delete=models.CASCADE)
+    title = models.CharField(max_length=100, default=None, null=True)
+    school = models.CharField(max_length=200, default=None, null=True)
+    time_period = models.CharField(max_length=50, default=None, null=True)
+    description = models.CharField(max_length=500, default=None, null=True)
+    class Meta:
+        db_table = "education"
 
