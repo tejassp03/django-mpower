@@ -74,7 +74,7 @@
             <div class="pxp-candidate-dashboard-skills mb-3">
                 <ul class="list-unstyled">
                     {% for i in skills %}
-                    <li>{{ i }}<span class="fa fa-trash-o"></span></li>
+                    <li>{{ i }}<button title="Delete" class="delete_skill"><input style="display: none" value={{ i }} /><span class="fa fa-trash-o"></span></button></li>
                     {% endfor %}
                 </ul>
             </div>
@@ -97,7 +97,7 @@
                             <div class="pxp-dashboard-table-options">
                                 <ul class="list-unstyled">
                                     <li><button title="Edit"><span class="fa fa-pencil"></span></button></li>
-                                    <li><button title="Delete"><span class="fa fa-trash-o"></span></button></li>
+                                    <li><button title="Delete" class="delete"><input style="display: none" value={{ i.exp_id }} /><span class="fa fa-trash-o"></span></button></li>
                                 </ul>
                             </div>
                         </td>
@@ -146,7 +146,7 @@
                             <div class="pxp-dashboard-table-options">
                                 <ul class="list-unstyled">
                                     <li><button title="Edit"><span class="fa fa-pencil"></span></button></li>
-                                    <li><button title="Delete"><span class="fa fa-trash-o"></span></button></li>
+                                    <li><button title="Delete" class="delete_edu"><input style="display: none" value={{ i.edu_id }} /><span class="fa fa-trash-o"></span></button></li>
                                 </ul>
                             </div>
                         </td>
@@ -188,3 +188,70 @@
     </form>
 </div>
 {% endblock content %}
+
+{% block script %}
+$('.addexper').click(function(e){
+    e.preventDefault()
+    $.ajax(
+    {
+        type:"POST",
+        url: "add_exp/",
+        data:{
+                title: $('[name="title"]').val(),
+                school: $('[name="school"]').val(),
+                period_edu: $('[name="period_edu"]').val(),
+                desc: $('[name="desc"]').val(),
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+        },
+        success: function( data ) 
+        {
+           window.location.reload();
+        }
+     })
+})
+$('.delete_skill').click(function(e){
+    $.ajax(
+    {
+        type:"POST",
+        url: "delete_skill/",
+        data:{
+                val: $(this).children()[0].value,
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+        },
+        success: function( data ) 
+        {
+           window.location.reload();
+        }
+     })
+})
+$('.delete').click(function(e){
+    $.ajax(
+    {
+        type:"POST",
+        url: "delete_exp/",
+        data:{
+                id: $(this).children()[0].value,
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+        },
+        success: function( data ) 
+        {
+           window.location.reload();
+        }
+     })
+})
+$('.delete_edu').click(function(e){
+    $.ajax(
+    {
+        type:"POST",
+        url: "delete_edu/",
+        data:{
+                id: $(this).children()[0].value,
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+        },
+        success: function( data ) 
+        {
+           window.location.reload();
+        }
+     })
+})
+{% endblock %}

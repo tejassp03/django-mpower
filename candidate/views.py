@@ -22,6 +22,8 @@ def dashboard(request, pk):
 
 
 def edit_profile(request, pk):
+    if(request.method=="DELETE"):
+        print("cehck")
     if(request.method=="POST" and request.POST['skill']):
         user = JobSeeker.objects.get(user_id=pk)
         if(user.skills):
@@ -75,6 +77,56 @@ def edit_profile(request, pk):
         if i=="":
             skills.remove(i)
     return render(request, 'profile-candidate.html', {'user': context, 'pk': pk, 'log': request.session['email'], 'skills': skills, 'experience': experience, 'education': education})
+
+
+def add_exp(request, pk):
+    if(request.method=="POST"):
+        edu = ExperienceJob()
+        user=JobSeeker.objects.get(user_id=pk)
+        edu.user_id=user
+        edu.title=request.POST['title']
+        edu.school=request.POST['school']
+        edu.time_period=request.POST['period_edu']
+        edu.description=request.POST['desc']
+        edu.save()
+    return redirect('candidate:edit', pk=pk)
+
+# @csrf_exempt
+def delete_skill(request, pk):
+    if request.method == "POST":
+        skill=JobSeeker.objects.get(user_id=pk)
+        skills=skill.skills.split(',')
+        for i in skills:
+            if i==request.POST['val']:
+                skills.remove(i)
+        final=""
+        for i in skills:
+            if i!="":
+             final=final+","+i
+        if(len(final)>0):
+            if(final[0]==","):
+                final=final[1:len(final)]
+            if(final[-1]==","):
+                final=final[0:len(final)-1]
+        skill.skills=final
+        skill.save()
+    return redirect('candidate:edit', pk=pk)
+
+
+# @csrf_exempt
+def delete_exp(request, pk):
+    if request.method == "POST":
+        exp = ExperienceJob.objects.get(exp_id=request.POST['id'])
+        exp.delete()
+    return redirect('candidate:edit', pk=pk)
+
+# @csrf_exempt
+def delete_edu(request, pk):
+    if request.method == "POST":
+        edu = Education.objects.get(edu_id=request.POST['id'])
+        edu.delete()
+    return redirect('candidate:edit', pk=pk)
+
 
 # def add_skill(request, pk):
 #     context = JobSeeker.objects.get(user_id=pk)
