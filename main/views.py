@@ -36,6 +36,8 @@ def index(request):
 				request.session['password'] = request.POST['c_pass']
 				empls=JobSeeker.objects.get(log_id=user[0].log_id)
 				request.session['name']=empls.name
+				if(empls.photo):
+					request.session['photo']=empls.photo.url
 				if(request.POST['user'] == 'candidate'):
 					urlval="candidate/"+str(jobseeker.user_id)
 					return JsonResponse({'message': 'Y', 'url': urlval})

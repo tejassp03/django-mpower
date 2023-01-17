@@ -51,8 +51,8 @@
                 <div class="form-label">&nbsp;</div>
                 <div class="pxp-candidate-cover mb-3">
                     <input type="file" id="pxp-candidate-cover-choose-file" accept="image/*" width="100%" height="166px" name="photo">
-                    {% if user.photo %}
-                        <label for="pxp-candidate-cover-choose-file" class="pxp-cover" style="background-image: url('{{ user.photo.url }}')"><span>Update Photo</span></label>
+                    {% if request.session.photo %}
+                        <label for="pxp-candidate-cover-choose-file" class="pxp-cover" style="background-image: url('{{ request.session.photo }}')"><span>Update Photo</span></label>
                     {% else %}
                         <label for="pxp-candidate-cover-choose-file" class="pxp-cover"><span>Upload Photo</span></label>
                     {% endif %}
@@ -74,7 +74,7 @@
             <div class="pxp-candidate-dashboard-skills mb-3">
                 <ul class="list-unstyled">
                     {% for i in skills %}
-                    <li>{{ i }}<button title="Delete" class="delete_skill"><input style="display: none" value={{ i }} /><span class="fa fa-trash-o"></span></button></li>
+                    <li>{{ i }}<button class="delete_skill" style="border: none; padding: 0px; margin: 0px; background: none"><input style="display: none" value={{ i }} /><span class="fa fa-trash-o"></span></button></li>
                     {% endfor %}
                 </ul>
             </div>
@@ -96,8 +96,8 @@
                         <td>
                             <div class="pxp-dashboard-table-options">
                                 <ul class="list-unstyled">
-                                    <li><button title="Edit"><span class="fa fa-pencil"></span></button></li>
-                                    <li><button title="Delete" class="delete"><input style="display: none" value={{ i.exp_id }} /><span class="fa fa-trash-o"></span></button></li>
+                                    <li><button title="Edit" id="pxp-signup-modal-button" onclick="return false;" data-bs-target="#pxp-signup-modal" data-bs-toggle="modal"><span class="fa fa-pencil"></span></button></li>
+                                    <li><button title="Delete" class="delete_exp"><input style="display: none" value={{ i.exp_id }} /><span class="fa fa-trash-o"></span></button></li>
                                 </ul>
                             </div>
                         </td>
@@ -145,7 +145,7 @@
                         <td>
                             <div class="pxp-dashboard-table-options">
                                 <ul class="list-unstyled">
-                                    <li><button title="Edit"><span class="fa fa-pencil"></span></button></li>
+                                    <li><button title="Edit" data-bs-target="#pxp-signup-modal" onclick="return false;"  data-bs-toggle="modal"><span class="fa fa-pencil"></span></button></li>
                                     <li><button title="Delete" class="delete_edu"><input style="display: none" value={{ i.edu_id }} /><span class="fa fa-trash-o"></span></button></li>
                                 </ul>
                             </div>
@@ -159,7 +159,7 @@
                 <div class="col-md-4">
                     <div class="mb-3">
                         <label for="pxp-candidate-edu-title" class="form-label">Title</label>
-                        <input type="text" id="pxp-candidate-edu-title" class="form-control" placeholder="E.g. Architecure" name="title">
+                        <input type="text" id="pxp-candidate-edu-title" class="form-control" placeholder="E.g. Architecure" name="edu_title">
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -179,7 +179,7 @@
                 <label for="pxp-candidate-edu-about" class="form-label">Description</label>
                 <textarea class="form-control pxp-smaller" id="pxp-candidate-edu-about" placeholder="Type a short description here..."  name="desc"></textarea>
             </div>
-            <button class="btn rounded-pill pxp-subsection-cta">Add Education</button>
+            <button class="btn rounded-pill pxp-subsection-cta addedu">Add Education</button>
         </div>
 
         <div class="mt-4 mt-lg-5">
@@ -187,9 +187,37 @@
         </div>
     </form>
 </div>
+<div class="modal fade pxp-user-modal" id="pxp-signup-modal" aria-hidden="true" aria-labelledby="signupModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="pxp-user-modal-fig text-center">
+                    <img src="{% static 'images/underconstruction.png' %}" alt="Sign up">
+                </div>
+                <h5 class="modal-title text-center mt-4" id="signupModal">Under Development</h5>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock content %}
 
 {% block script %}
+$('.skilladder').click(function(e){
+    e.preventDefault()
+    $.ajax(
+    {
+        type:"POST",
+        url: "add_skill/",
+        data:{
+                skill: $('[name="skill"]').val(),
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+        },
+        success: function( data ) 
+        {
+           window.location.reload();
+        }
+     })
+})
 $('.addexper').click(function(e){
     e.preventDefault()
     $.ajax(
@@ -197,7 +225,26 @@ $('.addexper').click(function(e){
         type:"POST",
         url: "add_exp/",
         data:{
-                title: $('[name="title"]').val(),
+                title: $('[name="job_title"]').val(),
+                company: $('[name="company"]').val(),
+                time_period: $('[name="time_period"]').val(),
+                description: $('[name="description"]').val(),
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+        },
+        success: function( data ) 
+        {
+           window.location.reload();
+        }
+     })
+})
+$('.addedu').click(function(e){
+    e.preventDefault()
+    $.ajax(
+    {
+        type:"POST",
+        url: "add_edu/",
+        data:{
+                title: $('[name="edu_title"]').val(),
                 school: $('[name="school"]').val(),
                 period_edu: $('[name="period_edu"]').val(),
                 desc: $('[name="desc"]').val(),
@@ -210,6 +257,7 @@ $('.addexper').click(function(e){
      })
 })
 $('.delete_skill').click(function(e){
+    e.preventDefault()
     $.ajax(
     {
         type:"POST",
@@ -224,7 +272,8 @@ $('.delete_skill').click(function(e){
         }
      })
 })
-$('.delete').click(function(e){
+$('.delete_exp').click(function(e){
+    e.preventDefault()
     $.ajax(
     {
         type:"POST",
@@ -240,6 +289,7 @@ $('.delete').click(function(e){
      })
 })
 $('.delete_edu').click(function(e){
+    e.preventDefault()
     $.ajax(
     {
         type:"POST",
@@ -254,4 +304,7 @@ $('.delete_edu').click(function(e){
         }
      })
 })
+$('#pxp-signup-modal-button').on('click', function() {
+    $('#pxp-signup-modal').show();
+});
 {% endblock %}

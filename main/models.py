@@ -108,3 +108,11 @@ class Education(models.Model):
     class Meta:
         db_table = "education"
 
+class ProfileVisits(models.Model):
+    visit_id = models.AutoField(primary_key=True)
+    user_id = models.ForeignKey(JobSeeker, default=None, null=True, on_delete=models.DO_NOTHING)
+    e_id = models.ForeignKey(Employer, default=None, null=True, on_delete=models.DO_NOTHING)
+    visiting_time = models.DateTimeField(default=timezone.now)
+    class Meta:
+        db_table = "profilevisits"
+

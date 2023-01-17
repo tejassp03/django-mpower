@@ -168,7 +168,7 @@ a:hover {
     transition-property: color;
 }
 .pxp-section-cta:hover {
-    color: #fff;
+    color: #fff !important;
     background-color: var(--pxpMainColorDark);
 }
 .pxp-section-cta-o:hover {
@@ -5583,7 +5583,7 @@ input[type="email"] {
  
 input[type="text"]:focus,
 input[type="email"]:focus {
-    border: 1px solid #DC3545;
+    /* border: 1px solid #DC3545; */
     border-radius: 5px;
     outline: 0px !important;
     -webkit-appearance: none;
