@@ -1,4 +1,9 @@
 {% extends 'candidate-index.html' %}
+
+{% block title %}
+<title>mpower - Candidate dashboard - Edit profile</title>
+{% endblock %}
+
 {% block content %}
 {% load static %}
 
@@ -183,7 +188,7 @@
         </div>
 
         <div class="mt-4 mt-lg-5">
-            <button class="btn rounded-pill pxp-subsection-cta">Save Profile</button>
+            <button class="btn rounded-pill pxp-section-cta">Save Profile</button>
         </div>
     </form>
 </div>
@@ -307,4 +312,13 @@ $('.delete_edu').click(function(e){
 $('#pxp-signup-modal-button').on('click', function() {
     $('#pxp-signup-modal').show();
 });
+$(document).ready(function () {
+    $('#das').removeClass('pxp-active');
+    $('#edi').addClass('pxp-active');
+    $('#app').removeClass('pxp-active');
+    $('#fav').removeClass('pxp-active');
+    $('#cha').removeClass('pxp-active');
+    $('#inb').removeClass('pxp-active');
+    $('#not').removeClass('pxp-active');
+})
 {% endblock %}

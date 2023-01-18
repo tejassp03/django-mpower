@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from main.models import JobSeeker, Employer, Jobs, Application, Selection, Login, ExperienceJob, Education, ProfileVisits
+from main.models import JobSeeker, Employer, Jobs, Application, Selection, Login, ExperienceJob, Education, ProfileVisits, Threads, Messages
 from json import dumps
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
@@ -126,5 +126,58 @@ def delete_edu(request, pk):
         edu.delete()
     return redirect('candidate:edit', pk=pk)
 
+
+def inbox(request, pk):
+    if(request.method=="POST"):
+        thread=Threads.objects.get(msg_id=request.POST['employer'])
+        message=Messages()
+        message.msg_id=thread
+        message.sender_user=Login.objects.get(email=request.session['email'])
+        message.receiver_user=Login.objects.get(log_id=thread.sender.log_id)
+        message.body=request.POST['message']
+        message.save()
+        return redirect('candidate:inbox', pk=pk)
+    user=Login.objects.get(email=request.session['email'])
+    threads=Threads.objects.filter(receiver=user.log_id)
+    messages=[]
+    for i in threads:
+        messages=Messages.objects.filter(msg_id=i.msg_id)
+    return render(request, 'inbox-candidate.html', {'pk': pk, 'threads': threads, 'mess': messages})
+
+
 def under_development(request, pk):
     return render(request, 'under_development.html', {'pk': pk})
+
+
+def employer(request, pk, pk2):
+    candidate = JobSeeker.objects.all()
+    return render(request, 'employer.html', {'candidates': candidate, 'pk': pk, 'pk2': pk2})
+
+def startconver(request, pk, pk2, pk3):
+    threads = Threads.objects.filter(sender=Login.objects.get(log_id=pk2), receiver=Login.objects.get(log_id=pk3))
+    sender = Employer.objects.get(log_id=pk2)
+    receiver = JobSeeker.objects.get(log_id=pk3)
+    messages=[]
+    if(len(threads)==1):
+        messages=Messages.objects.filter(msg_id=threads[0].msg_id)
+    if(len(threads)==0):
+        thread = Threads()
+        thread.sender = Login.objects.get(log_id=pk2)
+        thread.receiver = Login.objects.get(log_id=pk3)
+        thread.save()
+        thread=Threads.objects.get(sender=Login.objects.get(log_id=pk2), receiver=Login.objects.get(log_id=pk3))
+        messages=Messages.objects.filter(msg_id=thread.msg_id)
+        return redirect('candidate:startconver', pk=pk, pk2=pk2, pk3=pk3)
+    return render(request, 'startconver.html', {'candidate': receiver, 'pk': pk, 'pk2': pk2, 'pk3': pk3, 'messages': messages})
+
+def send(request, pk, pk2, pk3):
+    if request.method == "POST" and request.POST['message']:
+        threads = Threads.objects.get(sender=Login.objects.get(log_id=pk2), receiver=Login.objects.get(log_id=pk3))
+        message=Messages()
+        message.msg_id=threads
+        message.sender_user=Login.objects.get(log_id=pk2)
+        message.receiver_user=Login.objects.get(log_id=pk3)
+        message.body=request.POST['message']
+        message.save()
+        return redirect('candidate:startconver', pk=pk, pk2=pk2, pk3=pk3)
+    return redirect('candidate: startconver', pk=pk, pk2=pk2, pk3=pk3)

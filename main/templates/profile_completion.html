@@ -85,7 +85,7 @@
                 <h3>Setup your phone</h3>
                 <div class="form-row"> 
                   <div class="form-group col-md-6">  
-                    <input type="tel" id="phone" class="form-control" placeholder="+880" name="code"> 
+                    <input type="tel" id="phone" class="form-control" placeholder="+91" name="code"> 
                   </div>  
                   <div class="form-group col-md-6"> 
                     <input type="text" class="form-control" placeholder="0000000000" name="mobile" id="phone2">
@@ -301,7 +301,7 @@
                 function phoneNoselect(){
                     if ( $('#msform').length ){   
                         $("#phone").intlTelInput(); 
-                        $("#phone").intlTelInput("setNumber", "+880"); 
+                        $("#phone").intlTelInput("setNumber", "+91"); 
                     };
                 }; 
                 //* Select js
@@ -315,8 +315,6 @@
                 phoneNoselect ();
                 nice_Select ();
             })(jQuery);
-
-
 
             $('.action-but').click(function(){
                 if(document.getElementById('phone2').value=="")
@@ -420,7 +418,6 @@
 
 
                   $(document).ready(function () {
-                      console.log($('.selectMultiple'))
                       var select = $('select[multiple]');
                       var options = select.find('option');
                      
@@ -667,8 +664,7 @@
                     questionRadioCountArraya.push(doublea); 
                     rdc(questionRadioCountArray, "rdca");
                 }
-            }
-                    
+            }     
 
         </script>
     </body>

@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    Please mention with whom to start conversation with
+    {% for i in candidates.all %}
+    <p><a href="{% url 'candidate:startconver' pk=pk pk2=pk2 pk3=i.log_id %}">{{ i.name }}</a></p>
+    {% endfor %}
+</body>
+</html>

@@ -14,7 +14,11 @@ urlpatterns = [
 	path('edit_profile/delete_exp/', views.delete_exp, name='delete_exp'),
 	path('edit_profile/delete_skill/', views.delete_skill, name='delete_skill'),
 	path('edit_profile/delete_edu/', views.delete_edu, name='delete_edu'),
-	path('under_development/', views.under_development, name='under_development')
+	path('under_development/', views.under_development, name='under_development'),
+	path('inbox/', views.inbox, name='inbox'),
+	path('<int:pk2>/', views.employer, name='employer'),
+	path('<int:pk2>/startconver/<pk3>/', views.startconver, name='startconver'),
+	path('<int:pk2>/startconver/<pk3>/send', views.send, name='send'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 # if settings.DEBUG:

@@ -1,6 +1,9 @@
 {% extends 'candidate-index.html' %}
 {% load static %}
 
+{% block title %}
+<title>mpower - Candidate dashboard</title>
+{% endblock %}
 {% block content %}
 <div class="pxp-dashboard-content-details">
     <h1>Dashboard</h1>
@@ -445,6 +448,15 @@
 {% endblock content%}
 
 {% block script %}
+$(document).ready(function () {
+    $('#das').addClass('pxp-active');
+    $('#edi').removeClass('pxp-active');
+    $('#app').removeClass('pxp-active');
+    $('#fav').removeClass('pxp-active');
+    $('#cha').removeClass('pxp-active');
+    $('#inb').removeClass('pxp-active');
+    $('#not').removeClass('pxp-active');
+})
 // Candidate dashboard charts
     if ($('#pxp-candidate-dashboard-visits-chart').length > 0) {
         let selectedItem;

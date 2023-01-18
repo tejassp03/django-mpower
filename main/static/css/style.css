@@ -4253,7 +4253,7 @@ a:hover {
     z-index: 2;
 }
 .pxp-dashboard-inbox-messages-footer-field .form-control {
-    border: 0 none;
+    border: 0 none !important;
     font-size: 15px;
     font-weight: 300;
     color: var(--pxpTextColor);

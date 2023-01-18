@@ -9,6 +9,8 @@ class Login(models.Model):
     password = models.CharField(max_length=250)
     user_type = models.CharField(max_length=20)
     status = models.IntegerField(default=None, null=True)
+    def __str__(self):
+        return str(self.log_id)
     class Meta:
         db_table = "login"
 
@@ -115,4 +117,23 @@ class ProfileVisits(models.Model):
     visiting_time = models.DateTimeField(default=timezone.now)
     class Meta:
         db_table = "profilevisits"
+    
+class Threads(models.Model):
+    msg_id = models.AutoField(primary_key=True)
+    sender = models.ForeignKey(Login, on_delete=models.CASCADE, related_name='sender')
+    receiver = models.ForeignKey(Login, on_delete=models.CASCADE, related_name='receiver')
+    has_unread = models.BooleanField(default=False)
+    class Meta:
+        db_table = "threads"
+
+class Messages(models.Model):
+    msg_id = models.ForeignKey(Threads, on_delete=models.CASCADE, blank=True, null=True)
+    sender_user = models.ForeignKey(Login, on_delete=models.CASCADE, related_name='sender_user')
+    receiver_user = models.ForeignKey(Login, on_delete=models.CASCADE, related_name='receiver_user')
+    body = models.CharField(max_length=10000)
+    image = models.ImageField(upload_to='messages/', blank=True, null=True)
+    date = models.DateTimeField(default=timezone.now)
+    is_read = models.BooleanField(default=False)
+    class Meta:
+        db_table = "messages"
 
