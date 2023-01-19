@@ -5645,7 +5645,8 @@ input[type="radio"]:hover {
 }
 
 .bg-danger{
-    background-color: var(--pxpMainColor) !important;
+    background-color: rgba(var(--bs-danger-rgb), var(--bs-bg-opacity)) !important;;
+    /* background-color: var(--pxpMainColor) !important; */
 }
 
 /**

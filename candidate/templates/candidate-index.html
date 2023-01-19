@@ -175,10 +175,11 @@
         <script src="{% static 'js/owl.carousel.min.js' %}"></script>
         <script src="{% static 'js/nav.js' %}"></script>
         <script src="{% static 'js/Chart.min.js' %}"></script>
-        <script src="{% static 'js/main.js' %}"></script>
+        {% comment %} <script src="{% static 'js/main.js' %}"></script> {% endcomment %}
         <script>
             {% block script %}
             {% endblock script %}
         </script>
+        <script src="{% static 'js/main.js' %}"></script>
     </body>
 </html>

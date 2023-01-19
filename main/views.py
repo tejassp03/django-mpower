@@ -21,17 +21,19 @@ def index(request):
 			return JsonResponse({'message': 'X'})
 		else:
 			if(check_password(request.POST['c_pass'], user[0].password)):
-				if(request.POST['user'] == 'candidate'):
+				if(request.POST['user'] == 'candidate' and JobSeeker.objects.filter(log_id=user[0].log_id)):
 					jobseeker=JobSeeker.objects.get(log_id=user[0].log_id)
 					if((jobseeker.phone==None or jobseeker.phone=="" or len(jobseeker.phone)<=4) and (jobseeker.location==None or jobseeker.location=="") and (jobseeker.experience==None or jobseeker.experience=="") and (jobseeker.skills==None or jobseeker.skills=="") and (jobseeker.basic_edu==None or jobseeker.basic_edu=="") and (jobseeker.master_edu==None or jobseeker.master_edu=="") and (jobseeker.other_qual==None or jobseeker.other_qual=="") and (jobseeker.dob==None or jobseeker.dob=="") and (jobseeker.Resume=="" or jobseeker.Resume==None) and (jobseeker.photo=="" or jobseeker.photo==None)):
 						urlval="profile_completion/"+str(user[0].log_id)
 						return JsonResponse({'message': 'Y', 'url': urlval})
 					# return redirect('main:profilecompletion', pk=user[0].log_id)
-				elif(request.POST['user'] == 'employer'):
+				elif(request.POST['user'] == 'employer' and Employer.objects.filter(log_id=user[0].log_id)):
 					employer=Employer.objects.get(log_id=user[0].log_id)
 					if((employer.etype==None or employer.etype=="") and (employer.industry==None or employer.industry=="") and (employer.address==None or employer.address=="") and (employer.pincode==None or employer.pincode=="") and (employer.executive==None or employer.executive=="") and (employer.phone==None or employer.phone=="" or len(employer.phone)<=4) and (employer.location==None or employer.location=="") and (employer.profile==None or employer.profile=="") and (employer.logo=="" or employer.logo==None)):
 						urlval="emp_completion/"+str(user[0].log_id)
 						return JsonResponse({'message': 'Y', 'url': urlval})
+				else:
+					return JsonResponse({'message': 'X'})
 				request.session['email'] = request.POST['c_email']
 				request.session['password'] = request.POST['c_pass']
 				empls=JobSeeker.objects.get(log_id=user[0].log_id)
@@ -185,6 +187,10 @@ def profile_completion(request, pk):
 		loger = Login.objects.get(log_id=pk)
 		request.session['email'] = loger.email
 		request.session['password'] = loger.password
+		empls=JobSeeker.objects.get(log_id=pk)
+		request.session['name']=empls.name
+		if(empls.photo):
+			request.session['photo']=empls.photo.url
 		return redirect("candidate:dashboard", pk=jobseeker.user_id)
 	if(len(Login.objects.filter(log_id=pk, user_type="candidate"))==0):
 		return redirect('main:index')
@@ -222,15 +228,14 @@ def emp_completion(request, pk):
 def returnvalue(phone):
 	return str(phone) + str(datetime.date(datetime.now())) + "12345"
 
-def get_otp(request):
+def get_otp(request, pk):
 	if request.method == "GET":
 		key = base64.b32encode(returnvalue(request.GET['phone']).encode())
 		OTP = pyotp.TOTP(key,interval = 30)
 		return JsonResponse({'OTP': OTP.now()})
 	return JsonResponse({'OTP': 'X'})
 
-@csrf_exempt
-def verify_otp(request):
+def verify_otp(request, pk):
 	if(request.method=='POST'):
 		key = base64.b32encode(returnvalue(request.POST['phone']).encode())
 		OTP = pyotp.TOTP(key,interval = 30)

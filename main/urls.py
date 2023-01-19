@@ -16,8 +16,10 @@ urlpatterns = [
 	path('postjob/', views.postjob, name ='postjob'),
 	path('profile_completion/<int:pk>/', views.profile_completion, name="profilecompletion"),
 	path('emp_completion/<int:pk>/', views.emp_completion, name="eprofile"),
-	path('get_otp/', views.get_otp, name='get_otp'),
-	path('post_otp/', views.verify_otp, name='verify_otp'),
+	path('profile_completion/<int:pk>/get_otp/', views.get_otp, name='get_otp'),
+	path('profile_completion/<int:pk>/post_otp/', views.verify_otp, name='verify_otp'),
+	path('emp_completion/<int:pk>/get_otp/', views.get_otp, name='eget_otp'),
+	path('emp_completion/<int:pk>/post_otp/', views.verify_otp, name='everify_otp'),
 	path('candidate/<int:pk>/', include('candidate.urls', namespace = 'candidate')),
 ]
 

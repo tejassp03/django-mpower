@@ -129,6 +129,7 @@ def delete_edu(request, pk):
 
 def inbox(request, pk):
     if(request.method=="POST"):
+        print(request.POST)
         thread=Threads.objects.get(msg_id=request.POST['employer'])
         message=Messages()
         message.msg_id=thread
@@ -141,7 +142,8 @@ def inbox(request, pk):
     threads=Threads.objects.filter(receiver=user.log_id)
     messages=[]
     for i in threads:
-        messages=Messages.objects.filter(msg_id=i.msg_id)
+        mess=Messages.objects.filter(msg_id=i.msg_id).values()
+        messages.append(dumps(list(mess), default=str))
     return render(request, 'inbox-candidate.html', {'pk': pk, 'threads': threads, 'mess': messages})
 
 

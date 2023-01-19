@@ -477,7 +477,7 @@
                 $.ajax(
                 {
                     type:"GET",
-                    url: "http://localhost:8000/get_otp",
+                    url: "get_otp/",
                     data:{
                         'code': document.getElementById('phone').value,
                         'phone': document.getElementById('phone2').value
@@ -515,7 +515,7 @@
                 $.ajax(
                 {
                     type:"POST",
-                    url: "http://localhost:8000/post_otp/",
+                    url: "post_otp/",
                     data:{
                         'phone': text2,
                         'OTP': res1
