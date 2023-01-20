@@ -19,6 +19,8 @@ urlpatterns = [
 	path('<int:pk2>/', views.employer, name='employer'),
 	path('<int:pk2>/startconver/<pk3>/', views.startconver, name='startconver'),
 	path('<int:pk2>/startconver/<pk3>/send', views.send, name='send'),
+	path('inbox/sendfrom/', views.sendfromcand, name="sendfrom"),
+	path('inbox/fetchmess/', views.fetchmess, name="fetchmess"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 # if settings.DEBUG:

@@ -129,7 +129,6 @@ def delete_edu(request, pk):
 
 def inbox(request, pk):
     if(request.method=="POST"):
-        print(request.POST)
         thread=Threads.objects.get(msg_id=request.POST['employer'])
         message=Messages()
         message.msg_id=thread
@@ -137,14 +136,18 @@ def inbox(request, pk):
         message.receiver_user=Login.objects.get(log_id=thread.sender.log_id)
         message.body=request.POST['message']
         message.save()
-        return redirect('candidate:inbox', pk=pk)
+        urlval="candidate/"+str(pk)+"/inbox"
+        return JsonResponse({'message': 'Y', 'url': urlval})
     user=Login.objects.get(email=request.session['email'])
     threads=Threads.objects.filter(receiver=user.log_id)
+    temp_threads=[dumps(list(threads.values()), default=str)]
     messages=[]
+    temp_messages=[]
     for i in threads:
-        mess=Messages.objects.filter(msg_id=i.msg_id).values()
-        messages.append(dumps(list(mess), default=str))
-    return render(request, 'inbox-candidate.html', {'pk': pk, 'threads': threads, 'mess': messages})
+        mess=Messages.objects.filter(msg_id=i.msg_id)
+        messages.append(dumps(list(mess.values()), default=str))
+        temp_messages.append(mess)
+    return render(request, 'inbox-candidate.html', {'pk': pk, 'threads': threads, 'mess': messages, 'thre': temp_threads, 'm': temp_messages})
 
 
 def under_development(request, pk):
@@ -183,3 +186,36 @@ def send(request, pk, pk2, pk3):
         message.save()
         return redirect('candidate:startconver', pk=pk, pk2=pk2, pk3=pk3)
     return redirect('candidate: startconver', pk=pk, pk2=pk2, pk3=pk3)
+
+def sendfromcand(request, pk):
+    if(request.method=="POST"):
+        thread=Threads.objects.get(msg_id=request.POST['employer'])
+        message=Messages()
+        message.msg_id=thread
+        message.sender_user=Login.objects.get(email=request.session['email'])
+        message.receiver_user=Login.objects.get(log_id=thread.sender.log_id)
+        message.body=request.POST['message']
+        message.save()
+        urlval="candidate/"+str(pk)+"/inbox"
+        user=Login.objects.get(email=request.session['email'])
+        threads=Threads.objects.filter(receiver=user.log_id)
+        temp_threads=[dumps(list(threads.values()), default=str)]
+        messages=[]
+        temp_messages=[]
+        for i in threads:
+            mess=Messages.objects.filter(msg_id=i.msg_id)
+            messages.append(dumps(list(mess.values()), default=str))
+            temp_messages.append(mess)
+        return JsonResponse({'message': 'Y', 'url': "", 'id': request.POST['employer'], 'thre': temp_threads, 'm': messages})
+
+def fetchmess(request, pk):
+    user=Login.objects.get(email=request.session['email'])
+    threads=Threads.objects.filter(receiver=user.log_id)
+    temp_threads=[dumps(list(threads.values()), default=str)]
+    messages=[]
+    temp_messages=[]
+    for i in threads:
+        mess=Messages.objects.filter(msg_id=i.msg_id)
+        messages.append(dumps(list(mess.values()), default=str))
+        temp_messages.append(mess)
+    return JsonResponse({'message': 'Y', 'url': "", 'mess': messages, 'thre': temp_threads})
