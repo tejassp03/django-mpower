@@ -179,3 +179,187 @@ var count = 1;
         //         <button type="button" id="addQuestionsa" class="btn btn-primary" onclick="addQuestion('experience')" style="margin: 20px 20px">+</button>
         //     </section>
         // </div>
+
+
+
+
+// Dynamic loading on candidates side
+
+setInterval(temp, 2000);
+
+ function temp(id)
+ {
+    $.ajax(
+    {
+        type:"GET",
+        url: "fetchmess/",
+        data:{
+                employer: $('[name="employer"]').val()
+        },
+        success: function( data ) 
+        {
+            let mes=data['mess'];
+            let ms=[];
+            let tempele=$('.pxp-dashboard-inbox-messages-item-time');
+            let flag=0;
+            for (let i = 0; i < mes.length; i++) {
+                if(JSON.parse(mes[i])[0])
+                {
+                    if(JSON.parse(mes[i])[0].msg_id_id==id)
+                    {
+                        JSON.parse(mes[i]).forEach(myFunction);
+                        function myFunction(item, index) {
+                            console.log(tempele[tempele.length-1].innerHTML)
+                            if(item.date==tempele[tempele.length-1].innerHTML)
+                            {
+                                flag=1;
+                            }
+                            else
+                            {
+                                if(flag==1)
+                                {
+                                    ms.push(item);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            console.log(ms);
+        }
+     })
+     if(ms.length>0)
+     {
+    let itemdiv=document.createElement('div');
+    itemdiv.setAttribute('class', 'pxp-dashboard-inbox-messages-item mt-4')
+    let rowdiv=document.createElement('div');
+    rowdiv.setAttribute('class', 'row')
+    let coldiv=document.createElement('div');
+    coldiv.setAttribute('class', 'col-7')
+    let ithediv=document.createElement('div');
+    ithediv.setAttribute('class', 'pxp-dashboard-inbox-messages-item-header')
+    let firindiv=document.createElement('div');
+    firindiv.setAttribute('class', 'pxp-dashboard-inbox-messages-item-avatar pxp-cover')
+    firindiv.style.backgroundImage='url({% static 'images/company-logo-2.png' %})';
+    let secindiv=document.createElement('div');
+    secindiv.setAttribute('class', 'pxp-dashboard-inbox-messages-item-name ms-2')
+    secindiv.innerHTML="1"
+    let thiindiv=document.createElement('div');
+    thiindiv.setAttribute('class', 'pxp-dashboard-inbox-messages-item-time pxp-text-light ms-3')
+    thiindiv.innerHTML="1"
+    ithediv.append(firindiv);
+    ithediv.append(secindiv);
+    ithediv.append(thiindiv);
+    let indiv=document.createElement('div');
+    indiv.setAttribute('class', 'pxp-dashboard-inbox-messages-item-message pxp-is-self mt-2')
+    indiv.innerHTML="1"
+    coldiv.append(ithediv);
+    coldiv.append(indiv);
+    rowdiv.append(coldiv);
+    itemdiv.append(rowdiv);
+    $('.pxp-dashboard-inbox-messages-content').append(itemdiv)
+     }
+ }
+
+
+
+ 
+ function temp(id)
+ {
+    $.ajax(
+    {
+        type:"GET",
+        url: "fetchmess/",
+        data:{
+                employer: $('[name="employer"]').val()
+        },
+        success: function( data ) 
+        {
+            let mes=data['mess'];
+            let ms=[];
+            let tempele=$('.pxp-dashboard-inbox-messages-item-time');
+            let flag=0;
+            console.log(data)
+            for (let i = 0; i < mes.length; i++) {
+                if(JSON.parse(mes[i])[0])
+                {
+                    if(JSON.parse(mes[i])[0].msg_id_id==id)
+                    {
+                        JSON.parse(mes[i]).forEach(myFunction);
+                        function myFunction(item, index) {
+                            ms.push(item);
+                        }
+                    }
+                }
+            }
+            for(let i=0;i<ms.length;i++)
+            {
+                if(ms[i].receiver_user_id != thre.receiver_id)
+                {
+                    let itemdiv=document.createElement('div');
+                    itemdiv.setAttribute('class', 'pxp-dashboard-inbox-messages-item')
+                    let rowdiv=document.createElement('div');
+                    rowdiv.setAttribute('class', 'row justify-content-end')
+                    let coldiv=document.createElement('div');
+                    coldiv.setAttribute('class', 'col-7')
+                    let ithediv=document.createElement('div');
+                    ithediv.setAttribute('class', 'pxp-dashboard-inbox-messages-item-header flex-row-reverse')
+                    let firindiv=document.createElement('div');
+                    firindiv.setAttribute('class', 'pxp-dashboard-inbox-messages-item-avatar pxp-cover')
+                    firindiv.style.backgroundImage='url({% static 'images/company-logo-2.png' %})';
+                    let secindiv=document.createElement('div');
+                    secindiv.setAttribute('class', 'pxp-dashboard-inbox-messages-item-name me-2')
+                    secindiv.innerHTML=ms[i].sender_user_id
+                    let thiindiv=document.createElement('div');
+                    thiindiv.setAttribute('class', 'pxp-dashboard-inbox-messages-item-time pxp-text-light me-3')
+                    thiindiv.innerHTML=ms[i].date
+                    ithediv.append(firindiv);
+                    ithediv.append(secindiv);
+                    ithediv.append(thiindiv);
+                    let indiv=document.createElement('div');
+                    indiv.setAttribute('class', 'pxp-dashboard-inbox-messages-item-message pxp-is-other mt-2')
+                    indiv.innerHTML=ms[i].body
+                    coldiv.append(ithediv);
+                    coldiv.append(indiv);
+                    rowdiv.append(coldiv);
+                    itemdiv.append(rowdiv);
+                    firstDiv.append(itemdiv)
+                }
+                else
+                {
+                    let itemdiv=document.createElement('div');
+                    itemdiv.setAttribute('class', 'pxp-dashboard-inbox-messages-item mt-4')
+                    let rowdiv=document.createElement('div');
+                    rowdiv.setAttribute('class', 'row')
+                    let coldiv=document.createElement('div');
+                    coldiv.setAttribute('class', 'col-7')
+                    let ithediv=document.createElement('div');
+                    ithediv.setAttribute('class', 'pxp-dashboard-inbox-messages-item-header')
+                    let firindiv=document.createElement('div');
+                    firindiv.setAttribute('class', 'pxp-dashboard-inbox-messages-item-avatar pxp-cover')
+                    firindiv.style.backgroundImage='url({% static 'images/company-logo-2.png' %})';
+                    let secindiv=document.createElement('div');
+                    secindiv.setAttribute('class', 'pxp-dashboard-inbox-messages-item-name ms-2')
+                    secindiv.innerHTML=ms[i].sender_user_id
+                    let thiindiv=document.createElement('div');
+                    thiindiv.setAttribute('class', 'pxp-dashboard-inbox-messages-item-time pxp-text-light ms-3')
+                    thiindiv.innerHTML=ms[i].date
+                    ithediv.append(firindiv);
+                    ithediv.append(secindiv);
+                    ithediv.append(thiindiv);
+                    let indiv=document.createElement('div');
+                    indiv.setAttribute('class', 'pxp-dashboard-inbox-messages-item-message pxp-is-self mt-2')
+                    indiv.innerHTML=ms[i].body
+                    coldiv.append(ithediv);
+                    coldiv.append(indiv);
+                    rowdiv.append(coldiv);
+                    itemdiv.append(rowdiv);
+                    firstDiv.append(itemdiv)
+                }
+            }
+
+        }
+     })
+ }
+
+

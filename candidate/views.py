@@ -214,8 +214,24 @@ def fetchmess(request, pk):
     temp_threads=[dumps(list(threads.values()), default=str)]
     messages=[]
     temp_messages=[]
+    mess_all=[]
     for i in threads:
-        mess=Messages.objects.filter(msg_id=i.msg_id)
+        mess=Messages.objects.filter(msg_id=i.msg_id, is_read=False)
         messages.append(dumps(list(mess.values()), default=str))
         temp_messages.append(mess)
-    return JsonResponse({'message': 'Y', 'url': "", 'mess': messages, 'thre': temp_threads})
+        mess=Messages.objects.filter(msg_id=i.msg_id)
+        mess_all.append(dumps(list(mess.values()), default=str))
+    count=len(mess)
+    thread=dumps(list(Threads.objects.filter(msg_id=request.GET['employer']).values()), default=str)
+    messa=dumps(list(Messages.objects.filter(msg_id=request.GET['employer'], is_read=False).values()), default=str)
+    return JsonResponse({'message': 'Y', 'url': "", 'mess': messages, 'thre': temp_threads, 'count': count, 'thread': thread, 'messa': messa, 'all_mess': mess_all})
+
+def seenmes(request, pk):
+    if(request.method=="POST"):
+        messages=Messages.objects.filter(msg_id=request.POST['employer'], is_read=False)
+        Messages.objects.filter(msg_id=request.POST['employer'], is_read=False).update(is_read=True)
+        print(len(messages))
+        for i in messages:
+            i.is_read=True
+            i.save()
+        return JsonResponse({'message': 'Y'})

@@ -92,18 +92,15 @@
                     {% endif %}
                     {% endfor %}
                 </div>
-                <form method="POST">
-                    {% csrf_token %}
                     <div class="pxp-dashboard-inbox-messages-footer">
                         <div class="pxp-dashboard-inbox-messages-footer-field">
                             <input type="text" class="form-control" placeholder="Type your message here..." name="message">
                             <input type="text" class="form-control" placeholder="Type your message here..." name="employer" style="display: none" value={{ threads.0.msg_id }}>
                         </div>
                         <div class="pxp-dashboard-inbox-messages-footer-btn">
-                            <button class="btn rounded-pill pxp-section-cta">Send</button>
+                            <button class="btn rounded-pill pxp-section-cta" id="sender1">Send</button>
                         </div>
                     </div>
-                </form>
             </div>
         </div>
     </div>
@@ -120,13 +117,161 @@ $(document).ready(function () {
     $('#inb').addClass('pxp-active');
     $('#not').removeClass('pxp-active');
     $('.pxp-dashboard-inbox-messages-content').scrollTop($('.pxp-dashboard-inbox-messages-content')[0].scrollHeight);
+    $('#sender1').click(function(e){
+        e.preventDefault();
+        $.ajax(
+        {
+            type:"POST",
+            url: "sendfrom/",
+            data:{
+                    employer: $('[name="employer"]').val(),
+                    message: $('[name="message"]').val(),
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function( data ) 
+            {
+                caller(data['id'], data['m'], data['thre'])
+            }
+         })
+    })
+    setInterval(mesRec, 10000);
+    function mesRec()
+    {
+    $.ajax(
+    {
+        type:"GET",
+        url: "fetchmess/",
+        data:{
+                employer: $('[name="employer"]').val()
+        },
+        success: function( data ) 
+        {
+            $.ajax(
+            {
+                type:"POST",
+                url: "seenmes/",
+                data:{
+                        employer: $('[name="employer"]').val(),
+                        csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+                success: function( data ) 
+                {
+                    console.log("whre")
+                },
+                async: false
+            })
+            let mes=data['messa'];
+            let thre=data['thread']
+            let ms=JSON.parse(mes);
+            let tempele=$('.pxp-dashboard-inbox-messages-content');
+            let flag=0;
+            for(let i=0;i<ms.length;i++)
+            {
+                if(ms[i])
+                {
+                if(ms[i].receiver_user_id!= JSON.parse(thre)[0].receiver_id)
+                {
+                    let itemdiv=document.createElement('div');
+                    itemdiv.setAttribute('class', 'pxp-dashboard-inbox-messages-item')
+                    let rowdiv=document.createElement('div');
+                    rowdiv.setAttribute('class', 'row justify-content-end')
+                    let coldiv=document.createElement('div');
+                    coldiv.setAttribute('class', 'col-7')
+                    let ithediv=document.createElement('div');
+                    ithediv.setAttribute('class', 'pxp-dashboard-inbox-messages-item-header flex-row-reverse')
+                    let firindiv=document.createElement('div');
+                    firindiv.setAttribute('class', 'pxp-dashboard-inbox-messages-item-avatar pxp-cover')
+                    firindiv.style.backgroundImage='url({% static 'images/company-logo-2.png' %})';
+                    let secindiv=document.createElement('div');
+                    secindiv.setAttribute('class', 'pxp-dashboard-inbox-messages-item-name me-2')
+                    secindiv.innerHTML=ms[i].sender_user_id
+                    let thiindiv=document.createElement('div');
+                    thiindiv.setAttribute('class', 'pxp-dashboard-inbox-messages-item-time pxp-text-light me-3')
+                    thiindiv.innerHTML=ms[i].date
+                    ithediv.append(firindiv);
+                    ithediv.append(secindiv);
+                    ithediv.append(thiindiv);
+                    let indiv=document.createElement('div');
+                    indiv.setAttribute('class', 'pxp-dashboard-inbox-messages-item-message pxp-is-other mt-2')
+                    indiv.innerHTML=ms[i].body
+                    coldiv.append(ithediv);
+                    coldiv.append(indiv);
+                    rowdiv.append(coldiv);
+                    itemdiv.append(rowdiv);
+                    tempele.append(itemdiv)
+                }
+                else
+                {
+                    let itemdiv=document.createElement('div');
+                    itemdiv.setAttribute('class', 'pxp-dashboard-inbox-messages-item mt-4')
+                    let rowdiv=document.createElement('div');
+                    rowdiv.setAttribute('class', 'row')
+                    let coldiv=document.createElement('div');
+                    coldiv.setAttribute('class', 'col-7')
+                    let ithediv=document.createElement('div');
+                    ithediv.setAttribute('class', 'pxp-dashboard-inbox-messages-item-header')
+                    let firindiv=document.createElement('div');
+                    firindiv.setAttribute('class', 'pxp-dashboard-inbox-messages-item-avatar pxp-cover')
+                    firindiv.style.backgroundImage='url({% static 'images/company-logo-2.png' %})';
+                    let secindiv=document.createElement('div');
+                    secindiv.setAttribute('class', 'pxp-dashboard-inbox-messages-item-name ms-2')
+                    secindiv.innerHTML=ms[i].sender_user_id
+                    let thiindiv=document.createElement('div');
+                    thiindiv.setAttribute('class', 'pxp-dashboard-inbox-messages-item-time pxp-text-light ms-3')
+                    thiindiv.innerHTML=ms[i].date
+                    ithediv.append(firindiv);
+                    ithediv.append(secindiv);
+                    ithediv.append(thiindiv);
+                    let indiv=document.createElement('div');
+                    indiv.setAttribute('class', 'pxp-dashboard-inbox-messages-item-message pxp-is-self mt-2')
+                    indiv.innerHTML=ms[i].body
+                    coldiv.append(ithediv);
+                    coldiv.append(indiv);
+                    rowdiv.append(coldiv);
+                    itemdiv.append(rowdiv);
+                    tempele.append(itemdiv)
+                }
+            }
+            }
+        },
+        async: false
+     })
+    }
 })
 function caller(id, mess, thre1)
 {
-    let th=thre1;
-    let mes=mess;
-    let ms=[];
-    let thre;
+    $.ajax(
+    {
+        type:"POST",
+        url: "seenmes/",
+        data:{
+                employer: $('[name="employer"]').val(),
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+        },
+        success: function( data ) 
+        {
+            console.log("Done")
+        }, 
+        async: false
+     })
+     let th=thre1;
+     let mes=mess;
+     let ms=[];
+     let thre;
+     $.ajax(
+    {
+        type:"GET",
+        url: "fetchmess/",
+        data:{
+                employer: $('[name="employer"]').val()
+        },
+        success: function( data ) 
+        {
+            th=data['thre'];
+            mes=data['all_mess'];
+        },
+        async: false
+    })
     for(let j=0;j<JSON.parse(th[0]).length;j++)
     {
         if(JSON.parse(th[0])[j].msg_id==id)
