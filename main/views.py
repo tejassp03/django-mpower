@@ -13,6 +13,22 @@ import base64
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 
+import streamlit as st
+import pandas as pd
+import time,datetime
+from pyresparser import ResumeParser
+from pdfminer3.layout import LAParams, LTTextBox
+from pdfminer3.pdfpage import PDFPage
+from pdfminer3.pdfinterp import PDFResourceManager
+from pdfminer3.pdfinterp import PDFPageInterpreter
+from pdfminer3.converter import TextConverter
+import io,random
+from streamlit_tags import st_tags
+from PIL import Image
+import pymysql
+from .Courses import ds_course,web_course,android_course,ios_course,uiux_course,resume_videos,interview_videos
+import plotly.express as px
+
 @csrf_exempt
 def index(request):
 	if request.method == 'POST':
@@ -189,12 +205,137 @@ def profile_completion(request, pk):
 		request.session['password'] = loger.password
 		empls=JobSeeker.objects.get(log_id=pk)
 		request.session['name']=empls.name
+		if(empls.Resume):
+			resume_data = ResumeParser("media/"+str(empls.Resume)).get_extracted_data()
+			if resume_data:
+				resume_text = pdf_reader("media/"+str(empls.Resume))
+				try:
+					print(resume_data['name'], resume_data['email'], resume_data['mobile_number'], str(resume_data['no_of_pages']))
+				except:
+					print("!")
+				cand_level = ''
+				if resume_data['no_of_pages'] == 1:
+					cand_level = "Fresher"
+				elif resume_data['no_of_pages'] == 2:
+					cand_level = "Intermediate"
+				elif resume_data['no_of_pages'] >=3:
+					cand_level = "Experienced"
+				print(resume_data['skills'])
+				ds_keyword = ['tensorflow','keras','pytorch','machine learning','deep Learning','flask','streamlit']
+				web_keyword = ['react', 'django', 'node jS', 'react js', 'php', 'laravel', 'magento', 'wordpress',
+					'javascript', 'angular js', 'c#', 'flask']
+				android_keyword = ['android','android development','flutter','kotlin','xml','kivy']
+				ios_keyword = ['ios','ios development','swift','cocoa','cocoa touch','xcode']
+				uiux_keyword = ['ux','adobe xd','figma','zeplin','balsamiq','ui','prototyping','wireframes','storyframes','adobe photoshop','photoshop','editing','adobe illustrator','illustrator','adobe after effects','after effects','adobe premier pro','premier pro','adobe indesign','indesign','wireframe','solid','grasp','user research','user experience']
+
+				recommended_skills = []
+				reco_field = ''
+				rec_course = ''
+				for i in resume_data['skills']:
+                    ## Data science recommendation
+					if i.lower() in ds_keyword:
+						print(i.lower())
+						reco_field = 'Data Science'
+						recommended_skills = ['Data Visualization','Predictive Analysis','Statistical Modeling','Data Mining','Clustering & Classification','Data Analytics','Quantitative Analysis','Web Scraping','ML Algorithms','Keras','Pytorch','Probability','Scikit-learn','Tensorflow',"Flask",'Streamlit']
+						rec_course = course_recommender(ds_course)
+						break
+
+					## Web development recommendation
+					elif i.lower() in web_keyword:
+						print(i.lower())
+						reco_field = 'Web Development'
+						rec_course = course_recommender(web_course)
+						break
+
+					## Android App Development
+					elif i.lower() in android_keyword:
+						print(i.lower())
+						reco_field = 'Android Development'
+						rec_course = course_recommender(android_course)
+						break
+
+					## IOS App Development
+					elif i.lower() in ios_keyword:
+						print(i.lower())
+						reco_field = 'IOS Development'
+						rec_course = course_recommender(ios_course)
+						break
+
+					## Ui-UX Recommendation
+					elif i.lower() in uiux_keyword:
+						print(i.lower())
+						reco_field = 'UI-UX Development'
+						rec_course = course_recommender(uiux_course)
+						break
+				resume_score = 0
+				if 'Objective' in resume_text:
+					resume_score = resume_score+20
+					print("Objectives added good")
+				else:
+					print("According to our recommendation please add your career objective, it will give your career intension to the Recruiters")
+				if 'Declaration'  in resume_text:
+					resume_score = resume_score + 20
+					print("Declaration added good")
+				else:
+					print("According to our recommendation please add Declaration✍. It will give the assurance that everything written on your resume is true and fully acknowledged by you")
+				if 'Hobbies' or 'Interests'in resume_text:
+					resume_score = resume_score + 20
+					print("Hobbies or interests are added good")
+				else:
+					print("According to our recommendation please add Hobbies⚽. It will show your persnality to the Recruiters and give the assurance that you are fit for this role or not.")
+				if 'Achievements' in resume_text:
+					resume_score = resume_score + 20
+					print("Achievements added good")
+				else:
+					print("According to our recommendation please add Achievements🏅. It will show that you are capable for the required position.")
+				if 'Projects' in resume_text:
+					resume_score = resume_score + 20
+					print("Projects added good")
+				else:
+					print("According to our recommendation please add Projects👨‍💻. It will show that you have done work related the required position or not.")
+				score = 0
+				for percent_complete in range(resume_score):
+					score +=1
+					time.sleep(0.1)
+				print("Your resume score: ", score)
 		if(empls.photo):
 			request.session['photo']=empls.photo.url
 		return redirect("candidate:dashboard", pk=jobseeker.user_id)
 	if(len(Login.objects.filter(log_id=pk, user_type="candidate"))==0):
 		return redirect('main:index')
 	return render(request, 'profile_completion.html')
+
+def pdf_reader(file):
+    resource_manager = PDFResourceManager()
+    fake_file_handle = io.StringIO()
+    converter = TextConverter(resource_manager, fake_file_handle, laparams=LAParams())
+    page_interpreter = PDFPageInterpreter(resource_manager, converter)
+    with open(file, 'rb') as fh:
+        for page in PDFPage.get_pages(fh,
+                                      caching=True,
+                                      check_extractable=True):
+            page_interpreter.process_page(page)
+            print(page)
+        text = fake_file_handle.getvalue()
+
+    # close open handles
+    converter.close()
+    fake_file_handle.close()
+    return text
+
+def course_recommender(course_list):
+    st.subheader("**Courses & Certificates🎓 Recommendations**")
+    c = 0
+    rec_course = []
+    no_of_reco = st.slider('Choose Number of Course Recommendations:', 1, 10, 4)
+    random.shuffle(course_list)
+    for c_name, c_link in course_list:
+        c += 1
+        st.markdown(f"({c}) [{c_name}]({c_link})")
+        rec_course.append(c_name)
+        if c == no_of_reco:
+            break
+    return rec_course
 
 
 def emp_completion(request, pk):
