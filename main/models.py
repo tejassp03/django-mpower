@@ -137,3 +137,19 @@ class Messages(models.Model):
     class Meta:
         db_table = "messages"
 
+class ResumeAnalysis(models.Model):
+    any_id = models.AutoField(primary_key=True)
+    jobseeker_id = models.ForeignKey(JobSeeker, on_delete=models.CASCADE, blank=True, null=True)
+    resume_score = models.CharField(max_length=10, default=None, null=True)
+    date = models.DateField(auto_now=True)
+    no_of_pages = models.CharField(max_length=5, default=None, null=True)
+    predicted_field = models.CharField(max_length=100, default=None, null=True)
+    user_level = models.CharField(max_length=100, default=None, null=True)
+    actual_skills = models.CharField(max_length=500, default=None, null=True)
+    reco_skills = models.CharField(max_length=500, default=None, null=True)
+    reco_courses = models.CharField(max_length=1000, default=None, null=True)
+    recommendations = models.CharField(max_length=1000, default=None, null=True)
+    class Meta:
+        db_table = "resumeanalysis"
+
+

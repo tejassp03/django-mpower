@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate,login
 from django.contrib import messages
-from .models import JobSeeker, Login, Employer
+from .models import JobSeeker, Login, Employer, ResumeAnalysis
 import random
 import re
 from django.contrib.auth.hashers import make_password, check_password
@@ -206,11 +206,14 @@ def profile_completion(request, pk):
 		empls=JobSeeker.objects.get(log_id=pk)
 		request.session['name']=empls.name
 		if(empls.Resume):
+			analysis_object = ResumeAnalysis()
+			analysis_object.jobseeker_id = empls
 			resume_data = ResumeParser("media/"+str(empls.Resume)).get_extracted_data()
 			if resume_data:
 				resume_text = pdf_reader("media/"+str(empls.Resume))
 				try:
-					print(resume_data['name'], resume_data['email'], resume_data['mobile_number'], str(resume_data['no_of_pages']))
+					analysis_object.no_of_pages=resume_data['no_of_pages']
+					# print(resume_data['name'], resume_data['email'], resume_data['mobile_number'], str(resume_data['no_of_pages']))
 				except:
 					print("!")
 				cand_level = ''
@@ -220,7 +223,9 @@ def profile_completion(request, pk):
 					cand_level = "Intermediate"
 				elif resume_data['no_of_pages'] >=3:
 					cand_level = "Experienced"
-				print(resume_data['skills'])
+				analysis_object.user_level=cand_level
+				analysis_object.actual_skills=str(resume_data['skills'])
+				# print(resume_data['skills'])
 				ds_keyword = ['tensorflow','keras','pytorch','machine learning','deep Learning','flask','streamlit']
 				web_keyword = ['react', 'django', 'node jS', 'react js', 'php', 'laravel', 'magento', 'wordpress',
 					'javascript', 'angular js', 'c#', 'flask']
@@ -244,6 +249,7 @@ def profile_completion(request, pk):
 					elif i.lower() in web_keyword:
 						print(i.lower())
 						reco_field = 'Web Development'
+						recommended_skills = ['React','Django','Node JS','React JS','php','laravel','Magento','wordpress','Javascript','Angular JS','c#','Flask','SDK']
 						rec_course = course_recommender(web_course)
 						break
 
@@ -251,6 +257,7 @@ def profile_completion(request, pk):
 					elif i.lower() in android_keyword:
 						print(i.lower())
 						reco_field = 'Android Development'
+						recommended_skills = ['Android','Android development','Flutter','Kotlin','XML','Java','Kivy','GIT','SDK','SQLite']
 						rec_course = course_recommender(android_course)
 						break
 
@@ -258,6 +265,7 @@ def profile_completion(request, pk):
 					elif i.lower() in ios_keyword:
 						print(i.lower())
 						reco_field = 'IOS Development'
+						recommended_skills = ['IOS','IOS Development','Swift','Cocoa','Cocoa Touch','Xcode','Objective-C','SQLite','Plist','StoreKit',"UI-Kit",'AV Foundation','Auto-Layout']
 						rec_course = course_recommender(ios_course)
 						break
 
@@ -265,39 +273,57 @@ def profile_completion(request, pk):
 					elif i.lower() in uiux_keyword:
 						print(i.lower())
 						reco_field = 'UI-UX Development'
+						recommended_skills = ['UI','User Experience','Adobe XD','Figma','Zeplin','Balsamiq','Prototyping','Wireframes','Storyframes','Adobe Photoshop','Editing','Illustrator','After Effects','Premier Pro','Indesign','Wireframe','Solid','Grasp','User Research']
 						rec_course = course_recommender(uiux_course)
 						break
+				analysis_object.predicted_field=reco_field
+				analysis_object.reco_skills=str(recommended_skills)
+				analysis_object.reco_courses=str(rec_course)
 				resume_score = 0
+				recommendations=[]
 				if 'Objective' in resume_text:
 					resume_score = resume_score+20
-					print("Objectives added good")
+					recommendations.append('Awesome! You have added Objective')
+					# print("Objectives added good")
 				else:
-					print("According to our recommendation please add your career objective, it will give your career intension to the Recruiters")
+					recommendations.append('According to our recommendation please add your career objective, it will give your career intension to the Recruiters')
+					# print("According to our recommendation please add your career objective, it will give your career intension to the Recruiters")
 				if 'Declaration'  in resume_text:
 					resume_score = resume_score + 20
-					print("Declaration added good")
+					recommendations.append('Awesome! You have added Declaration')
+					# print("Declaration added good")
 				else:
-					print("According to our recommendation please add Declaration✍. It will give the assurance that everything written on your resume is true and fully acknowledged by you")
+					recommendations.append('According to our recommendation please add Declaration. It will give the assurance that everything written on your resume is true and fully acknowledged by you')
+					# print("According to our recommendation please add Declaration✍. It will give the assurance that everything written on your resume is true and fully acknowledged by you")
 				if 'Hobbies' or 'Interests'in resume_text:
 					resume_score = resume_score + 20
-					print("Hobbies or interests are added good")
+					recommendations.append('Awesome! You have added Hobbies')
+					# print("Hobbies or interests are added good")
 				else:
-					print("According to our recommendation please add Hobbies⚽. It will show your persnality to the Recruiters and give the assurance that you are fit for this role or not.")
+					recommendations.append("According to our recommendation please add Hobbies. It will show your persnality to the Recruiters and give the assurance that you are fit for this role or not.")
+					# print("According to our recommendation please add Hobbies⚽. It will show your persnality to the Recruiters and give the assurance that you are fit for this role or not.")
 				if 'Achievements' in resume_text:
 					resume_score = resume_score + 20
-					print("Achievements added good")
+					recommendations.append("Awesome! You have added Achievements")
+					# print("Achievements added good")
 				else:
-					print("According to our recommendation please add Achievements🏅. It will show that you are capable for the required position.")
+					recommendations.append("According to our recommendation please add Achievements. It will show that you are capable for the required position.")
+					# print("According to our recommendation please add Achievements🏅. It will show that you are capable for the required position.")
 				if 'Projects' in resume_text:
 					resume_score = resume_score + 20
-					print("Projects added good")
+					recommendations.append("Awesome! You have added Projects")
+					# print("Projects added good")
 				else:
-					print("According to our recommendation please add Projects👨‍💻. It will show that you have done work related the required position or not.")
+					recommendations.append("According to our recommendation please add Projects. It will show that you have done work related the required position or not.")
+					# print("According to our recommendation please add Projects👨‍💻. It will show that you have done work related the required position or not.")
 				score = 0
 				for percent_complete in range(resume_score):
 					score +=1
 					time.sleep(0.1)
-				print("Your resume score: ", score)
+				analysis_object.resume_score=score
+				analysis_object.recommendations=str(recommendations)
+				analysis_object.save()
+				# print("Your resume score: ", score)
 		if(empls.photo):
 			request.session['photo']=empls.photo.url
 		return redirect("candidate:dashboard", pk=jobseeker.user_id)
