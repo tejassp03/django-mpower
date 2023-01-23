@@ -1,0 +1,309 @@
+{% extends 'candidate-index.html' %}
+
+{% block title %}
+<title>mpower - Candidate dashboard - Edit profile</title>
+{% endblock %}
+
+{% block content %}
+{% load static %}
+
+<div class="pxp-dashboard-content-details">
+    <h1>Resume Strength</h1>
+    <p class="pxp-text-light">Your strengths and weaknesses according to your resume</p>
+    <div class="mt-4 mt-lg-5">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <tbody>
+                    <tr>
+                        <td style="width: 75%;">
+                            <div class="pxp-dashboard-notifications-item-left">
+                                <div class="pxp-dashboard-notifications-item-message">
+                                    <h5>Resume Score</h5>
+                                </div>
+                            </div>
+                        </td>
+                        <td style="width: 20%;"><div class="pxp-dashboard-notifications-item-right"><h5>{{ context.score }}</h5></div></td>
+                    </tr>
+                    <tr>
+                        <td style="width: 75%;">
+                            <div class="pxp-dashboard-notifications-item-left">
+                                <div class="pxp-dashboard-notifications-item-message">
+                                    <h5>Number of pages</h5>
+                                </div>
+                            </div>
+                        </td>
+                        <td style="width: 20%;"><div class="pxp-dashboard-notifications-item-right"><h5>{{ context.num }}</h5></div></td>
+                    </tr>
+                    <tr>
+                        <td style="width: 75%;">
+                            <div class="pxp-dashboard-notifications-item-left">
+                                <div class="pxp-dashboard-notifications-item-message">
+                                    <h5>Predicted Field</h5>
+                                </div>
+                            </div>
+                        </td>
+                        <td style="width: 20%;"><div class="pxp-dashboard-notifications-item-right"><h5>{{ context.predicted }}</h5></div></td>
+                    </tr>
+                    <tr>
+                        <td style="width: 75%;">
+                            <div class="pxp-dashboard-notifications-item-left">
+                                <div class="pxp-dashboard-notifications-item-message">
+                                    <h5>User Level</h5>
+                                </div>
+                            </div>
+                        </td>
+                        <td style="width: 20%;"><div class="pxp-dashboard-notifications-item-right"><h5>{{ context.user }}</h5></div></td>
+                    </tr>
+                    <tr>
+                        <td style="width: 75%;">
+                            <div class="pxp-dashboard-notifications-item-left">
+                                <div class="pxp-dashboard-notifications-item-message">
+                                    <h5>Skills</h5>
+                                </div>
+                            </div>
+                        </td>
+                        <td style="width: 20%;"><div class="pxp-dashboard-notifications-item-right"><h5>{{ context.skills }}</h5></div></td>
+                    </tr>
+                    <tr>
+                        <td style="width: 75%;">
+                            <div class="pxp-dashboard-notifications-item-left">
+                                <div class="pxp-dashboard-notifications-item-message">
+                                    <h5>Recommended Skills</h5>
+                                </div>
+                            </div>
+                        </td>
+                        <td style="width: 20%;"><div class="pxp-dashboard-notifications-item-right"><h5>{{ context.reco_skills }}</h5></div></td>
+                    </tr>
+                    <tr>
+                        <td style="width: 75%;">
+                            <div class="pxp-dashboard-notifications-item-left">
+                                <div class="pxp-dashboard-notifications-item-message">
+                                    <h5>Recommended courses</h5>
+                                </div>
+                            </div>
+                        </td>
+                        <td style="width: 20%;"><div class="pxp-dashboard-notifications-item-right"><h5>{{ context.reco_courses }}</h5></div></td>
+                    </tr>
+                    <tr>
+                        <td style="width: 75%;">
+                            <div class="pxp-dashboard-notifications-item-left">
+                                <div class="pxp-dashboard-notifications-item-message">
+                                    <h5>Recommendations</h5>
+                                </div>
+                            </div>
+                        </td>
+                        <td style="width: 20%;"><div class="pxp-dashboard-notifications-item-right"><h5>{{ context.recommendations }}</h5></div></td>
+                    </tr>
+                    <tr>
+                        <td style="width: 75%;">
+                            <div class="pxp-dashboard-notifications-item-left">
+                                <div class="pxp-dashboard-notifications-item-type"><span class="fa fa-briefcase"></span></div>
+                                <div class="pxp-dashboard-notifications-item-message">
+                                    <a href="#">Artistre Studio</a> viewed your profile.
+                                </div>
+                            </div>
+                        </td>
+                        <td style="width: 20%;"><div class="pxp-dashboard-notifications-item-right">20m ago</div></td>
+                        <td>
+                            <div class="pxp-dashboard-table-options">
+                                <ul class="list-unstyled">
+                                    <li><button title="Delete"><span class="fa fa-trash-o"></span></button></li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 75%;">
+                            <div class="pxp-dashboard-notifications-item-left">
+                                <div class="pxp-dashboard-notifications-item-type"><span class="fa fa-envelope-o"></span></div>
+                                <div class="pxp-dashboard-notifications-item-message">
+                                    <a href="#">CoderBotics</a> sent you a message.
+                                </div>
+                            </div>
+                        </td>
+                        <td style="width: 20%;"><div class="pxp-dashboard-notifications-item-right">1h ago</div></td>
+                        <td>
+                            <div class="pxp-dashboard-table-options">
+                                <ul class="list-unstyled">
+                                    <li><button title="Delete"><span class="fa fa-trash-o"></span></button></li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 75%;">
+                            <div class="pxp-dashboard-notifications-item-left">
+                                <div class="pxp-dashboard-notifications-item-type"><span class="fa fa-briefcase"></span></div>
+                                <div class="pxp-dashboard-notifications-item-message">
+                                    <a href="#">Illuminate Studio</a> viewed your profile.
+                                </div>
+                            </div>
+                        </td>
+                        <td style="width: 20%;"><div class="pxp-dashboard-notifications-item-right">3h ago</div></td>
+                        <td>
+                            <div class="pxp-dashboard-table-options">
+                                <ul class="list-unstyled">
+                                    <li><button title="Delete"><span class="fa fa-trash-o"></span></button></li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 75%;">
+                            <div class="pxp-dashboard-notifications-item-left">
+                                <div class="pxp-dashboard-notifications-item-type"><span class="fa fa-briefcase"></span></div>
+                                <div class="pxp-dashboard-notifications-item-message">
+                                    <a href="#">Syspresoft</a> viewed your profile.
+                                </div>
+                            </div>
+                        </td>
+                        <td style="width: 20%;"><div class="pxp-dashboard-notifications-item-right">20m ago</div></td>
+                        <td>
+                            <div class="pxp-dashboard-table-options">
+                                <ul class="list-unstyled">
+                                    <li><button title="Delete"><span class="fa fa-trash-o"></span></button></li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 75%;">
+                            <div class="pxp-dashboard-notifications-item-left">
+                                <div class="pxp-dashboard-notifications-item-type"><span class="fa fa-envelope-o"></span></div>
+                                <div class="pxp-dashboard-notifications-item-message">
+                                    <a href="#">Illuminate Studio</a> sent you a message.
+                                </div>
+                            </div>
+                        </td>
+                        <td style="width: 20%;"><div class="pxp-dashboard-notifications-item-right">1h ago</div></td>
+                        <td>
+                            <div class="pxp-dashboard-table-options">
+                                <ul class="list-unstyled">
+                                    <li><button title="Delete"><span class="fa fa-trash-o"></span></button></li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 75%;">
+                            <div class="pxp-dashboard-notifications-item-left">
+                                <div class="pxp-dashboard-notifications-item-type"><span class="fa fa-briefcase"></span></div>
+                                <div class="pxp-dashboard-notifications-item-message">
+                                    <a href="#">Illuminate Studio</a> viewed your profile.
+                                </div>
+                            </div>
+                        </td>
+                        <td style="width: 20%;"><div class="pxp-dashboard-notifications-item-right">3h ago</div></td>
+                        <td>
+                            <div class="pxp-dashboard-table-options">
+                                <ul class="list-unstyled">
+                                    <li><button title="Delete"><span class="fa fa-trash-o"></span></button></li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 75%;">
+                            <div class="pxp-dashboard-notifications-item-left">
+                                <div class="pxp-dashboard-notifications-item-type"><span class="fa fa-briefcase"></span></div>
+                                <div class="pxp-dashboard-notifications-item-message">
+                                    <a href="#">Syspresoft</a> viewed your profile.
+                                </div>
+                            </div>
+                        </td>
+                        <td style="width: 20%;"><div class="pxp-dashboard-notifications-item-right">20m ago</div></td>
+                        <td>
+                            <div class="pxp-dashboard-table-options">
+                                <ul class="list-unstyled">
+                                    <li><button title="Delete"><span class="fa fa-trash-o"></span></button></li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 75%;">
+                            <div class="pxp-dashboard-notifications-item-left">
+                                <div class="pxp-dashboard-notifications-item-type"><span class="fa fa-envelope-o"></span></div>
+                                <div class="pxp-dashboard-notifications-item-message">
+                                    <a href="#">CoderBotics</a> sent you a message.
+                                </div>
+                            </div>
+                        </td>
+                        <td style="width: 20%;"><div class="pxp-dashboard-notifications-item-right">1h ago</div></td>
+                        <td>
+                            <div class="pxp-dashboard-table-options">
+                                <ul class="list-unstyled">
+                                    <li><button title="Delete"><span class="fa fa-trash-o"></span></button></li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 75%;">
+                            <div class="pxp-dashboard-notifications-item-left">
+                                <div class="pxp-dashboard-notifications-item-type"><span class="fa fa-briefcase"></span></div>
+                                <div class="pxp-dashboard-notifications-item-message">
+                                    <a href="#">CoderBotics</a> viewed your profile.
+                                </div>
+                            </div>
+                        </td>
+                        <td style="width: 20%;"><div class="pxp-dashboard-notifications-item-right">3h ago</div></td>
+                        <td>
+                            <div class="pxp-dashboard-table-options">
+                                <ul class="list-unstyled">
+                                    <li><button title="Delete"><span class="fa fa-trash-o"></span></button></li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 75%;">
+                            <div class="pxp-dashboard-notifications-item-left">
+                                <div class="pxp-dashboard-notifications-item-type"><span class="fa fa-envelope-o"></span></div>
+                                <div class="pxp-dashboard-notifications-item-message">
+                                    <a href="#">CoderBotics</a> sent you a message.
+                                </div>
+                            </div>
+                        </td>
+                        <td style="width: 20%;"><div class="pxp-dashboard-notifications-item-right">1h ago</div></td>
+                        <td>
+                            <div class="pxp-dashboard-table-options">
+                                <ul class="list-unstyled">
+                                    <li><button title="Delete"><span class="fa fa-trash-o"></span></button></li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="modal fade pxp-user-modal" id="pxp-signup-modal" aria-hidden="true" aria-labelledby="signupModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="pxp-user-modal-fig text-center">
+                    <img src="{% static 'images/underconstruction.png' %}" alt="Sign up">
+                </div>
+                <h5 class="modal-title text-center mt-4" id="signupModal">Under Development</h5>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block script %}
+$(document).ready(function () {
+    $('#das').removeClass('pxp-active');
+    $('#edi').removeClass('pxp-active');
+    $('#app').removeClass('pxp-active');
+    $('#fav').removeClass('pxp-active');
+    $('#cha').removeClass('pxp-active');
+    $('#inb').removeClass('pxp-active');
+    $('#not').removeClass('pxp-active');
+    $('#res').addClass('pxp-active');
+    $('#fee').removeClass('pxp-active');
+    $('#sug').removeClass('pxp-active');
+})
+{% endblock %}

@@ -6652,12 +6652,13 @@ input[type=date]:focus::-webkit-datetime-edit {
     text-align: center;
     position: relative;
     padding-top: 20px;
-    min-height: 700px;
+    min-height: 115vh;
     height: auto;
     max-width: 820px;
     margin: 0 auto;
     background: #ffffff;
     z-index: 1;
+    overflow: hidden;
   }
   .multi_step_form #msform .tittle {
     text-align: center;
@@ -7582,3 +7583,25 @@ main.show {
 .specialInputQuestionsa{
     width: 98% !important;
 }
+
+.intimage{
+    width: 45vw;
+    margin-top: 100px;
+    margin-bottom: 100px;
+}
+
+@media (max-width: 767px) {
+    .intimage {
+        width: 65vw;
+        margin-top: 100px;
+        margin-bottom: 100px;
+    }
+}
+
+@media (min-width: 576px) {
+    .widthadjuster{
+        max-width: 80vw;
+    }
+}
+
+

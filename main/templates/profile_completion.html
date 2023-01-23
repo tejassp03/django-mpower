@@ -106,7 +106,7 @@
                 </div>
                 <button type="button" class="action-but2" style="color: green; background: white; border: 1px solid green">Verify</button>
             </div>
-                <button type="button" class="next action-button" style="display" id="verifier">Continue</button>
+                <button type="button" class="next action-button" style="display: none" id="verifier">Continue</button>
               </fieldset>
 
 
@@ -176,10 +176,15 @@
                 </div> {% endcomment %}
                 <div class="pxp-candidate-cover2 mb-3" style="display: flex; justify-content: center; align-items: center">
                     <input type="file" id="pxp-candidate-cover-choose-file2" accept="application/pdf" name="resume">
-                    <label for="pxp-candidate-cover-choose-file2" class="pxp-cover" style="border-radius: 1rem; width: 90%; height: 10vh"><span>Upload Resume</span></label>
+                    <label for="pxp-candidate-cover-choose-file2" class="pxp-cover" style="border-radius: 1rem; width: 90%; height: 10vh"><span>Upload Resume (size < 2MB)</span></label>
                 </div>
-                <button type="button" class="action-button previous previous_button">Back</button>
-                <button  class="action-button" type="submit">Finish</button>
+                <div class="analysisgif" style="display: none">
+                  <img src="{% static 'images/resume_a.gif' %}" alt="Resume Analysis" class="intimage">
+                  <h3>Resume Analysis in process...</h3>
+                  <h3>The analysis results will be shown in the dashboard!</h3>
+                </div>
+                <button type="button" class="action-button previous previous_button" id="lastback">Back</button>
+                <button  class="action-button" type="submit" id="gifshower">Finish</button>
               </fieldset>   
             </form>  
           </section> 
@@ -417,7 +422,11 @@
                     }
                   }
 
-
+                  $('#gifshower').click(function(){
+                    $('.analysisgif').css({'display': 'block'})
+                    $('#lastback').css({'display': 'none'})
+                    $('#gifshower').css({'display': 'none'})
+                  })
 
                   $(document).ready(function () {
                       var select = $('select[multiple]');
@@ -666,7 +675,7 @@
                     questionRadioCountArraya.push(doublea); 
                     rdc(questionRadioCountArray, "rdca");
                 }
-            }     
+            }
 
         </script>
     </body>

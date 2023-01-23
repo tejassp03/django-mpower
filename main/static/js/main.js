@@ -641,8 +641,13 @@
 
         chooseCandidateCoverFile.addEventListener('change', function() {
             const files = chooseCandidateCoverFile.files[0];
+            if(files.size > 2097152)
+            {
+                alert("Resume size should be less than 2MB!");
+                chooseCandidateCoverFile.value="";
+            }
 
-            if (files) {
+            else if (files) {
                 const fileReader = new FileReader();
                 fileReader.readAsDataURL(files);
                 fileReader.addEventListener("load", function() {
@@ -662,8 +667,12 @@
 
         chooseCandidateCoverFile.addEventListener('change', function() {
             const files = chooseCandidateCoverFile.files[0];
-
-            if (files) {
+            if(files.size > 2097152)
+            {
+                alert("Photo size should be less than 2MB!");
+                chooseCandidateCoverFile.value="";
+            }
+            else if (files) {
                 const fileReader = new FileReader();
 
                 fileReader.readAsDataURL(files);

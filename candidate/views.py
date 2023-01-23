@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from main.models import JobSeeker, Employer, Jobs, Application, Selection, Login, ExperienceJob, Education, ProfileVisits, Threads, Messages
+from main.models import JobSeeker, Employer, Jobs, Application, Selection, Login, ExperienceJob, Education, ProfileVisits, Threads, Messages, ResumeAnalysis
 from json import dumps
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
@@ -20,6 +20,15 @@ def dashboard(request, pk):
     # i = {'post': 'ABC', 'com_name': 'Microsoft', 'industry': 'software', 'location': 'US'}
     # applics.append(i)
     return render(request, 'dashboard-candidate.html', {'user': context, 'applications': applics, 'pk': pk, 'profile': profile})
+
+
+def jobapp(request, pk):
+    jobinfo = Jobs.objects.filter(jobid=request.GET['jobid'])
+    employer = Employer.objects.filter(eid=jobinfo[0].eid.eid)
+    image=""
+    if(employer[0].logo):
+        image = str(employer[0].logo.url)
+    return JsonResponse({'logo': image, 'info': dumps(list(jobinfo.values()), default=str), 'company': dumps(list(employer.values()))})
 
 
 def edit_profile(request, pk):
@@ -235,3 +244,17 @@ def seenmes(request, pk):
             i.is_read=True
             i.save()
         return JsonResponse({'message': 'Y'})
+
+
+def resume(request, pk):
+    context=ResumeAnalysis.objects.get(jobseeker_id=pk)
+    data={}
+    data['score']=context.resume_score
+    data['num']=context.no_of_pages
+    data['predicted']=context.predicted_field
+    data['user']=context.user_level
+    data['skills']=context.actual_skills[1:-1].split(",")
+    data['reco_skills']=context.reco_skills[1:-1].split(",")
+    data['reco_courses']=context.reco_courses[1:-1].split(",")
+    data['recommendations']=context.recommendations[1:-1].split(",")
+    return render(request, 'resume.html', {'pk': pk, 'context': data})

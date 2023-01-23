@@ -15,7 +15,7 @@ from django.http import JsonResponse
 
 import streamlit as st
 import pandas as pd
-import time,datetime
+import time
 from pyresparser import ResumeParser
 from pdfminer3.layout import LAParams, LTTextBox
 from pdfminer3.pdfpage import PDFPage
@@ -223,8 +223,10 @@ def profile_completion(request, pk):
 					cand_level = "Intermediate"
 				elif resume_data['no_of_pages'] >=3:
 					cand_level = "Experienced"
-				analysis_object.user_level=cand_level
-				analysis_object.actual_skills=str(resume_data['skills'])
+				if(cand_level):
+					analysis_object.user_level=cand_level
+				if(resume_data['skills']):
+					analysis_object.actual_skills=str(resume_data['skills'])
 				# print(resume_data['skills'])
 				ds_keyword = ['tensorflow','keras','pytorch','machine learning','deep Learning','flask','streamlit']
 				web_keyword = ['react', 'django', 'node jS', 'react js', 'php', 'laravel', 'magento', 'wordpress',
@@ -239,7 +241,7 @@ def profile_completion(request, pk):
 				for i in resume_data['skills']:
                     ## Data science recommendation
 					if i.lower() in ds_keyword:
-						print(i.lower())
+						# print(i.lower())
 						reco_field = 'Data Science'
 						recommended_skills = ['Data Visualization','Predictive Analysis','Statistical Modeling','Data Mining','Clustering & Classification','Data Analytics','Quantitative Analysis','Web Scraping','ML Algorithms','Keras','Pytorch','Probability','Scikit-learn','Tensorflow',"Flask",'Streamlit']
 						rec_course = course_recommender(ds_course)
@@ -247,7 +249,7 @@ def profile_completion(request, pk):
 
 					## Web development recommendation
 					elif i.lower() in web_keyword:
-						print(i.lower())
+						# print(i.lower())
 						reco_field = 'Web Development'
 						recommended_skills = ['React','Django','Node JS','React JS','php','laravel','Magento','wordpress','Javascript','Angular JS','c#','Flask','SDK']
 						rec_course = course_recommender(web_course)
@@ -255,7 +257,7 @@ def profile_completion(request, pk):
 
 					## Android App Development
 					elif i.lower() in android_keyword:
-						print(i.lower())
+						# print(i.lower())
 						reco_field = 'Android Development'
 						recommended_skills = ['Android','Android development','Flutter','Kotlin','XML','Java','Kivy','GIT','SDK','SQLite']
 						rec_course = course_recommender(android_course)
@@ -263,7 +265,7 @@ def profile_completion(request, pk):
 
 					## IOS App Development
 					elif i.lower() in ios_keyword:
-						print(i.lower())
+						# print(i.lower())
 						reco_field = 'IOS Development'
 						recommended_skills = ['IOS','IOS Development','Swift','Cocoa','Cocoa Touch','Xcode','Objective-C','SQLite','Plist','StoreKit',"UI-Kit",'AV Foundation','Auto-Layout']
 						rec_course = course_recommender(ios_course)
@@ -271,14 +273,17 @@ def profile_completion(request, pk):
 
 					## Ui-UX Recommendation
 					elif i.lower() in uiux_keyword:
-						print(i.lower())
+						# print(i.lower())
 						reco_field = 'UI-UX Development'
 						recommended_skills = ['UI','User Experience','Adobe XD','Figma','Zeplin','Balsamiq','Prototyping','Wireframes','Storyframes','Adobe Photoshop','Editing','Illustrator','After Effects','Premier Pro','Indesign','Wireframe','Solid','Grasp','User Research']
 						rec_course = course_recommender(uiux_course)
 						break
-				analysis_object.predicted_field=reco_field
-				analysis_object.reco_skills=str(recommended_skills)
-				analysis_object.reco_courses=str(rec_course)
+				if(reco_field):
+					analysis_object.predicted_field=reco_field
+				if(recommended_skills):
+					analysis_object.reco_skills=str(recommended_skills)
+				if(rec_course):
+					analysis_object.reco_courses=str(rec_course)
 				resume_score = 0
 				recommendations=[]
 				if 'Objective' in resume_text:

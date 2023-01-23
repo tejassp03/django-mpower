@@ -7,6 +7,7 @@ app_name = 'candidate'
 
 urlpatterns = [
 	path('', views.dashboard, name ='dashboard'),
+	path('jobapp/', views.jobapp, name='jobapp'),
 	path('edit_profile/', views.edit_profile, name='edit'),
 	path('edit_profile/add_skill/', views.add_skill, name='add_skill'),
 	path('edit_profile/add_exp/', views.add_exp, name='add_exp'),
@@ -21,7 +22,8 @@ urlpatterns = [
 	path('<int:pk2>/startconver/<pk3>/send', views.send, name='send'),
 	path('inbox/sendfrom/', views.sendfromcand, name="sendfrom"),
 	path('inbox/fetchmess/', views.fetchmess, name="fetchmess"),
-	path('inbox/seenmes/', views.seenmes, name='seenmes')
+	path('inbox/seenmes/', views.seenmes, name='seenmes'),
+	path('resume/', views.resume, name='resume')
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 # if settings.DEBUG:
