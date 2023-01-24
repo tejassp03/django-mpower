@@ -152,11 +152,17 @@ def inbox(request, pk):
     temp_threads=[dumps(list(threads.values()), default=str)]
     messages=[]
     temp_messages=[]
+    empls=[]
+    temp_empls=[]
     for i in threads:
         mess=Messages.objects.filter(msg_id=i.msg_id)
         messages.append(dumps(list(mess.values()), default=str))
         temp_messages.append(mess)
-    return render(request, 'inbox-candidate.html', {'pk': pk, 'threads': threads, 'mess': messages, 'thre': temp_threads, 'm': temp_messages})
+        logs_info=Employer.objects.get(log_id=i.sender.log_id)
+        logs_info2=Employer.objects.filter(log_id=i.sender.log_id)
+        temp_empls.append(logs_info)
+        empls.append(dumps(list(logs_info2.values()), default=str))
+    return render(request, 'inbox-candidate.html', {'pk': pk, 'threads': threads, 'mess': messages, 'thre': temp_threads, 'm': temp_messages, 'emp': empls, 'initial': zip(threads, temp_empls)})
 
 
 def under_development(request, pk):
