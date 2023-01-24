@@ -23,7 +23,8 @@ urlpatterns = [
 	path('inbox/sendfrom/', views.sendfromcand, name="sendfrom"),
 	path('inbox/fetchmess/', views.fetchmess, name="fetchmess"),
 	path('inbox/seenmes/', views.seenmes, name='seenmes'),
-	path('resume/', views.resume, name='resume')
+	path('resume/', views.resume, name='resume'),
+	path('logout/', views.logout, name='logout')
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 # if settings.DEBUG:

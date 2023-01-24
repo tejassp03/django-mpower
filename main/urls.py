@@ -20,6 +20,7 @@ urlpatterns = [
 	path('profile_completion/<int:pk>/post_otp/', views.verify_otp, name='verify_otp'),
 	path('emp_completion/<int:pk>/get_otp/', views.get_otp, name='eget_otp'),
 	path('emp_completion/<int:pk>/post_otp/', views.verify_otp, name='everify_otp'),
+	path('singlejob/<int:pk2>/', views.singlejob, name='singlejob'),
 	path('candidate/<int:pk>/', include('candidate.urls', namespace = 'candidate')),
 ]
 

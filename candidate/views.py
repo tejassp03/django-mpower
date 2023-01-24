@@ -247,14 +247,30 @@ def seenmes(request, pk):
 
 
 def resume(request, pk):
-    context=ResumeAnalysis.objects.get(jobseeker_id=pk)
     data={}
-    data['score']=context.resume_score
-    data['num']=context.no_of_pages
-    data['predicted']=context.predicted_field
-    data['user']=context.user_level
-    data['skills']=context.actual_skills
-    data['reco_skills']=context.reco_skills
-    data['reco_courses']=context.reco_courses
-    data['recommendations']=context.recommendations
+    try:
+        context=ResumeAnalysis.objects.get(jobseeker_id=pk)
+        data['score']=context.resume_score
+        data['num']=context.no_of_pages
+        data['predicted']=context.predicted_field
+        data['user']=context.user_level
+        data['skills']=context.actual_skills
+        data['reco_skills']=context.reco_skills
+        data['reco_courses']=context.reco_courses
+        data['recommendations']=context.recommendations
+        data['upload']="Y"
+    except:
+        data['score']=0
+        data['num']=0
+        data['predicted']=""
+        data['user']=""
+        data['skills']=""
+        data['reco_skills']=""
+        data['reco_courses']=""
+        data['recommendations']=""
+        data['upload']="N"
     return render(request, 'resume.html', {'pk': pk, 'context': data})
+
+def logout(request, pk):
+    request.session.flush()
+    return redirect('main:index')

@@ -19,8 +19,7 @@
                 <div class="offcanvas offcanvas-start pxp-nav-mobile-container" tabindex="-1" id="pxpMobileNav">
                     <div class="offcanvas-header">
                         <div class="pxp-logo">
-                            <a                 <a href="{% url 'main:index' %}" class="pxp-animate"><span style="color: var(--pxpMainColor)">m</span>power</a>
-                            class="pxp-animate"><span style="color: var(--pxpMainColor)">m</span>power</a>
+                            <a href="{% url 'main:index' %}" class="pxp-animate"><span style="color: var(--pxpMainColor)">m</span>power</a>
                         </div>
                         <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
                     </div>
@@ -144,18 +143,22 @@
             <nav class="pxp-user-nav d-none d-sm-flex">
                 <a ref="{% url 'main:postjob' %}" class="btn rounded-pill pxp-nav-btn">Post a Job</a>
                 
-                {% if 'session_id' in request.session %}
-               <div class="dropdown pxp-user-nav-dropdown">
-                    <a href="index.html" class="dropdown-toggle" data-bs-toggle="dropdown">
-                        <div class="pxp-user-nav-avatar pxp-cover" style="background-image: url(/static/images/user.png);"></div>
-                        <div class="pxp-user-nav-name d-none d-md-block">Derek Cotner</div>
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="candidate-dashboard.html">Dashboard</a></li>
-                        <li><a class="dropdown-item" href="candidate-dashboard-profile.html">Edit profile</a></li>
-                        <li><a class="dropdown-item" href="index.html">Logout</a></li>
-                    </ul>
-                </div>
+                {% if 'email' in request.session %}
+                <div class="dropdown pxp-user-nav-dropdown">
+                        <a href="index.html" class="dropdown-toggle" data-bs-toggle="dropdown">
+                            {% if request.session.photo %}
+                            <div class="pxp-user-nav-avatar pxp-cover" style="background-image: url('{{ request.session.photo }}')"></div>
+                            {% else %}
+                            <div class="pxp-user-nav-avatar pxp-cover" style="background-image: url()"></div>
+                            {% endif %}
+                            <div class="pxp-user-nav-name d-none d-md-block" id="blackcolor">{{ request.session.name }}</div>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="{% url 'candidate:dashboard' pk=request.session.pk %}">Dashboard</a></li>
+                            <li><a class="dropdown-item" href="{% url 'candidate:edit' pk=request.session.pk %}">Edit profile</a></li>
+                            <li><a class="dropdown-item" href="{% url 'candidate:logout' pk=request.session.pk  %}">Logout</a></li>
+                        </ul>
+                    </div>
                 {% else %}
                 {% comment %} <a class="btn rounded-pill pxp-user-nav-trigger pxp-on-light"  href="{% url 'main:user_login' %}" role="button">Sign in</a> {% endcomment %}
                 <a id="signin" role="button" class="btn rounded-pill pxp-user-nav-trigger pxp-on-light" data-bs-target="#pxp-signin-modal" data-bs-toggle="modal">Sign in</a>

@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate,login
 from django.contrib import messages
-from .models import JobSeeker, Login, Employer, ResumeAnalysis
+from .models import JobSeeker, Login, Employer, ResumeAnalysis, Jobs
 import random
 import re
 from django.contrib.auth.hashers import make_password, check_password
@@ -54,6 +54,7 @@ def index(request):
 				request.session['password'] = request.POST['c_pass']
 				empls=JobSeeker.objects.get(log_id=user[0].log_id)
 				request.session['name']=empls.name
+				request.session['pk']=empls.user_id
 				if(empls.photo):
 					request.session['photo']=empls.photo.url
 				if(request.POST['user'] == 'candidate'):
@@ -140,7 +141,12 @@ def findjobs(request):
 	context = {
     'var': 6
     }
-	return render(request, 'jobs-list-3.html',context)
+	jobs=Jobs.objects.all()
+	companies=[]
+	for i in jobs:
+		companies.append(Employer.objects.get(eid=i.eid.eid))
+	categories=Jobs.objects.order_by().values('fnarea').distinct()
+	return render(request, 'jobs.html', {'jobs': zip(jobs, companies), 'categories': categories})
 
 def profile_completion(request, pk):
 	if request.method=='POST':
@@ -205,6 +211,7 @@ def profile_completion(request, pk):
 		request.session['password'] = loger.password
 		empls=JobSeeker.objects.get(log_id=pk)
 		request.session['name']=empls.name
+		request.session['pk']=empls.user_id
 		if(empls.Resume):
 			analysis_object = ResumeAnalysis()
 			analysis_object.jobseeker_id = empls
@@ -430,4 +437,10 @@ def verify_otp(request, pk):
 		if OTP.verify(int(request.POST['OTP'])):
 			return JsonResponse({'message': 'Phone number verified'})
 	return JsonResponse({'message': 'Please enter correct OTP'})
+
+
+def singlejob(request, pk2):
+	jobdet=Jobs.objects.get(jobid=pk2)
+	companydet=Employer.objects.get(eid=jobdet.eid.eid)
+	return render(request, 'singlejob.html', {'job_details': jobdet, 'company_details': companydet})
 

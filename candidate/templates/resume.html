@@ -121,8 +121,16 @@ $(document).ready(function () {
     $('#sug').removeClass('pxp-active');
     var progressval = {{ context.score }};
     var elm = document.getElementsByClassName('progressab')[0];
-    elm.style.width = progressval+"%";
-    elm.innerText = progressval+"%";
+    if("{{ context.upload }}"=="Y")
+    {
+        elm.style.width = progressval+"%";
+        elm.innerText = progressval+"%";
+    }
+    else
+    {
+        elm.style.width = 100+"%";
+        elm.innerText="Please upload your resume";
+    }
     if(progressval>90 && progressval<=100 )
     {   
         elm.style.backgroundColor = 'green';                                 
@@ -160,11 +168,11 @@ $(document).ready(function () {
     abc=getter("{{context.reco_skills}}".split(","), ", ")
     document.getElementById('recskil').innerText=abc
 
-    abc=getter("{{context.reco_courses}}".split(","), "\n")
-    document.getElementById('reccour').innerText=abc
+    abc=getter("{{context.reco_courses}}".split(","), "<hr />")
+    document.getElementById('reccour').innerHTML=abc
 
-    abc=getter("{{context.recommendations}}".split(","), "\n")
-    document.getElementById('rec').innerText=abc
+    abc=getter("{{context.recommendations}}".split(","), "<hr />")
+    document.getElementById('rec').innerHTML=abc
 
 })
 {% endblock %}
