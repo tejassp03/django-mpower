@@ -253,8 +253,8 @@ def resume(request, pk):
     data['num']=context.no_of_pages
     data['predicted']=context.predicted_field
     data['user']=context.user_level
-    data['skills']=context.actual_skills[1:-1].split(",")
-    data['reco_skills']=context.reco_skills[1:-1].split(",")
-    data['reco_courses']=context.reco_courses[1:-1].split(",")
-    data['recommendations']=context.recommendations[1:-1].split(",")
+    data['skills']=context.actual_skills
+    data['reco_skills']=context.reco_skills
+    data['reco_courses']=context.reco_courses
+    data['recommendations']=context.recommendations
     return render(request, 'resume.html', {'pk': pk, 'context': data})

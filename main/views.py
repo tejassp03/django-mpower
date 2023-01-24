@@ -226,7 +226,11 @@ def profile_completion(request, pk):
 				if(cand_level):
 					analysis_object.user_level=cand_level
 				if(resume_data['skills']):
-					analysis_object.actual_skills=str(resume_data['skills'])
+					final=""
+					for i in resume_data['skills']:
+						if(i!=""):
+							final=final+","+i
+					analysis_object.actual_skills=final
 				# print(resume_data['skills'])
 				ds_keyword = ['tensorflow','keras','pytorch','machine learning','deep Learning','flask','streamlit']
 				web_keyword = ['react', 'django', 'node jS', 'react js', 'php', 'laravel', 'magento', 'wordpress',
@@ -281,9 +285,17 @@ def profile_completion(request, pk):
 				if(reco_field):
 					analysis_object.predicted_field=reco_field
 				if(recommended_skills):
-					analysis_object.reco_skills=str(recommended_skills)
+					final=""
+					for i in recommended_skills:
+						if(i!=""):
+							final=final+","+i
+					analysis_object.reco_skills=final
 				if(rec_course):
-					analysis_object.reco_courses=str(rec_course)
+					final=""
+					for i in rec_course:
+						if(i!=""):
+							final=final+","+i
+					analysis_object.reco_courses=final
 				resume_score = 0
 				recommendations=[]
 				if 'Objective' in resume_text:
@@ -326,7 +338,11 @@ def profile_completion(request, pk):
 					score +=1
 					time.sleep(0.1)
 				analysis_object.resume_score=score
-				analysis_object.recommendations=str(recommendations)
+				final=""
+				for i in recommendations:
+					if(i!=""):
+						final=final+","+i
+				analysis_object.recommendations=final
 				analysis_object.save()
 				# print("Your resume score: ", score)
 		if(empls.photo):
