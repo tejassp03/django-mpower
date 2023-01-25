@@ -51,8 +51,13 @@
             <div class="pxp-dashboard-inbox-messages-container">
                 <div class="pxp-dashboard-inbox-messages-header">
                     <div class="pxp-dashboard-inbox-list-item-left">
+                        {% if first.logo %}
+                        <div class="pxp-dashboard-inbox-list-item-avatar pxp-cover" style="background-image: url({{first.logo.url}});"></div>
+                        {% else %}
                         <div class="pxp-dashboard-inbox-list-item-avatar pxp-cover" style="background-image: url({% static 'images/company-logo-2.png' %});"></div>
-                        <div class="pxp-dashboard-inbox-list-item-name ms-2">{{ threads.0.msg_id }}</div>
+                        {% endif %}
+                        <div class="pxp-dashboard-inbox-list-item-name ms-2">{{ first.ename }}</div>
+                        <div class="pxp-dashboard-inbox-messages-item-time pxp-text-light" style="margin-left: 15px">Chatting with - {{ first.executive }}</div>
                     </div>
                     <div class="d-flex align-items-center">
                         <div class="pxp-dashboard-inbox-list-item-options">
@@ -68,8 +73,12 @@
                         <div class="row justify-content-end">
                             <div class="col-7">
                                 <div class="pxp-dashboard-inbox-messages-item-header flex-row-reverse">
+                                    {% if request.session.photo %}
+                                    <div class="pxp-dashboard-inbox-messages-item-avatar pxp-cover" style="background-image: url({{request.session.photo}});"></div>
+                                    {% else %}
                                     <div class="pxp-dashboard-inbox-messages-item-avatar pxp-cover" style="background-image: url({% static 'images/company-logo-3.png' %});"></div>
-                                    <div class="pxp-dashboard-inbox-messages-item-name me-2">{{ i.sender_user }}</div>
+                                    {% endif %}
+                                    <div class="pxp-dashboard-inbox-messages-item-name me-2">You</div>
                                     <div class="pxp-dashboard-inbox-messages-item-time pxp-text-light me-3">{{ i.date }}</div>
                                 </div>
                                 <div class="pxp-dashboard-inbox-messages-item-message pxp-is-other mt-2">
@@ -83,8 +92,12 @@
                         <div class="row">
                             <div class="col-7">
                                 <div class="pxp-dashboard-inbox-messages-item-header">
+                                    {% if first.logo %}
+                                    <div class="pxp-dashboard-inbox-messages-item-avatar pxp-cover" style="background-image: url({{first.logo.url}});"></div>
+                                    {% else %}
                                     <div class="pxp-dashboard-inbox-messages-item-avatar pxp-cover" style="background-image: url({% static 'images/company-logo-4.png' %});"></div>
-                                    <div class="pxp-dashboard-inbox-messages-item-name ms-2">{{ i.sender_user }}</div>
+                                    {% endif %}
+                                    <div class="pxp-dashboard-inbox-messages-item-name ms-2">{{ first.ename }}</div>
                                     <div class="pxp-dashboard-inbox-messages-item-time pxp-text-light ms-3">{{ i.date }}</div>
                                 </div>
                                 <div class="pxp-dashboard-inbox-messages-item-message pxp-is-self mt-2">
@@ -163,15 +176,18 @@ $(document).ready(function () {
                 },
                 success: function( data ) 
                 {
-                    console.log("whre")
+                    let mpower="";
                 },
                 async: false
             })
             let mes=data['messa'];
-            let thre=data['thread']
+            let thre=data['thread'];
+            let company=data['company'];
             let ms=JSON.parse(mes);
             let tempele=$('.pxp-dashboard-inbox-messages-content');
             let flag=0;
+            let ans;
+            let urlval=data['image']
             for(let i=0;i<ms.length;i++)
             {
                 if(ms[i])
@@ -188,13 +204,20 @@ $(document).ready(function () {
                     ithediv.setAttribute('class', 'pxp-dashboard-inbox-messages-item-header flex-row-reverse')
                     let firindiv=document.createElement('div');
                     firindiv.setAttribute('class', 'pxp-dashboard-inbox-messages-item-avatar pxp-cover')
-                    firindiv.style.backgroundImage='url({% static 'images/company-logo-2.png' %})';
+                    if("{{request.session.photo}}")
+                    {
+                        firindiv.style.backgroundImage='url({{request.session.photo}})';
+                    }
+                    else
+                    {
+                        firindiv.style.backgroundImage='url({% static 'images/company-logo-2.png' %})';
+                    }
                     let secindiv=document.createElement('div');
                     secindiv.setAttribute('class', 'pxp-dashboard-inbox-messages-item-name me-2')
-                    secindiv.innerHTML=ms[i].sender_user_id
+                    secindiv.innerHTML='You'
                     let thiindiv=document.createElement('div');
                     thiindiv.setAttribute('class', 'pxp-dashboard-inbox-messages-item-time pxp-text-light me-3')
-                    thiindiv.innerHTML=ms[i].date
+                    thiindiv.innerHTML=ms[i].date.slice(0, 19);
                     ithediv.append(firindiv);
                     ithediv.append(secindiv);
                     ithediv.append(thiindiv);
@@ -219,13 +242,21 @@ $(document).ready(function () {
                     ithediv.setAttribute('class', 'pxp-dashboard-inbox-messages-item-header')
                     let firindiv=document.createElement('div');
                     firindiv.setAttribute('class', 'pxp-dashboard-inbox-messages-item-avatar pxp-cover')
-                    firindiv.style.backgroundImage='url({% static 'images/company-logo-2.png' %})';
+                    if(JSON.parse(company)[0].logo)
+                    {
+                        ans='url('+urlval+')';
+                        firindiv.style.backgroundImage=ans
+                    }
+                    else
+                    {
+                        firindiv.style.backgroundImage='url({% static 'images/company-logo-2.png' %})';
+                    }
                     let secindiv=document.createElement('div');
                     secindiv.setAttribute('class', 'pxp-dashboard-inbox-messages-item-name ms-2')
-                    secindiv.innerHTML=ms[i].sender_user_id
+                    secindiv.innerHTML=JSON.parse(company)[0].ename
                     let thiindiv=document.createElement('div');
                     thiindiv.setAttribute('class', 'pxp-dashboard-inbox-messages-item-time pxp-text-light ms-3')
-                    thiindiv.innerHTML=ms[i].date
+                    thiindiv.innerHTML=ms[i].date.slice(0, 19);
                     ithediv.append(firindiv);
                     ithediv.append(secindiv);
                     ithediv.append(thiindiv);
@@ -252,12 +283,12 @@ function caller(id, mess, thre1)
         type:"POST",
         url: "seenmes/",
         data:{
-                employer: $('[name="employer"]').val(),
+                employer: id,
                 csrfmiddlewaretoken: '{{ csrf_token }}'
         },
         success: function( data ) 
         {
-            console.log("Done")
+            let mpower="";
         }, 
         async: false
      })
@@ -265,17 +296,21 @@ function caller(id, mess, thre1)
      let mes=mess;
      let ms=[];
      let thre;
+     let company;
+     let urlval;
      $.ajax(
     {
         type:"GET",
         url: "fetchmess/",
         data:{
-                employer: $('[name="employer"]').val()
+                employer: id
         },
         success: function( data ) 
         {
             th=data['thre'];
             mes=data['all_mess'];
+            company=data['company'];
+            urlval=data['image'];
         },
         async: false
     })
@@ -297,18 +332,32 @@ function caller(id, mess, thre1)
     }
     $('.pxp-dashboard-inbox-messages-container').remove();
 
+let hiderdiv=document.createElement('div');
+hiderdiv.setAttribute('class', 'pxp-dashboard-inbox-messages-item-time pxp-text-light')
+hiderdiv.style.marginLeft="15px";
+hiderdiv.innerHTML="Chatting with - "+JSON.parse(company)[0].executive
+
 let headerdiv=document.createElement('div');
 headerdiv.setAttribute('class', 'pxp-dashboard-inbox-messages-header');
 let photodiv=document.createElement('div');
 photodiv.setAttribute('class', 'pxp-dashboard-inbox-list-item-left');
 let avatardiv=document.createElement('div');
 avatardiv.setAttribute('class', 'pxp-dashboard-inbox-list-item-avatar pxp-cover');
-avatardiv.style.backgroundImage='url({% static 'images/company-logo-2.png' %})';
+if(JSON.parse(company)[0].logo)
+{
+    let ans='url('+urlval+')';
+    avatardiv.style.backgroundImage=ans
+}
+else
+{
+    avatardiv.style.backgroundImage='url({% static 'images/company-logo-2.png' %})';
+}
 let namediv=document.createElement('div');
 namediv.setAttribute('class', 'pxp-dashboard-inbox-list-item-name ms-2');
-namediv.innerHTML=id;
+namediv.innerHTML=JSON.parse(company)[0].ename;
 photodiv.append(avatardiv);
 photodiv.append(namediv);
+photodiv.append(hiderdiv)
 let deleterdiv=document.createElement('div');
 deleterdiv.setAttribute('class', 'd-flex align-items-center');
 let icondiv=document.createElement('div');
@@ -353,13 +402,20 @@ for(let i=0;i<ms.length;i++)
         ithediv.setAttribute('class', 'pxp-dashboard-inbox-messages-item-header flex-row-reverse')
         let firindiv=document.createElement('div');
         firindiv.setAttribute('class', 'pxp-dashboard-inbox-messages-item-avatar pxp-cover')
-        firindiv.style.backgroundImage='url({% static 'images/company-logo-2.png' %})';
+        if("{{request.session.photo}}")
+        {
+            firindiv.style.backgroundImage='url({{request.session.photo}})';
+        }
+        else
+        {
+            firindiv.style.backgroundImage='url({% static 'images/company-logo-2.png' %})';
+        }
         let secindiv=document.createElement('div');
         secindiv.setAttribute('class', 'pxp-dashboard-inbox-messages-item-name me-2')
-        secindiv.innerHTML=ms[i].sender_user_id
+        secindiv.innerHTML='You'
         let thiindiv=document.createElement('div');
         thiindiv.setAttribute('class', 'pxp-dashboard-inbox-messages-item-time pxp-text-light me-3')
-        thiindiv.innerHTML=ms[i].date
+        thiindiv.innerHTML=ms[i].date.slice(0, 19);
         ithediv.append(firindiv);
         ithediv.append(secindiv);
         ithediv.append(thiindiv);
@@ -384,13 +440,21 @@ for(let i=0;i<ms.length;i++)
         ithediv.setAttribute('class', 'pxp-dashboard-inbox-messages-item-header')
         let firindiv=document.createElement('div');
         firindiv.setAttribute('class', 'pxp-dashboard-inbox-messages-item-avatar pxp-cover')
-        firindiv.style.backgroundImage='url({% static 'images/company-logo-2.png' %})';
+        if(JSON.parse(company)[0].logo)
+        {
+            ans='url('+urlval+')';
+            firindiv.style.backgroundImage=ans
+        }
+        else
+        {
+            firindiv.style.backgroundImage='url({% static 'images/company-logo-2.png' %})';
+        }
         let secindiv=document.createElement('div');
         secindiv.setAttribute('class', 'pxp-dashboard-inbox-messages-item-name ms-2')
-        secindiv.innerHTML=ms[i].sender_user_id
+        secindiv.innerHTML=JSON.parse(company)[0].ename
         let thiindiv=document.createElement('div');
         thiindiv.setAttribute('class', 'pxp-dashboard-inbox-messages-item-time pxp-text-light ms-3')
-        thiindiv.innerHTML=ms[i].date
+        thiindiv.innerHTML=ms[i].date.slice(0, 19);
         ithediv.append(firindiv);
         ithediv.append(secindiv);
         ithediv.append(thiindiv);
@@ -469,4 +533,5 @@ $('.pxp-dashboard-inbox-messages-close-btn').click(function(e){
 
 
 {% endblock %}
+
 

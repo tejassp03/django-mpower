@@ -8,6 +8,7 @@ app_name = 'candidate'
 urlpatterns = [
 	path('', views.dashboard, name ='dashboard'),
 	path('jobapp/', views.jobapp, name='jobapp'),
+	path('count_inbox/', views.count_inbox, name='count_inbox'),
 	path('edit_profile/', views.edit_profile, name='edit'),
 	path('edit_profile/add_skill/', views.add_skill, name='add_skill'),
 	path('edit_profile/add_exp/', views.add_exp, name='add_exp'),

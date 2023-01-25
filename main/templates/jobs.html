@@ -229,7 +229,7 @@
                         <div class="pxp-jobs-list-top mt-4 mt-lg-0">
                             <div class="row justify-content-between align-items-center">
                                 <div class="col-auto">
-                                    <h2><span class="pxp-text-light">Showing</span> 8,536 <span class="pxp-text-light">jobs</span></h2>
+                                    <h2><span class="pxp-text-light">Showing</span>&nbsp; {{ count }} &nbsp;<span class="pxp-text-light">jobs</span></h2>
                                 </div>
                                 <div class="col-auto">
                                     <select class="form-select">
@@ -242,7 +242,7 @@
                         </div>
 
                         <div>
-                            {% for i, j in jobs %}
+                            {% for i, j in page_obj %}
                             <div class="pxp-jobs-card-3 pxp-has-border">
                                 <div class="row align-items-center justify-content-between">
                                     <div class="col-sm-3 col-md-2 col-lg-3 col-xl-2 col-xxl-auto">
@@ -281,11 +281,32 @@
                             <div class="col-auto">
                                 <nav class="mt-3 mt-sm-0" aria-label="Jobs list pagination">
                                     <ul class="pagination pxp-pagination">
-                                        <li class="page-item active" aria-current="page">
-                                            <span class="page-link">1</span>
-                                        </li>
-                                        <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                        <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                        {% if pe.has_previous %}
+                                            <li class="page-item"><a href="?page={{pe.previous_page_number}}" class="page-link"><i class="fa fa-chevron-left" aria-hidden="true"></i></a></li>
+                                        {% endif %}
+
+                                        {% if pe.number|add:'-4' > 1 %}
+                                            <li class="page-item"><a href="?page={{ pe.number|add:'-5' }}" class="page-link">&hellip;</a></li>
+                                        {% endif %}
+
+                                        {% for i in pe.paginator.page_range %}
+                                            {% if pe.number == i %}
+                                                <li class="page-item active" aria-current="page">
+                                                    <span class="page-link">{{pe.number}}</span>
+                                                </li>
+                                            {% elif i > pe.number|add:'-5' and i < pe.number|add:'5' %}
+                                                <li class="page-item"><a href="?page={{ i }}" class="page-link">{{i}}</a></li>
+                                            {% endif %}
+                                        {% endfor %}
+
+                                        {% if pe.paginator.num_pages > pe.number|add:'4' %}
+                                            <li class="page-item"><a href="?page={{ pe.number|add:'5' }}" class="page-link">&hellip;</a></li>
+                                        {% endif %}
+
+                                        {% if pe.has_next %}
+                                            <li class="page-item"><a href="?page={{pe.next_page_number}}" class="page-link"><i class="fa fa-chevron-right" aria-hidden="true"></i></a></li>
+                                        {% endif %}
+
                                     </ul>
                                 </nav>
                             </div>
@@ -305,12 +326,14 @@
         <script src="{% static 'js/owl.carousel.min.js' %}"></script>
         <script src="{% static 'js/nav.js' %}"></script>
         <script src="{% static 'js/main.js' %}"></script>
+        <script>
         $(document).ready(function () {
             document.getElementById('blackcolor').style.color=black;
             $('select').selectize({
                 sortField: 'text'
             });
-        })  
+        })
+    </script>
     </body>
 </html>
 {% endblock %}

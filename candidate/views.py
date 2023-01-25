@@ -9,6 +9,8 @@ def dashboard(request, pk):
     applics = list(Application.objects.filter(user_id=pk).values())
     profile = list(ProfileVisits.objects.filter(user_id=pk))
     fordates = Application.objects.filter(user_id=pk).order_by('-date_applied')
+    userobj=JobSeeker.objects.get(user_id=pk)
+    num_mess=Threads.objects.filter(receiver=userobj.log_id, has_unread=True)
     for i in applics:
         emplo = list(Employer.objects.filter(eid=i.emp_id).values())
         jobo = list(Jobs.objects.filter(jobid=i.job_id).values())
@@ -19,7 +21,7 @@ def dashboard(request, pk):
         i['logo']=emplo[0].logo
     # i = {'post': 'ABC', 'com_name': 'Microsoft', 'industry': 'software', 'location': 'US'}
     # applics.append(i)
-    return render(request, 'dashboard-candidate.html', {'user': context, 'applications': applics, 'pk': pk, 'profile': profile})
+    return render(request, 'dashboard-candidate.html', {'user': context, 'applications': applics, 'pk': pk, 'profile': profile, 'count': len(num_mess)})
 
 
 def jobapp(request, pk):
@@ -162,7 +164,7 @@ def inbox(request, pk):
         logs_info2=Employer.objects.filter(log_id=i.sender.log_id)
         temp_empls.append(logs_info)
         empls.append(dumps(list(logs_info2.values()), default=str))
-    return render(request, 'inbox-candidate.html', {'pk': pk, 'threads': threads, 'mess': messages, 'thre': temp_threads, 'm': temp_messages, 'emp': empls, 'initial': zip(threads, temp_empls)})
+    return render(request, 'inbox-candidate.html', {'pk': pk, 'threads': threads, 'first': temp_empls[0] ,'mess': messages, 'thre': temp_threads, 'm': temp_messages, 'emp': empls, 'initial': zip(threads, temp_empls)})
 
 
 def under_development(request, pk):
@@ -230,22 +232,27 @@ def fetchmess(request, pk):
     messages=[]
     temp_messages=[]
     mess_all=[]
+    urlval=""
+    count=0
     for i in threads:
         mess=Messages.objects.filter(msg_id=i.msg_id, is_read=False)
+        count=len(mess)+count
         messages.append(dumps(list(mess.values()), default=str))
         temp_messages.append(mess)
         mess=Messages.objects.filter(msg_id=i.msg_id)
         mess_all.append(dumps(list(mess.values()), default=str))
-    count=len(mess)
+    comp_thread=Threads.objects.get(msg_id=request.GET['employer'])
+    comp_log=Login.objects.get(log_id=comp_thread.sender.log_id)
     thread=dumps(list(Threads.objects.filter(msg_id=request.GET['employer']).values()), default=str)
     messa=dumps(list(Messages.objects.filter(msg_id=request.GET['employer'], is_read=False).values()), default=str)
-    return JsonResponse({'message': 'Y', 'url': "", 'mess': messages, 'thre': temp_threads, 'count': count, 'thread': thread, 'messa': messa, 'all_mess': mess_all})
+    company=dumps(list(Employer.objects.filter(log_id=comp_log).values()), default=str)
+    urlval=Employer.objects.filter(log_id=comp_log)[0].logo.url
+    return JsonResponse({'message': 'Y', 'url': "", 'mess': messages, 'thre': temp_threads, 'count': count, 'thread': thread, 'company': company ,'messa': messa, 'all_mess': mess_all, 'image': urlval})
 
 def seenmes(request, pk):
     if(request.method=="POST"):
         messages=Messages.objects.filter(msg_id=request.POST['employer'], is_read=False)
         Messages.objects.filter(msg_id=request.POST['employer'], is_read=False).update(is_read=True)
-        print(len(messages))
         for i in messages:
             i.is_read=True
             i.save()
@@ -276,6 +283,11 @@ def resume(request, pk):
         data['recommendations']=""
         data['upload']="N"
     return render(request, 'resume.html', {'pk': pk, 'context': data})
+
+def count_inbox(request, pk):
+    user=JobSeeker.objects.get(user_id=pk)
+    num_mess=Threads.objects.filter(receiver=user.log_id, has_unread=1)
+    return JsonResponse({'count': len(num_mess)})
 
 def logout(request, pk):
     request.session.flush()

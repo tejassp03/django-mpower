@@ -48,7 +48,7 @@
                         {% comment %} <a href="candidate-dashboard-inbox.html" class="d-flex justify-content-between align-items-center"> {% endcomment %}
                             <a href="{% url 'candidate:inbox' pk=pk %}" class="d-flex justify-content-between align-items-center">
                             <div><span class="fa fa-envelope-o"></span>Inbox</div>
-                            <span class="badge rounded-pill">14</span>
+                            <span class="badge rounded-pill" id="countinbox">{{ count }}</span>
                         </a>
                     </li>
                     <li id="not">
@@ -134,7 +134,7 @@
                                         {% comment %} <a href="candidate-dashboard-inbox.html" class="d-flex justify-content-between align-items-center"> {% endcomment %}
                                         <a href="{% url 'candidate:inbox' pk=pk %}" class="d-flex justify-content-between align-items-center">
                                             <div><span class="fa fa-envelope-o"></span>Inbox</div>
-                                            <span class="badge rounded-pill">14</span>
+                                            <span class="badge rounded-pill" id="countinbox2">{{ count }}</span>
                                         </a>
                                     </li>
                                     <li class="nav-item">
@@ -219,6 +219,29 @@
         <script src="{% static 'js/Chart.min.js' %}"></script>
         {% comment %} <script src="{% static 'js/main.js' %}"></script> {% endcomment %}
         <script>
+            $(document).ready(function () {
+            setInterval(getCount, 10000);
+            function getCount()
+            {
+                let url = "{% url 'candidate:count_inbox' pk %}"
+                $.ajax(
+                {
+                    type:"GET",
+                    url: url,
+                    data:{
+                    },
+                    success: function( data ) 
+                    {
+                        if(data['count']>0)
+                        {
+                            $('#countinbox').text(data['count'])
+                            $('#countinbox2').text(data['count'])
+                        }
+                    },
+                    async: false
+                })
+            }
+        })
             {% block script %}
             {% endblock script %}
         </script>

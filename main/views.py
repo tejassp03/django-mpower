@@ -29,6 +29,10 @@ import pymysql
 from .Courses import ds_course,web_course,android_course,ios_course,uiux_course,resume_videos,interview_videos
 import plotly.express as px
 
+
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+from itertools import chain
+
 @csrf_exempt
 def index(request):
 	if request.method == 'POST':
@@ -142,11 +146,20 @@ def findjobs(request):
     'var': 6
     }
 	jobs=Jobs.objects.all()
+	count=len(jobs)
 	companies=[]
 	for i in jobs:
 		companies.append(Employer.objects.get(eid=i.eid.eid))
+	p=Paginator(jobs, 5)
+	page_number = request.GET.get('page')
+	try:
+		page_obj = p.get_page(page_number)
+	except PageNotAnInteger:
+		page_obj = p.page(1)
+	except EmptyPage:
+		page_obj = p.page(p.num_pages)
 	categories=Jobs.objects.order_by().values('fnarea').distinct()
-	return render(request, 'jobs.html', {'jobs': zip(jobs, companies), 'categories': categories})
+	return render(request, 'jobs.html', {'jobs': zip(jobs, companies), 'categories': categories, 'page_obj': zip(page_obj, companies), 'pe': page_obj, 'count': count})
 
 def profile_completion(request, pk):
 	if request.method=='POST':
