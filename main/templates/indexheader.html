@@ -149,7 +149,7 @@
                             {% if request.session.photo %}
                             <div class="pxp-user-nav-avatar pxp-cover" style="background-image: url('{{ request.session.photo }}')"></div>
                             {% else %}
-                            <div class="pxp-user-nav-avatar pxp-cover" style="background-image: url()"></div>
+                            <div class="pxp-user-nav-avatar pxp-cover"><div id="profileImage" class="profileimage"></div></div>
                             {% endif %}
                             <div class="pxp-user-nav-name d-none d-md-block" id="blackcolor">{{ request.session.name }}</div>
                         </a>
@@ -167,3 +167,11 @@
         </div>
     </div>
 </header>
+
+<script>
+    $(document).ready(function () {
+        $(".profileimage").each(function(i, el) {
+            el.innerHTML = '{{request.session.name}}'[0]
+        })
+    })
+</script>

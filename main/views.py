@@ -33,6 +33,10 @@ import plotly.express as px
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from itertools import chain
 
+from django.db.models import Q
+from django.db.models import Max, Min
+
+
 @csrf_exempt
 def index(request):
 	if request.method == 'POST':
@@ -142,10 +146,63 @@ def postjob(request):
 	return render(request, 'company-dashboard-new-job.html')
 
 def findjobs(request):
-	context = {
-    'var': 6
-    }
-	jobs=Jobs.objects.all()
+	t_val=""
+	c_val=""
+	l_val=""
+	emp_sel=[]
+	exp_sel=[]
+	sal_sel=[]
+	if(('title' not in request.GET) and ('category' not in request.GET) and ('location' not in request.GET)):
+		jobs=Jobs.objects.all().order_by('-postdate')
+	elif(request.GET['title']=="all" and request.GET['location']=="all" and request.GET['category']=="all"):
+		jobs=Jobs.objects.all()
+	elif(request.GET['location']=="all" and request.GET['category']=="all"):
+		jobs=Jobs.objects.filter(title=request.GET['title'])
+		t_val=request.GET['title']
+	elif(request.GET['title']=="all" and request.GET['category']=="all"):
+		jobs=Jobs.objects.filter(location=request.GET['location'])
+		l_val=request.GET['location']
+	elif(request.GET['title']=="all" and request.GET['location']=="all"):
+		jobs=Jobs.objects.filter(fnarea=request.GET['category'])
+		c_val=request.GET['category']
+	elif(request.GET['title']=="all"):
+		jobs=Jobs.objects.filter(location=request.GET['location'], fnarea=request.GET['category'])
+		l_val=request.GET['location']
+		c_val=request.GET['category']
+	elif(request.GET['location']=="all"):
+		jobs=Jobs.objects.filter(title=request.GET['title'], fnarea=request.GET['category'])
+		t_val=request.GET['title']
+		c_val=request.GET['category']
+	elif(request.GET['category']=="all"):
+		jobs=Jobs.objects.filter(title=request.GET['title'], location=request.GET['location'])
+		t_val=request.GET['title']
+		l_val=request.GET['location']
+	else:
+		jobs=Jobs.objects.filter(title=request.GET['title'], location=request.GET['location'], fnarea=request.GET['category'])
+		t_val=request.GET['title']
+		l_val=request.GET['location']
+		c_val=request.GET['category']
+	if 'emp' in request.GET:
+		jobs=jobs.filter(jobtype__in=request.GET.getlist('emp'))
+		emp_sel=request.GET.getlist('emp')
+	if 'exp' in request.GET:
+		jobs=jobs.filter(experience__in=request.GET.getlist('exp'))
+		exp_sel=request.GET.getlist('exp')
+	if 'sal' in request.GET:
+		minval=-1
+		maxval=-1
+		for i in request.GET.getlist('sal'):
+			ab=i.split(',')
+			if int(ab[0])<minval:
+				minval=int(ab[0])
+			if int(ab[1])>maxval:
+				maxval=int(ab[1])
+			sal_sel.append([int(ab[0]), int(ab[1])])
+		jobs=jobs.filter(basicpay__range=(minval, maxval))
+	GET_params = request.GET.copy()
+	if('page' in GET_params):
+		last=GET_params['page'][-1]
+		GET_params['page']=last[0]
 	count=len(jobs)
 	companies=[]
 	for i in jobs:
@@ -158,8 +215,34 @@ def findjobs(request):
 		page_obj = p.page(1)
 	except EmptyPage:
 		page_obj = p.page(p.num_pages)
-	categories=Jobs.objects.order_by().values('fnarea').distinct()
-	return render(request, 'jobs.html', {'jobs': zip(jobs, companies), 'categories': categories, 'page_obj': zip(page_obj, companies), 'pe': page_obj, 'count': count})
+	categories=jobs.order_by().values('fnarea').distinct()
+	locations=jobs.order_by().values('location').distinct()
+	titles=jobs.order_by().values('title').distinct()
+	jobtype=Jobs.objects.order_by().values('jobtype').distinct()
+	emptype=Jobs.objects.order_by().values('experience').distinct()
+	max_sal=Jobs.objects.all().aggregate(Max('basicpay'))
+	min_sal=Jobs.objects.all().aggregate(Min('basicpay'))
+	saltype=[]
+	diff=(max_sal['basicpay__max']-min_sal['basicpay__min'])//5
+	for i in range(0,5):
+		if saltype:
+			saltype.append([saltype[-1][1], 1000*round((saltype[-1][1]+diff)/1000)])
+		else:
+			saltype.append([0, 1000*round(min_sal['basicpay__min']/1000)])
+			saltype.append([1000*round(min_sal['basicpay__min']/1000), 1000*round((min_sal['basicpay__min']+diff)/1000)])
+	countjob=[]
+	countemp=[]
+	countsal=[]
+	for i in jobtype:
+		countjob.append(len(Jobs.objects.filter(jobtype=i['jobtype'])))
+	for i in emptype:
+		countemp.append(len(Jobs.objects.filter(experience=i['experience'])))
+	for i in saltype:
+		countsal.append(len(Jobs.objects.filter(basicpay__range=(i[0], i[1]))))
+	print(saltype)
+	print(sal_sel)
+	context={'c': c_val, 'l': l_val, 't': t_val, 'sel': emp_sel, 'eel': exp_sel, 'els': sal_sel}
+	return render(request, 'jobs.html', {'page_obj': zip(page_obj, companies), 'pe': page_obj, 'count': count, 'locations': locations, 'titles': titles, 'categories': categories, 'GET_params':GET_params, 'jobtype': zip(jobtype, countjob), 'emptype': zip(emptype, countemp), 'saltype': zip(saltype, countsal), 'context': context})
 
 def profile_completion(request, pk):
 	if request.method=='POST':

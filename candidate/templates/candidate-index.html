@@ -89,7 +89,7 @@
                             {% if request.session.photo %}
                                 <div class="pxp-dashboard-side-user-nav-avatar pxp-cover" style="background-image: url('{{ request.session.photo }}')"></div>
                             {% else %}
-                            <div class="pxp-dashboard-side-user-nav-avatar pxp-cover" style="background-image: url()"></div>
+                            <div class="pxp-dashboard-side-user-nav-avatar pxp-cover" style="background-image: url()"><div class="profileimage" id="profileImage"></div></div>
                             {% endif %}
                             <div class="pxp-dashboard-side-user-nav-name">{{ request.session.name }}</div>
                         </a>
@@ -191,7 +191,7 @@
                             {% if request.session.photo %}
                                 <div class="pxp-user-nav-avatar pxp-cover" style="background-image: url('{{ request.session.photo }}')"></div>
                             {% else %}
-                            <div class="pxp-user-nav-avatar pxp-cover"  style="background-image: url()"></div>
+                            <div class="pxp-user-nav-avatar pxp-cover"  style="background-image: url()"><div class="profileimage" id="profileImage2"></div></div>
                             {% endif %}
                             <div class="pxp-user-nav-name d-none d-md-block">{{ request.session.name }}</div>
                         </a>
@@ -220,6 +220,9 @@
         {% comment %} <script src="{% static 'js/main.js' %}"></script> {% endcomment %}
         <script>
             $(document).ready(function () {
+                $(".profileimage").each(function(i, el) {
+                    el.innerHTML = '{{request.session.name}}'[0]
+                })
             setInterval(getCount, 10000);
             function getCount()
             {

@@ -57,28 +57,50 @@
                 <h1>Search Jobs</h1>
                 <div class="pxp-hero-subtitle pxp-text-light">Search your career opportunity through <strong>12,800</strong> jobs</div>
                 <div class="pxp-hero-form pxp-hero-form-round pxp-large mt-3 mt-lg-4">
-                    <form class="row gx-3 align-items-center">
+                    <form class="row gx-3 align-items-center" method="GET">
                         <div class="col-12 col-lg">
                             <div class="input-group mb-3 mb-lg-0">
                                 <span class="input-group-text"><span class="fa fa-search"></span></span>
-                                <input type="text" class="form-control" placeholder="Job Title or Keyword">
+                                <select id="select-titles" placeholder="Job titles" class="form-select" name="title">
+                                    <option value="all" selected>Job title</option>
+                                    {% for i in titles %}
+                                        {% if i.title == context.t %}
+                                        <option value='{{ i.title }}' selected>{{ i.title }}</option>
+                                        {% else %}
+                                        <option value='{{ i.title }}'>{{ i.title }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
                             </div>
                         </div>
                         <div class="col-12 col-lg pxp-has-left-border">
                             <div class="input-group mb-3 mb-lg-0">
                                 <span class="input-group-text"><span class="fa fa-globe"></span></span>
-                                <input type="text" class="form-control" placeholder="Location">
+                                <select id="select-locations" placeholder="Pick a Category..." class="form-select"  name="location">
+                                    <option value="all">All locations</option>
+                                    {% for i in locations %}
+                                        {% if i.location == context.l %}
+                                        <option value='{{ i.location }}' selected>{{ i.location }}</option>
+                                        {% else %}
+                                        <option value='{{ i.location }}'>{{ i.location }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
                             </div>
                         </div>
                         <div class="col-12 col-lg pxp-has-left-border">
                             <div class="input-group mb-3 mb-lg-0">
                                 <span class="input-group-text"><span class="fa fa-folder-o"></span></span>
-                                <select id="select-categories" placeholder="Pick a Category..." class="form-select">
+                                <select id="select-categories" placeholder="Pick a Category..." class="form-select"  name="category">
                                     <option value="all">All categories</option>
                                     {% for i in categories %}
-                                        <option value={{ i.fnarea }}>{{ i.fnarea }}</option>
+                                        {% if i.fnarea == context.c %}
+                                        <option value='{{ i.fnarea }}' selected>{{ i.fnarea }}</option>
+                                        {% else %}
+                                        <option value='{{ i.fnarea }}'>{{ i.fnarea }}</option>
+                                        {% endif %}
                                     {% endfor %}
-                                  </select>
+                                </select>
                             </div>
                         </div>
                         <div class="col-12 col-lg-auto">
@@ -98,130 +120,88 @@
                                 <div class="pxp-list-side-filter-header-label">Filter Jobs</div>
                                 <a role="button"><span class="fa fa-sliders"></span></a>
                             </div>
+                            <form method="GET">
                             <div class="mt-4 mt-lg-0 d-lg-block pxp-list-side-filter-panel">
                                 <h3>Type of Employment</h3>
                                 <div class="list-group mt-2 mt-lg-3">
+                                    {% comment %} <form method="GET"> {% endcomment %}
+                                    {% for i, j in jobtype %}
+                                    {% if i.jobtype in context.sel %}
                                     <label class="list-group-item d-flex justify-content-between align-items-center pxp-checked">
                                         <span class="d-flex">
-                                            <input class="form-check-input me-2" type="checkbox" value="" checked>
-                                            Full Time
+                                            <input class="form-check-input me-2 emp" type="checkbox" value='{{i.jobtype}}' name="emp" checked>
+                                            {{i.jobtype}}
+                                            <input type="submit" style="display: none" class="empbutton">
                                         </span>
-                                        <span class="badge rounded-pill">56</span>
+                                        <span class="badge rounded-pill">{{j}}</span>
                                     </label>
+                                    {% else %}
                                     <label class="list-group-item d-flex justify-content-between align-items-center mt-2 mt-lg-3">
                                         <span class="d-flex">
-                                            <input class="form-check-input me-2" type="checkbox" value="">
-                                            Part Time
+                                            <input class="form-check-input me-2 emp" type="checkbox" value='{{i.jobtype}}' name="emp">
+                                            {{i.jobtype}}
+                                            <input type="submit" style="display: none" class="empbutton">
                                         </span>
-                                        <span class="badge rounded-pill">34</span>
+                                        <span class="badge rounded-pill">{{j}}</span>
                                     </label>
-                                    <label class="list-group-item d-flex justify-content-between align-items-center mt-2 mt-lg-3">
-                                        <span class="d-flex">
-                                            <input class="form-check-input me-2" type="checkbox" value="">
-                                            Remote
-                                        </span>
-                                        <span class="badge rounded-pill">24</span>
-                                    </label>
-                                    <label class="list-group-item d-flex justify-content-between align-items-center mt-2 mt-lg-3">
-                                        <span class="d-flex">
-                                            <input class="form-check-input me-2" type="checkbox" value="">
-                                            Internship
-                                        </span>
-                                        <span class="badge rounded-pill">27</span>
-                                    </label>
-                                    <label class="list-group-item d-flex justify-content-between align-items-center mt-2 mt-lg-3">
-                                        <span class="d-flex">
-                                            <input class="form-check-input me-2" type="checkbox" value="">
-                                            Contract
-                                        </span>
-                                        <span class="badge rounded-pill">76</span>
-                                    </label>
-                                    <label class="list-group-item d-flex justify-content-between align-items-center mt-2 mt-lg-3">
-                                        <span class="d-flex">
-                                            <input class="form-check-input me-2" type="checkbox" value="">
-                                            Training
-                                        </span>
-                                        <span class="badge rounded-pill">28</span>
-                                    </label>
+                                    {% endif %}
+                                    {% endfor %}
+                                    {% comment %} </form> {% endcomment %}
                                 </div>
     
                                 <h3 class="mt-3 mt-lg-4">Experience Level</h3>
                                 <div class="list-group mt-2 mt-lg-3">
-                                    <label class="list-group-item d-flex justify-content-between align-items-center">
-                                        <span class="d-flex">
-                                            <input class="form-check-input me-2" type="checkbox" value="">
-                                            No Experience
-                                        </span>
-                                        <span class="badge rounded-pill">98</span>
-                                    </label>
-                                    <label class="list-group-item d-flex justify-content-between align-items-center mt-2 mt-lg-3 pxp-checked">
-                                        <span class="d-flex">
-                                            <input class="form-check-input me-2" type="checkbox" value="" checked>
-                                            Entry-Level
-                                        </span>
-                                        <span class="badge rounded-pill">44</span>
-                                    </label>
-                                    <label class="list-group-item d-flex justify-content-between align-items-center mt-2 mt-lg-3 pxp-checked">
-                                        <span class="d-flex">
-                                            <input class="form-check-input me-2" type="checkbox" value="" checked>
-                                            Mid-Level
-                                        </span>
-                                        <span class="badge rounded-pill">35</span>
-                                    </label>
-                                    <label class="list-group-item d-flex justify-content-between align-items-center mt-2 mt-lg-3">
-                                        <span class="d-flex">
-                                            <input class="form-check-input me-2" type="checkbox" value="">
-                                            Senior-Level
-                                        </span>
-                                        <span class="badge rounded-pill">45</span>
-                                    </label>
-                                    <label class="list-group-item d-flex justify-content-between align-items-center mt-2 mt-lg-3">
-                                        <span class="d-flex">
-                                            <input class="form-check-input me-2" type="checkbox" value="">
-                                            Manager / Executive
-                                        </span>
-                                        <span class="badge rounded-pill">21</span>
-                                    </label>
+                                    {% comment %} <form method="GET"> {% endcomment %}
+                                        {% for i, j in emptype %}
+                                        {% if i.experience in context.eel %}
+                                        <label class="list-group-item d-flex justify-content-between align-items-center pxp-checked">
+                                            <span class="d-flex">
+                                                <input class="form-check-input me-2 exp" type="checkbox" value='{{i.experience}}' name="exp" checked>
+                                                {{i.experience}}
+                                                <input type="submit" style="display: none" class="expbutton">
+                                            </span>
+                                            <span class="badge rounded-pill">{{j}}</span>
+                                        </label>
+                                        {% else %}
+                                        <label class="list-group-item d-flex justify-content-between align-items-center mt-2 mt-lg-3">
+                                            <span class="d-flex">
+                                                <input class="form-check-input me-2 exp" type="checkbox" value='{{i.experience}}' name="exp">
+                                                {{i.experience}}
+                                                <input type="submit" style="display: none" class="expbutton">
+                                            </span>
+                                            <span class="badge rounded-pill">{{j}}</span>
+                                        </label>
+                                        {% endif %}
+                                        {% endfor %}
+                                        
                                 </div>
+                            {% comment %} </form> {% endcomment %}
     
                                 <h3 class="mt-3 mt-lg-4">Salary Range</h3>
                                 <div class="list-group mt-2 mt-lg-3">
-                                    <label class="list-group-item d-flex justify-content-between align-items-center pxp-checked">
-                                        <span class="d-flex">
-                                            <input class="form-check-input me-2" type="checkbox" value="" checked>
-                                            $700 - $1000
-                                        </span>
-                                        <span class="badge rounded-pill">34</span>
-                                    </label>
-                                    <label class="list-group-item d-flex justify-content-between align-items-center mt-2 mt-lg-3 pxp-checked">
-                                        <span class="d-flex">
-                                            <input class="form-check-input me-2" type="checkbox" value="" checked>
-                                            $1000 - $1200
-                                        </span>
-                                        <span class="badge rounded-pill">22</span>
-                                    </label>
-                                    <label class="list-group-item d-flex justify-content-between align-items-center mt-2 mt-lg-3">
-                                        <span class="d-flex">
-                                            <input class="form-check-input me-2" type="checkbox" value="">
-                                            $1200 - $1400
-                                        </span>
-                                        <span class="badge rounded-pill">67</span>
-                                    </label>
-                                    <label class="list-group-item d-flex justify-content-between align-items-center mt-2 mt-lg-3">
-                                        <span class="d-flex">
-                                            <input class="form-check-input me-2" type="checkbox" value="">
-                                            $1500 - $1800
-                                        </span>
-                                        <span class="badge rounded-pill">12</span>
-                                    </label>
-                                    <label class="list-group-item d-flex justify-content-between align-items-center mt-2 mt-lg-3">
-                                        <span class="d-flex">
-                                            <input class="form-check-input me-2" type="checkbox" value="">
-                                            $2000 - $3000
-                                        </span>
-                                        <span class="badge rounded-pill">26</span>
-                                    </label>
+                                    {% for i, j in saltype %}
+                                        {% if i.0 == 1 %}
+                                        <label class="list-group-item d-flex justify-content-between align-items-center pxp-checked">
+                                            <span class="d-flex">
+                                                <input class="form-check-input me-2 sal" type="checkbox" value='{{i.0}},{{i.1}}' name="sal" checked>
+                                                ${{i.0}} - ${{i.1}}
+                                                <input type="submit" style="display: none" class="salbutton">
+                                            </span>
+                                            <span class="badge rounded-pill">{{j}}</span>
+                                        </label>
+                                        {% else %}
+                                        <label class="list-group-item d-flex justify-content-between align-items-center mt-2 mt-lg-3">
+                                            <span class="d-flex">
+                                                <input class="form-check-input me-2 sal" type="checkbox" value='{{i.0}},{{i.1}}' name="sal">
+                                                ${{i.0}} - ${{i.1}}
+                                                <input type="submit" style="display: none" class="salbutton">
+                                            </span>
+                                            <span class="badge rounded-pill">{{j}}</span>
+                                        </label>
+                                        {% endif %}
+                                        {% endfor %}
                                 </div>
+                            </form>
                             </div>
                         </div>
                     </div>
@@ -282,11 +262,19 @@
                                 <nav class="mt-3 mt-sm-0" aria-label="Jobs list pagination">
                                     <ul class="pagination pxp-pagination">
                                         {% if pe.has_previous %}
+                                            {% if GET_params %}
+                                            <li class="page-item"><a href="?{{GET_params.urlencode}}&amp;page={{pe.previous_page_number}}" class="page-link"><i class="fa fa-chevron-left" aria-hidden="true"></i></a></li>
+                                            {% else %}
                                             <li class="page-item"><a href="?page={{pe.previous_page_number}}" class="page-link"><i class="fa fa-chevron-left" aria-hidden="true"></i></a></li>
+                                            {% endif %}
                                         {% endif %}
 
                                         {% if pe.number|add:'-4' > 1 %}
+                                            {% if GET_params %}
+                                            <li class="page-item"><a href="?{{GET_params.urlencode}}&amp;page={{ pe.number|add:'-5' }}" class="page-link">&hellip;</a></li>
+                                            {% else %}
                                             <li class="page-item"><a href="?page={{ pe.number|add:'-5' }}" class="page-link">&hellip;</a></li>
+                                            {% endif %}
                                         {% endif %}
 
                                         {% for i in pe.paginator.page_range %}
@@ -295,16 +283,28 @@
                                                     <span class="page-link">{{pe.number}}</span>
                                                 </li>
                                             {% elif i > pe.number|add:'-5' and i < pe.number|add:'5' %}
+                                                {% if GET_params %}
+                                                <li class="page-item"><a href="?{{GET_params.urlencode}}&amp;page={{ i }}" class="page-link">{{i}}</a></li>
+                                                {% else %}
                                                 <li class="page-item"><a href="?page={{ i }}" class="page-link">{{i}}</a></li>
+                                                {% endif %}
                                             {% endif %}
                                         {% endfor %}
 
                                         {% if pe.paginator.num_pages > pe.number|add:'4' %}
+                                            {% if GET_params %}
+                                            <li class="page-item"><a href="?{{GET_params.urlencode}}&amp;page={{ pe.number|add:'5' }}" class="page-link">&hellip;</a></li>
+                                            {% else %}
                                             <li class="page-item"><a href="?page={{ pe.number|add:'5' }}" class="page-link">&hellip;</a></li>
+                                            {% endif %}
                                         {% endif %}
 
                                         {% if pe.has_next %}
+                                            {% if GET_params %}
+                                            <li class="page-item"><a href="?{{GET_params.urlencode}}&amp;page={{ pe.next_page_number }}" class="page-link"><i class="fa fa-chevron-right" aria-hidden="true"></i></a></li>
+                                            {% else %}
                                             <li class="page-item"><a href="?page={{pe.next_page_number}}" class="page-link"><i class="fa fa-chevron-right" aria-hidden="true"></i></a></li>
+                                            {% endif %}
                                         {% endif %}
 
                                     </ul>
@@ -328,7 +328,46 @@
         <script src="{% static 'js/main.js' %}"></script>
         <script>
         $(document).ready(function () {
-            document.getElementById('blackcolor').style.color=black;
+            $('.form-check-input').change(function(){
+                $('.empbutton').click();
+                $('.expbutton').click();
+                $('.salbutton').click();
+            })
+            $('.form-check-input1').change(function()
+            {
+                let empval=[];
+                let a=$('.emp:checkbox:checked')
+                for(let i=0;i<a.length;i++)
+                {
+                    empval.push(a[i].value)
+                }
+                let expval=[];
+                a=$('.exp:checkbox:checked')
+                for(let i=0;i<a.length;i++)
+                {
+                    expval.push(a[i].value)
+                }
+                let salval=[];
+                a=$('.sal:checkbox:checked')
+                for(let i=0;i<a.length;i++)
+                {
+                    salval.push(a[i].value)
+                }
+                $.ajax(
+                {
+                    type:"GET",
+                    url: "",
+                    data:{
+                        'emp': empval
+                    },
+                    success: function( data ) 
+                    {
+                        location.reload();
+                        console.log("Fetched")
+                    }
+                 })
+            })
+            document.getElementById('blackcolor').style.color="black";
             $('select').selectize({
                 sortField: 'text'
             });

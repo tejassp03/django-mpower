@@ -156,6 +156,7 @@ def inbox(request, pk):
     temp_messages=[]
     empls=[]
     temp_empls=[]
+    first=None
     for i in threads:
         mess=Messages.objects.filter(msg_id=i.msg_id)
         messages.append(dumps(list(mess.values()), default=str))
@@ -164,7 +165,9 @@ def inbox(request, pk):
         logs_info2=Employer.objects.filter(log_id=i.sender.log_id)
         temp_empls.append(logs_info)
         empls.append(dumps(list(logs_info2.values()), default=str))
-    return render(request, 'inbox-candidate.html', {'pk': pk, 'threads': threads, 'first': temp_empls[0] ,'mess': messages, 'thre': temp_threads, 'm': temp_messages, 'emp': empls, 'initial': zip(threads, temp_empls)})
+    if(temp_empls):
+        first=temp_empls[0]
+    return render(request, 'inbox-candidate.html', {'pk': pk, 'threads': threads, 'first': first ,'mess': messages, 'thre': temp_threads, 'm': temp_messages, 'emp': empls, 'initial': zip(threads, temp_empls)})
 
 
 def under_development(request, pk):
@@ -226,6 +229,8 @@ def sendfromcand(request, pk):
         return JsonResponse({'message': 'Y', 'url': "", 'id': request.POST['employer'], 'thre': temp_threads, 'm': messages})
 
 def fetchmess(request, pk):
+    if request.GET['employer']=="":
+        return JsonResponse({'message': 'X'})
     user=Login.objects.get(email=request.session['email'])
     threads=Threads.objects.filter(receiver=user.log_id)
     temp_threads=[dumps(list(threads.values()), default=str)]
@@ -251,6 +256,8 @@ def fetchmess(request, pk):
 
 def seenmes(request, pk):
     if(request.method=="POST"):
+        if request.POST['employer']=="":
+            return JsonResponse({'message': 'X'})
         messages=Messages.objects.filter(msg_id=request.POST['employer'], is_read=False)
         Messages.objects.filter(msg_id=request.POST['employer'], is_read=False).update(is_read=True)
         for i in messages:

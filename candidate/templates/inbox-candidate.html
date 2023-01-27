@@ -76,7 +76,7 @@
                                     {% if request.session.photo %}
                                     <div class="pxp-dashboard-inbox-messages-item-avatar pxp-cover" style="background-image: url({{request.session.photo}});"></div>
                                     {% else %}
-                                    <div class="pxp-dashboard-inbox-messages-item-avatar pxp-cover" style="background-image: url({% static 'images/company-logo-3.png' %});"></div>
+                                    <div class="pxp-dashboard-inbox-messages-item-avatar pxp-cover"><div id="profileImage" class="profileimage"></div></div>
                                     {% endif %}
                                     <div class="pxp-dashboard-inbox-messages-item-name me-2">You</div>
                                     <div class="pxp-dashboard-inbox-messages-item-time pxp-text-light me-3">{{ i.date }}</div>
@@ -166,6 +166,10 @@ $(document).ready(function () {
         },
         success: function( data ) 
         {
+            if(data['message']=='X')
+            {
+                return;
+            }
             $.ajax(
             {
                 type:"POST",
@@ -176,6 +180,10 @@ $(document).ready(function () {
                 },
                 success: function( data ) 
                 {
+                    if(data['message']=='X')
+                    {
+                        return;
+                    }
                     let mpower="";
                 },
                 async: false
@@ -204,14 +212,16 @@ $(document).ready(function () {
                     ithediv.setAttribute('class', 'pxp-dashboard-inbox-messages-item-header flex-row-reverse')
                     let firindiv=document.createElement('div');
                     firindiv.setAttribute('class', 'pxp-dashboard-inbox-messages-item-avatar pxp-cover')
+                    let imageLetterdiv=document.createElement('div');
                     if("{{request.session.photo}}")
                     {
                         firindiv.style.backgroundImage='url({{request.session.photo}})';
                     }
                     else
                     {
-                        firindiv.style.backgroundImage='url({% static 'images/company-logo-2.png' %})';
+                        imageLetterdiv.setAttribute('class', 'profileimage')
                     }
+                    firindiv.append(imageLetterdiv);
                     let secindiv=document.createElement('div');
                     secindiv.setAttribute('class', 'pxp-dashboard-inbox-messages-item-name me-2')
                     secindiv.innerHTML='You'
@@ -274,6 +284,9 @@ $(document).ready(function () {
         },
         async: false
      })
+     $(".profileimage").each(function(i, el) {
+        el.innerHTML = '{{request.session.name}}'[0]
+    })
     }
 })
 function caller(id, mess, thre1)
@@ -402,14 +415,16 @@ for(let i=0;i<ms.length;i++)
         ithediv.setAttribute('class', 'pxp-dashboard-inbox-messages-item-header flex-row-reverse')
         let firindiv=document.createElement('div');
         firindiv.setAttribute('class', 'pxp-dashboard-inbox-messages-item-avatar pxp-cover')
+        let imageLetterdiv=document.createElement('div');
         if("{{request.session.photo}}")
         {
             firindiv.style.backgroundImage='url({{request.session.photo}})';
         }
         else
         {
-            firindiv.style.backgroundImage='url({% static 'images/company-logo-2.png' %})';
+            imageLetterdiv.setAttribute('class', 'profileimage')
         }
+        firindiv.append(imageLetterdiv);
         let secindiv=document.createElement('div');
         secindiv.setAttribute('class', 'pxp-dashboard-inbox-messages-item-name me-2')
         secindiv.innerHTML='You'
@@ -528,6 +543,9 @@ $('#sender').click(function(e){
 
 $('.pxp-dashboard-inbox-messages-close-btn').click(function(e){
     $('.pxp-dashboard-inbox-messages-container').removeClass('pxp-show');
+})
+$(".profileimage").each(function(i, el) {
+    el.innerHTML = '{{request.session.name}}'[0]
 })
 }
 

@@ -5553,7 +5553,7 @@ button#submit-btn:hover::after {
  
 .form-check-input:checked,
 .form-check-input:focus {
-    background-color: var(--pxpMainColor) !important;
+    /* background-color: var(--pxpMainColor) !important; */
     outline: none !important;
     border: none !important;
 }
@@ -7605,3 +7605,20 @@ main.show {
 }
 
 
+.profileimage {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background: var(--pxpMainColor);
+    font-size: 1.3rem;
+    color: #fff;
+    text-align: center;
+}
+
+input::-webkit-calendar-picker-indicator {
+    display: none;
+}
+
+.pxp-checked{
+    margin-top: 1rem !important;
+}

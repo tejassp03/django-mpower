@@ -51,3 +51,13 @@
     width: 50%;
     color: black;
 }
+
+.profileimage {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background: var(--pxpMainColor);
+    font-size: 1.3rem;
+    color: #fff;
+    text-align: center;
+}

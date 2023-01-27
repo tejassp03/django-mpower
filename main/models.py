@@ -59,7 +59,7 @@ class Jobs(models.Model):
     jobdesc = models.CharField(max_length=700, default=None, null=True)
     vacno = models.IntegerField(default=None, null=True)
     experience = models.CharField(max_length=100, default=None, null=True)
-    basicpay = models.CharField(max_length=100, default=None, null=True)
+    basicpay = models.IntegerField(default=None, null=True)
     fnarea = models.CharField(max_length=100, default=None, null=True)
     location = models.CharField(max_length=200, default=None, null=True)
     industry = models.CharField(max_length=200, default=None, null=True)
@@ -67,6 +67,7 @@ class Jobs(models.Model):
     pgqual = models.CharField(max_length=100, default=None, null=True)
     profile = models.CharField(max_length=700, default=None, null=True)
     postdate = models.DateField(default=timezone.now)
+    jobtype = models.CharField(max_length=50, default="Full Time")
     class Meta:
         db_table = "jobs"
 
