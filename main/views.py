@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate,login
 from django.contrib import messages
-from .models import JobSeeker, Login, Employer, ResumeAnalysis, Jobs
+from .models import JobSeeker, Login, Employer, ResumeAnalysis, Jobs, LikedJobs
 import random
 import re
 from django.contrib.auth.hashers import make_password, check_password
@@ -59,7 +59,7 @@ def index(request):
 				else:
 					return JsonResponse({'message': 'X'})
 				request.session['email'] = request.POST['c_email']
-				request.session['password'] = request.POST['c_pass']
+				request.session['password'] = user[0].password
 				empls=JobSeeker.objects.get(log_id=user[0].log_id)
 				request.session['name']=empls.name
 				request.session['pk']=empls.user_id
@@ -149,6 +149,7 @@ def findjobs(request):
 	t_val=""
 	c_val=""
 	l_val=""
+	d_val=""
 	emp_sel=[]
 	exp_sel=[]
 	sal_sel=[]
@@ -199,6 +200,10 @@ def findjobs(request):
 				maxval=int(ab[1])
 			sal_sel.append([int(ab[0]), int(ab[1])])
 		jobs=jobs.filter(basicpay__range=(minval, maxval))
+	if 'datesort' in request.GET:
+		d_val=request.GET['datesort']
+		if(request.GET['datesort']=="2"):
+			jobs=jobs.reverse()
 	GET_params = request.GET.copy()
 	if('page' in GET_params):
 		last=GET_params['page'][-1]
@@ -239,9 +244,7 @@ def findjobs(request):
 		countemp.append(len(Jobs.objects.filter(experience=i['experience'])))
 	for i in saltype:
 		countsal.append(len(Jobs.objects.filter(basicpay__range=(i[0], i[1]))))
-	print(saltype)
-	print(sal_sel)
-	context={'c': c_val, 'l': l_val, 't': t_val, 'sel': emp_sel, 'eel': exp_sel, 'els': sal_sel}
+	context={'c': c_val, 'l': l_val, 't': t_val, 'd': d_val, 'sel': emp_sel, 'eel': exp_sel, 'els': sal_sel}
 	return render(request, 'jobs.html', {'page_obj': zip(page_obj, companies), 'pe': page_obj, 'count': count, 'locations': locations, 'titles': titles, 'categories': categories, 'GET_params':GET_params, 'jobtype': zip(jobtype, countjob), 'emptype': zip(emptype, countemp), 'saltype': zip(saltype, countsal), 'context': context})
 
 def profile_completion(request, pk):
@@ -536,7 +539,14 @@ def verify_otp(request, pk):
 
 
 def singlejob(request, pk2):
+	if request.method=="POST":
+		like=LikedJobs()
+		like.job_id=Jobs.objects.get(jobid=pk2)
+		like.user_id=JobSeeker.objects.get(user_id=request.session['pk'])
+		like.save()
+		return redirect('main:singlejob', pk2=pk2)
 	jobdet=Jobs.objects.get(jobid=pk2)
 	companydet=Employer.objects.get(eid=jobdet.eid.eid)
-	return render(request, 'singlejob.html', {'job_details': jobdet, 'company_details': companydet})
+	liked=LikedJobs.objects.filter(job_id=pk2)
+	return render(request, 'singlejob.html', {'job_details': jobdet, 'company_details': companydet, 'liked': liked})
 

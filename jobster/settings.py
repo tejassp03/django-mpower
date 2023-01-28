@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'main.apps.MainConfig',
-    'candidate.apps.CandidateConfig'
+    'candidate.apps.CandidateConfig',
+    'multiforloop'
     
 ]
 

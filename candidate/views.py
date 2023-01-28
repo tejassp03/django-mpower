@@ -1,8 +1,14 @@
 from django.shortcuts import render, redirect
-from main.models import JobSeeker, Employer, Jobs, Application, Selection, Login, ExperienceJob, Education, ProfileVisits, Threads, Messages, ResumeAnalysis
+from main.models import JobSeeker, Employer, Jobs, Application, Selection, Login, ExperienceJob, Education, ProfileVisits, Threads, Messages, ResumeAnalysis, LikedJobs
 from json import dumps
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
+from django.contrib import messages
+from django.contrib.auth.hashers import make_password, check_password
+import re
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+from itertools import chain
+
 # Create your views here.
 def dashboard(request, pk):
     context = JobSeeker.objects.get(user_id=pk)
@@ -295,6 +301,70 @@ def count_inbox(request, pk):
     user=JobSeeker.objects.get(user_id=pk)
     num_mess=Threads.objects.filter(receiver=user.log_id, has_unread=1)
     return JsonResponse({'count': len(num_mess)})
+
+
+def change(request, pk):
+    if request.method=="POST":
+        user=Login.objects.get(email=request.session['email'])
+        if(check_password(request.POST['old'], user.password)):
+            if request.POST['new']!=request.POST['cnew']:
+                messages.error(request, "Both your password and your confirmation password must be exactly same")
+                return redirect('candidate:change', pk=pk)
+            if not re.fullmatch(r'^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$', request.POST['new']):
+                messages.error(request, "Please entere a valid password")
+                return redirect('candidate:change', pk=pk)
+            if(request.POST['old']==request.POST['new']):
+                messages.error(request, "Old and new password cant be same")
+                return redirect('candidate:change', pk=pk)
+            user.password=make_password(request.POST['new'])
+            user.save()
+            request.session['password']=user.password
+            print(request.session['password'])
+            messages.success(request, 'Password changed successfully')
+            return redirect('candidate:change', pk=pk)
+        else:
+            messages.error(request, "Please enter correct old password")
+            return redirect('candidate:change', pk=pk)
+    return render(request, 'password-candidate.html', {'pk': pk})
+
+def favjobs(request, pk):
+    if request.method=="POST":
+        if 'act' in request.POST:
+            for i in request.POST.getlist('ids[]'):
+                LikedJobs.objects.filter(like_id=i).delete()
+            return redirect('candidate:favjobs', pk=pk)
+        LikedJobs.objects.filter(like_id=request.POST['like_id']).delete()
+        return redirect('candidate:favjobs', pk=pk)
+    all_fav = LikedJobs.objects.filter(user_id=pk).order_by('-likedate')
+    all_det = []
+    for i in all_fav:
+        data={}
+        data['like_id']=i.like_id
+        data['likedate']=i.likedate
+        job=Jobs.objects.get(jobid=i.job_id.jobid)
+        data['title']=job.title
+        data['jobid']=job.jobid
+        data['location']=job.location
+        data['fnarea']=job.fnarea
+        data['jobtype']=job.jobtype
+        emp=Employer.objects.get(eid=job.eid.eid)
+        data['ename']=emp.ename
+        data['eid']=emp.eid
+        all_det.append(data)
+    count=len(all_fav)
+    GET_params = request.GET.copy()
+    if('page' in GET_params):
+        last=GET_params['page'][-1]
+        GET_params['page']=last[0]
+    p=Paginator(all_det, 5)
+    page_number = request.GET.get('page')
+    try:
+        page_obj = p.get_page(page_number)
+    except PageNotAnInteger:
+        page_obj = p.page(1)
+    except EmptyPage:
+        page_obj = p.page(p.num_pages)
+    return render(request, 'favjobs-candidate.html', {'pk': pk, 'fav': page_obj, 'count': count, 'pe': page_obj, 'GET_params': GET_params})
 
 def logout(request, pk):
     request.session.flush()

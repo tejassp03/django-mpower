@@ -2906,6 +2906,7 @@ a:hover {
     color: var(--pxpTextColor);
     border: 0 none;
     background-color: transparent;
+    margin-top: 10px;
 }
 .pxp-jobs-list-side-filter .form-check-input {
     border: 0 none;
@@ -7619,6 +7620,40 @@ input::-webkit-calendar-picker-indicator {
     display: none;
 }
 
-.pxp-checked{
+/* .pxp-checked{
     margin-top: 1rem !important;
+} */
+
+.filterbuttons{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 10px;
 }
+
+@media (min-width: 991px) {
+    .cancelshow
+    {
+        display: none;
+    }
+}
+
+
+@media (max-width: 991px) {
+    .filterbuttons{
+        justify-content: center;
+    }
+    .cancelshow
+    {
+        display: block;
+        margin-left: 10px;
+        background: white;
+        color: var(--pxpMainColor);
+    }
+}
+
+
+.pxp-jobs-card-3{
+    cursor: pointer;
+}
+

@@ -152,5 +152,13 @@ class ResumeAnalysis(models.Model):
     recommendations = models.CharField(max_length=1000, default=None, null=True)
     class Meta:
         db_table = "resumeanalysis"
+    
+class LikedJobs(models.Model):
+    like_id = models.AutoField(primary_key=True)
+    user_id = models.ForeignKey(JobSeeker, on_delete=models.CASCADE, blank=True, null=True)
+    job_id = models.ForeignKey(Jobs, on_delete=models.CASCADE, blank = True, null=True)
+    likedate = models.DateTimeField(default=timezone.now)
+    class Meta:
+        db_table = "likedjobs"
 
 
