@@ -153,6 +153,7 @@ def findjobs(request):
 	emp_sel=[]
 	exp_sel=[]
 	sal_sel=[]
+	data=[]
 	if(('title' not in request.GET) and ('category' not in request.GET) and ('location' not in request.GET)):
 		jobs=Jobs.objects.all().order_by('-postdate')
 	elif(request.GET['title']=="all" and request.GET['location']=="all" and request.GET['category']=="all"):
@@ -211,8 +212,20 @@ def findjobs(request):
 	count=len(jobs)
 	companies=[]
 	for i in jobs:
+		new_data={}
+		new_data['jobid']=i.jobid
+		new_data['title']=i.title
+		new_data['location']=i.location
+		new_data['experience']=i.experience
+		new_data['fnarea']=i.fnarea
+		new_data['postdat']=i.postdate
 		companies.append(Employer.objects.get(eid=i.eid.eid))
-	p=Paginator(jobs, 5)
+		em=Employer.objects.get(eid=i.eid.eid)
+		new_data['eid']=em.eid
+		new_data['ename']=em.ename
+		new_data['logo']=em.logo
+		data.append(new_data)
+	p=Paginator(data, 5)
 	page_number = request.GET.get('page')
 	try:
 		page_obj = p.get_page(page_number)
@@ -245,7 +258,7 @@ def findjobs(request):
 	for i in saltype:
 		countsal.append(len(Jobs.objects.filter(basicpay__range=(i[0], i[1]))))
 	context={'c': c_val, 'l': l_val, 't': t_val, 'd': d_val, 'sel': emp_sel, 'eel': exp_sel, 'els': sal_sel}
-	return render(request, 'jobs.html', {'page_obj': zip(page_obj, companies), 'pe': page_obj, 'count': count, 'locations': locations, 'titles': titles, 'categories': categories, 'GET_params':GET_params, 'jobtype': zip(jobtype, countjob), 'emptype': zip(emptype, countemp), 'saltype': zip(saltype, countsal), 'context': context})
+	return render(request, 'jobs.html', {'page_obj': page_obj, 'pe': page_obj, 'count': count, 'locations': locations, 'titles': titles, 'categories': categories, 'GET_params':GET_params, 'jobtype': zip(jobtype, countjob), 'emptype': zip(emptype, countemp), 'saltype': zip(saltype, countsal), 'context': context})
 
 def profile_completion(request, pk):
 	if request.method=='POST':

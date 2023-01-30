@@ -43,7 +43,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'main.apps.MainConfig',
     'candidate.apps.CandidateConfig',
-    'multiforloop'
+    'multiforloop',
+    'django.contrib.humanize'
     
 ]
 
@@ -70,6 +71,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'candidate.context_processors.notifs' 
             ],
         },
     },

@@ -238,12 +238,12 @@
                         </div>
                     </form>
                         <div>
-                            {% for i, j in page_obj %}
+                            {% for i in page_obj %}
                                 <div class="pxp-jobs-card-3 pxp-has-border">
                                     <div class="row align-items-center justify-content-between">
                                         <div class="col-sm-3 col-md-2 col-lg-3 col-xl-2 col-xxl-auto">
-                                            {% if j.logo %}
-                                            <a href="single-company-1.html" class="pxp-jobs-card-3-company-logo" style="background-image: url({{j.logo.url}});"></a>
+                                            {% if i.logo %}
+                                            <a href="single-company-1.html" class="pxp-jobs-card-3-company-logo" style="background-image: url({{i.logo.url}});"></a>
                                             {% else %}
                                             <a href="single-company-1.html" class="pxp-jobs-card-3-company-logo" style="background-image: url();"></a>
                                             {% endif %}
@@ -262,7 +262,7 @@
                                                 <div class="pxp-jobs-card-3-category-label">{{ i.fnarea }}</div>
                                             </a>
                                             <div class="pxp-jobs-card-3-date-company">
-                                                <span class="pxp-jobs-card-3-date pxp-text-light">{{ i.postdate }}</span> <a href="#" class="pxp-jobs-card-3-company">{{ j.ename }}</a>
+                                                <span class="pxp-jobs-card-3-date pxp-text-light">{{ i.postdate }}</span> <a href="#" class="pxp-jobs-card-3-company">{{ i.ename }}</a>
                                             </div>
                                         </div>
                                         <div class="col-sm-4 col-xl-2 col-xxl-auto mt-3 mt-xxl-0 pxp-text-right" style="display: none">

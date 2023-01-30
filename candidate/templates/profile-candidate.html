@@ -8,6 +8,13 @@
 {% load static %}
 
 <div class="pxp-dashboard-content-details">
+    {% if messages %}
+        {% for message in messages %}
+         {% if message.tags %}  
+         <script>alert('{{ message }}')</script>
+        {% endif %}
+        {% endfor %}
+    {% endif %}
     <h1>Edit Profile</h1>
     <p class="pxp-text-light">Edit your candidate profile page info.</p>
 
@@ -101,7 +108,7 @@
                         <td>
                             <div class="pxp-dashboard-table-options">
                                 <ul class="list-unstyled">
-                                    <li><button title="Edit" id="pxp-signup-modal-button" onclick="return false;" data-bs-target="#pxp-signup-modal" data-bs-toggle="modal"><span class="fa fa-pencil"></span></button></li>
+                                    <li><button type="button" title="Edit" id="pxp-exp-modal-button" data-bs-target="#pxp-edit-modal" data-bs-toggle="modal" onclick="expmodal('{{i.exp_id}}')"><span class="fa fa-pencil"></span></button></li>
                                     <li><button title="Delete" class="delete_exp"><input style="display: none" value={{ i.exp_id }} /><span class="fa fa-trash-o"></span></button></li>
                                 </ul>
                             </div>
@@ -150,7 +157,7 @@
                         <td>
                             <div class="pxp-dashboard-table-options">
                                 <ul class="list-unstyled">
-                                    <li><button title="Edit" data-bs-target="#pxp-signup-modal" onclick="return false;"  data-bs-toggle="modal"><span class="fa fa-pencil"></span></button></li>
+                                    <li><button type="button" title="Edit" id="pxp-edu-modal-button" data-bs-target="#pxp-edu-modal" data-bs-toggle="modal" onclick="edumodal('{{i.edu_id}}')"><span class="fa fa-pencil"></span></button></li>
                                     <li><button title="Delete" class="delete_edu"><input style="display: none" value={{ i.edu_id }} /><span class="fa fa-trash-o"></span></button></li>
                                 </ul>
                             </div>
@@ -204,6 +211,84 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade pxp-user-modal" id="pxp-edit-modal" aria-hidden="true" aria-labelledby="expModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered" style="
+    display: flex;
+    align-items: center;
+    justify-content: center;">
+        <div class="modal-content" style="width: 100vw; display: flex; flex-direction: row; align-items: center">
+            <div class="modal-body" style="width: 60vw; padding: 15px 15px !important">
+                <div class="row mt-3 mt-lg-4">
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label for="pxp-candidate-work-title" class="form-label">Job title</label>
+                            <input type="text" id="pxp-candidate-work-title" class="form-control" placeholder="E.g. Web Designer" name="job_titlem">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label for="pxp-candidate-work-company" class="form-label">Company</label>
+                            <input type="text" id="pxp-candidate-work-company" class="form-control" placeholder="Company name" name="companym">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label for="pxp-candidate-work-time" class="form-label">Time period</label>
+                            <input type="text" id="pxp-candidate-work-time" class="form-control" placeholder="E.g. 2005 - 2013" name="time_periodm">
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="pxp-candidate-work-about" class="form-label">Description</label>
+                    <textarea class="form-control pxp-smaller" id="pxp-candidate-work-about" placeholder="Type a short description here..." name="descriptionm"></textarea>
+                </div>
+                <input style="display: none" name="expidm">
+                <button class="btn rounded-pill pxp-subsection-cta" onclick="expmodalsub()">Edit Experience</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade pxp-user-modal" id="pxp-edu-modal" aria-hidden="true" aria-labelledby="eduModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered" style="
+    display: flex;
+    align-items: center;
+    justify-content: center;">
+        <div class="modal-content" style="width: 100vw; display: flex; flex-direction: row; align-items: center">
+            <div class="modal-body" style="width: 60vw; padding: 15px 15px !important">
+                <div class="row mt-3 mt-lg-4">
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label for="pxp-candidate-edu-title" class="form-label">Title</label>
+                            <input type="text" id="pxp-candidate-edu-title" class="form-control" placeholder="E.g. Architecure" name="edu_titlem">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label for="pxp-candidate-edu-school" class="form-label">School</label>
+                            <input type="text" id="pxp-candidate-edu-school" class="form-control" placeholder="School name" name="schoolm">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label for="pxp-candidate-edu-time" class="form-label">Time period</label>
+                            <input type="text" id="pxp-candidate-edu-time" class="form-control" placeholder="E.g. 2005 - 2013"  name="period_edum">
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="pxp-candidate-edu-about" class="form-label">Description</label>
+                    <textarea class="form-control pxp-smaller" id="pxp-candidate-edu-about" placeholder="Type a short description here..."  name="descm"></textarea>
+                </div>
+                <input style="display: none" name="eduidm">
+                <button class="btn rounded-pill pxp-subsection-cta" onclick="edumodalsub()">Edit Education</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock content %}
 
 {% block script %}
@@ -309,8 +394,98 @@ $('.delete_edu').click(function(e){
         }
      })
 })
+
+
+function expmodal(id)
+{
+    $.ajax(
+    {
+        type:"GET",
+        url: "{% url 'candidate:edit_exp' pk=pk %}",
+        data:{
+                expid: id
+        },
+        success: function( data ) 
+        {
+            $('[name="expidm"]').val(JSON.parse(data['info'])[0].exp_id);
+            $('[name="job_titlem"]').val(JSON.parse(data['info'])[0].job_title);
+            $('[name="companym"]').val(JSON.parse(data['info'])[0].company);
+            $('[name="time_periodm"]').val(JSON.parse(data['info'])[0].time_period);
+            $('[name="descriptionm"]').val(JSON.parse(data['info'])[0].description);
+        }
+    })
+}
+
+function expmodalsub()
+{
+    $.ajax(
+    {
+        type:"POST",
+        url: "{% url 'candidate:edit_exp' pk=pk %}",
+        data:{
+                expid: $('[name="expidm"]').val(),
+                job_title: $('[name="job_titlem"]').val(),
+                company: $('[name="companym"]').val(),
+                time_period: $('[name="time_periodm"]').val(),
+                description: $('[name="descriptionm"]').val(),
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+        },
+        success: function( data ) 
+        {
+           alert("Data updated successfully");
+        }
+    })
+}
+
+function edumodal(id)
+{
+    $.ajax(
+    {
+        type:"GET",
+        url: "{% url 'candidate:edit_edu' pk=pk %}",
+        data:{
+                eduid: id
+        },
+        success: function( data ) 
+        {
+            $('[name="eduidm"]').val(JSON.parse(data['info'])[0].edu_id);
+            $('[name="edu_titlem"]').val(JSON.parse(data['info'])[0].title);
+            $('[name="schoolm"]').val(JSON.parse(data['info'])[0].school);
+            $('[name="period_edum"]').val(JSON.parse(data['info'])[0].time_period);
+            $('[name="descm"]').val(JSON.parse(data['info'])[0].description);
+        }
+    })
+}
+
+function edumodalsub()
+{
+    $.ajax(
+    {
+        type:"POST",
+        url: "{% url 'candidate:edit_edu' pk=pk %}",
+        data:{
+                eduid: $('[name="eduidm"]').val(),
+                title: $('[name="edu_titlem"]').val(),
+                school: $('[name="schoolm"]').val(),
+                time_period: $('[name="period_edum"]').val(),
+                description: $('[name="descm"]').val(),
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+        },
+        success: function( data ) 
+        {
+            alert("Data updated successfully");
+        }
+    })
+}
+
 $('#pxp-signup-modal-button').on('click', function() {
     $('#pxp-signup-modal').show();
+});
+$('#pxp-exp-modal-button').on('click', function() {
+    $('#pxp-exp-modal').show();
+});
+$('#pxp-edu-modal-button').on('click', function() {
+    $('#pxp-edu-modal').show();
 });
 $(document).ready(function () {
     $('#das').removeClass('pxp-active');

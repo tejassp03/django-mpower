@@ -74,10 +74,9 @@ class Jobs(models.Model):
 class Application(models.Model):
     apply_id = models.AutoField(primary_key=True)
     user_id = models.ForeignKey(JobSeeker, default=None, null=True, on_delete=models.CASCADE)
-    emp_id = models.ForeignKey(Employer, default=None, null=True, on_delete=models.CASCADE)
     job_id = models.ForeignKey(Jobs, default=None, null=True, on_delete=models.CASCADE)
     status = models.IntegerField(default=None, null=True)
-    date_applied = models.DateField(default=timezone.now)
+    date_applied = models.DateTimeField(default=timezone.now)
     class Meta:
         db_table = "application"
 
@@ -161,4 +160,13 @@ class LikedJobs(models.Model):
     class Meta:
         db_table = "likedjobs"
 
+class Notifications(models.Model):
+    notif_id = models.AutoField(primary_key=True)
+    send_id = models.ForeignKey(Login, on_delete=models.CASCADE, blank=True, null=True, related_name='notif_sender')
+    rece_id = models.ForeignKey(Login, on_delete=models.CASCADE, blank=True, null=True, related_name='notif_receiver')
+    datetime = models.DateTimeField(default=timezone.now)
+    notif_type = models.CharField(max_length=10, default=None, null=True)
+    readed = models.BooleanField(default=False)
+    class Meta:
+        db_table = "notifications"
 

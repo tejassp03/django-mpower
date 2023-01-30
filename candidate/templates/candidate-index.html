@@ -1,4 +1,5 @@
 {% load static %}
+{% load humanize %}
 <!doctype html>
 <html lang="en" class="pxp-root">
     <head>
@@ -35,7 +36,7 @@
                 <ul class="list-unstyled">
                     <li id="das"><a href="{% url 'candidate:dashboard' pk=pk %}"><span class="fa fa-home"></span>Dashboard</a></li>
                     <li id="edi" ><a href="{% url 'candidate:edit' pk=pk %}"><span class="fa fa-pencil"></span>Edit Profile</a></li>
-                    <li id="app"><a href="{% url 'candidate:under_development' pk=pk %}"><span class="fa fa-file-text-o"></span>Applications</a></li>
+                    <li id="app"><a href="{% url 'candidate:applications' pk=pk %}"><span class="fa fa-file-text-o"></span>Applications</a></li>
                     <li id="fav"><a href="{% url 'candidate:favjobs' pk=pk %}"><span class="fa fa-heart-o"></span>Favourite Jobs</a></li>
                     <li id="cha" ><a href="{% url 'candidate:change' pk=pk %}"><span class="fa fa-lock"></span>Change Password</a></li>
                     {% comment %} <li><a href="candidate-dashboard-applications.html"><span class="fa fa-file-text-o"></span>Apllications</a></li>
@@ -53,9 +54,11 @@
                     </li>
                     <li id="not">
                         {% comment %} <a href="candidate-dashboard-notifications.html" class="d-flex justify-content-between align-items-center"> {% endcomment %}
-                            <a href="{% url 'candidate:under_development' pk=pk %}" class="d-flex justify-content-between align-items-center">
+                            <a href="{% url 'candidate:notifications' pk=pk %}" class="d-flex justify-content-between align-items-center">
                             <div><span class="fa fa-bell-o"></span>Notifications</div>
-                            <span class="badge rounded-pill">5</span>
+                            {% if request.session.notifnum != 0%}
+                            <span class="badge rounded-pill">{{ request.session.notifnum }}</span>
+                            {% endif %}
                         </a>
                     </li>
                 </ul>
@@ -123,7 +126,7 @@
                                     <li class="pxp-dropdown-header">Candidate tools</li>
                                     <li class="nav-item"><a href="{% url 'candidate:dashboard' pk=pk %}"><span class="fa fa-home"></span>Dashboard</a></li>
                                     <li class="nav-item"><a href="{% url 'candidate:edit' pk=pk %}"><span class="fa fa-pencil"></span>Edit Profile</a></li>
-                                    <li class="nav-item"><a href="{% url 'candidate:under_development' pk=pk %}"><span class="fa fa-file-text-o"></span>Applications</a></li>
+                                    <li class="nav-item"><a href="{% url 'candidate:applications' pk=pk %}"><span class="fa fa-file-text-o"></span>Applications</a></li>
                                     <li class="nav-item"><a href="{% url 'candidate:favjobs' pk=pk %}"><span class="fa fa-heart-o"></span>Favourite Jobs</a></li>
                                     <li class="nav-item"><a href="{% url 'candidate:change' pk=pk %}"><span class="fa fa-lock"></span>Change Password</a></li>
                                     {% comment %} <li class="nav-item"><a href="candidate-dashboard-applications.html"><span class="fa fa-file-text-o"></span>Apllications</a></li>
@@ -139,9 +142,11 @@
                                     </li>
                                     <li class="nav-item">
                                         {% comment %} <a href="candidate-dashboard-notifications.html" class="d-flex justify-content-between align-items-center"> {% endcomment %}
-                                        <a href="{% url 'candidate:under_development' pk=pk %}" class="d-flex justify-content-between align-items-center">
+                                        <a href="{% url 'candidate:notifications' pk=pk %}" class="d-flex justify-content-between align-items-center">
                                             <div><span class="fa fa-bell-o"></span>Notifications</div>
-                                            <span class="badge rounded-pill">5</span>
+                                            {% if request.session.notifnum != 0%}
+                                            <span class="badge rounded-pill">{{ request.session.notifnum }}</span>
+                                            {% endif %}
                                         </a>
                                     </li>
                                     <li class="pxp-dropdown-header mt-4">AI Tools<sup style="background: var(--pxpMainColor); padding: 3px; color: white; border-radius: 50rem; margin-left: 5px">Beta</sup></li>
@@ -172,18 +177,25 @@
                     <div class="dropdown pxp-user-nav-dropdown pxp-user-notifications">
                         <a role="button" class="dropdown-toggle" data-bs-toggle="dropdown">
                             <span class="fa fa-bell-o"></span>
-                            <div class="pxp-user-notifications-counter">5</div>
+                            {% if request.session.notifnum != 0%}
+                            <div class="pxp-user-notifications-counter">{{ request.session.notifnum }}</div>
+                            {% endif %}
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
                             {% comment %} <li><a class="dropdown-item" href="candidate-dashboard-notifications.html"><strong>Artistre Studio</strong> viewed your profile. <span class="pxp-is-time">20m</span></a></li> {% endcomment %}
-                            <li><a class="dropdown-item" href="{% url 'candidate:under_development' pk=pk %}"><strong>Artistre Studio</strong> viewed your profile. <span class="pxp-is-time">20m</span></a></li>
-                            <li><a class="dropdown-item" href="{% url 'candidate:under_development' pk=pk %}"><strong>CoderBotics</strong> sent you a message. <span class="pxp-is-time">1h</span></a></li>
-                            <li><a class="dropdown-item" href="{% url 'candidate:under_development' pk=pk %}"><strong>Illuminate Studio</strong> viewed your profile. <span class="pxp-is-time">2h</span></a></li>
-                            <li><a class="dropdown-item" href="{% url 'candidate:under_development' pk=pk %}"><strong>Syspresoft</strong> sent you a message. <span class="pxp-is-time">5h</span></a></li>
-                            <li><a class="dropdown-item" href="{% url 'candidate:under_development' pk=pk %}"><strong>Artistre Studio</strong> viewed your profile. <span class="pxp-is-time">1d</span></a></li>
-                            <li><a class="dropdown-item" href="{% url 'candidate:under_development' pk=pk %}"><strong>Illuminate Studio</strong> viewed your profile. <span class="pxp-is-time">3d</span></a></li>
+                            {% if notis|length %}
+                                {% for i in notis %}
+                                {% if i.notif_type == "M" %}
+                                <li><a class="dropdown-item" href="{% url 'candidate:under_development' pk=pk %}"><strong>{{ i.ename }}</strong> sent you a message. <span class="pxp-is-time">{{ i.datetime|naturaltime }}</span></a></li>
+                                {% else %}
+                                <li><a class="dropdown-item" href="{% url 'candidate:under_development' pk=pk %}"><strong>{{ i.ename }}</strong> viewed your profile. <span class="pxp-is-time">{{ i.datetime|naturaltime }}</span></a></li>
+                                {% endif %}
+                                {% endfor %}
+                            {% else %}
+                            <li><a class="dropdown-item" href="#" style="cursor: text"><strong></strong>No new notifications<span class="pxp-is-time"></span></a></li>
+                            {% endif %}
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item pxp-link" href="{% url 'candidate:under_development' pk=pk %}">Read All</a></li>
+                            <li><a class="dropdown-item pxp-link" href="{% url 'candidate:notifications' pk=pk %}">Read All</a></li>
                         </ul>
                     </div>
                     <div class="dropdown pxp-user-nav-dropdown">
@@ -225,7 +237,6 @@
                                                     </div>
                                                     <div class="col-auto">
                                                         <div class="pxp-single-job-options mt-4 col-xl-0">
-                                                            <button class="btn pxp-single-job-save-btn"><span class="fa fa-heart-o"></span></button>
                                                             <div class="dropdown ms-2">
                                                                 <button class="btn pxp-single-job-share-btn dropdown-toggle" type="button" id="socialShareBtn" data-bs-toggle="dropdown" aria-expanded="false">
                                                                     <span class="fa fa-share-alt">

@@ -1,5 +1,6 @@
 {% extends 'candidate-index.html' %}
 {% load static %}
+{% load humanize %}
 
 {% block title %}
 <title>mpower - Candidate dashboard</title>
@@ -38,7 +39,7 @@
                     <span class="fa fa-envelope-o"></span>
                 </div>
                 <div class="pxp-dashboard-stats-card-info">
-                    <div class="pxp-dashboard-stats-card-info-number">14</div>
+                    <div class="pxp-dashboard-stats-card-info-number">{{ messcount }}</div>
                     <div class="pxp-dashboard-stats-card-info-text pxp-text-light">Unread messages</div>
                 </div>
             </div>
@@ -49,7 +50,7 @@
                     <span class="fa fa-bell-o"></span>
                 </div>
                 <div class="pxp-dashboard-stats-card-info">
-                    <div class="pxp-dashboard-stats-card-info-number">5</div>
+                    <div class="pxp-dashboard-stats-card-info-number">{{ request.session.notifnum }}</div>
                     <div class="pxp-dashboard-stats-card-info-text pxp-text-light">Notifications</div>
                 </div>
             </div>
@@ -103,96 +104,29 @@
         <div class="col-xxl-6">
             <h2>Recent Notifications</h2>
             <div class="pxp-candidate-dashboard-notifications">
-                <div class="pxp-candidate-dashboard-notifications-item mb-3">
-                    <div class="pxp-candidate-dashboard-notifications-item-left">
-                        <div class="pxp-candidate-dashboard-notifications-item-type"><span class="fa fa-user-circle-o"></span></div>
-                        <div class="pxp-candidate-dashboard-notifications-item-message">
-                            <a href="{% url 'candidate:under_development' pk=pk %}">Artistre Studio</a> viewed your profile.
-                        </div>
-                    </div>
-                    <div class="pxp-candidate-dashboard-notifications-item-right">20m ago</div>
-                </div>
+                {% for i in notifics %}
+                {% if i.notif_type == "M" %}
                 <div class="pxp-candidate-dashboard-notifications-item mb-3">
                     <div class="pxp-candidate-dashboard-notifications-item-left">
                         <div class="pxp-candidate-dashboard-notifications-item-type"><span class="fa fa-envelope-o"></span></div>
                         <div class="pxp-candidate-dashboard-notifications-item-message">
-                            <a href="{% url 'candidate:under_development' pk=pk %}">Craftgenics</a> sent you a message.
+                            <a href="{% url 'candidate:under_development' pk=pk %}">{{ i.ename }}</a> sent you a message.
                         </div>
                     </div>
-                    <div class="pxp-candidate-dashboard-notifications-item-right">1h ago</div>
+                    <div class="pxp-candidate-dashboard-notifications-item-right">{{ i.datetime|naturaltime }}</div>
                 </div>
+                {% else %}
                 <div class="pxp-candidate-dashboard-notifications-item mb-3">
                     <div class="pxp-candidate-dashboard-notifications-item-left">
                         <div class="pxp-candidate-dashboard-notifications-item-type"><span class="fa fa-user-circle-o"></span></div>
                         <div class="pxp-candidate-dashboard-notifications-item-message">
-                            <a href="{% url 'candidate:under_development' pk=pk %}">Illuminate Studio</a> viewed your profile.
+                            <a href="#">{{ i.ename }}</a> viewed your profile.
                         </div>
                     </div>
-                    <div class="pxp-candidate-dashboard-notifications-item-right">3h ago</div>
+                    <div class="pxp-candidate-dashboard-notifications-item-right">{{ i.datetime|naturaltime }}</div>
                 </div>
-                <div class="pxp-candidate-dashboard-notifications-item mb-3">
-                    <div class="pxp-candidate-dashboard-notifications-item-left">
-                        <div class="pxp-candidate-dashboard-notifications-item-type"><span class="fa fa-envelope-o"></span></div>
-                        <div class="pxp-candidate-dashboard-notifications-item-message">
-                            <a href="{% url 'candidate:under_development' pk=pk %}">Syspresoft</a> you sent a message.
-                        </div>
-                    </div>
-                    <div class="pxp-candidate-dashboard-notifications-item-right">1d ago</div>
-                </div>
-                <div class="pxp-candidate-dashboard-notifications-item mb-3">
-                    <div class="pxp-candidate-dashboard-notifications-item-left">
-                        <div class="pxp-candidate-dashboard-notifications-item-type"><span class="fa fa-user-circle-o"></span></div>
-                        <div class="pxp-candidate-dashboard-notifications-item-message">
-                            <a href="{% url 'candidate:under_development' pk=pk %}">Adobe Corporation</a> viewed your profile.
-                        </div>
-                    </div>
-                    <div class="pxp-candidate-dashboard-notifications-item-right">20m ago</div>
-                </div>
-                <div class="pxp-candidate-dashboard-notifications-item mb-3">
-                    <div class="pxp-candidate-dashboard-notifications-item-left">
-                        <div class="pxp-candidate-dashboard-notifications-item-type"><span class="fa fa-envelope-o"></span></div>
-                        <div class="pxp-candidate-dashboard-notifications-item-message">
-                            <a href="{% url 'candidate:under_development' pk=pk %}">Gramware</a> sent you a message.
-                        </div>
-                    </div>
-                    <div class="pxp-candidate-dashboard-notifications-item-right">1h ago</div>
-                </div>
-                <div class="pxp-candidate-dashboard-notifications-item mb-3">
-                    <div class="pxp-candidate-dashboard-notifications-item-left">
-                        <div class="pxp-candidate-dashboard-notifications-item-type"><span class="fa fa-user-circle-o"></span></div>
-                        <div class="pxp-candidate-dashboard-notifications-item-message">
-                            <a href="{% url 'candidate:under_development' pk=pk %}">Bitbytech</a> viewed your profile.
-                        </div>
-                    </div>
-                    <div class="pxp-candidate-dashboard-notifications-item-right">3h ago</div>
-                </div>
-                <div class="pxp-candidate-dashboard-notifications-item mb-3">
-                    <div class="pxp-candidate-dashboard-notifications-item-left">
-                        <div class="pxp-candidate-dashboard-notifications-item-type"><span class="fa fa-envelope-o"></span></div>
-                        <div class="pxp-candidate-dashboard-notifications-item-message">
-                            <a href="{% url 'candidate:under_development' pk=pk %}">CoderBotics</a> you sent a message.
-                        </div>
-                    </div>
-                    <div class="pxp-candidate-dashboard-notifications-item-right">1d ago</div>
-                </div>
-                <div class="pxp-candidate-dashboard-notifications-item mb-3">
-                    <div class="pxp-candidate-dashboard-notifications-item-left">
-                        <div class="pxp-candidate-dashboard-notifications-item-type"><span class="fa fa-user-circle-o"></span></div>
-                        <div class="pxp-candidate-dashboard-notifications-item-message">
-                            <a href="{% url 'candidate:under_development' pk=pk %}">Artistre Studio</a> viewed your profile.
-                        </div>
-                    </div>
-                    <div class="pxp-candidate-dashboard-notifications-item-right">20m ago</div>
-                </div>
-                <div class="pxp-candidate-dashboard-notifications-item mb-3">
-                    <div class="pxp-candidate-dashboard-notifications-item-left">
-                        <div class="pxp-candidate-dashboard-notifications-item-type"><span class="fa fa-envelope-o"></span></div>
-                        <div class="pxp-candidate-dashboard-notifications-item-message">
-                            <a href="{% url 'candidate:under_development' pk=pk %}">Gramware</a> sent you a message.
-                        </div>
-                    </div>
-                    <div class="pxp-candidate-dashboard-notifications-item-right">1h ago</div>
-                </div>
+                {% endif %}
+                {% endfor%}
             </div>
         </div>
         <div class="col-xxl-6">
@@ -240,195 +174,27 @@
             <table class="table align-middle">
                 {% for i in applications %}
                 <tr>
-                    <td style="width: 3%;"><div class="pxp-candidate-dashboard-job-avatar pxp-cover"  style="background-image: url('{{ i.logo.url }}')"></div></td>
+                    {% if i.logo %}
+                        <td style="width: 3%;"><div class="pxp-candidate-dashboard-job-avatar pxp-cover"  style="background-image: url('{{ i.logo.url }}')"></div></td>
+                    {% else %}
+                    <td style="width: 3%;"><div class="pxp-candidate-dashboard-job-avatar pxp-cover"  style="background-image: url()"></div></td>
+                    {% endif %}
                     <td style="width: 25%;">
-                        <div class="pxp-candidate-dashboard-job-title">{{ i.post }}</div>
-                        <div class="pxp-candidate-dashboard-job-company">{{ i.com_name }}</div>
+                        <div class="pxp-candidate-dashboard-job-title">{{ i.title }}</div>
+                        <div class="pxp-candidate-dashboard-job-company">{{ i.ename }}</div>
                     </td>
-                    <td style="width: 25%;"><div class="pxp-candidate-dashboard-job-category">{{ i.industry }}</div></td>
+                    <td style="width: 25%;"><div class="pxp-candidate-dashboard-job-category">{{ i.fnarea }}</div></td>
                     <td style="width: 25%;"><div class="pxp-candidate-dashboard-job-location"><span class="fa fa-globe"></span>{{ i.location }}</div></td>
-                    <td style="width: 10%;"><div class="pxp-candidate-dashboard-job-type">Full-time</div></td>
+                    <td style="width: 10%;"><div class="pxp-candidate-dashboard-job-type">{{ i.jobtype }}</div></td>
                     <td>
                         <div class="pxp-dashboard-table-options">
                             <ul class="list-unstyled">
-                                <li><button title="View job details" onclick="loadermodal(i.job_id)" data-bs-target="#pxp-job-modal"><span class="fa fa-eye"></span></button></li>
+                                <li><button title="Preview" onclick="loadermodal('{{i.jobid}}')" data-bs-target="#pxp-job-modal" data-bs-toggle="modal"><span class="fa fa-eye"></span></button></li>
                             </ul>
                         </div>
                     </td>
                 </tr>
                 {% endfor %}
-            </table>
-            <table class="table align-middle">
-                <tr>
-                    <td style="width: 3%;"><div class="pxp-candidate-dashboard-job-avatar pxp-cover" style="background-image: url('/static/images/company-logo-1.png')"></div></td>
-                    <td style="width: 25%;">
-                        <div class="pxp-candidate-dashboard-job-title">Senior Editor</div>
-                        <div class="pxp-candidate-dashboard-job-company">Artistre Studio</div>
-                    </td>
-                    <td style="width: 25%;"><div class="pxp-candidate-dashboard-job-category">Marketing & Communication</div></td>
-                    <td style="width: 25%;"><div class="pxp-candidate-dashboard-job-location"><span class="fa fa-globe"></span>London, UK</div></td>
-                    <td style="width: 10%;"><div class="pxp-candidate-dashboard-job-type">Full-time</div></td>
-                    <td>
-                        <div class="pxp-dashboard-table-options">
-                            <ul class="list-unstyled">
-                                <li><button title="View job details" onclick="loadermodal('1')" data-bs-target="#pxp-job-modal" data-bs-toggle="modal"><span class="fa fa-eye"></span></button></li>
-                            </ul>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td style="width: 3%;"><div class="pxp-candidate-dashboard-job-avatar pxp-cover" style="background-image: url('/static/images/company-logo-2.png')"></div></td>
-                    <td style="width: 25%;">
-                        <div class="pxp-candidate-dashboard-job-title">Software Engineering Team Leader</div>
-                        <div class="pxp-candidate-dashboard-job-company">Craftgenics</div>
-                    </td>
-                    <td style="width: 25%;"><div class="pxp-candidate-dashboard-job-category">Project Management</div></td>
-                    <td style="width: 25%;"><div class="pxp-candidate-dashboard-job-location"><span class="fa fa-globe"></span>San Francisco, CA</div></td>
-                    <td style="width: 10%;"><div class="pxp-candidate-dashboard-job-type">Full-time</div></td>
-                    <td>
-                        <div class="pxp-dashboard-table-options">
-                            <ul class="list-unstyled">
-                                <li><button title="View job details" onclick="loadermodal('2')" data-bs-target="#pxp-job-modal" data-bs-toggle="modal"><span class="fa fa-eye"></span></button></li>
-                            </ul>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td style="width: 3%;"><div class="pxp-candidate-dashboard-job-avatar pxp-cover" style="background-image: url('/static/images/company-logo-3.png')"></div></td>
-                    <td style="width: 25%;">
-                        <div class="pxp-candidate-dashboard-job-title">Techincal Support Engineer</div>
-                        <div class="pxp-candidate-dashboard-job-company">Illuminate Studio</div>
-                    </td>
-                    <td style="width: 25%;"><div class="pxp-candidate-dashboard-job-category">Customer Service</div></td>
-                    <td style="width: 25%;"><div class="pxp-candidate-dashboard-job-location"><span class="fa fa-globe"></span>London, UK</div></td>
-                    <td style="width: 10%;"><div class="pxp-candidate-dashboard-job-type">Full-time</div></td>
-                    <td>
-                        <div class="pxp-dashboard-table-options">
-                            <ul class="list-unstyled">
-                                <li><button title="View job details" data-bs-target="#pxp-signup-modal" data-bs-toggle="modal"><span class="fa fa-eye"></span></button></li>
-                            </ul>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td style="width: 3%;"><div class="pxp-candidate-dashboard-job-avatar pxp-cover" style="background-image: url('/static/images/company-logo-4.png')"></div></td>
-                    <td style="width: 25%;">
-                        <div class="pxp-candidate-dashboard-job-title">Javascript Developer</div>
-                        <div class="pxp-candidate-dashboard-job-company">Syspresoft</div>
-                    </td>
-                    <td style="width: 25%;"><div class="pxp-candidate-dashboard-job-category">Software Engineering</div></td>
-                    <td style="width: 25%;"><div class="pxp-candidate-dashboard-job-location"><span class="fa fa-globe"></span>San Francisco, CA</div></td>
-                    <td style="width: 10%;"><div class="pxp-candidate-dashboard-job-type">Full-time</div></td>
-                    <td>
-                        <div class="pxp-dashboard-table-options">
-                            <ul class="list-unstyled">
-                                <li><button title="View job details" data-bs-target="#pxp-signup-modal" data-bs-toggle="modal"><span class="fa fa-eye"></span></button></li>
-                            </ul>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td style="width: 3%;"><div class="pxp-candidate-dashboard-job-avatar pxp-cover" style="background-image: url('/static/images/company-logo-5.png')"></div></td>
-                    <td style="width: 25%;">
-                        <div class="pxp-candidate-dashboard-job-title">Technical Writer</div>
-                        <div class="pxp-candidate-dashboard-job-company">Gramware</div>
-                    </td>
-                    <td style="width: 25%;"><div class="pxp-candidate-dashboard-job-category">Business Development</div></td>
-                    <td style="width: 25%;"><div class="pxp-candidate-dashboard-job-location"><span class="fa fa-globe"></span>London, UK</div></td>
-                    <td style="width: 10%;"><div class="pxp-candidate-dashboard-job-type">Full-time</div></td>
-                    <td>
-                        <div class="pxp-dashboard-table-options">
-                            <ul class="list-unstyled">
-                                <li><button title="View job details" data-bs-target="#pxp-signup-modal" data-bs-toggle="modal"><span class="fa fa-eye"></span></button></li>
-                            </ul>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td style="width: 3%;"><div class="pxp-candidate-dashboard-job-avatar pxp-cover" style="background-image: url('/static/images/company-logo-6.png')"></div></td>
-                    <td style="width: 25%;">
-                        <div class="pxp-candidate-dashboard-job-title">Human Resources Coordinator</div>
-                        <div class="pxp-candidate-dashboard-job-company">Bitbytech</div>
-                    </td>
-                    <td style="width: 25%;"><div class="pxp-candidate-dashboard-job-category">Human Resources</div></td>
-                    <td style="width: 25%;"><div class="pxp-candidate-dashboard-job-location"><span class="fa fa-globe"></span>San Francisco, CA</div></td>
-                    <td style="width: 10%;"><div class="pxp-candidate-dashboard-job-type">Full-time</div></td>
-                    <td>
-                        <div class="pxp-dashboard-table-options">
-                            <ul class="list-unstyled">
-                                <li><button title="View job details" data-bs-target="#pxp-signup-modal" data-bs-toggle="modal"><span class="fa fa-eye"></span></button></li>
-                            </ul>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td style="width: 3%;"><div class="pxp-candidate-dashboard-job-avatar pxp-cover" style="background-image: url('/static/images/company-logo-7.png')"></div></td>
-                    <td style="width: 25%;">
-                        <div class="pxp-candidate-dashboard-job-title">Fullstack Web Developer</div>
-                        <div class="pxp-candidate-dashboard-job-company">CoderBotics</div>
-                    </td>
-                    <td style="width: 25%;"><div class="pxp-candidate-dashboard-job-category">Software Engineering</div></td>
-                    <td style="width: 25%;"><div class="pxp-candidate-dashboard-job-location"><span class="fa fa-globe"></span>London, UK</div></td>
-                    <td style="width: 10%;"><div class="pxp-candidate-dashboard-job-type">Full-time</div></td>
-                    <td>
-                        <div class="pxp-dashboard-table-options">
-                            <ul class="list-unstyled">
-                                <li><button title="View job details" data-bs-target="#pxp-signup-modal" data-bs-toggle="modal"><span class="fa fa-eye"></span></button></li>
-                            </ul>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td style="width: 3%;"><div class="pxp-candidate-dashboard-job-avatar pxp-cover" style="background-image: url('/static/images/company-logo-1.png')"></div></td>
-                    <td style="width: 25%;">
-                        <div class="pxp-candidate-dashboard-job-title">Senior Editor</div>
-                        <div class="pxp-candidate-dashboard-job-company">Artistre Studio</div>
-                    </td>
-                    <td style="width: 25%;"><div class="pxp-candidate-dashboard-job-category">Marketing & Communication</div></td>
-                    <td style="width: 25%;"><div class="pxp-candidate-dashboard-job-location"><span class="fa fa-globe"></span>London, UK</div></td>
-                    <td style="width: 10%;"><div class="pxp-candidate-dashboard-job-type">Full-time</div></td>
-                    <td>
-                        <div class="pxp-dashboard-table-options">
-                            <ul class="list-unstyled">
-                                <li><button title="View job details" data-bs-target="#pxp-signup-modal" data-bs-toggle="modal"><span class="fa fa-eye"></span></button></li>
-                            </ul>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td style="width: 3%;"><div class="pxp-candidate-dashboard-job-avatar pxp-cover" style="background-image: url('/static/images/company-logo-2.png')"></div></td>
-                    <td style="width: 25%;">
-                        <div class="pxp-candidate-dashboard-job-title">Software Engineering Team Leader</div>
-                        <div class="pxp-candidate-dashboard-job-company">Craftgenics</div>
-                    </td>
-                    <td style="width: 25%;"><div class="pxp-candidate-dashboard-job-category">Project Management</div></td>
-                    <td style="width: 25%;"><div class="pxp-candidate-dashboard-job-location"><span class="fa fa-globe"></span>San Francisco, CA</div></td>
-                    <td style="width: 10%;"><div class="pxp-candidate-dashboard-job-type">Full-time</div></td>
-                    <td>
-                        <div class="pxp-dashboard-table-options">
-                            <ul class="list-unstyled">
-                                <li><button title="View job details" data-bs-target="#pxp-signup-modal" data-bs-toggle="modal"><span class="fa fa-eye"></span></button></li>
-                            </ul>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td style="width: 3%;"><div class="pxp-candidate-dashboard-job-avatar pxp-cover" style="background-image: url('/static/images/company-logo-3.png')"></div></td>
-                    <td style="width: 25%;">
-                        <div class="pxp-candidate-dashboard-job-title">Techincal Support Engineer</div>
-                        <div class="pxp-candidate-dashboard-job-company">Illuminate Studio</div>
-                    </td>
-                    <td style="width: 25%;"><div class="pxp-candidate-dashboard-job-category">Customer Service</div></td>
-                    <td style="width: 25%;"><div class="pxp-candidate-dashboard-job-location"><span class="fa fa-globe"></span>London, UK</div></td>
-                    <td style="width: 10%;"><div class="pxp-candidate-dashboard-job-type">Full-time</div></td>
-                    <td>
-                        <div class="pxp-dashboard-table-options">
-                            <ul class="list-unstyled">
-                                <li><button title="View job details" data-bs-target="#pxp-signup-modal" data-bs-toggle="modal"><span class="fa fa-eye"></span></button></li>
-                            </ul>
-                        </div>
-                    </td>
-                </tr>
             </table>
         </div>
     </div>
@@ -559,14 +325,13 @@ $(document).ready(function () {
         gradient.addColorStop(0, 'rgba(255, 255, 255, 0)');
         gradient.addColorStop(.5, 'rgba(255, 168, 35, 0.09)');
         gradient.addColorStop(1, 'rgba(255, 168, 35, 0.12)');
-
         var candidateAppChart = new Chart(candidateAppChartElem, {
             type: 'line',
             data: {
                 labels: ['Oct 06', 'Oct 07', 'Oct 08', 'Oct 09', 'Oct 10', 'Oct 11', 'Oct 12'],
                 datasets: [{
                     label: 'Applications',
-                    data: [43, 81, 72, 85, 42, 65, 80],
+                    data: JSON.parse('{{pastsev}}'),
                     borderWidth: 3,
                     borderColor: 'rgba(255, 168, 35, 1)',
                     pointBackgroundColor: 'rgba(255, 255, 255, 0)',

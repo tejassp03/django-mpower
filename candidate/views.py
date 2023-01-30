@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from main.models import JobSeeker, Employer, Jobs, Application, Selection, Login, ExperienceJob, Education, ProfileVisits, Threads, Messages, ResumeAnalysis, LikedJobs
+from main.models import *
 from json import dumps
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
@@ -8,26 +8,55 @@ from django.contrib.auth.hashers import make_password, check_password
 import re
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from itertools import chain
+from django.template import RequestContext
+
+from datetime import date, timedelta, datetime
+
 
 # Create your views here.
 def dashboard(request, pk):
     context = JobSeeker.objects.get(user_id=pk)
-    applics = list(Application.objects.filter(user_id=pk).values())
+    applics = Application.objects.filter(user_id=pk)
     profile = list(ProfileVisits.objects.filter(user_id=pk))
     fordates = Application.objects.filter(user_id=pk).order_by('-date_applied')
     userobj=JobSeeker.objects.get(user_id=pk)
     num_mess=Threads.objects.filter(receiver=userobj.log_id, has_unread=True)
+    num_notif=Notifications.objects.filter(rece_id=context.log_id).order_by('-datetime')
+    all_notis=[]
+    threadval=Threads.objects.filter(receiver=userobj.log_id, has_unread=1)
+    countunmess=0
+    for i in threadval:
+        countunmess=countunmess+len(Messages.objects.filter(msg_id=i.msg_id, is_read=0))
+    print(countunmess)
+    count=0
+    for i in num_notif:
+        single_notis={}
+        single_notis['notif_type']=i.notif_type
+        single_notis['datetime']=i.datetime
+        emp=Employer.objects.get(log_id=i.send_id)
+        single_notis['ename']=emp.ename
+        single_notis['eid']=emp.eid
+        all_notis.append(single_notis)
+    all_applics=[]
     for i in applics:
-        emplo = list(Employer.objects.filter(eid=i.emp_id).values())
-        jobo = list(Jobs.objects.filter(jobid=i.job_id).values())
-        i['post']=jobo[0].title
-        i['com_name']=emplo[0].ename
-        i['industry']=emplo[0].industry
-        i['location']=jobo[0].location
-        i['logo']=emplo[0].logo
-    # i = {'post': 'ABC', 'com_name': 'Microsoft', 'industry': 'software', 'location': 'US'}
-    # applics.append(i)
-    return render(request, 'dashboard-candidate.html', {'user': context, 'applications': applics, 'pk': pk, 'profile': profile, 'count': len(num_mess)})
+        singappli={}
+        job=Jobs.objects.get(jobid=i.job_id.jobid)
+        singappli['jobid']=job.jobid
+        singappli['title']=job.title
+        singappli['fnarea']=job.fnarea
+        singappli['location']=job.location
+        singappli['jobtype']=job.jobtype
+        com=Employer.objects.get(eid=job.eid.eid)
+        singappli['ename']=com.ename
+        singappli['logo']=com.logo
+        all_applics.append(singappli)
+    graph_val=[]
+    for i in range(0, 7):
+        d=date.today()-timedelta(days=i)
+        temp = Application.objects.filter(date_applied__year=d.year, date_applied__month=d.month, date_applied__day=d.day)
+        graph_val.append(len(temp))
+        # appsl=Application.objects.filter(date_applied__gte=d)
+    return render(request, 'dashboard-candidate.html', {'user': context, 'applications': all_applics, 'pk': pk, 'profile': profile, 'count': len(num_mess), 'notifics': all_notis, 'messcount': countunmess, 'pastsev': dumps(graph_val)})
 
 
 def jobapp(request, pk):
@@ -71,7 +100,8 @@ def edit_profile(request, pk):
         request.session['email']=request.POST['email']
         request.session['name']=request.POST['name']
         ss_info=JobSeeker.objects.get(user_id=pk)
-        request.session['photo']=ss_info.photo.url
+        if(ss_info.photo):
+            request.session['photo']=ss_info.photo.url
         return redirect('candidate:edit', pk=pk)
     return render(request, 'profile-candidate.html', {'user': context, 'pk': pk, 'log': request.session['email'], 'skills': skills, 'experience': experience, 'education': education})
 
@@ -142,6 +172,38 @@ def delete_edu(request, pk):
         edu = Education.objects.get(edu_id=request.POST['id'])
         edu.delete()
     return redirect('candidate:edit', pk=pk)
+
+def edit_exp(request, pk):
+    exp=None
+    if(request.method=="GET"):
+        exp = ExperienceJob.objects.filter(exp_id=request.GET['expid'])
+    else:
+        exp = ExperienceJob.objects.filter(exp_id=request.POST['expid'])
+    if request.method=="POST":
+        if(len(exp)>0):
+            exp[0].job_title=request.POST['job_title']
+            exp[0].company=request.POST['company']
+            exp[0].time_period=request.POST['time_period']
+            exp[0].description=request.POST['description']
+            exp[0].save()
+        return redirect('candidate:edit', pk=pk)
+    return JsonResponse({'info': dumps(list(exp.values()), default=str)})
+
+def edit_edu(request, pk):
+    edu=None
+    if(request.method=="GET"):
+        edu = Education.objects.filter(edu_id=request.GET['eduid'])
+    else:
+        edu = Education.objects.filter(edu_id=request.POST['eduid'])
+    if request.method=="POST":
+        if(len(edu)>0):
+            edu[0].title=request.POST['title']
+            edu[0].school=request.POST['school']
+            edu[0].time_period=request.POST['time_period']
+            edu[0].description=request.POST['description']
+            edu[0].save()
+        return redirect('candidate:edit', pk=pk)
+    return JsonResponse({'info': dumps(list(edu.values()), default=str)})
 
 
 def inbox(request, pk):
@@ -365,6 +427,76 @@ def favjobs(request, pk):
     except EmptyPage:
         page_obj = p.page(p.num_pages)
     return render(request, 'favjobs-candidate.html', {'pk': pk, 'fav': page_obj, 'count': count, 'pe': page_obj, 'GET_params': GET_params})
+
+def notifications(request, pk):
+    loger=Login.objects.get(email=request.session['email'])
+    notifs=Notifications.objects.filter(rece_id=loger.log_id).order_by('-datetime')
+    nots=[]
+    for i in notifs:
+        i.readed=True
+        i.save()
+        request.session['notifnum']=0
+        single_notif={}
+        single_notif['notif_id']=i.notif_id
+        single_notif['notif_type']=i.notif_type
+        single_notif['datetime']=i.datetime
+        com = Employer.objects.get(log_id=i.send_id)
+        single_notif['eid']=com.eid
+        single_notif['ename']=com.ename
+        nots.append(single_notif)
+    GET_params = request.GET.copy()
+    if('page' in GET_params):
+        last=GET_params['page'][-1]
+        GET_params['page']=last[0]
+    p=Paginator(nots, 10)
+    page_number = request.GET.get('page')
+    try:
+        page_obj = p.get_page(page_number)
+    except PageNotAnInteger:
+        page_obj = p.page(1)
+    except EmptyPage:
+        page_obj = p.page(p.num_pages)
+    return render(request, 'notification-candidate.html', {'pk': pk, 'notif': page_obj})
+
+
+def applications(request, pk):
+    if request.method=="POST":
+        if 'act' in request.POST:
+            for i in request.POST.getlist('ids[]'):
+                Application.objects.filter(apply_id=i).delete()
+            return redirect('candidate:applications', pk=pk)
+        Application.objects.filter(apply_id=request.POST['apply_id']).delete()
+        return redirect('candidate:applications', pk=pk)
+    applics=Application.objects.filter(user_id=pk).order_by("-date_applied")
+    all_app=[]
+    for i in applics:
+        app={}
+        app['apply_id']=i.apply_id
+        job=Jobs.objects.get(jobid=i.job_id.jobid)
+        app['jobid']=job.jobid
+        app['title']=job.title
+        app['location']=job.location
+        app['fnarea']=job.fnarea
+        app['jobtype']=job.jobtype
+        app['date_applied']=i.date_applied
+        com=Employer.objects.get(eid=job.eid.eid)
+        app['ename']=com.ename
+        app['eid']=com.eid
+        all_app.append(app)
+    GET_params = request.GET.copy()
+    if('page' in GET_params):
+        last=GET_params['page'][-1]
+        GET_params['page']=last[0]
+    p=Paginator(all_app, 5)
+    page_number = request.GET.get('page')
+    try:
+        page_obj = p.get_page(page_number)
+    except PageNotAnInteger:
+        page_obj = p.page(1)
+    except EmptyPage:
+        page_obj = p.page(p.num_pages)
+    return render(request, 'applications-candidate.html', {'pk': pk, 'all_app': page_obj, 'GET_params': GET_params})
+
 
 def logout(request, pk):
     request.session.flush()

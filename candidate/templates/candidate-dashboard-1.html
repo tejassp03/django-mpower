@@ -1,4 +1,5 @@
 {% load static %}
+{% load humanize %}
 <!doctype html>
 <html lang="en" class="pxp-root">
     <head>
@@ -240,6 +241,29 @@
                     <div class="col-xxl-6">
                         <h2>Recent Notifications</h2>
                         <div class="pxp-candidate-dashboard-notifications">
+                            {% for i in notifics %}
+                            {% if i.notif_type == "M" %}
+                            <div class="pxp-candidate-dashboard-notifications-item mb-3">
+                                <div class="pxp-candidate-dashboard-notifications-item-left">
+                                    <div class="pxp-candidate-dashboard-notifications-item-type"><span class="fa fa-user-circle-o"></span></div>
+                                    <div class="pxp-candidate-dashboard-notifications-item-message">
+                                        <a href="#">{{ i.ename }}</a> viewed your profile.
+                                    </div>
+                                </div>
+                                <div class="pxp-candidate-dashboard-notifications-item-right">{{ i.datetime|naturaltime }}</div>
+                            </div>
+                            {% else %}
+                            <div class="pxp-candidate-dashboard-notifications-item mb-3">
+                                <div class="pxp-candidate-dashboard-notifications-item-left">
+                                    <div class="pxp-candidate-dashboard-notifications-item-type"><span class="fa fa-user-circle-o"></span></div>
+                                    <div class="pxp-candidate-dashboard-notifications-item-message">
+                                        <a href="#">{{ i.ename }}</a> viewed your profile.
+                                    </div>
+                                </div>
+                                <div class="pxp-candidate-dashboard-notifications-item-right">{{ i.datetime|naturaltime }}</div>
+                            </div>
+                            {% endif %}
+                            {% endfor%}
                             <div class="pxp-candidate-dashboard-notifications-item mb-3">
                                 <div class="pxp-candidate-dashboard-notifications-item-left">
                                     <div class="pxp-candidate-dashboard-notifications-item-type"><span class="fa fa-user-circle-o"></span></div>
