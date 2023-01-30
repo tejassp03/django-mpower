@@ -241,13 +241,20 @@ def findjobs(request):
 	max_sal=Jobs.objects.all().aggregate(Max('basicpay'))
 	min_sal=Jobs.objects.all().aggregate(Min('basicpay'))
 	saltype=[]
-	diff=(max_sal['basicpay__max']-min_sal['basicpay__min'])//5
-	for i in range(0,5):
-		if saltype:
-			saltype.append([saltype[-1][1], 1000*round((saltype[-1][1]+diff)/1000)])
-		else:
+	diff=None
+	if(count!=0):
+		diff=(max_sal['basicpay__max']-min_sal['basicpay__min'])//5
+		if(diff==0):
 			saltype.append([0, 1000*round(min_sal['basicpay__min']/1000)])
-			saltype.append([1000*round(min_sal['basicpay__min']/1000), 1000*round((min_sal['basicpay__min']+diff)/1000)])
+		else:
+			for i in range(0,5):
+				if saltype:
+					if saltype[-1][1]!=1000*round((saltype[-1][1]+diff)/1000):
+						saltype.append([saltype[-1][1], 1000*round((saltype[-1][1]+diff)/1000)])
+				else:
+					saltype.append([0, 1000*round(min_sal['basicpay__min']/1000)])
+					if 1000*round(min_sal['basicpay__min']/1000)!=1000*round((min_sal['basicpay__min']+diff)/1000):
+						saltype.append([1000*round(min_sal['basicpay__min']/1000), 1000*round((min_sal['basicpay__min']+diff)/1000)])
 	countjob=[]
 	countemp=[]
 	countsal=[]
