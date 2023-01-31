@@ -87,11 +87,11 @@
                     </div>
                     <div class="col-auto">
                         <select class="form-select selectVal2">
-                            <option value="-7 days">Last 7 days</option>
-                            <option value="-30 days">Last 30 days</option>
-                            <option value="-60 days">Last 60 days</option>
-                            <option value="-90 days">Last 90 days</option>
-                            <option value="-12 months">Last 12 months</option>
+                            <option value="s">Last 7 days</option>
+                            <option value="t">Last 30 days</option>
+                            <option value="x">Last 60 days</option>
+                            <option value="n">Last 90 days</option>
+                            <option value="y">Last 12 months</option>
                         </select>
                     </div>
                 </div>
@@ -315,12 +315,40 @@ $(document).ready(function () {
     }
     if ($('#pxp-candidate-dashboard-app-chart').length > 0) {
         let selectedItem1;
+        var dates=[];
+        var chart_data=JSON.parse('{{ charts.pastthi }}');
+        function getMonthName(monthNumber) {
+            const date = new Date();
+            date.setMonth(monthNumber - 1);
+            return date.toLocaleString('en-US', { month: 'short' });
+          }
+          var de={{charts.dates30|safe}};
+          
+          for(let i=0;i<de.length;i++)
+            {
+                let abc=getMonthName(parseInt(de[i].slice(5,7))) + " " + de[i].slice(8,10)
+                dates.push(abc)
+            }
+
         $("select.selectVal2").change(function() {
             selectedItem1 = $(this).children("option:selected").val();
-            console.log(JSON.parse("{{data|escapejs}}"))
+            if($(this).val()=="s")
+            {
+                de={{dates|safe}};
+                chart_data=JSON.parse('{{ pastsev }}');
+            }
+            else
+            {
+                de={{charts.dates30|safe}};
+                chart_data=JSON.parse('{{ charts.pastthi}}');
+            }
+            for(let i=0;i<de.length;i++)
+            {
+                let abc=getMonthName(parseInt(de[i].slice(5,7))) + " " + de[i].slice(8,10)
+                dates.push(abc)
+            }
         });
         var candidateAppChartElem = document.getElementById('pxp-candidate-dashboard-app-chart').getContext('2d');
-
         var gradient = candidateVisitsChartElem.createLinearGradient(0, 250, 0, 0);
         gradient.addColorStop(0, 'rgba(255, 255, 255, 0)');
         gradient.addColorStop(.5, 'rgba(255, 168, 35, 0.09)');
@@ -328,10 +356,10 @@ $(document).ready(function () {
         var candidateAppChart = new Chart(candidateAppChartElem, {
             type: 'line',
             data: {
-                labels: ['Oct 06', 'Oct 07', 'Oct 08', 'Oct 09', 'Oct 10', 'Oct 11', 'Oct 12'],
+                labels: dates,
                 datasets: [{
                     label: 'Applications',
-                    data: JSON.parse('{{pastsev}}'),
+                    data: chart_data,
                     borderWidth: 3,
                     borderColor: 'rgba(255, 168, 35, 1)',
                     pointBackgroundColor: 'rgba(255, 255, 255, 0)',

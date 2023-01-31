@@ -49,7 +49,11 @@
                         {% comment %} <a href="candidate-dashboard-inbox.html" class="d-flex justify-content-between align-items-center"> {% endcomment %}
                             <a href="{% url 'candidate:inbox' pk=pk %}" class="d-flex justify-content-between align-items-center">
                             <div><span class="fa fa-envelope-o"></span>Inbox</div>
+                            {% if count == 0%}
+                            <span class="badge rounded-pill" id="countinbox"></span>
+                            {% else %}
                             <span class="badge rounded-pill" id="countinbox">{{ count }}</span>
+                            {% endif %}
                         </a>
                     </li>
                     <li id="not">
@@ -397,10 +401,15 @@
                     },
                     success: function( data ) 
                     {
-                        if(data['count']>0)
+                        if(data['count']!=0)
                         {
                             $('#countinbox').text(data['count'])
                             $('#countinbox2').text(data['count'])
+                        }
+                        else
+                        {
+                            $('#countinbox').text("")
+                            $('#countinbox2').text("")
                         }
                     },
                     async: false

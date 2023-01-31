@@ -51,12 +51,48 @@ def dashboard(request, pk):
         singappli['logo']=com.logo
         all_applics.append(singappli)
     graph_val=[]
+    dates=[]
     for i in range(0, 7):
         d=date.today()-timedelta(days=i)
         temp = applics.filter(date_applied__year=d.year, date_applied__month=d.month, date_applied__day=d.day)
         graph_val.append(len(temp))
+        dates.append(d)
         # appsl=Application.objects.filter(date_applied__gte=d)
-    return render(request, 'dashboard-candidate.html', {'user': context, 'applications': all_applics, 'pk': pk, 'profile': profile, 'count': len(num_mess), 'notifics': all_notis, 'messcount': countunmess, 'pastsev': dumps(graph_val)})
+    graph_val30=[]
+    dates30=[]
+    mapin={}
+    for i in range(0, 30):
+        d=date.today()-timedelta(days=i)
+        temp = len(applics.filter(date_applied__year=d.year, date_applied__month=d.month, date_applied__day=d.day))
+        graph_val30.append(temp)
+        if temp in mapin.keys():
+            mapin[temp].append(d)
+        else:
+            mapin[temp]=[d]
+    graph_val30.sort(reverse=True)
+    final30=[]
+    datefinal30=[]
+    finaldic={}
+    for i in graph_val30:
+        if(len(final30)>=7):
+            break
+        for j in mapin[i]:
+            if(len(datefinal30)>=7):
+                break
+            if j not in datefinal30:
+                final30.append(i)
+                datefinal30.append(j)
+                finaldic[j]=i
+    datefinal30.sort()
+    pas30=[]
+    pasdat30=[]
+    for i in datefinal30:
+        pas30.append(finaldic[i])
+        pasdat30.append(i)
+    charts_context={}
+    charts_context['pastthi']=dumps(pas30)
+    charts_context['dates30']=dumps(pasdat30, default=str)
+    return render(request, 'dashboard-candidate.html', {'user': context, 'applications': all_applics, 'pk': pk, 'profile': profile, 'count': len(num_mess), 'notifics': all_notis, 'messcount': countunmess, 'pastsev': dumps(graph_val), 'dates': dumps(dates, default=str), 'charts': charts_context})
 
 
 def jobapp(request, pk):
