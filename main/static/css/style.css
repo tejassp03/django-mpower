@@ -7657,3 +7657,27 @@ input::-webkit-calendar-picker-indicator {
     cursor: pointer;
 }
 
+@media (min-width: 576px) {
+.sig{
+    display: none;
+}
+}
+
+@media (max-width: 1199px) {
+.pxp-user-nav-dropdown > .dropdown-toggle::after {
+    border-top-color: black;
+}
+#blackcolor{
+    color: black;
+}
+}
+
+@media only screen and (max-width: 768px) and (min-width: 1199px)  {
+    .pxp-user-nav-dropdown > .dropdown-toggle::after {
+        border-top-color: black;
+    }
+}
+
+.sig{
+    margin-left: auto;
+}

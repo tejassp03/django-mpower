@@ -10,6 +10,27 @@
             <div class="pxp-logo">
                 <a href="{% url 'main:index' %}" class="pxp-animate"><span style="color: var(--pxpMainColor)">m</span>power</a>
             </div>
+            <div class="sig">
+                {% if 'email' in request.session %}
+                <div class="dropdown pxp-user-nav-dropdown">
+                    <a href="index.html" class="dropdown-toggle" data-bs-toggle="dropdown">
+                        {% if request.session.photo %}
+                        <div class="pxp-user-nav-avatar pxp-cover" style="background-image: url('{{ request.session.photo }}')"></div>
+                        {% else %}
+                        <div class="pxp-user-nav-avatar pxp-cover"><div id="profileImage" class="profileimage"></div></div>
+                        {% endif %}
+                        <div class="pxp-user-nav-name d-none d-md-block" id="blackcolor">{{ request.session.name }}</div>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="{% url 'candidate:dashboard' pk=request.session.pk %}">Dashboard</a></li>
+                        <li><a class="dropdown-item" href="{% url 'candidate:edit' pk=request.session.pk %}">Edit profile</a></li>
+                        <li><a class="dropdown-item" href="{% url 'candidate:logout' pk=request.session.pk  %}">Logout</a></li>
+                    </ul>
+                </div>
+                {% else %}
+                <a id="signin" role="button" class="btn rounded-pill pxp-user-nav-trigger pxp-on-light" data-bs-target="#pxp-signin-modal" data-bs-toggle="modal">Sign in</a>
+                {% endif %}
+            </div>
             <div class="pxp-nav-trigger navbar d-xl-none flex-fill">
                 <a role="button" data-bs-toggle="offcanvas" data-bs-target="#pxpMobileNav" aria-controls="pxpMobileNav">
                     <div class="pxp-line-1"></div>
@@ -27,7 +48,7 @@
                         <nav class="pxp-nav-mobile">
                             <ul class="navbar-nav justify-content-end flex-grow-1">
                                 <li class="nav-item dropdown">
-                                    <a role="button" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="{% url 'main:index' %}">Home</a>
+                                    <a role="button" class="nav-link" href="{% url 'main:index' %}">Home</a>
                                     <!-- <ul class="dropdown-menu">
                                         <li class="pxp-dropdown-header">Home Page Versions</li>
                                         <li class="nav-item"><a href="index.html">Hero with Animated Cards</a></li>
@@ -40,7 +61,7 @@
                                     </ul> -->
                                 </li>
                                 <li class="nav-item dropdown">
-                                    <a role="button" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Find Jobs</a>
+                                    <a role="button" class="nav-link" href="{% url 'main:jobs' %}">Find Jobs</a>
                                     
                                 </li>
                                 <li class="nav-item dropdown">
@@ -65,28 +86,30 @@
                                         <li class="nav-item"><a href="company-dashboard.html">Company Dashboard</a></li>
                                     </ul>
                                 </li>
-                                <li class="nav-item dropdown">
+                                {% comment %} <li class="nav-item dropdown">
                                     <a role="button" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Candidates</a>
+
+                                    {% if 'email' in request.session %}
                                     <ul class="dropdown-menu">
-                                        <li class="nav-item dropdown">
-                                            <a role="button" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Candidates List</a>
+                                        <li class="nav-item">
+                                            <a role="button" class="nav-link" href="{% url 'candidate:dashboard' pk=request.session.pk %}">Dashboard</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a role="button" class="nav-link" href="{% url 'candidate:edit' pk=request.session.pk %}">Edit profile</a>
                                             <ul class="dropdown-menu">
-                                                <li class="nav-item"><a href="candidates-list-1.html">Top Search</a></li>
-                                                <li class="nav-item"><a href="candidates-list-2.html">Left Search Side Panel</a></li>
-                                                <li class="nav-item"><a href="candidates-list-3.html">Top Search Light</a></li>
                                             </ul>
                                         </li>
-                                        <li class="nav-item dropdown">
-                                            <a role="button" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Single Candidate</a>
+                                        <li class="nav-item">
+                                            <a role="button" class="nav-link" href="{% url 'candidate:logout' pk=request.session.pk  %}">Logout</a>
                                             <ul class="dropdown-menu">
-                                                <li class="nav-item"><a href="single-candidate-1.html">Wide Content</a></li>
-                                                <li class="nav-item"><a href="single-candidate-2.html">Right Side Panel</a></li>
-                                                <li class="nav-item"><a href="single-candidate-3.html">Center Boxed Content</a></li>
                                             </ul>
                                         </li>
-                                        <li class="nav-item"><a href="candidate-dashboard.html">Candidate Dashboard</a></li>
+                                        
                                     </ul>
-                                </li>
+                                    {% comment %} <a class="btn rounded-pill pxp-user-nav-trigger pxp-on-light"  href="{% url 'main:user_login' %}" role="button">Sign in</a> {% endcomment %}
+                                    {% comment %} <a id="signin" role="button" class="btn rounded-pill pxp-user-nav-trigger pxp-on-light" data-bs-target="#pxp-signin-modal" data-bs-toggle="modal">Sign in</a> {% endcomment %}
+                                    {% comment %} {% endif %} {% endcomment %}
+                                {% comment %} </li> {% endcomment %}
                                 <li class="nav-item dropdown">
                                     <a role="button" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Blog</a>
                                     <ul class="dropdown-menu">

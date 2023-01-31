@@ -41,15 +41,34 @@
                             <div class="pxp-hero-subtitle mt-3 mt-lg-4">Search your career opportunity through <strong>12,800</strong> jobs</div>
 
                             <div class="pxp-hero-form pxp-hero-form-round mt-3 mt-lg-4">
-                                <form class="row gx-3 align-items-center" action="jobs-list-1.html">
+                                <form class="row gx-3 align-items-center" method="GET" action = "{% url 'main:jobs' %}">
+                                    <input type="text" name="category" value="all" style="display: none">
                                     <div class="col-12 col-sm">
                                         <div class="mb-3 mb-sm-0">
-                                            <input type="text" class="form-control" placeholder="Job Title or Keyword">
+                                            <select id="select-titles" placeholder="Job titles" class="form-select" name="title">
+                                                <option value="all" selected>Job title</option>
+                                                {% for i in titles %}
+                                                    {% if i.title == context.t %}
+                                                    <option value='{{ i.title }}' selected>{{ i.title }}</option>
+                                                    {% else %}
+                                                    <option value='{{ i.title }}'>{{ i.title }}</option>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </select>
                                         </div>
                                     </div>
                                     <div class="col-12 col-sm pxp-has-left-border">
                                         <div class="mb-3 mb-sm-0">
-                                            <input type="text" class="form-control" placeholder="Location">
+                                            <select id="select-locations" placeholder="Pick a Category..." class="form-select"  name="location">
+                                                <option value="all">All locations</option>
+                                                {% for i in locations %}
+                                                    {% if i.location == context.l %}
+                                                    <option value='{{ i.location }}' selected>{{ i.location }}</option>
+                                                    {% else %}
+                                                    <option value='{{ i.location }}'>{{ i.location }}</option>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </select>
                                         </div>
                                     </div>
                                     <div class="col-12 col-sm-auto">
@@ -807,6 +826,9 @@
                 $(".profileimage").each(function(i, el) {
                     el.innerHTML = '{{request.session.name}}'[0]
                 })
+                $('select').selectize({
+                    sortField: 'text'
+                });
             })
             $(".tabs").click(function(){
     

@@ -53,7 +53,7 @@ def dashboard(request, pk):
     graph_val=[]
     for i in range(0, 7):
         d=date.today()-timedelta(days=i)
-        temp = Application.objects.filter(date_applied__year=d.year, date_applied__month=d.month, date_applied__day=d.day)
+        temp = applics.filter(date_applied__year=d.year, date_applied__month=d.month, date_applied__day=d.day)
         graph_val.append(len(temp))
         # appsl=Application.objects.filter(date_applied__gte=d)
     return render(request, 'dashboard-candidate.html', {'user': context, 'applications': all_applics, 'pk': pk, 'profile': profile, 'count': len(num_mess), 'notifics': all_notis, 'messcount': countunmess, 'pastsev': dumps(graph_val)})
