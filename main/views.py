@@ -13,7 +13,7 @@ import base64
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 
-import streamlit as st
+
 import pandas as pd
 import time
 from pyresparser import ResumeParser
@@ -23,11 +23,9 @@ from pdfminer3.pdfinterp import PDFResourceManager
 from pdfminer3.pdfinterp import PDFPageInterpreter
 from pdfminer3.converter import TextConverter
 import io,random
-from streamlit_tags import st_tags
 from PIL import Image
-import pymysql
 from .Courses import ds_course,web_course,android_course,ios_course,uiux_course,resume_videos,interview_videos
-import plotly.express as px
+# import plotly.express as px
 
 
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
@@ -497,16 +495,13 @@ def pdf_reader(file):
     return text
 
 def course_recommender(course_list):
-    st.subheader("**Courses & Certificates🎓 Recommendations**")
     c = 0
     rec_course = []
-    no_of_reco = st.slider('Choose Number of Course Recommendations:', 1, 10, 4)
     random.shuffle(course_list)
     for c_name, c_link in course_list:
         c += 1
-        st.markdown(f"({c}) [{c_name}]({c_link})")
         rec_course.append(c_name)
-        if c == no_of_reco:
+        if c == 4:
             break
     return rec_course
 
