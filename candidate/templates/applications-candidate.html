@@ -37,14 +37,14 @@
                     <div class="pxp-candidate-dashboard-jobs-search-search-form">
                         <div class="input-group">
                             <span class="input-group-text"><span class="fa fa-search"></span></span>
-                            <input type="text" class="form-control" placeholder="Search jobs...">
+                            <input type="text" class="form-control" placeholder="Search jobs..." id="search">
                         </div>
                     </div>
                 </div>
             </div>
         </div>
         <div class="table-responsive">
-            <table class="table table-hover align-middle">
+            <table class="table table-hover align-middle" id="table">
                 <thead>
                     <tr>
                         <th class="pxp-is-checkbox" style="width: 1%;"><input type="checkbox" onClick="toggle(this)" class="form-check-input" name="all"></th>
@@ -155,7 +155,18 @@ $(document).ready(function () {
     $('#res').removeClass('pxp-active');
     $('#fee').removeClass('pxp-active');
     $('#sug').removeClass('pxp-active');
+
 })
+
+var $rows = $('#table tr');
+$('#search').keyup(function() {
+    var val = $.trim($(this).val()).replace(/ +/g, ' ').toLowerCase();
+    
+    $rows.show().filter(function() {
+        var text = $(this).text().replace(/\s+/g, ' ').toLowerCase();
+        return !~text.indexOf(val);
+    }).hide();
+});
 
 $("[name='chek']").change(function(){
     let a=0;

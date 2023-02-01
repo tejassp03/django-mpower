@@ -63,15 +63,16 @@
             <div class="mt-3 mt-lg-4 pxp-dashboard-chart-container">
                 <div class="row justify-content-between align-content-center mb-4">
                     <div class="col-auto">
-                        <span class="pxp-dashboard-chart-value">{{ profile|length }}</span><span class="pxp-dashboard-chart-percent text-success"><span class="fa fa-long-arrow-up"></span> 34%</span><span class="pxp-dashboard-chart-vs">vs last 7 days</span>
+                        <span class="pxp-dashboard-chart-value vissh"></span>
+                        <span class="pxp-dashboard-chart-percent text-success"><span class="fa fa-long-arrow-up"></span> 34%</span><span class="pxp-dashboard-chart-vs">vs last 7 days</span>
                     </div>
                     <div class="col-auto">
                         <select class="form-select selectVal" id="selec">
-                            <option value="-7 days">Last 7 days</option>
-                            <option value="-30 days">Last 30 days</option>
-                            <option value="-60 days">Last 60 days</option>
-                            <option value="-90 days">Last 90 days</option>
-                            <option value="-12 months">Last 12 months</option>
+                            <option value="s">Last 7 days</option>
+                            <option value="t">Last 30 days</option>
+                            <option value="x">Last 60 days</option>
+                            <option value="n">Last 90 days</option>
+                            <option value="y">Last 12 months</option>
                         </select>
                     </div>
                 </div>
@@ -83,7 +84,8 @@
             <div class="mt-3 mt-lg-4 pxp-dashboard-chart-container">
                 <div class="row justify-content-between align-content-center mb-4">
                     <div class="col-auto">
-                        <span class="pxp-dashboard-chart-value">{{ applications|length }}</span><span class="pxp-dashboard-chart-percent text-success"><span class="fa fa-long-arrow-up"></span> 56%</span><span class="pxp-dashboard-chart-vs">vs last 7 days</span>
+                        <span class="pxp-dashboard-chart-value appsh"></span>
+                        <span class="pxp-dashboard-chart-percent text-success"><span class="fa fa-long-arrow-up"></span> 56%</span><span class="pxp-dashboard-chart-vs">vs last 7 days</span>
                     </div>
                     <div class="col-auto">
                         <select class="form-select selectVal2">
@@ -132,38 +134,20 @@
         <div class="col-xxl-6">
             <h2 class="mt-4 mt-lg-5 mt-xxl-0">Recent Messages</h2>
             <div class="pxp-candidate-dashboard-messages">
+                {% for i in recent %}
                 <div class="pxp-candidate-dashboard-messages-item mb-3">
+                    {% if i.3 %}
+                    <div class="pxp-candidate-dashboard-messages-item-avatar pxp-cover" style="background-image: url('{{i.3.url}}')"></div>
+                    {% else %}
                     <div class="pxp-candidate-dashboard-messages-item-avatar pxp-cover" style="background-image: url('/static/images/company-logo-1.png')"></div>
+                    {% endif %}
                     <div class="pxp-candidate-dashboard-messages-item-details ms-3">
-                        <div class="pxp-candidate-dashboard-messages-item-name">Artistre Studio</div>
-                        <div class="pxp-candidate-dashboard-messages-item-date pxp-text-light">Oct 6, 2021 at 8:04 pm</div>
-                        <p class="mt-1 mb-0">Lorem Ipsum is also known as: Greeked text, blind text, placeholder text, dummy content, filler text, lipsum, and mock-content.</p>
+                        <div class="pxp-candidate-dashboard-messages-item-name">{{i.2}}</div>
+                        <div class="pxp-candidate-dashboard-messages-item-date pxp-text-light">{{i.0}}</div>
+                        <p class="mt-1 mb-0">{{i.1}}</p>
                     </div>
                 </div>
-                <div class="pxp-candidate-dashboard-messages-item mb-3">
-                    <div class="pxp-candidate-dashboard-messages-item-avatar pxp-cover" style="background-image: url('/static/images/company-logo-2.png')"></div>
-                    <div class="pxp-candidate-dashboard-messages-item-details ms-3">
-                        <div class="pxp-candidate-dashboard-messages-item-name">Craftgenics</div>
-                        <div class="pxp-candidate-dashboard-messages-item-date pxp-text-light">Oct 6, 2021 at 8:04 pm</div>
-                        <p class="mt-1 mb-0">In publishing and graphic design, lorem ipsum is a filler text or greeking commonly used to demonstrate the textual elements of a graphic document or visual presentation.</p>
-                    </div>
-                </div>
-                <div class="pxp-candidate-dashboard-messages-item mb-3">
-                    <div class="pxp-candidate-dashboard-messages-item-avatar pxp-cover" style="background-image: url('/static/images/company-logo-3.png')"></div>
-                    <div class="pxp-candidate-dashboard-messages-item-details ms-3">
-                        <div class="pxp-candidate-dashboard-messages-item-name">Illuminate Studio</div>
-                        <div class="pxp-candidate-dashboard-messages-item-date pxp-text-light">Oct 6, 2021 at 8:04 pm</div>
-                        <p class="mt-1 mb-0">Replacing meaningful content with placeholder text allows designers to design the form of the content before the content itself has been produced.</p>
-                    </div>
-                </div>
-                <div class="pxp-candidate-dashboard-messages-item mb-3">
-                    <div class="pxp-candidate-dashboard-messages-item-avatar pxp-cover" style="background-image: url('/static/images/company-logo-4.png')"></div>
-                    <div class="pxp-candidate-dashboard-messages-item-details ms-3">
-                        <div class="pxp-candidate-dashboard-messages-item-name">Syspresoft</div>
-                        <div class="pxp-candidate-dashboard-messages-item-date pxp-text-light">Oct 6, 2021 at 8:04 pm</div>
-                        <p class="mt-1 mb-0">Lorem Ipsum is also known as: Greeked text, blind text, placeholder text, dummy content, filler text, lipsum, and mock-content.</p>
-                    </div>
-                </div>
+                {% endfor %}
             </div>
         </div>
     </div>
@@ -231,32 +215,43 @@ $(document).ready(function () {
 
 
 // Candidate dashboard charts
-    if ($('#pxp-candidate-dashboard-visits-chart').length > 0) {
-        let selectedItem;
-        $("select.selectVal").change(function() {
-            selectedItem = $(this).children("option:selected").val();
-            console.log("Change in visits"+selectedItem);
-        });
-        var candidateVisitsChartElem = document.getElementById('pxp-candidate-dashboard-visits-chart').getContext('2d');
 
-        var gradient = candidateVisitsChartElem.createLinearGradient(0, 250, 0, 0);
-        gradient.addColorStop(0, 'rgba(255, 255, 255, 0)');
-        gradient.addColorStop(.5, 'rgba(0, 112, 201, 0.09)');
-        gradient.addColorStop(1, 'rgba(0, 112, 201, 0.12)');
-
-        var candidateVisitsChart = new Chart(candidateVisitsChartElem, {
+function chart_shower(dates, chart_data, para)
+    {
+        var candidateAppChartElem, labelval, colorval, gradient;
+        if(para=="a")
+        {
+            candidateAppChartElem=document.getElementById('pxp-candidate-dashboard-app-chart').getContext('2d');
+            gradient = candidateAppChartElem.createLinearGradient(0, 250, 0, 0);
+            gradient.addColorStop(0, 'rgba(255, 255, 255, 0)');
+            gradient.addColorStop(.5, 'rgba(255, 168, 35, 0.09)');
+            gradient.addColorStop(1, 'rgba(255, 168, 35, 0.12)');
+            labelval='Applications';
+            colorval='rgba(255, 168, 35, 1)';
+        }
+        else
+        {
+            candidateAppChartElem=document.getElementById('pxp-candidate-dashboard-visits-chart').getContext('2d');
+            gradient = candidateAppChartElem.createLinearGradient(0, 250, 0, 0);
+            gradient.addColorStop(0, 'rgba(255, 255, 255, 0)');
+            gradient.addColorStop(.5, 'rgba(0, 112, 201, 0.09)');
+            gradient.addColorStop(1, 'rgba(0, 112, 201, 0.12)');
+            labelval='Visits';
+            colorval='rgba(0, 112, 201, 1)';
+        }
+        var candidateAppChart = new Chart(candidateAppChartElem, {
             type: 'line',
             data: {
-                labels: ['Oct 06', 'Oct 07', 'Oct 08', 'Oct 09', 'Oct 10', 'Oct 11', 'Oct 12'],
+                labels: dates,
                 datasets: [{
-                    label: 'Visits',
-                    data: [20, 56, 34, 78, 38, 28, 54],
+                    label: labelval,
+                    data: chart_data,
                     borderWidth: 3,
-                    borderColor: 'rgba(0, 112, 201, 1)',
+                    borderColor: colorval,
                     pointBackgroundColor: 'rgba(255, 255, 255, 0)',
                     pointHoverBackgroundColor: 'rgba(255, 255, 255, 1)',
                     pointBorderColor: 'rgba(66, 133, 244, 0)',
-                    pointHoverBorderColor: 'rgba(0, 112, 201, 1)',
+                    pointHoverBorderColor: colorval,
                     pointBorderWidth: 10,
                     pointHoverBorderWidth: 3,
                     pointHitRadius: 20,
@@ -313,114 +308,130 @@ $(document).ready(function () {
             }
         });
     }
-    if ($('#pxp-candidate-dashboard-app-chart').length > 0) {
-        let selectedItem1;
+
+    if ($('#pxp-candidate-dashboard-visits-chart').length > 0) {
+        $('.vissh').text({{charts.vcount_7}});
+        let selectedItem;
         var dates=[];
-        var chart_data=JSON.parse('{{ charts.pastthi }}');
+        var chart_data=JSON.parse('{{ charts.vpastsev }}');
         function getMonthName(monthNumber) {
             const date = new Date();
             date.setMonth(monthNumber - 1);
             return date.toLocaleString('en-US', { month: 'short' });
           }
-          var de={{charts.dates30|safe}};
+          var de={{charts.vdates|safe}};
           
           for(let i=0;i<de.length;i++)
             {
                 let abc=getMonthName(parseInt(de[i].slice(5,7))) + " " + de[i].slice(8,10)
                 dates.push(abc)
             }
+            chart_shower(dates, chart_data, "v");
 
-        $("select.selectVal2").change(function() {
-            selectedItem1 = $(this).children("option:selected").val();
+        $("select.selectVal").change(function() {
+            dates=[];
+            selectedItem = $(this).children("option:selected").val();
             if($(this).val()=="s")
             {
-                de={{dates|safe}};
-                chart_data=JSON.parse('{{ pastsev }}');
+                $('.vissh').text({{charts.vcount_7}});
+                de={{charts.vdates|safe}};
+                chart_data=JSON.parse('{{ charts.vpastsev }}');
             }
-            else
+            else if($(this).val()=="t")
             {
-                de={{charts.dates30|safe}};
-                chart_data=JSON.parse('{{ charts.pastthi}}');
+                $('.vissh').text({{charts.vcount_30}});
+                de={{charts.vdates30|safe}};
+                chart_data=JSON.parse('{{ charts.vpastthi }}');
+            }
+            else if($(this).val()=="x")
+            {
+                $('.vissh').text({{charts.vcount_60}});
+                de={{charts.vdates60|safe}};
+                chart_data=JSON.parse('{{ charts.vpastsix }}');
+            }
+            else if($(this).val()=="n")
+            {
+                $('.vissh').text({{charts.vcount_90}});
+                de={{charts.vdates90|safe}};
+                chart_data=JSON.parse('{{ charts.vpastnin }}');
+            }
+            else if($(this).val()=="y")
+            {
+                $('.vissh').text({{charts.vcount_365}});
+                de={{charts.vdates365|safe}};
+                chart_data=JSON.parse('{{ charts.vpastyea }}');
             }
             for(let i=0;i<de.length;i++)
             {
                 let abc=getMonthName(parseInt(de[i].slice(5,7))) + " " + de[i].slice(8,10)
                 dates.push(abc)
             }
+            chart_shower(dates, chart_data, "v");
         });
-        var candidateAppChartElem = document.getElementById('pxp-candidate-dashboard-app-chart').getContext('2d');
-        var gradient = candidateVisitsChartElem.createLinearGradient(0, 250, 0, 0);
-        gradient.addColorStop(0, 'rgba(255, 255, 255, 0)');
-        gradient.addColorStop(.5, 'rgba(255, 168, 35, 0.09)');
-        gradient.addColorStop(1, 'rgba(255, 168, 35, 0.12)');
-        var candidateAppChart = new Chart(candidateAppChartElem, {
-            type: 'line',
-            data: {
-                labels: dates,
-                datasets: [{
-                    label: 'Applications',
-                    data: chart_data,
-                    borderWidth: 3,
-                    borderColor: 'rgba(255, 168, 35, 1)',
-                    pointBackgroundColor: 'rgba(255, 255, 255, 0)',
-                    pointHoverBackgroundColor: 'rgba(255, 255, 255, 1)',
-                    pointBorderColor: 'rgba(66, 133, 244, 0)',
-                    pointHoverBorderColor: 'rgba(255, 168, 35, 1)',
-                    pointBorderWidth: 10,
-                    pointHoverBorderWidth: 3,
-                    pointHitRadius: 20,
-                    cubicInterpolationMode: 'monotone',
-                    fill: true,
-                    backgroundColor: gradient
-                }]
-            },
-            options: {
-                scales: {
-                    xAxes: [{
-                        ticks: {
-                            fontColor: 'rgba(153, 153, 153, 1)',
-                            maxTicksLimit: 7,
-                            maxRotation: 0
-                        },
-                        gridLines: {
-                            zeroLineColor: 'rgba(232, 232, 232, 1)',
-                            drawOnChartArea: false,
-                        },
-                    }],
-                    yAxes: [{
-                        ticks: {
-                            beginAtZero: true,
-                            fontColor: 'rgba(153, 153, 153, 1)',
-                            callback: function(value, index, values) {
-                                if (Math.floor(value) === value) {
-                                    return value;
-                                }
-                            }
-                        },
-                        gridLines: {
-                            zeroLineColor: 'rgba(232, 232, 232, 0)',
-                        },
-                    }],
-                },
-                responsive: true,
-                tooltips: {
-                    backgroundColor: 'rgba(0, 39, 69, 1)',
-                    cornerRadius: 7,
-                    mode: 'index',
-                    intersect: false,
-                    displayColors: false,
-                    xPadding: 10,
-                    yPadding: 10,
-                    titleFontColor: 'rgba(255, 255, 255, .7)',
-                    bodyFontColor: 'rgba(255, 255, 255, 1)',
-                    titleFontStyle: 'normal',
-                    bodyFontStyle: 'bold',
-                },
-                legend: {
-                    display: false,
-                }
+        
+    }
+
+
+    if ($('#pxp-candidate-dashboard-app-chart').length > 0) {
+        $('.appsh').text({{charts.count_7}});
+        let selectedItem1;
+        var dates=[];
+        var chart_data=JSON.parse('{{ charts.pastsev }}');
+        function getMonthName(monthNumber) {
+            const date = new Date();
+            date.setMonth(monthNumber - 1);
+            return date.toLocaleString('en-US', { month: 'short' });
+          }
+          var de={{charts.dates|safe}};
+          
+          for(let i=0;i<de.length;i++)
+            {
+                let abc=getMonthName(parseInt(de[i].slice(5,7))) + " " + de[i].slice(8,10)
+                dates.push(abc)
             }
+            chart_shower(dates, chart_data, "a");
+            
+        $("select.selectVal2").change(function() {
+            dates=[];
+            selectedItem1 = $(this).children("option:selected").val();
+            if($(this).val()=="s")
+            {
+                $('.appsh').text({{charts.count_7}});
+                de={{charts.dates|safe}};
+                chart_data=JSON.parse('{{ charts.pastsev }}');
+            }
+            else if($(this).val()=="t")
+            {
+                $('.appsh').text({{charts.count_30}});
+                de={{charts.dates30|safe}};
+                chart_data=JSON.parse('{{ charts.pastthi }}');
+            }
+            else if($(this).val()=="x")
+            {
+                $('.appsh').text({{charts.count_60}});
+                de={{charts.dates60|safe}};
+                chart_data=JSON.parse('{{ charts.pastsix }}');
+            }
+            else if($(this).val()=="n")
+            {
+                $('.appsh').text({{charts.count_90}});
+                de={{charts.dates90|safe}};
+                chart_data=JSON.parse('{{ charts.pastnin }}');
+            }
+            else if($(this).val()=="y")
+            {
+                $('.appsh').text({{charts.count_365}});
+                de={{charts.dates365|safe}};
+                chart_data=JSON.parse('{{ charts.pastyea}}');
+            }
+            for(let i=0;i<de.length;i++)
+            {
+                let abc=getMonthName(parseInt(de[i].slice(5,7))) + " " + de[i].slice(8,10)
+                dates.push(abc)
+            }
+            chart_shower(dates, chart_data, "a");
         });
+        
         
     }
 {% endblock script %}
