@@ -49,13 +49,13 @@ def index(request):
 				if(request.POST['user'] == 'candidate' and JobSeeker.objects.filter(log_id=user[0].log_id)):
 					jobseeker=JobSeeker.objects.get(log_id=user[0].log_id)
 					if((jobseeker.phone==None or jobseeker.phone=="" or len(jobseeker.phone)<=4) and (jobseeker.location==None or jobseeker.location=="") and (jobseeker.experience==None or jobseeker.experience=="") and (jobseeker.skills==None or jobseeker.skills=="") and (jobseeker.basic_edu==None or jobseeker.basic_edu=="") and (jobseeker.master_edu==None or jobseeker.master_edu=="") and (jobseeker.other_qual==None or jobseeker.other_qual=="") and (jobseeker.dob==None or jobseeker.dob=="") and (jobseeker.Resume=="" or jobseeker.Resume==None) and (jobseeker.photo=="" or jobseeker.photo==None)):
-						urlval="profile_completion/"+str(user[0].log_id)
+						urlval="/profile_completion/"+str(user[0].log_id)
 						return JsonResponse({'message': 'Y', 'url': urlval})
 					# return redirect('main:profilecompletion', pk=user[0].log_id)
 				elif(request.POST['user'] == 'employer' and Employer.objects.filter(log_id=user[0].log_id)):
 					employer=Employer.objects.get(log_id=user[0].log_id)
 					if((employer.etype==None or employer.etype=="") and (employer.industry==None or employer.industry=="") and (employer.address==None or employer.address=="") and (employer.pincode==None or employer.pincode=="") and (employer.executive==None or employer.executive=="") and (employer.phone==None or employer.phone=="" or len(employer.phone)<=4) and (employer.location==None or employer.location=="") and (employer.profile==None or employer.profile=="") and (employer.logo=="" or employer.logo==None)):
-						urlval="emp_completion/"+str(user[0].log_id)
+						urlval="/emp_completion/"+str(user[0].log_id)
 						return JsonResponse({'message': 'Y', 'url': urlval})
 				else:
 					return JsonResponse({'message': 'X'})
@@ -69,7 +69,7 @@ def index(request):
 				if(empls.photo):
 					request.session['photo']=empls.photo.url
 				if(request.POST['user'] == 'candidate'):
-					urlval="candidate/"+str(jobseeker.user_id)
+					urlval="/candidate/"+str(jobseeker.user_id)
 					return JsonResponse({'message': 'Y', 'url': urlval})
 				else:
 					return JsonResponse({'message': 'Y', 'url': "/"})

@@ -1,361 +1,314 @@
+{% extends 'base.html' %}
 {% load static %}
+
+{% block title %}
+<title>mpower - Find Jobs</title>
+{% endblock %}
+
+{% block style %}
+#blackcolor{
+    color: black;
+}
+.pxp-user-nav-dropdown > .dropdown-toggle::after {
+    border-top-color: black;
+}
+.pxp-user-nav-trigger{
+    color: black;
+    border-color: black;
+}
+.pxp-user-nav-trigger:hover{
+    color: white;
+    border-color: white;
+    background: black
+}
+{% endblock %}
+
 {% block content %}
-<!doctype html>
-<html lang="en" class="pxp-root">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-        <link rel="shortcut icon" href="{% static 'images/favicon.png' %}" type="image/x-icon' %}">
-        <link rel="preconnect" href="{% static 'https://fonts.googleapis.com' %}">
-        <link rel="preconnect" href="{% static 'https://fonts.gstatic.com' %}" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600;700&display=swap" rel="stylesheet">
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/js/standalone/selectize.min.js" integrity="sha256-+C0A5Ilqmu4QcSPxrlGpaZxJ04VjsRjKu+G82kl5UJk=" crossorigin="anonymous"></script>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/css/selectize.bootstrap3.min.css" integrity="sha256-ze/OEYGcFbPRmvCnrSeKbRTtjG4vGLHXgOqsyLFTRjg=" crossorigin="anonymous" />
-        </head>
-        <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
-        <link rel="stylesheet" href="{% static 'css/font-awesome.min.css' %}">
-        <link rel="stylesheet" href="{% static 'css/owl.carousel.min.css' %}">
-        <link rel="stylesheet" href="{% static 'css/owl.theme.default.min.css' %}">
-        <link rel="stylesheet" href="{% static 'css/animate.css' %}">
-        <link rel="stylesheet" href="{% static 'css/style.css' %}">
 
-        <title>mpower - Find Jobs</title>
-        <style>
-            #blackcolor{
-                color: black;
-            }
-            .pxp-user-nav-dropdown > .dropdown-toggle::after {
-                border-top-color: black;
-            }
-            .pxp-user-nav-trigger{
-                color: black;
-                border-color: black;
-            }
-            .pxp-user-nav-trigger:hover{
-                color: white;
-                border-color: white;
-                background: black
-            }
-        </style>
-    </head>
-    <body>
-        {% if messages %}
-        {% for message in messages %}
-         {% if message.tags %}  
-         <script>alert('{{ message }}')</script>
-        {% endif %}
+<section class="pxp-page-header-simple" style="background-color: var(--pxpMainColorLight);">
+    <div class="pxp-container">
+        <h1>Search Jobs</h1>
+        <div class="pxp-hero-subtitle pxp-text-light">Search your career opportunity through <strong>{{count}}</strong> jobs</div>
+        <div class="pxp-hero-form pxp-hero-form-round pxp-large mt-3 mt-lg-4">
+            <form class="row gx-3 align-items-center" method="GET">
+                <div class="col-12 col-lg">
+                    <div class="input-group mb-3 mb-lg-0">
+                        <span class="input-group-text"><span class="fa fa-search"></span></span>
+                        <select id="select-titles" placeholder="Job titles" class="form-select" name="title">
+                            <option value="all" selected>Job title</option>
+                            {% for i in titles %}
+                                {% if i.title == context.t %}
+                                <option value='{{ i.title }}' selected>{{ i.title }}</option>
+                                {% else %}
+                                <option value='{{ i.title }}'>{{ i.title }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="col-12 col-lg pxp-has-left-border">
+                    <div class="input-group mb-3 mb-lg-0">
+                        <span class="input-group-text"><span class="fa fa-globe"></span></span>
+                        <select id="select-locations" placeholder="Pick a Category..." class="form-select"  name="location">
+                            <option value="all">All locations</option>
+                            {% for i in locations %}
+                                {% if i.location == context.l %}
+                                <option value='{{ i.location }}' selected>{{ i.location }}</option>
+                                {% else %}
+                                <option value='{{ i.location }}'>{{ i.location }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="col-12 col-lg pxp-has-left-border">
+                    <div class="input-group mb-3 mb-lg-0">
+                        <span class="input-group-text"><span class="fa fa-folder-o"></span></span>
+                        <select id="select-categories" placeholder="Pick a Category..." class="form-select"  name="category">
+                            <option value="all">All categories</option>
+                            {% for i in categories %}
+                                {% if i.fnarea == context.c %}
+                                <option value='{{ i.fnarea }}' selected>{{ i.fnarea }}</option>
+                                {% else %}
+                                <option value='{{ i.fnarea }}'>{{ i.fnarea }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="col-12 col-lg-auto">
+                    <button>Find Jobs</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
 
-        {% endfor %}
-
-        {% endif %}
-        {% include "indexheader.html" %}
-
-        <section class="pxp-page-header-simple" style="background-color: var(--pxpMainColorLight);">
-            <div class="pxp-container">
-                <h1>Search Jobs</h1>
-                <div class="pxp-hero-subtitle pxp-text-light">Search your career opportunity through <strong>12,800</strong> jobs</div>
-                <div class="pxp-hero-form pxp-hero-form-round pxp-large mt-3 mt-lg-4">
-                    <form class="row gx-3 align-items-center" method="GET">
-                        <div class="col-12 col-lg">
-                            <div class="input-group mb-3 mb-lg-0">
-                                <span class="input-group-text"><span class="fa fa-search"></span></span>
-                                <select id="select-titles" placeholder="Job titles" class="form-select" name="title">
-                                    <option value="all" selected>Job title</option>
-                                    {% for i in titles %}
-                                        {% if i.title == context.t %}
-                                        <option value='{{ i.title }}' selected>{{ i.title }}</option>
-                                        {% else %}
-                                        <option value='{{ i.title }}'>{{ i.title }}</option>
-                                        {% endif %}
-                                    {% endfor %}
-                                </select>
-                            </div>
+<section class="mt-100">
+    <div class="pxp-container">
+        <div class="row" style="justify-content: center">
+            <div class="col-lg-5 col-xl-4 col-xxl-3">
+                <div class="pxp-jobs-list-side-filter">
+                    <div class="pxp-list-side-filter-header d-flex d-lg-none">
+                        <div class="pxp-list-side-filter-header-label">Filter Jobs</div>
+                        <a role="button"><span class="fa fa-sliders"></span></a>
+                    </div>
+                    <form method="GET">
+                    <div class="mt-4 mt-lg-0 d-lg-block pxp-list-side-filter-panel">
+                        <h3>Type of Employment</h3>
+                        <div class="list-group mt-2 mt-lg-3">
+                            {% comment %} <form method="GET"> {% endcomment %}
+                            {% for i, j in jobtype %}
+                            {% if i.jobtype in context.sel %}
+                            <label class="list-group-item d-flex justify-content-between align-items-center pxp-checked">
+                                <span class="d-flex">
+                                    <input class="form-check-input me-2 emp" type="checkbox" value='{{i.jobtype}}' name="emp" checked>
+                                    {{i.jobtype}}
+                                    <input type="submit" style="display: none" class="empbutton">
+                                </span>
+                                <span class="badge rounded-pill">{{j}}</span>
+                            </label>
+                            {% else %}
+                            <label class="list-group-item d-flex justify-content-between align-items-center mt-2 mt-lg-3">
+                                <span class="d-flex">
+                                    <input class="form-check-input me-2 emp" type="checkbox" value='{{i.jobtype}}' name="emp">
+                                    {{i.jobtype}}
+                                    <input type="submit" style="display: none" class="empbutton">
+                                </span>
+                                <span class="badge rounded-pill">{{j}}</span>
+                            </label>
+                            {% endif %}
+                            {% endfor %}
+                            {% comment %} </form> {% endcomment %}
                         </div>
-                        <div class="col-12 col-lg pxp-has-left-border">
-                            <div class="input-group mb-3 mb-lg-0">
-                                <span class="input-group-text"><span class="fa fa-globe"></span></span>
-                                <select id="select-locations" placeholder="Pick a Category..." class="form-select"  name="location">
-                                    <option value="all">All locations</option>
-                                    {% for i in locations %}
-                                        {% if i.location == context.l %}
-                                        <option value='{{ i.location }}' selected>{{ i.location }}</option>
-                                        {% else %}
-                                        <option value='{{ i.location }}'>{{ i.location }}</option>
-                                        {% endif %}
-                                    {% endfor %}
-                                </select>
-                            </div>
+
+                        <h3 class="mt-3 mt-lg-4">Experience Level</h3>
+                        <div class="list-group mt-2 mt-lg-3">
+                            {% comment %} <form method="GET"> {% endcomment %}
+                                {% for i, j in emptype %}
+                                {% if i.experience in context.eel %}
+                                <label class="list-group-item d-flex justify-content-between align-items-center pxp-checked">
+                                    <span class="d-flex">
+                                        <input class="form-check-input me-2 exp" type="checkbox" value='{{i.experience}}' name="exp" checked>
+                                        {{i.experience}}
+                                        <input type="submit" style="display: none" class="expbutton">
+                                    </span>
+                                    <span class="badge rounded-pill">{{j}}</span>
+                                </label>
+                                {% else %}
+                                <label class="list-group-item d-flex justify-content-between align-items-center mt-2 mt-lg-3">
+                                    <span class="d-flex">
+                                        <input class="form-check-input me-2 exp" type="checkbox" value='{{i.experience}}' name="exp">
+                                        {{i.experience}}
+                                        <input type="submit" style="display: none" class="expbutton">
+                                    </span>
+                                    <span class="badge rounded-pill">{{j}}</span>
+                                </label>
+                                {% endif %}
+                                {% endfor %}
+                                
                         </div>
-                        <div class="col-12 col-lg pxp-has-left-border">
-                            <div class="input-group mb-3 mb-lg-0">
-                                <span class="input-group-text"><span class="fa fa-folder-o"></span></span>
-                                <select id="select-categories" placeholder="Pick a Category..." class="form-select"  name="category">
-                                    <option value="all">All categories</option>
-                                    {% for i in categories %}
-                                        {% if i.fnarea == context.c %}
-                                        <option value='{{ i.fnarea }}' selected>{{ i.fnarea }}</option>
-                                        {% else %}
-                                        <option value='{{ i.fnarea }}'>{{ i.fnarea }}</option>
-                                        {% endif %}
-                                    {% endfor %}
-                                </select>
-                            </div>
+                    {% comment %} </form> {% endcomment %}
+
+                        <h3 class="mt-3 mt-lg-4">Salary Range</h3>
+                        <div class="list-group mt-2 mt-lg-3">
+                            {% for i, j in saltype %}
+                                {% if i in context.els %}
+                                <label class="list-group-item d-flex justify-content-between align-items-center pxp-checked">
+                                    <span class="d-flex">
+                                        <input class="form-check-input me-2 sal" type="checkbox" value='{{i.0}},{{i.1}}' name="sal" checked>
+                                        ${{i.0}} - ${{i.1}}
+                                        <input type="submit" style="display: none" class="salbutton">
+                                    </span>
+                                    <span class="badge rounded-pill">{{j}}</span>
+                                </label>
+                                {% else %}
+                                <label class="list-group-item d-flex justify-content-between align-items-center mt-2 mt-lg-3">
+                                    <span class="d-flex">
+                                        <input class="form-check-input me-2 sal" type="checkbox" value='{{i.0}},{{i.1}}' name="sal">
+                                        ${{i.0}} - ${{i.1}}
+                                        <input type="submit" style="display: none" class="salbutton">
+                                    </span>
+                                    <span class="badge rounded-pill">{{j}}</span>
+                                </label>
+                                {% endif %}
+                                {% endfor %}
                         </div>
-                        <div class="col-12 col-lg-auto">
-                            <button>Find Jobs</button>
+                        <div class="filterbuttons">
+                        <input type="submit" value="Apply Filters" class="btn rounded-pill pxp-card-btn">
+                        <a role="button" class="btn rounded-pill pxp-card-btn cancelshow">Cancel</a>
                         </div>
-                    </form>
+                    {% comment %} </form> {% endcomment %}
+                    </div>
                 </div>
             </div>
-        </section>
-
-        <section class="mt-100">
-            <div class="pxp-container">
-                <div class="row" style="justify-content: center">
-                    <div class="col-lg-5 col-xl-4 col-xxl-3">
-                        <div class="pxp-jobs-list-side-filter">
-                            <div class="pxp-list-side-filter-header d-flex d-lg-none">
-                                <div class="pxp-list-side-filter-header-label">Filter Jobs</div>
-                                <a role="button"><span class="fa fa-sliders"></span></a>
-                            </div>
-                            <form method="GET">
-                            <div class="mt-4 mt-lg-0 d-lg-block pxp-list-side-filter-panel">
-                                <h3>Type of Employment</h3>
-                                <div class="list-group mt-2 mt-lg-3">
-                                    {% comment %} <form method="GET"> {% endcomment %}
-                                    {% for i, j in jobtype %}
-                                    {% if i.jobtype in context.sel %}
-                                    <label class="list-group-item d-flex justify-content-between align-items-center pxp-checked">
-                                        <span class="d-flex">
-                                            <input class="form-check-input me-2 emp" type="checkbox" value='{{i.jobtype}}' name="emp" checked>
-                                            {{i.jobtype}}
-                                            <input type="submit" style="display: none" class="empbutton">
-                                        </span>
-                                        <span class="badge rounded-pill">{{j}}</span>
-                                    </label>
-                                    {% else %}
-                                    <label class="list-group-item d-flex justify-content-between align-items-center mt-2 mt-lg-3">
-                                        <span class="d-flex">
-                                            <input class="form-check-input me-2 emp" type="checkbox" value='{{i.jobtype}}' name="emp">
-                                            {{i.jobtype}}
-                                            <input type="submit" style="display: none" class="empbutton">
-                                        </span>
-                                        <span class="badge rounded-pill">{{j}}</span>
-                                    </label>
-                                    {% endif %}
-                                    {% endfor %}
-                                    {% comment %} </form> {% endcomment %}
-                                </div>
-    
-                                <h3 class="mt-3 mt-lg-4">Experience Level</h3>
-                                <div class="list-group mt-2 mt-lg-3">
-                                    {% comment %} <form method="GET"> {% endcomment %}
-                                        {% for i, j in emptype %}
-                                        {% if i.experience in context.eel %}
-                                        <label class="list-group-item d-flex justify-content-between align-items-center pxp-checked">
-                                            <span class="d-flex">
-                                                <input class="form-check-input me-2 exp" type="checkbox" value='{{i.experience}}' name="exp" checked>
-                                                {{i.experience}}
-                                                <input type="submit" style="display: none" class="expbutton">
-                                            </span>
-                                            <span class="badge rounded-pill">{{j}}</span>
-                                        </label>
-                                        {% else %}
-                                        <label class="list-group-item d-flex justify-content-between align-items-center mt-2 mt-lg-3">
-                                            <span class="d-flex">
-                                                <input class="form-check-input me-2 exp" type="checkbox" value='{{i.experience}}' name="exp">
-                                                {{i.experience}}
-                                                <input type="submit" style="display: none" class="expbutton">
-                                            </span>
-                                            <span class="badge rounded-pill">{{j}}</span>
-                                        </label>
-                                        {% endif %}
-                                        {% endfor %}
-                                        
-                                </div>
-                            {% comment %} </form> {% endcomment %}
-    
-                                <h3 class="mt-3 mt-lg-4">Salary Range</h3>
-                                <div class="list-group mt-2 mt-lg-3">
-                                    {% for i, j in saltype %}
-                                        {% if i in context.els %}
-                                        <label class="list-group-item d-flex justify-content-between align-items-center pxp-checked">
-                                            <span class="d-flex">
-                                                <input class="form-check-input me-2 sal" type="checkbox" value='{{i.0}},{{i.1}}' name="sal" checked>
-                                                ${{i.0}} - ${{i.1}}
-                                                <input type="submit" style="display: none" class="salbutton">
-                                            </span>
-                                            <span class="badge rounded-pill">{{j}}</span>
-                                        </label>
-                                        {% else %}
-                                        <label class="list-group-item d-flex justify-content-between align-items-center mt-2 mt-lg-3">
-                                            <span class="d-flex">
-                                                <input class="form-check-input me-2 sal" type="checkbox" value='{{i.0}},{{i.1}}' name="sal">
-                                                ${{i.0}} - ${{i.1}}
-                                                <input type="submit" style="display: none" class="salbutton">
-                                            </span>
-                                            <span class="badge rounded-pill">{{j}}</span>
-                                        </label>
-                                        {% endif %}
-                                        {% endfor %}
-                                </div>
-                                <div class="filterbuttons">
-                                <input type="submit" value="Apply Filters" class="btn rounded-pill pxp-card-btn">
-                                <a role="button" class="btn rounded-pill pxp-card-btn cancelshow">Cancel</a>
-                                </div>
-                            {% comment %} </form> {% endcomment %}
-                            </div>
+            <div class="col-lg-6 col-xl-7 col-xxl-8">
+                <div class="pxp-jobs-list-top mt-4 mt-lg-0">
+                    <div class="row justify-content-between align-items-center">
+                        <div class="col-auto">
+                            <h2><span class="pxp-text-light">Showing</span>&nbsp; {{ count }} &nbsp;<span class="pxp-text-light">jobs</span></h2>
+                        </div>
+                        <div class="col-auto">
+                            <select class="form-select" name="datesort">
+                                {% if "0" == context.d %}
+                                <option value="0" selected>Most relevant</option>
+                                {% else %}
+                                <option value="0">Most relevant</option>
+                                {% endif %}
+                                {% if "1" == context.d %}
+                                <option value="1" selected>Newest</option>
+                                {% else %}
+                                <option value="1">Newest</option>
+                                {% endif %}
+                                {% if "2" == context.d %}
+                                <option value="2" selected>Oldest</option>
+                                {% else %}
+                                <option value="2">Oldest</option>
+                                {% endif %}
+                            </select>
                         </div>
                     </div>
-                    <div class="col-lg-6 col-xl-7 col-xxl-8">
-                        <div class="pxp-jobs-list-top mt-4 mt-lg-0">
-                            <div class="row justify-content-between align-items-center">
-                                <div class="col-auto">
-                                    <h2><span class="pxp-text-light">Showing</span>&nbsp; {{ count }} &nbsp;<span class="pxp-text-light">jobs</span></h2>
+                </div>
+            </form>
+                <div>
+                    {% for i in page_obj %}
+                        <div class="pxp-jobs-card-3 pxp-has-border">
+                            <div class="row align-items-center justify-content-between">
+                                <div class="col-sm-3 col-md-2 col-lg-3 col-xl-2 col-xxl-auto">
+                                    {% if i.logo %}
+                                    <a href="single-company-1.html" class="pxp-jobs-card-3-company-logo" style="background-image: url({{i.logo.url}});"></a>
+                                    {% else %}
+                                    <a href="single-company-1.html" class="pxp-jobs-card-3-company-logo" style="background-image: url();"></a>
+                                    {% endif %}
                                 </div>
-                                <div class="col-auto">
-                                    <select class="form-select" name="datesort">
-                                        {% if "0" == context.d %}
-                                        <option value="0" selected>Most relevant</option>
-                                        {% else %}
-                                        <option value="0">Most relevant</option>
-                                        {% endif %}
-                                        {% if "1" == context.d %}
-                                        <option value="1" selected>Newest</option>
-                                        {% else %}
-                                        <option value="1">Newest</option>
-                                        {% endif %}
-                                        {% if "2" == context.d %}
-                                        <option value="2" selected>Oldest</option>
-                                        {% else %}
-                                        <option value="2">Oldest</option>
-                                        {% endif %}
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                        <div>
-                            {% for i in page_obj %}
-                                <div class="pxp-jobs-card-3 pxp-has-border">
-                                    <div class="row align-items-center justify-content-between">
-                                        <div class="col-sm-3 col-md-2 col-lg-3 col-xl-2 col-xxl-auto">
-                                            {% if i.logo %}
-                                            <a href="single-company-1.html" class="pxp-jobs-card-3-company-logo" style="background-image: url({{i.logo.url}});"></a>
-                                            {% else %}
-                                            <a href="single-company-1.html" class="pxp-jobs-card-3-company-logo" style="background-image: url();"></a>
-                                            {% endif %}
-                                        </div>
-                                        <div class="col-sm-9 col-md-10 col-lg-9 col-xl-10 col-xxl-4">
-                                            <a href="single-job-1.html" class="pxp-jobs-card-3-title mt-3 mt-sm-0">{{ i.title }}</a>
-                                            <div class="pxp-jobs-card-3-details">
-                                                <a href="jobs-list-1.html" class="pxp-jobs-card-3-location">
-                                                    <span class="fa fa-globe"></span>{{ i.location }}
-                                                </a>
-                                                <div class="pxp-jobs-card-3-type">{{ i.experience }}</div>
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-8 col-xl-6 col-xxl-4 mt-3 mt-xxl-0">
-                                            <a href="jobs-list-1.html" class="pxp-jobs-card-3-category">
-                                                <div class="pxp-jobs-card-3-category-label">{{ i.fnarea }}</div>
-                                            </a>
-                                            <div class="pxp-jobs-card-3-date-company">
-                                                <span class="pxp-jobs-card-3-date pxp-text-light">{{ i.postdate }}</span> <a href="#" class="pxp-jobs-card-3-company">{{ i.ename }}</a>
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-4 col-xl-2 col-xxl-auto mt-3 mt-xxl-0 pxp-text-right" style="display: none">
-                                            <a href="{% url 'main:singlejob' pk2=i.jobid %}" class="btn rounded-pill pxp-card-btn">Apply</a>
-                                        </div>
+                                <div class="col-sm-9 col-md-10 col-lg-9 col-xl-10 col-xxl-4">
+                                    <a href="single-job-1.html" class="pxp-jobs-card-3-title mt-3 mt-sm-0">{{ i.title }}</a>
+                                    <div class="pxp-jobs-card-3-details">
+                                        <a href="jobs-list-1.html" class="pxp-jobs-card-3-location">
+                                            <span class="fa fa-globe"></span>{{ i.location }}
+                                        </a>
+                                        <div class="pxp-jobs-card-3-type">{{ i.experience }}</div>
                                     </div>
                                 </div>
-                            {% endfor %}
-                        </div>
-
-                        <div class="row mt-4 mt-lg-5 justify-content-between align-items-center">
-                            <div class="col-auto">
-                                <nav class="mt-3 mt-sm-0" aria-label="Jobs list pagination">
-                                    <ul class="pagination pxp-pagination">
-                                        {% if pe.has_previous %}
-                                            {% if GET_params %}
-                                            <li class="page-item"><a href="?{{GET_params.urlencode}}&amp;page={{pe.previous_page_number}}" class="page-link"><i class="fa fa-chevron-left" aria-hidden="true"></i></a></li>
-                                            {% else %}
-                                            <li class="page-item"><a href="?page={{pe.previous_page_number}}" class="page-link"><i class="fa fa-chevron-left" aria-hidden="true"></i></a></li>
-                                            {% endif %}
-                                        {% endif %}
-
-                                        {% if pe.number|add:'-4' > 1 %}
-                                            {% if GET_params %}
-                                            <li class="page-item"><a href="?{{GET_params.urlencode}}&amp;page={{ pe.number|add:'-5' }}" class="page-link">&hellip;</a></li>
-                                            {% else %}
-                                            <li class="page-item"><a href="?page={{ pe.number|add:'-5' }}" class="page-link">&hellip;</a></li>
-                                            {% endif %}
-                                        {% endif %}
-
-                                        {% for i in pe.paginator.page_range %}
-                                            {% if pe.number == i %}
-                                                <li class="page-item active" aria-current="page">
-                                                    <span class="page-link">{{pe.number}}</span>
-                                                </li>
-                                            {% elif i > pe.number|add:'-5' and i < pe.number|add:'5' %}
-                                                {% if GET_params %}
-                                                <li class="page-item"><a href="?{{GET_params.urlencode}}&amp;page={{ i }}" class="page-link">{{i}}</a></li>
-                                                {% else %}
-                                                <li class="page-item"><a href="?page={{ i }}" class="page-link">{{i}}</a></li>
-                                                {% endif %}
-                                            {% endif %}
-                                        {% endfor %}
-
-                                        {% if pe.paginator.num_pages > pe.number|add:'4' %}
-                                            {% if GET_params %}
-                                            <li class="page-item"><a href="?{{GET_params.urlencode}}&amp;page={{ pe.number|add:'5' }}" class="page-link">&hellip;</a></li>
-                                            {% else %}
-                                            <li class="page-item"><a href="?page={{ pe.number|add:'5' }}" class="page-link">&hellip;</a></li>
-                                            {% endif %}
-                                        {% endif %}
-
-                                        {% if pe.has_next %}
-                                            {% if GET_params %}
-                                            <li class="page-item"><a href="?{{GET_params.urlencode}}&amp;page={{ pe.next_page_number }}" class="page-link"><i class="fa fa-chevron-right" aria-hidden="true"></i></a></li>
-                                            {% else %}
-                                            <li class="page-item"><a href="?page={{pe.next_page_number}}" class="page-link"><i class="fa fa-chevron-right" aria-hidden="true"></i></a></li>
-                                            {% endif %}
-                                        {% endif %}
-
-                                    </ul>
-                                </nav>
-                            </div>
-                            <div class="col-auto">
-                                <a href="#" class="btn rounded-pill pxp-section-cta mt-3 mt-sm-0">Show me more<span class="fa fa-angle-right"></span></a>
+                                <div class="col-sm-8 col-xl-6 col-xxl-4 mt-3 mt-xxl-0">
+                                    <a href="jobs-list-1.html" class="pxp-jobs-card-3-category">
+                                        <div class="pxp-jobs-card-3-category-label">{{ i.fnarea }}</div>
+                                    </a>
+                                    <div class="pxp-jobs-card-3-date-company">
+                                        <span class="pxp-jobs-card-3-date pxp-text-light">{{ i.postdate }}</span> <a href="#" class="pxp-jobs-card-3-company">{{ i.ename }}</a>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4 col-xl-2 col-xxl-auto mt-3 mt-xxl-0 pxp-text-right" style="display: none">
+                                    <a href="{% url 'main:singlejob' pk2=i.jobid %}" class="btn rounded-pill pxp-card-btn">Apply</a>
+                                </div>
                             </div>
                         </div>
+                    {% endfor %}
+                </div>
+
+                <div class="row mt-4 mt-lg-5 justify-content-between align-items-center">
+                    <div class="col-auto">
+                        <nav class="mt-3 mt-sm-0" aria-label="Jobs list pagination">
+                            <ul class="pagination pxp-pagination">
+                                {% if pe.has_previous %}
+                                    {% if GET_params %}
+                                    <li class="page-item"><a href="?{{GET_params.urlencode}}&amp;page={{pe.previous_page_number}}" class="page-link"><i class="fa fa-chevron-left" aria-hidden="true"></i></a></li>
+                                    {% else %}
+                                    <li class="page-item"><a href="?page={{pe.previous_page_number}}" class="page-link"><i class="fa fa-chevron-left" aria-hidden="true"></i></a></li>
+                                    {% endif %}
+                                {% endif %}
+
+                                {% if pe.number|add:'-4' > 1 %}
+                                    {% if GET_params %}
+                                    <li class="page-item"><a href="?{{GET_params.urlencode}}&amp;page={{ pe.number|add:'-5' }}" class="page-link">&hellip;</a></li>
+                                    {% else %}
+                                    <li class="page-item"><a href="?page={{ pe.number|add:'-5' }}" class="page-link">&hellip;</a></li>
+                                    {% endif %}
+                                {% endif %}
+
+                                {% for i in pe.paginator.page_range %}
+                                    {% if pe.number == i %}
+                                        <li class="page-item active" aria-current="page">
+                                            <span class="page-link">{{pe.number}}</span>
+                                        </li>
+                                    {% elif i > pe.number|add:'-5' and i < pe.number|add:'5' %}
+                                        {% if GET_params %}
+                                        <li class="page-item"><a href="?{{GET_params.urlencode}}&amp;page={{ i }}" class="page-link">{{i}}</a></li>
+                                        {% else %}
+                                        <li class="page-item"><a href="?page={{ i }}" class="page-link">{{i}}</a></li>
+                                        {% endif %}
+                                    {% endif %}
+                                {% endfor %}
+
+                                {% if pe.paginator.num_pages > pe.number|add:'4' %}
+                                    {% if GET_params %}
+                                    <li class="page-item"><a href="?{{GET_params.urlencode}}&amp;page={{ pe.number|add:'5' }}" class="page-link">&hellip;</a></li>
+                                    {% else %}
+                                    <li class="page-item"><a href="?page={{ pe.number|add:'5' }}" class="page-link">&hellip;</a></li>
+                                    {% endif %}
+                                {% endif %}
+
+                                {% if pe.has_next %}
+                                    {% if GET_params %}
+                                    <li class="page-item"><a href="?{{GET_params.urlencode}}&amp;page={{ pe.next_page_number }}" class="page-link"><i class="fa fa-chevron-right" aria-hidden="true"></i></a></li>
+                                    {% else %}
+                                    <li class="page-item"><a href="?page={{pe.next_page_number}}" class="page-link"><i class="fa fa-chevron-right" aria-hidden="true"></i></a></li>
+                                    {% endif %}
+                                {% endif %}
+
+                            </ul>
+                        </nav>
+                    </div>
+                    <div class="col-auto">
+                        <a href="#" class="btn rounded-pill pxp-section-cta mt-3 mt-sm-0">Show me more<span class="fa fa-angle-right"></span></a>
                     </div>
                 </div>
             </div>
-        </section>
+        </div>
+    </div>
+</section>
 
-        {% include "footer.html" %}
+{% include "footer.html" %}
 
-        <script src="{% static 'js/jquery-3.4.1.min.js' %}"></script>
-        <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
-        <script src="{% static 'js/owl.carousel.min.js' %}"></script>
-        <script src="{% static 'js/nav.js' %}"></script>
-        <script src="{% static 'js/main.js' %}"></script>
-        <script>
-        $(document).ready(function () {
-            $('.cancelshow').click(function(){
-                $('.pxp-list-side-filter-panel').slideToggle();
-            })
-            $('.pxp-jobs-card-3').click(function(){
-                $(this).find('a')[5].click();
-            })
-            document.getElementById('blackcolor').style.color="black";
-            $('select').selectize({
-                sortField: 'text'
-            });
-        })
-    </script>
-    </body>
-</html>
 {% endblock %}

@@ -1,403 +1,183 @@
+{% extends 'base.html' %}
 {% load static %}
+
+{% block title %}
+<title>mpower - Single job</title>
+{% endblock %}
+
+{% block style %}
+.pxp-user-nav-trigger{
+    color: black;
+    border-color: black;
+}
+.pxp-user-nav-trigger:hover{
+    color: white;
+    border-color: white;
+    background: black
+}
+#blackcolor{
+    color: black !important;
+}
+.pxp-user-nav-dropdown > .dropdown-toggle::after{
+    border-top-color: black !important;
+}
+{% endblock %}
+
 {% block content %}
-<!doctype html>
-<html lang="en" class="pxp-root">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-        <link rel="shortcut icon" href="{% static 'images/favicon.png' %}" type="image/x-icon">
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600;700&display=swap" rel="stylesheet">
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-        <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
-        <link rel="stylesheet" href="{% static 'css/font-awesome.min.css' %}">
-        <link rel="stylesheet" href="{% static 'css/owl.carousel.min.css' %}">
-        <link rel="stylesheet" href="{% static 'css/owl.theme.default.min.css' %}">
-        <link rel="stylesheet" href="{% static 'css/animate.css' %}">
-        <link rel="stylesheet" href="{% static 'css/style.css' %}">
+<section>
+    <div class="pxp-container">
+        <div class="pxp-single-job-content pxp-has-columns">
+            <div class="row">
+                <div class="col-lg-7 col-xl-8 col-xxl-9">
+                    {% if company_details.logo %}
+                    <div class="pxp-single-job-cover pxp-cover" style="background-image: url({{ company_details.logo.url }});"></div>
+                    <div class="pxp-single-job-cover-logo" style="background-image: url({{ company_details.logo.url }});"></div>
+                    {% else %}
+                    <div class="pxp-single-job-cover pxp-cover" style="background-image: url();"></div>
+                    <div class="pxp-single-job-cover-logo" style="background-image: url();"></div>
+                    {% endif %}
 
-        <title>mpower - Single job v2</title>
-        <style>
-            .pxp-user-nav-trigger{
-                color: black;
-                border-color: black;
-            }
-            .pxp-user-nav-trigger:hover{
-                color: white;
-                border-color: white;
-                background: black
-            }
-        </style>
-    </head>
-    <body>
-        {% if messages %}
-        {% for message in messages %}
-         {% if message.tags %}  
-         <script>alert('{{ message }}')</script>
-        {% endif %}
-
-        {% endfor %}
-
-        {% endif %}
-        {% include "indexheader.html" %}
-
-        <section>
-            <div class="pxp-container">
-                <div class="pxp-single-job-content pxp-has-columns">
-                    <div class="row">
-                        <div class="col-lg-7 col-xl-8 col-xxl-9">
-                            {% if company_details.logo %}
-                            <div class="pxp-single-job-cover pxp-cover" style="background-image: url({{ company_details.logo.url }});"></div>
-                            <div class="pxp-single-job-cover-logo" style="background-image: url({{ company_details.logo.url }});"></div>
-                            {% else %}
-                            <div class="pxp-single-job-cover pxp-cover" style="background-image: url();"></div>
-                            <div class="pxp-single-job-cover-logo" style="background-image: url();"></div>
-                            {% endif %}
-
-                            <div class="row justify-content-between align-items-center mt-4 mt-lg-5">
-                                <div class="col-xl-8 col-xxl-6">
-                                    <h1>{{ job_details.title }}</h1>
-                                    <div class="pxp-single-job-company-location">
-                                        by <a href="single-company-1.html" class="pxp-single-job-company">{{ company_details.title }}</a> in 
-                                        <a href="jobs-list-1.html" class="pxp-single-job-location">{{ job_details.location }}</a>
-                                    </div>
-                                </div>
-                                <div class="col-auto">
-                                    <div class="pxp-single-job-options mt-4 col-xl-0">
-                                        <form method="POST">
-                                            {% csrf_token %}
-                                        {% if request.session.name %}
-                                        {% if liked %}
-                                        <button class="btn pxp-single-job-save-btn" style="background: black; color: white"><span class="fa fa-heart-o"></span></button>
-                                        {% else %}
-                                        <button class="btn pxp-single-job-save-btn"><span class="fa fa-heart-o"></span></button>
-                                        {% endif %}
-                                        {% endif %}
-                                        </form>
-                                        <div class="dropdown ms-2">
-                                            <button class="btn pxp-single-job-share-btn dropdown-toggle" type="button" id="socialShareBtn" data-bs-toggle="dropdown" aria-expanded="false">
-                                                <span class="fa fa-share-alt">
-                                            </span></button>
-                                            <ul class="dropdown-menu pxp-single-job-share-dropdown" aria-labelledby="socialShareBtn">
-                                                <li><a class="dropdown-item" href="#"><span class="fa fa-facebook"></span> Facebook</a></li>
-                                                <li><a class="dropdown-item" href="#"><span class="fa fa-twitter"></span> Twitter</a></li>
-                                                <li><a class="dropdown-item" href="#"><span class="fa fa-pinterest"></span> Pinterest</a></li>
-                                                <li><a class="dropdown-item" href="#"><span class="fa fa-linkedin"></span> LinkedIn</a></li>
-                                            </ul>
-                                        </div>
-                                        <button class="btn ms-2 pxp-single-job-apply-btn rounded-pill">Apply Now</button>
-                                    </div>
-                                </div>
+                    <div class="row justify-content-between align-items-center mt-4 mt-lg-5">
+                        <div class="col-xl-8 col-xxl-6">
+                            <h1>{{ job_details.title }}</h1>
+                            <div class="pxp-single-job-company-location">
+                                by <a href="single-company-1.html" class="pxp-single-job-company">{{ company_details.title }}</a> in 
+                                <a href="jobs-list-1.html" class="pxp-single-job-location">{{ job_details.location }}</a>
                             </div>
-
-                            <div class="row mt-4 justify-content-between align-items-center">
-                                <div class="col-6">
-                                    <a href="jobs-list-1.html" class="pxp-single-job-category">
-                                        <div class="pxp-single-job-category-icon"><span class="fa fa-calendar-o"></span></div>
-                                        <div class="pxp-single-job-category-label">{{ job_details.fnarea }}</div>
-                                    </a>
-                                </div>
-                                <div class="col-auto">
-                                    <div class="pxp-single-job-date pxp-text-light">{{ job_details.postdate }}</div>
-                                </div>
-                            </div>
-
-                            <div class="pxp-single-job-content-details mt-4 mt-lg-5">
-                                <h4>Overview</h4>
-                                <p>{{ job_details.jobdesc }}</p>
-                                <div class="mt-4">
-                                    <h4>Responsabilities</h4>
-                                    <ul>
-                                        <li>Be involved in every step of the product design cycle from discovery to developer handoff and user acceptance testing.</li>
-                                        <li>Work with BAs, product managers and tech teams to lead the Product Design</li>
-                                        <li>Maintain quality of the design process and ensure that when designs are translated into code they accurately reflect the design specifications.</li>
-                                        <li>Accurately estimate design tickets during planning sessions.</li>
-                                        <li>Contribute to sketching sessions involving non-designersCreate, iterate and maintain UI deliverables including sketch files, style guides, high fidelity prototypes, micro interaction specifications and pattern libraries.</li>
-                                        <li>Ensure design choices are data led by identifying assumptions to test each sprint, and work with the analysts in your team to plan moderated usability test sessions.</li>
-                                        <li>Design pixel perfect responsive UI’s and understand that adopting common interface patterns is better for UX than reinventing the wheel</li>
-                                        <li>Present your work to the wider business at Show &amp; Tell sessions.</li>
+                        </div>
+                        <div class="col-auto">
+                            <div class="pxp-single-job-options mt-4 col-xl-0">
+                                <form method="POST">
+                                    {% csrf_token %}
+                                {% if request.session.name %}
+                                {% if liked %}
+                                <button class="btn pxp-single-job-save-btn" style="background: black; color: white"><span class="fa fa-heart-o"></span></button>
+                                {% else %}
+                                <button class="btn pxp-single-job-save-btn"><span class="fa fa-heart-o"></span></button>
+                                {% endif %}
+                                {% endif %}
+                                </form>
+                                <div class="dropdown ms-2">
+                                    <button class="btn pxp-single-job-share-btn dropdown-toggle" type="button" id="socialShareBtn" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <span class="fa fa-share-alt">
+                                    </span></button>
+                                    <ul class="dropdown-menu pxp-single-job-share-dropdown" aria-labelledby="socialShareBtn">
+                                        <li><a class="dropdown-item" href="#"><span class="fa fa-facebook"></span> Facebook</a></li>
+                                        <li><a class="dropdown-item" href="#"><span class="fa fa-twitter"></span> Twitter</a></li>
+                                        <li><a class="dropdown-item" href="#"><span class="fa fa-pinterest"></span> Pinterest</a></li>
+                                        <li><a class="dropdown-item" href="#"><span class="fa fa-linkedin"></span> LinkedIn</a></li>
                                     </ul>
                                 </div>
-                                <div class="mt-4">
-                                    <h4>Requirements</h4>
-                                    <ul><li>4+ years of system administration experience with the Microsoft Server platform (2012/2016, Microsoft IIS, Active Directory)</li><li>3+ years of hands-on system administration experience with AWS (EC2, Elastic Load Balancing, Multi AZ, etc.)</li><li>4+ years of SQL Server, MySQL</li><li>Working knowledge of Encryption techniques and protocols, Multi-factor authentication, Data protection, Penetration testing, Security threats</li><li>Bachelor's Degree, or 4+ years of hands-on IT experience</li></ul>
-                                </div>
-                                <div class="mt-4">
-                                    <h4>Skills</h4>
-                                    <ul><li>Programming experience developing web applications with the Microsoft .NET stack and a basic knowledge of SQL</li><li>Development experience with Angular, Node.JS, or ColdFusion</li><li>HTML, CSS, XHTML, XML</li><li>Hypervisors, SAN’s, load balancers, firewalls, and Web Application Firewall (WAF)</li><li>Experience with Higher Logic (a collaboration platform)</li><li>MongoDB, Drupal</li><li>Mobile App Development (iOS and Android)</li><li>Episerver CMS</li><li>Microsoft Team Foundation Server</li><li>Speaker Management System (Planstone)</li></ul>
-                                </div>
-
-                                <div class="mt-4 mt-lg-5">
-                                    <a href="#" class="btn rounded-pill pxp-section-cta">Apply Now</a>
-                                </div>
+                                <button class="btn ms-2 pxp-single-job-apply-btn rounded-pill">Apply Now</button>
                             </div>
                         </div>
-                        <div class="col-lg-5 col-xl-4 col-xxl-3">
-                            <div class="pxp-single-job-side-panel mt-5 mt-lg-0">
-                                <div>
-                                    <div class="pxp-single-job-side-info-label pxp-text-light">Experience</div>
-                                    <div class="pxp-single-job-side-info-data">{{ job_details.experience }}</div>
-                                </div>
-                                <div class="mt-4">
-                                    <div class="pxp-single-job-side-info-label pxp-text-light">Work Level</div>
-                                    <div class="pxp-single-job-side-info-data">Senior Level</div>
-                                </div>
-                                <div class="mt-4">
-                                    <div class="pxp-single-job-side-info-label pxp-text-light">Employment Type</div>
-                                    <div class="pxp-single-job-side-info-data">Full Time</div>
-                                </div>
-                                <div class="mt-4">
-                                    <div class="pxp-single-job-side-info-label pxp-text-light">Salary</div>
-                                    <div class="pxp-single-job-side-info-data">${{ job_details.basicpay }}</div>
-                                </div>
-                            </div>
-                            <div class="mt-3 mt-lg-4 pxp-single-job-side-panel">
-                                <div class="pxp-single-job-side-company">
-                                    {% if company_details.logo %}
-                                    <div class="pxp-single-job-side-company-logo pxp-cover" style="background-image: url({{ company_details.logo.url }});"></div>
-                                    {% else %}
-                                    <div class="pxp-single-job-side-company-logo pxp-cover" style="background-image: url();"></div>
-                                    {% endif %}
-                                    <div class="pxp-single-job-side-company-profile">
-                                        <div class="pxp-single-job-side-company-name">{{ company_details.ename }}</div>
-                                        <a href="single-company-1.html">View profile</a>
-                                    </div>
-                                </div>
-                                <div class="mt-4">
-                                    <div class="pxp-single-job-side-info-label pxp-text-light">Industry</div>
-                                    <div class="pxp-single-job-side-info-data">{{ job_details.industry }}</div>
-                                </div>
-                                <div class="mt-4">
-                                    <div class="pxp-single-job-side-info-label pxp-text-light">Company size</div>
-                                    <div class="pxp-single-job-side-info-data">50-100</div>
-                                </div>
-                                <div class="mt-4">
-                                    <div class="pxp-single-job-side-info-label pxp-text-light">Founded in</div>
-                                    <div class="pxp-single-job-side-info-data">2005</div>
-                                </div>
-                                <div class="mt-4">
-                                    <div class="pxp-single-job-side-info-label pxp-text-light">Phone</div>
-                                    <div class="pxp-single-job-side-info-data">{{ company_details.phone }}</div>
-                                </div>
-                                <div class="mt-4">
-                                    <div class="pxp-single-job-side-info-label pxp-text-light">Email</div>
-                                    <div class="pxp-single-job-side-info-data">office@craftgenics.com</div>
-                                </div>
-                                <div class="mt-4">
-                                    <div class="pxp-single-job-side-info-label pxp-text-light">Location</div>
-                                    <div class="pxp-single-job-side-info-data">{{ company_details.location }}</div>
-                                </div>
-                                <div class="mt-4">
-                                    <div class="pxp-single-job-side-info-label pxp-text-light">Website</div>
-                                    <div class="pxp-single-job-side-info-data"><a href="#">www.craftgenics.com</a></div>
-                                </div>
-                                <div class="mt-4">
-                                    <div class="pxp-single-job-side-info-data">
-                                        <ul class="list-unstyled pxp-single-job-side-info-social">
-                                            <li><a href="#"><span class="fa fa-facebook"></span></a></li>
-                                            <li><a href="#"><span class="fa fa-twitter"></span></a></li>
-                                            <li><a href="#"><span class="fa fa-instagram"></span></a></li>
-                                            <li><a href="#"><span class="fa fa-linkedin"></span></a></li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
+                    </div>
+
+                    <div class="row mt-4 justify-content-between align-items-center">
+                        <div class="col-6">
+                            <a href="jobs-list-1.html" class="pxp-single-job-category">
+                                <div class="pxp-single-job-category-icon"><span class="fa fa-calendar-o"></span></div>
+                                <div class="pxp-single-job-category-label">{{ job_details.fnarea }}</div>
+                            </a>
+                        </div>
+                        <div class="col-auto">
+                            <div class="pxp-single-job-date pxp-text-light">{{ job_details.postdate }}</div>
+                        </div>
+                    </div>
+
+                    <div class="pxp-single-job-content-details mt-4 mt-lg-5">
+                        <h4>Overview</h4>
+                        <p>{{ job_details.jobdesc }}</p>
+                        <div class="mt-4">
+                            <h4>Responsabilities</h4>
+                            <ul>
+                                <li>Be involved in every step of the product design cycle from discovery to developer handoff and user acceptance testing.</li>
+                                <li>Work with BAs, product managers and tech teams to lead the Product Design</li>
+                                <li>Maintain quality of the design process and ensure that when designs are translated into code they accurately reflect the design specifications.</li>
+                                <li>Accurately estimate design tickets during planning sessions.</li>
+                                <li>Contribute to sketching sessions involving non-designersCreate, iterate and maintain UI deliverables including sketch files, style guides, high fidelity prototypes, micro interaction specifications and pattern libraries.</li>
+                                <li>Ensure design choices are data led by identifying assumptions to test each sprint, and work with the analysts in your team to plan moderated usability test sessions.</li>
+                                <li>Design pixel perfect responsive UI’s and understand that adopting common interface patterns is better for UX than reinventing the wheel</li>
+                                <li>Present your work to the wider business at Show &amp; Tell sessions.</li>
+                            </ul>
+                        </div>
+                        <div class="mt-4">
+                            <h4>Requirements</h4>
+                            <ul><li>4+ years of system administration experience with the Microsoft Server platform (2012/2016, Microsoft IIS, Active Directory)</li><li>3+ years of hands-on system administration experience with AWS (EC2, Elastic Load Balancing, Multi AZ, etc.)</li><li>4+ years of SQL Server, MySQL</li><li>Working knowledge of Encryption techniques and protocols, Multi-factor authentication, Data protection, Penetration testing, Security threats</li><li>Bachelor's Degree, or 4+ years of hands-on IT experience</li></ul>
+                        </div>
+                        <div class="mt-4">
+                            <h4>Skills</h4>
+                            <ul><li>Programming experience developing web applications with the Microsoft .NET stack and a basic knowledge of SQL</li><li>Development experience with Angular, Node.JS, or ColdFusion</li><li>HTML, CSS, XHTML, XML</li><li>Hypervisors, SAN’s, load balancers, firewalls, and Web Application Firewall (WAF)</li><li>Experience with Higher Logic (a collaboration platform)</li><li>MongoDB, Drupal</li><li>Mobile App Development (iOS and Android)</li><li>Episerver CMS</li><li>Microsoft Team Foundation Server</li><li>Speaker Management System (Planstone)</li></ul>
+                        </div>
+
+                        <div class="mt-4 mt-lg-5">
+                            <a href="#" class="btn rounded-pill pxp-section-cta">Apply Now</a>
                         </div>
                     </div>
                 </div>
-            </div>
-        </section>
-
-        <section class="mt-100">
-            <div class="pxp-container">
-                <h2 class="pxp-subsection-h2">Related Jobs</h2>
-                <p class="pxp-text-light">Other similar jobs that might interest you</p>
-
-                <div class="row mt-3 mt-md-4 pxp-animate-in pxp-animate-in-top pxp-in">
-                    <div class="col-xl-6 pxp-jobs-card-2-container">
-                        <div class="pxp-jobs-card-2 pxp-has-border">
-                            <div class="pxp-jobs-card-2-top">
-                                <a href="single-company-1.html" class="pxp-jobs-card-2-company-logo" style="background-image: url();"></a>
-                                <div class="pxp-jobs-card-2-info">
-                                    <a href="single-job-1.html" class="pxp-jobs-card-2-title">Software Engineering Team Leader</a>
-                                    <div class="pxp-jobs-card-2-details">
-                                        <a href="jobs-list-1.html" class="pxp-jobs-card-2-location">
-                                            <span class="fa fa-globe"></span>Los Angeles, CA
-                                        </a>
-                                        <div class="pxp-jobs-card-2-type">Full-time</div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="pxp-jobs-card-2-bottom">
-                                <a href="jobs-list-1.html" class="pxp-jobs-card-2-category">
-                                    <div class="pxp-jobs-card-2-category-label">Project Management</div>
-                                </a>
-                                <div class="pxp-jobs-card-2-bottom-right">
-                                    <span class="pxp-jobs-card-2-date pxp-text-light">3 days ago by</span> <a href="single-company-1.html" class="pxp-jobs-card-2-company">Craftgenics</a>
-                                </div>
-                            </div>
+                <div class="col-lg-5 col-xl-4 col-xxl-3">
+                    <div class="pxp-single-job-side-panel mt-5 mt-lg-0">
+                        <div>
+                            <div class="pxp-single-job-side-info-label pxp-text-light">Experience</div>
+                            <div class="pxp-single-job-side-info-data">{{ job_details.experience }}</div>
+                        </div>
+                        <div class="mt-4">
+                            <div class="pxp-single-job-side-info-label pxp-text-light">Work Level</div>
+                            <div class="pxp-single-job-side-info-data">Senior Level</div>
+                        </div>
+                        <div class="mt-4">
+                            <div class="pxp-single-job-side-info-label pxp-text-light">Employment Type</div>
+                            <div class="pxp-single-job-side-info-data">Full Time</div>
+                        </div>
+                        <div class="mt-4">
+                            <div class="pxp-single-job-side-info-label pxp-text-light">Salary</div>
+                            <div class="pxp-single-job-side-info-data">${{ job_details.basicpay }}</div>
                         </div>
                     </div>
-                    <div class="col-xl-6 pxp-jobs-card-2-container">
-                        <div class="pxp-jobs-card-2 pxp-has-border">
-                            <div class="pxp-jobs-card-2-top">
-                                <a href="single-company-1.html" class="pxp-jobs-card-2-company-logo" style="background-image: url();"></a>
-                                <div class="pxp-jobs-card-2-info">
-                                    <a href="single-job-1.html" class="pxp-jobs-card-2-title">Techincal Support Engineer</a>
-                                    <div class="pxp-jobs-card-2-details">
-                                        <a href="jobs-list-1.html" class="pxp-jobs-card-2-location">
-                                            <span class="fa fa-globe"></span>Paris, France
-                                        </a>
-                                        <div class="pxp-jobs-card-2-type">Full-time</div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="pxp-jobs-card-2-bottom">
-                                <a href="jobs-list-1.html" class="pxp-jobs-card-2-category">
-                                    <div class="pxp-jobs-card-2-category-label">Customer Service</div>
-                                </a>
-                                <div class="pxp-jobs-card-2-bottom-right">
-                                    <span class="pxp-jobs-card-2-date pxp-text-light">3 days ago by</span> <a href="single-company-1.html" class="pxp-jobs-card-2-company">Illuminate Studio</a>
-                                </div>
+                    <div class="mt-3 mt-lg-4 pxp-single-job-side-panel">
+                        <div class="pxp-single-job-side-company">
+                            {% if company_details.logo %}
+                            <div class="pxp-single-job-side-company-logo pxp-cover" style="background-image: url({{ company_details.logo.url }});"></div>
+                            {% else %}
+                            <div class="pxp-single-job-side-company-logo pxp-cover" style="background-image: url();"></div>
+                            {% endif %}
+                            <div class="pxp-single-job-side-company-profile">
+                                <div class="pxp-single-job-side-company-name">{{ company_details.ename }}</div>
+                                <a href="single-company-1.html">View profile</a>
                             </div>
                         </div>
-                    </div>
-                    <div class="col-xl-6 pxp-jobs-card-2-container">
-                        <div class="pxp-jobs-card-2 pxp-has-border">
-                            <div class="pxp-jobs-card-2-top">
-                                <a href="single-company-1.html" class="pxp-jobs-card-2-company-logo" style="background-image: url();"></a>
-                                <div class="pxp-jobs-card-2-info">
-                                    <a href="single-job-1.html" class="pxp-jobs-card-2-title">Javascript Developer</a>
-                                    <div class="pxp-jobs-card-2-details">
-                                        <a href="jobs-list-1.html" class="pxp-jobs-card-2-location">
-                                            <span class="fa fa-globe"></span>London, UK
-                                        </a>
-                                        <div class="pxp-jobs-card-2-type">Full-time</div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="pxp-jobs-card-2-bottom">
-                                <a href="jobs-list-1.html" class="pxp-jobs-card-2-category">
-                                    <div class="pxp-jobs-card-2-category-label">Software Engineering</div>
-                                </a>
-                                <div class="pxp-jobs-card-2-bottom-right">
-                                    <span class="pxp-jobs-card-2-date pxp-text-light">3 days ago by</span> <a href="single-company-1.html" class="pxp-jobs-card-2-company">Syspresoft</a>
-                                </div>
-                            </div>
+                        <div class="mt-4">
+                            <div class="pxp-single-job-side-info-label pxp-text-light">Industry</div>
+                            <div class="pxp-single-job-side-info-data">{{ job_details.industry }}</div>
                         </div>
-                    </div>
-                    <div class="col-xl-6 pxp-jobs-card-2-container">
-                        <div class="pxp-jobs-card-2 pxp-has-border">
-                            <div class="pxp-jobs-card-2-top">
-                                <a href="single-company-1.html" class="pxp-jobs-card-2-company-logo" style="background-image: url();"></a>
-                                <div class="pxp-jobs-card-2-info">
-                                    <a href="single-job-1.html" class="pxp-jobs-card-2-title">Technical Writer</a>
-                                    <div class="pxp-jobs-card-2-details">
-                                        <a href="jobs-list-1.html" class="pxp-jobs-card-2-location">
-                                            <span class="fa fa-globe"></span>London, UK
-                                        </a>
-                                        <div class="pxp-jobs-card-2-type">Full-time</div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="pxp-jobs-card-2-bottom">
-                                <a href="jobs-list-1.html" class="pxp-jobs-card-2-category">
-                                    <div class="pxp-jobs-card-2-category-label">Business Development</div>
-                                </a>
-                                <div class="pxp-jobs-card-2-bottom-right">
-                                    <span class="pxp-jobs-card-2-date pxp-text-light">3 days ago by</span> <a href="single-company-1.html" class="pxp-jobs-card-2-company">Gramware</a>
-                                </div>
-                            </div>
+                        <div class="mt-4">
+                            <div class="pxp-single-job-side-info-label pxp-text-light">Company size</div>
+                            <div class="pxp-single-job-side-info-data">50-100</div>
                         </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <footer class="pxp-main-footer mt-100">
-            <div class="pxp-main-footer-top pt-100 pb-100" style="background-color: var(--pxpMainColorLight);">
-                <div class="pxp-container">
-                    <div class="row">
-                        <div class="col-lg-6 col-xl-5 col-xxl-4 mb-4">
-                            <div class="pxp-footer-logo">
-                                <a href="index.html" class="pxp-animate"><span style="color: var(--pxpMainColor)">m</span>power</a>
-                            </div>
-                            <div class="pxp-footer-section mt-3 mt-md-4">
-                                <h3>Call us</h3>
-                                <div class="pxp-footer-phone">(123) 456-7890</div>
-                            </div>
-                            <div class="mt-3 mt-md-4 pxp-footer-section">
-                                <div class="pxp-footer-text">
-                                    90 Fifth Avenue, 3rd Floor<br>
-                                    San Francisco, CA 1980<br>
-                                    office@mpower.com
-                                </div>
-                            </div>
+                        <div class="mt-4">
+                            <div class="pxp-single-job-side-info-label pxp-text-light">Founded in</div>
+                            <div class="pxp-single-job-side-info-data">2005</div>
                         </div>
-                        <div class="col-lg-6 col-xl-7 col-xxl-8">
-                            <div class="row">
-                                <div class="col-md-6 col-xl-4 col-xxl-3 mb-4">
-                                    <div class="pxp-footer-section">
-                                        <h3>For Candidates</h3>
-                                        <ul class="pxp-footer-list">
-                                            <li><a href="jobs-list-1.html">Find Jobs</a></li>
-                                            <li><a href="candidate-dashboard.html">Candidate Dashboard</a></li>
-                                            <li><a href="candidate-dashboard-applications.html">My Applications</a></li>
-                                            <li><a href="candidate-dashboard-fav-jobs.html">Favourite Jobs</a></li>
-                                            <li><a href="candidate-dashboard-inbox.html">My inbox</a></li>
-                                        </ul>
-                                    </div>
-                                </div>
-                                <div class="col-md-6 col-xl-4 col-xxl-3 mb-4">
-                                    <div class="pxp-footer-section">
-                                        <h3>For Employers</h3>
-                                        <ul class="pxp-footer-list">
-                                            <li><a href="candidates-list-1.html">Find Candidates</a></li>
-                                            <li><a href="company-dashboard.html">Company Dashboard</a></li>
-                                            <li><a href="company-dashboard-new-job.html">Post a Job</a></li>
-                                            <li><a href="company-dashboard-jobs.html">Manage Jobs</a></li>
-                                            <li><a href="company-dashboard-candidates.html">Candidates</a></li>
-                                        </ul>
-                                    </div>
-                                </div>
-                                <div class="col-md-6 col-xl-4 col-xxl-3 mb-4">
-                                    <div class="pxp-footer-section">
-                                        <h3>About Us</h3>
-                                        <ul class="pxp-footer-list">
-                                            <li><a href="about-us.html">About Us</a></li>
-                                            <li><a href="pricing.html">Pricing</a></li>
-                                            <li><a href="blog-list-1.html">Blog</a></li>
-                                            <li><a href="blog-list-1.html">Contact Us</a></li>
-                                        </ul>
-                                    </div>
-                                </div>
-                                <div class="col-md-6 col-xl-4 col-xxl-3 mb-4">
-                                    <div class="pxp-footer-section">
-                                        <h3>Helpful Resources</h3>
-                                        <ul class="pxp-footer-list">
-                                            <li><a href="faqs.html">FAQs</a></li>
-                                            <li><a href="sign-in.html">Sign In</a></li>
-                                            <li><a href="sign-up.html">Sign Up</a></li>
-                                            <li><a href="404.html">404 Page</a></li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
+                        <div class="mt-4">
+                            <div class="pxp-single-job-side-info-label pxp-text-light">Phone</div>
+                            <div class="pxp-single-job-side-info-data">{{ company_details.phone }}</div>
                         </div>
-                    </div>
-                </div>
-            </div>
-            <div class="pxp-main-footer-bottom" style="background-color: var(--pxpSecondaryColor);">
-                <div class="pxp-container">
-                    <div class="row justify-content-between align-items-center">
-                        <div class="col-lg-auto">
-                            <div class="pxp-footer-copyright pxp-text-light">© 2021 mpower. All Right Reserved.</div>
+                        <div class="mt-4">
+                            <div class="pxp-single-job-side-info-label pxp-text-light">Email</div>
+                            <div class="pxp-single-job-side-info-data">office@craftgenics.com</div>
                         </div>
-                        <div class="col-lg-auto">
-                            <div class="pxp-footer-social mt-3 mt-lg-0">
-                                <ul class="list-unstyled">
+                        <div class="mt-4">
+                            <div class="pxp-single-job-side-info-label pxp-text-light">Location</div>
+                            <div class="pxp-single-job-side-info-data">{{ company_details.location }}</div>
+                        </div>
+                        <div class="mt-4">
+                            <div class="pxp-single-job-side-info-label pxp-text-light">Website</div>
+                            <div class="pxp-single-job-side-info-data"><a href="#">www.craftgenics.com</a></div>
+                        </div>
+                        <div class="mt-4">
+                            <div class="pxp-single-job-side-info-data">
+                                <ul class="list-unstyled pxp-single-job-side-info-social">
                                     <li><a href="#"><span class="fa fa-facebook"></span></a></li>
                                     <li><a href="#"><span class="fa fa-twitter"></span></a></li>
                                     <li><a href="#"><span class="fa fa-instagram"></span></a></li>
@@ -408,85 +188,117 @@
                     </div>
                 </div>
             </div>
-        </footer>
+        </div>
+    </div>
+</section>
 
-        <div class="modal fade pxp-user-modal" id="pxp-signin-modal" aria-hidden="true" aria-labelledby="signinModal" tabindex="-1">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="pxp-user-modal-fig text-center">
-                            <img src="" alt="Sign in">
+<section class="mt-100">
+    <div class="pxp-container">
+        <h2 class="pxp-subsection-h2">Related Jobs</h2>
+        <p class="pxp-text-light">Other similar jobs that might interest you</p>
+
+        <div class="row mt-3 mt-md-4 pxp-animate-in pxp-animate-in-top pxp-in">
+            <div class="col-xl-6 pxp-jobs-card-2-container">
+                <div class="pxp-jobs-card-2 pxp-has-border">
+                    <div class="pxp-jobs-card-2-top">
+                        <a href="single-company-1.html" class="pxp-jobs-card-2-company-logo" style="background-image: url();"></a>
+                        <div class="pxp-jobs-card-2-info">
+                            <a href="single-job-1.html" class="pxp-jobs-card-2-title">Software Engineering Team Leader</a>
+                            <div class="pxp-jobs-card-2-details">
+                                <a href="jobs-list-1.html" class="pxp-jobs-card-2-location">
+                                    <span class="fa fa-globe"></span>Los Angeles, CA
+                                </a>
+                                <div class="pxp-jobs-card-2-type">Full-time</div>
+                            </div>
                         </div>
-                        <h5 class="modal-title text-center mt-4" id="signinModal">Welcome back!</h5>
-                        <form class="mt-4">
-                            <div class="form-floating mb-3">
-                                <input type="email" class="form-control" id="pxp-signin-email" placeholder="Email address">
-                                <label for="pxp-signin-email">Email address</label>
-                                <span class="fa fa-envelope-o"></span>
+                    </div>
+                    <div class="pxp-jobs-card-2-bottom">
+                        <a href="jobs-list-1.html" class="pxp-jobs-card-2-category">
+                            <div class="pxp-jobs-card-2-category-label">Project Management</div>
+                        </a>
+                        <div class="pxp-jobs-card-2-bottom-right">
+                            <span class="pxp-jobs-card-2-date pxp-text-light">3 days ago by</span> <a href="single-company-1.html" class="pxp-jobs-card-2-company">Craftgenics</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-6 pxp-jobs-card-2-container">
+                <div class="pxp-jobs-card-2 pxp-has-border">
+                    <div class="pxp-jobs-card-2-top">
+                        <a href="single-company-1.html" class="pxp-jobs-card-2-company-logo" style="background-image: url();"></a>
+                        <div class="pxp-jobs-card-2-info">
+                            <a href="single-job-1.html" class="pxp-jobs-card-2-title">Techincal Support Engineer</a>
+                            <div class="pxp-jobs-card-2-details">
+                                <a href="jobs-list-1.html" class="pxp-jobs-card-2-location">
+                                    <span class="fa fa-globe"></span>Paris, France
+                                </a>
+                                <div class="pxp-jobs-card-2-type">Full-time</div>
                             </div>
-                            <div class="form-floating mb-3">
-                                <input type="password" class="form-control" id="pxp-signin-password" placeholder="Password">
-                                <label for="pxp-signin-password">Password</label>
-                                <span class="fa fa-lock"></span>
+                        </div>
+                    </div>
+                    <div class="pxp-jobs-card-2-bottom">
+                        <a href="jobs-list-1.html" class="pxp-jobs-card-2-category">
+                            <div class="pxp-jobs-card-2-category-label">Customer Service</div>
+                        </a>
+                        <div class="pxp-jobs-card-2-bottom-right">
+                            <span class="pxp-jobs-card-2-date pxp-text-light">3 days ago by</span> <a href="single-company-1.html" class="pxp-jobs-card-2-company">Illuminate Studio</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-6 pxp-jobs-card-2-container">
+                <div class="pxp-jobs-card-2 pxp-has-border">
+                    <div class="pxp-jobs-card-2-top">
+                        <a href="single-company-1.html" class="pxp-jobs-card-2-company-logo" style="background-image: url();"></a>
+                        <div class="pxp-jobs-card-2-info">
+                            <a href="single-job-1.html" class="pxp-jobs-card-2-title">Javascript Developer</a>
+                            <div class="pxp-jobs-card-2-details">
+                                <a href="jobs-list-1.html" class="pxp-jobs-card-2-location">
+                                    <span class="fa fa-globe"></span>London, UK
+                                </a>
+                                <div class="pxp-jobs-card-2-type">Full-time</div>
                             </div>
-                            <a href="#" class="btn rounded-pill pxp-modal-cta">Continue</a>
-                            <div class="mt-4 text-center pxp-modal-small">
-                                <a href="#" class="pxp-modal-link">Forgot password</a>
+                        </div>
+                    </div>
+                    <div class="pxp-jobs-card-2-bottom">
+                        <a href="jobs-list-1.html" class="pxp-jobs-card-2-category">
+                            <div class="pxp-jobs-card-2-category-label">Software Engineering</div>
+                        </a>
+                        <div class="pxp-jobs-card-2-bottom-right">
+                            <span class="pxp-jobs-card-2-date pxp-text-light">3 days ago by</span> <a href="single-company-1.html" class="pxp-jobs-card-2-company">Syspresoft</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-6 pxp-jobs-card-2-container">
+                <div class="pxp-jobs-card-2 pxp-has-border">
+                    <div class="pxp-jobs-card-2-top">
+                        <a href="single-company-1.html" class="pxp-jobs-card-2-company-logo" style="background-image: url();"></a>
+                        <div class="pxp-jobs-card-2-info">
+                            <a href="single-job-1.html" class="pxp-jobs-card-2-title">Technical Writer</a>
+                            <div class="pxp-jobs-card-2-details">
+                                <a href="jobs-list-1.html" class="pxp-jobs-card-2-location">
+                                    <span class="fa fa-globe"></span>London, UK
+                                </a>
+                                <div class="pxp-jobs-card-2-type">Full-time</div>
                             </div>
-                            <div class="mt-4 text-center pxp-modal-small">
-                                New to mpower? <a role="button" class="" data-bs-target="#pxp-signup-modal" data-bs-toggle="modal" data-bs-dismiss="modal">Create an account</a>
-                            </div>
-                        </form>
+                        </div>
+                    </div>
+                    <div class="pxp-jobs-card-2-bottom">
+                        <a href="jobs-list-1.html" class="pxp-jobs-card-2-category">
+                            <div class="pxp-jobs-card-2-category-label">Business Development</div>
+                        </a>
+                        <div class="pxp-jobs-card-2-bottom-right">
+                            <span class="pxp-jobs-card-2-date pxp-text-light">3 days ago by</span> <a href="single-company-1.html" class="pxp-jobs-card-2-company">Gramware</a>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
+</section>
 
-        <div class="modal fade pxp-user-modal" id="pxp-signup-modal" aria-hidden="true" aria-labelledby="signupModal" tabindex="-1">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="pxp-user-modal-fig text-center">
-                            <img src="" alt="Sign up">
-                        </div>
-                        <h5 class="modal-title text-center mt-4" id="signupModal">Create an account</h5>
-                        <form class="mt-4">
-                            <div class="form-floating mb-3">
-                                <input type="email" class="form-control" id="pxp-signup-email" placeholder="Email address">
-                                <label for="pxp-signup-email">Email address</label>
-                                <span class="fa fa-envelope-o"></span>
-                            </div>
-                            <div class="form-floating mb-3">
-                                <input type="password" class="form-control" id="pxp-signup-password" placeholder="Create password">
-                                <label for="pxp-signup-password">Create password</label>
-                                <span class="fa fa-lock"></span>
-                            </div>
-                            <a href="#" class="btn rounded-pill pxp-modal-cta">Continue</a>
-                            <div class="mt-4 text-center pxp-modal-small">
-                                Already have an account? <a role="button" class="" data-bs-target="#pxp-signin-modal" data-bs-toggle="modal">Sign in</a>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
+       
+{% include "footer.html" %}
 
-        <script src="{% static 'js/jquery-3.4.1.min.js' %}"></script>
-        <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
-        <script src="{% static 'js/owl.carousel.min.js' %}"></script>
-        <script src="{% static 'js/nav.js' %}"></script>
-        <script src="{% static 'js/main.js' %}"></script>
-        <script>
-            $(document).ready(function () {
-                document.getElementById('blackcolor').style.color="black";
-            })
-        </script>
-    </body>
-</html>
 {% endblock %}
