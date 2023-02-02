@@ -1,26 +1,19 @@
 {% extends 'candidate-index.html' %}
 
 {% block title %}
-<title>mpower - Candidate dashboard - Favourite jobs</title>
+<title>mpower - Candidate dashboard - Suggestions</title>
 {% endblock %}
 
 {% block content %}
 {% load static %}
 
 <div class="pxp-dashboard-content-details">
-    <h1>Favourite Jobs</h1>
-    <p class="pxp-text-light">Detailed list of your favourite jobs.</p>
+    <h1>Suggestions</h1>
+    <p class="pxp-text-light">Detailed list of suggested jobs.</p>
 
     <div class="mt-4 mt-lg-5">
         <div class="row justify-content-between align-content-center">
             <div class="col-auto order-2 order-sm-1">
-                <div class="pxp-candidate-dashboard-jobs-bulk-actions mb-3">
-                    <select class="form-select" name="act">
-                        <option value="a">Bulk actions</option>
-                        <option value="b">Delete</option>
-                    </select>
-                    <button class="btn ms-2" onclick="multiple()">Apply</button>
-                </div>
             </div>
             <div class="col-auto order-1 order-sm-2">
                 <div class="pxp-candidate-dashboard-jobs-search mb-3">
@@ -38,7 +31,6 @@
             <table class="table table-hover align-middle" id="table">
                 <thead>
                     <tr>
-                        <th class="pxp-is-checkbox" style="width: 1%;"><input type="checkbox" onClick="toggle(this)" class="form-check-input" name="all"></th>
                         <th style="width: 25%;">Job</th>
                         <th style="width: 15%;">Company</th>
                         <th style="width: 20%;">Category</th>
@@ -50,7 +42,6 @@
                 <tbody>
                     {% for i in fav %}
                     <tr>
-                        <td><input type="checkbox" name="chek" class="form-check-input" value={{ i.like_id }}></td>
                         <td>
                             <a href="#">
                                 <div class="pxp-candidate-dashboard-job-title">{{ i.title }}</div>
@@ -60,13 +51,13 @@
                         <td><a href="#" class="pxp-candidate-dashboard-job-company">{{ i.ename }}</a></td>
                         <td><div class="pxp-candidate-dashboard-job-category">{{ i.fnarea }}</div></td>
                         <td><div class="pxp-candidate-dashboard-job-type">{{ i.jobtype }}</div></td>
-                        <td><div class="pxp-candidate-dashboard-job-date mt-1">{{ i.likedate }}</div></td>
+                        <td><div class="pxp-candidate-dashboard-job-date mt-1">{{ i.date_applied }}</div></td>
                         <td>
                             <div class="pxp-dashboard-table-options">
                                 <ul class="list-unstyled">
                                     <li><button title="Preview" onclick="loadermodal('{{i.jobid}}')" data-bs-target="#pxp-job-modal" data-bs-toggle="modal"><span class="fa fa-eye"></span></button></li>
                                     <input style="display: none" value={{i.like_id}}>
-                                    <li><button title="Delete" onclick="delfav({{i.like_id}})"><span class="fa fa-trash-o"></span></button></li>
+                                    {% comment %} <li><button title="Delete" onclick="delfav({{i.like_id}})"><span class="fa fa-trash-o"></span></button></li> {% endcomment %}
                                 </ul>
                             </div>
                         </td>
@@ -139,13 +130,13 @@ $(document).ready(function () {
     $('#das').removeClass('pxp-active');
     $('#edi').removeClass('pxp-active');
     $('#app').removeClass('pxp-active');
-    $('#fav').addClass('pxp-active');
+    $('#fav').removeClass('pxp-active');
     $('#cha').removeClass('pxp-active');
     $('#inb').removeClass('pxp-active');
     $('#not').removeClass('pxp-active');
     $('#res').removeClass('pxp-active');
     $('#fee').removeClass('pxp-active');
-    $('#sug').removeClass('pxp-active');
+    $('#sug').addClass('pxp-active');
 })
 
 var $rows = $('#table tbody tr');
@@ -157,83 +148,6 @@ $('#search').keyup(function() {
         return !~text.indexOf(val);
     }).hide();
 });
-
-$("[name='chek']").change(function(){
-    let a=0;
-    checkboxes = document.getElementsByName('chek');
-    let n=checkboxes.length
-    for(let i=0;i<n;i++) {
-      if(checkboxes[i].checked==false)
-      {
-        a=a+1;
-      }
-    }
-    if(a==0)
-    {
-        console.log("True")
-        $("[name=all]").prop('checked', true);
-    }
-    else
-    {
-        $("[name=all]").prop('checked', false);
-    }
-})
-function delfav(id)
-{
-    $.ajax(
-        {
-            type:"POST",
-            url: "",
-            data:{
-                    'like_id': id,
-                    csrfmiddlewaretoken: '{{ csrf_token }}'
-            },
-            success: function( data ) 
-            {
-                location.reload()
-            }
-    })
-}
-
-function multiple()
-{
-    let action=$("[name='act']").val();
-    if(action=='a')
-    {
-        alert("Please select an appropriate action")
-        return;
-    }
-    let ids=[];
-    $("[name='chek']:checked").map(function () {
-        ids.push(this.value);
-    })
-    if(ids.length==0)
-    {
-        alert("Please select at least one of the records to apply delete operation")
-        return;
-    }
-    $.ajax(
-        {
-            type:"POST",
-            url: "",
-            data:{
-                    'ids': ids,
-                    'act': "delall",
-                    csrfmiddlewaretoken: '{{ csrf_token }}'
-            },
-            success: function( data ) 
-            {
-                location.reload()
-            }
-    })
-}
-
-function toggle(source) {
-    checkboxes = document.getElementsByName('chek');
-    for(var i=0, n=checkboxes.length;i<n;i++) {
-      checkboxes[i].checked = source.checked;
-    }
-  }
 
 {% endblock %}
 

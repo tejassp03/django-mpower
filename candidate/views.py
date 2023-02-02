@@ -613,7 +613,44 @@ def applications(request, pk):
         page_obj = p.page(p.num_pages)
     return render(request, 'applications-candidate.html', {'pk': pk, 'all_app': page_obj, 'GET_params': GET_params})
 
+def suggestions(request, pk):
+    user_skills=JobSeeker.objects.get(user_id=pk)
+    user_skills=user_skills.skills.lower().split(",")
+    jobs_skills=Jobs.objects.all()
+    all_suggest=[]
+    for i in jobs_skills:
+        print(user_skills)
+        print(i.skills.lower().split(","))
+        if(any(j in user_skills for j in i.skills.lower().split(","))):
+            sugg = {}
+            sugg['jobid']=i.jobid
+            sugg['title']=i.title
+            sugg['location']=i.location
+            sugg['fnarea']=i.fnarea
+            sugg['jobtype']=i.jobtype
+            sugg['date_applied']=i.postdate
+            emp=Employer.objects.get(eid=i.eid.eid)
+            sugg['ename']=emp.ename
+            sugg['eid']=emp.eid
+            all_suggest.append(sugg)
+    count=len(all_suggest)
+    GET_params = request.GET.copy()
+    if('page' in GET_params):
+        last=GET_params['page'][-1]
+        GET_params['page']=last[0]
+    p=Paginator(all_suggest, 5)
+    page_number = request.GET.get('page')
+    try:
+        page_obj = p.get_page(page_number)
+    except PageNotAnInteger:
+        page_obj = p.page(1)
+    except EmptyPage:
+        page_obj = p.page(p.num_pages)
+    return render(request, 'suggestions-candidate.html', {'pk': pk, 'fav': page_obj, 'count': count, 'pe': page_obj, 'GET_params': GET_params})
 
 def logout(request, pk):
+    user=Login.objects.get(log_id=JobSeeker.objects.get(user_id=pk).log_id.log_id)
+    user.status=0
+    user.save()
     request.session.flush()
     return redirect('main:index')

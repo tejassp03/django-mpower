@@ -68,6 +68,7 @@ class Jobs(models.Model):
     profile = models.CharField(max_length=700, default=None, null=True)
     postdate = models.DateField(default=timezone.now)
     jobtype = models.CharField(max_length=50, default="Full Time")
+    skills = models.CharField(max_length=700, default=None, null=True)
     class Meta:
         db_table = "jobs"
 

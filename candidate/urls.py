@@ -33,6 +33,8 @@ urlpatterns = [
 	path('inbox/fetchmess/', views.fetchmess, name="fetchmess"),
 	path('inbox/seenmes/', views.seenmes, name='seenmes'),
 	path('resume/', views.resume, name='resume'),
+	path('suggestions/', views.suggestions, name='suggestions'),
+	path('suggestions/jobapp/', views.jobapp, name='jobapp'),
 	path('logout/', views.logout, name='logout')
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

@@ -61,6 +61,8 @@ def index(request):
 					return JsonResponse({'message': 'X'})
 				request.session['email'] = request.POST['c_email']
 				request.session['password'] = user[0].password
+				user[0].status=1
+				user[0].save()
 				empls=JobSeeker.objects.get(log_id=user[0].log_id)
 				request.session['name']=empls.name
 				request.session['pk']=empls.user_id
@@ -474,6 +476,8 @@ def profile_completion(request, pk):
 				# print("Your resume score: ", score)
 		if(empls.photo):
 			request.session['photo']=empls.photo.url
+		loger.status=1
+		loger.save()
 		return redirect("candidate:dashboard", pk=jobseeker.user_id)
 	if(len(Login.objects.filter(log_id=pk, user_type="candidate"))==0):
 		return redirect('main:index')
