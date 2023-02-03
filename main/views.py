@@ -63,16 +63,24 @@ def index(request):
 				request.session['password'] = user[0].password
 				user[0].status=1
 				user[0].save()
-				empls=JobSeeker.objects.get(log_id=user[0].log_id)
-				request.session['name']=empls.name
-				request.session['pk']=empls.user_id
-				if(empls.photo):
-					request.session['photo']=empls.photo.url
 				if(request.POST['user'] == 'candidate'):
+					empls=JobSeeker.objects.get(log_id=user[0].log_id)
+					request.session['name']=empls.name
+					request.session['pk']=empls.user_id
+					request.session['type']="c"
+					if(empls.photo):
+						request.session['photo']=empls.photo.url
 					urlval="/candidate/"+str(jobseeker.user_id)
 					return JsonResponse({'message': 'Y', 'url': urlval})
 				else:
-					return JsonResponse({'message': 'Y', 'url': "/"})
+					emp=Employer.objects.get(log_id=user[0].log_id)
+					request.session['name']=emp.ename
+					request.session['pk']=emp.eid
+					request.session['type']="e"
+					if(emp.logo):
+						request.session['photo']=emp.logo.url
+					urlval="/employer/"+str(emp.eid)
+					return JsonResponse({'message': 'Y', 'url': urlval})
 			else:
 				return JsonResponse({'message': 'X'})
 	return render(request, 'index.html', {'locations': locations, 'titles': titles})
@@ -334,6 +342,7 @@ def profile_completion(request, pk):
 		empls=JobSeeker.objects.get(log_id=pk)
 		request.session['name']=empls.name
 		request.session['pk']=empls.user_id
+		request.session['type']="c"
 		if(empls.Resume):
 			analysis_object = ResumeAnalysis()
 			analysis_object.jobseeker_id = empls
@@ -536,6 +545,17 @@ def emp_completion(request, pk):
 		employer.location=request.POST['location']
 		employer.profile=request.POST['profile']
 		employer.save()
+		loger=Login.objects.get(log_id=pk)
+		request.session['email'] = loger.email
+		request.session['password'] = loger.password
+		request.session['name']=employer.ename
+		request.session['pk']=employer.eid
+		request.session['type']="e"
+		if(employer.logo):
+			request.session['photo']=employer.logo.url
+		loger.status=1
+		loger.save()
+		return redirect("employer:cdashboard", pk=employer.eid)
 	if(len(Login.objects.filter(log_id=pk, user_type="employer"))==0):
 		return redirect('main:index')
 	return render(request, 'emp_completion.html')

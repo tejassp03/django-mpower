@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'main.apps.MainConfig',
     'candidate.apps.CandidateConfig',
+    'employer.apps.EmployerConfig',
     'django.contrib.humanize'
     
 ]
