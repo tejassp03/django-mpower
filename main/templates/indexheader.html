@@ -12,6 +12,7 @@
             </div>
             <div class="sig">
                 {% if 'email' in request.session %}
+                {% if request.session.type == "c" %}
                 <div class="dropdown pxp-user-nav-dropdown">
                     <a href="index.html" class="dropdown-toggle" data-bs-toggle="dropdown">
                         {% if request.session.photo %}
@@ -27,6 +28,23 @@
                         <li><a class="dropdown-item" href="{% url 'candidate:logout' pk=request.session.pk  %}">Logout</a></li>
                     </ul>
                 </div>
+                {% else %}
+                <div class="dropdown pxp-user-nav-dropdown">
+                    <a href="index.html" class="dropdown-toggle" data-bs-toggle="dropdown">
+                        {% if request.session.photo %}
+                        <div class="pxp-user-nav-avatar pxp-cover" style="background-image: url('{{ request.session.photo }}')"></div>
+                        {% else %}
+                        <div class="pxp-user-nav-avatar pxp-cover"><div id="profileImage" class="profileimage"></div></div>
+                        {% endif %}
+                        <div class="pxp-user-nav-name d-none d-md-block" id="blackcolor">{{ request.session.name }}</div>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="{% url 'employer:cdashboard' pk=request.session.pk %}">Dashboard</a></li>
+                        <li><a class="dropdown-item" href="{% url 'employer:cedit' pk=request.session.pk %}">Edit profile</a></li>
+                        <li><a class="dropdown-item" href="{% url 'employer:clogout' pk=request.session.pk  %}">Logout</a></li>
+                    </ul>
+                </div>
+                {% endif %}
                 {% else %}
                 <a id="signin" role="button" class="btn rounded-pill pxp-user-nav-trigger pxp-on-light" data-bs-target="#pxp-signin-modal" data-bs-toggle="modal">Sign in</a>
                 {% endif %}
@@ -167,6 +185,7 @@
                 <a ref="{% url 'main:postjob' %}" class="btn rounded-pill pxp-nav-btn">Post a Job</a>
                 
                 {% if 'email' in request.session %}
+                {% if request.session.type == "c" %}
                 <div class="dropdown pxp-user-nav-dropdown">
                         <a href="index.html" class="dropdown-toggle" data-bs-toggle="dropdown">
                             {% if request.session.photo %}
@@ -182,6 +201,23 @@
                             <li><a class="dropdown-item" href="{% url 'candidate:logout' pk=request.session.pk  %}">Logout</a></li>
                         </ul>
                     </div>
+                    {% else %}
+                    <div class="dropdown pxp-user-nav-dropdown">
+                        <a href="index.html" class="dropdown-toggle" data-bs-toggle="dropdown">
+                            {% if request.session.photo %}
+                            <div class="pxp-user-nav-avatar pxp-cover" style="background-image: url('{{ request.session.photo }}')"></div>
+                            {% else %}
+                            <div class="pxp-user-nav-avatar pxp-cover"><div id="profileImage" class="profileimage"></div></div>
+                            {% endif %}
+                            <div class="pxp-user-nav-name d-none d-md-block" id="blackcolor">{{ request.session.name }}</div>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="{% url 'employer:cdashboard' pk=request.session.pk %}">Dashboard</a></li>
+                            <li><a class="dropdown-item" href="{% url 'employer:cedit' pk=request.session.pk %}">Edit profile</a></li>
+                            <li><a class="dropdown-item" href="{% url 'employer:clogout' pk=request.session.pk  %}">Logout</a></li>
+                        </ul>
+                    </div>
+                    {% endif %}
                 {% else %}
                 {% comment %} <a class="btn rounded-pill pxp-user-nav-trigger pxp-on-light"  href="{% url 'main:user_login' %}" role="button">Sign in</a> {% endcomment %}
                 <a id="signin" role="button" class="btn rounded-pill pxp-user-nav-trigger pxp-on-light" data-bs-target="#pxp-signin-modal" data-bs-toggle="modal">Sign in</a>

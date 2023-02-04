@@ -397,3 +397,18 @@
 </div>
 
 {% endblock content%}
+
+{% block script %}
+$(document).ready(function () {
+    $('#cdas').addClass('pxp-active');
+    $('#cedi').removeClass('pxp-active');
+    $('#cnew').removeClass('pxp-active');
+    $('#cman').removeClass('pxp-active');
+    $('#ccan').removeClass('pxp-active');
+    $('#csub').removeClass('pxp-active');
+    $('#ccha').removeClass('pxp-active');
+    $('#cinb').removeClass('pxp-active');
+    $('#cnot').removeClass('pxp-active');
+})
+
+{% endblock %}

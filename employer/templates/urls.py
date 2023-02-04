@@ -15,6 +15,5 @@ urlpatterns = [
 	path('change_pass/', views.change_pass, name='change_pass'),
 	path('cinbox/', views.cinbox, name='cinbox'),
 	path('cnotifications/', views.cnotifications, name='cnotifications'),
-	path('logout/', views.logout, name='clogout'),
 	path('under_development/', views.under_development, name='under_development'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
