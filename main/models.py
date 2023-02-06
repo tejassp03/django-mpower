@@ -48,7 +48,16 @@ class Employer(models.Model):
     phone = models.CharField(max_length=100, default=None, null=True)
     location = models.CharField(max_length=200, default=None, null=True)
     profile = models.CharField(max_length=700, default=None, null=True)
-    logo = models.ImageField(upload_to='logos/', default=None, null=True)
+    logo = models.ImageField(upload_to='logos/', default=None, blank=True, null=True)
+    website = models.CharField(max_length=100, blank=True, null=True)
+    yearfounded = models.CharField(max_length=10, default=None, null=True)
+    size = models.CharField(max_length=20, default=None, null=True)
+    city = models.CharField(max_length=30, default=None, null=True)
+    fblink = models.CharField(max_length=100, default=None, null=True)
+    twlink = models.CharField(max_length=100, default=None, null=True)
+    inlink = models.CharField(max_length=100, default=None, null=True)
+    lnlink = models.CharField(max_length=100, default=None, null=True)
+    cover = models.ImageField(upload_to='cover/', default=None, blank=True, null=True)
     class Meta:
         db_table = "employer"
 
@@ -76,6 +85,7 @@ class Jobs(models.Model):
 class Application(models.Model):
     apply_id = models.AutoField(primary_key=True)
     user_id = models.ForeignKey(JobSeeker, default=None, null=True, on_delete=models.CASCADE)
+    eid = models.ForeignKey(Employer, default=None, null=True, on_delete=models.CASCADE)
     job_id = models.ForeignKey(Jobs, default=None, null=True, on_delete=models.CASCADE)
     status = models.IntegerField(default=None, null=True)
     date_applied = models.DateTimeField(default=timezone.now)
@@ -117,6 +127,7 @@ class ProfileVisits(models.Model):
     user_id = models.ForeignKey(JobSeeker, default=None, null=True, on_delete=models.DO_NOTHING)
     e_id = models.ForeignKey(Employer, default=None, null=True, on_delete=models.DO_NOTHING)
     visiting_time = models.DateTimeField(default=timezone.now)
+    user_type = models.CharField(max_length=5, default=None, null=True)
     class Meta:
         db_table = "profilevisits"
     
@@ -169,6 +180,7 @@ class Notifications(models.Model):
     datetime = models.DateTimeField(default=timezone.now)
     notif_type = models.CharField(max_length=10, default=None, null=True)
     readed = models.BooleanField(default=False)
+    job_id = models.ForeignKey(Jobs, on_delete=models.CASCADE, blank=True, null=True, related_name='notif_job')
     class Meta:
         db_table = "notifications"
 

@@ -26,21 +26,21 @@
             </div>
             <div class="col-auto order-1 order-sm-2">
                 <div class="pxp-company-dashboard-jobs-search mb-3">
-                    <div class="pxp-company-dashboard-jobs-search-results me-3">16 candidates</div>
+                    <div class="pxp-company-dashboard-jobs-search-results me-3">{{ count }} candidates</div>
                     <div class="pxp-company-dashboard-jobs-search-search-form">
                         <div class="input-group">
                             <span class="input-group-text"><span class="fa fa-search"></span></span>
-                            <input type="text" class="form-control" placeholder="Search candidates...">
+                            <input type="text" class="form-control" placeholder="Search candidates..." id="search">
                         </div>
                     </div>
                 </div>
             </div>
         </div>
         <div class="table-responsive">
-            <table class="table table-hover align-middle">
+            <table class="table table-hover align-middle" id="table">
                 <thead>
                     <tr>
-                        <th class="pxp-is-checkbox" style="width: 1%;"><input type="checkbox" class="form-check-input"></th>
+                        <th class="pxp-is-checkbox" style="width: 1%;"><input type="checkbox" onClick="toggle(this)" class="form-check-input" name="all"></th>
                         <th colspan="2" style="width: 25%;">Name</th>
                         <th style="width: 20%;">Applied for</th>
                         <th style="width: 15%;">Status</th>
@@ -49,21 +49,30 @@
                     </tr>
                 </thead>
                 <tbody>
+                    {% for i in pe %}
                     <tr>
-                        <td><input type="checkbox" class="form-check-input"></td>
+                        <td><input type="checkbox" class="form-check-input" name="chek"></td>
                         <td style="width: 3%;">
-                            <div class="pxp-company-dashboard-candidate-avatar pxp-cover" style="background-image: url();"></div>
+                            {% if i.photo %}
+                            <div class="pxp-company-dashboard-candidate-avatar pxp-cover" style="background-image: url('{{i.photo.url}}');"></div>
+                            {% else %}
+                            <div class="pxp-company-dashboard-candidate-avatar pxp-cover" style="background-image: url('/static/images/company-logo-1.png');"></div>
+                            {% endif %}
                         </td>
                         <td>
                             <a href="#">
-                                <div class="pxp-company-dashboard-job-title">Scott Goodwin</div>
-                                <div class="pxp-company-dashboard-job-location"><span class="fa fa-globe me-1"></span>San Francisco, CA</div>
+                                <div class="pxp-company-dashboard-job-title">{{ i.name }}</div>
+                                {% if i.location %}
+                                <div class="pxp-company-dashboard-job-location"><span class="fa fa-globe me-1"></span>{{ i.location }}</div>
+                                {% else %}
+                                <div class="pxp-company-dashboard-job-location"><span class="fa fa-globe me-1"></span>Not Specified</div>
+                                {% endif %}
                             </a>
                         </td>
                         <td><div class="pxp-company-dashboard-job-category">Software Developer</div></td>
                         <td><div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-success">Approved</span></div></td>
                         <td>
-                            <div class="pxp-company-dashboard-job-date">2020/08/24 at 11:56 am</div>
+                            <div class="pxp-company-dashboard-job-date">{{ i.date_applied }}</div>
                         </td>
                         <td>
                             <div class="pxp-dashboard-table-options">
@@ -77,258 +86,7 @@
                             </div>
                         </td>
                     </tr>
-                    <tr>
-                        <td><input type="checkbox" class="form-check-input"></td>
-                        <td style="width: 3%;">
-                            <div class="pxp-company-dashboard-candidate-avatar pxp-cover" style="background-image: url();"></div>
-                        </td>
-                        <td>
-                            <a href="#">
-                                <div class="pxp-company-dashboard-job-title">Kenneth Spiers</div>
-                                <div class="pxp-company-dashboard-job-location"><span class="fa fa-globe me-1"></span>London, UK</div>
-                            </a>
-                        </td>
-                        <td><div class="pxp-company-dashboard-job-category">Marketing Expert</div></td>
-                        <td><div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-danger">Rejected</span></div></td>
-                        <td>
-                            <div class="pxp-company-dashboard-job-date">2020/08/24 at 11:56 am</div>
-                        </td>
-                        <td>
-                            <div class="pxp-dashboard-table-options">
-                                <ul class="list-unstyled">
-                                    <li><button title="View profile"><span class="fa fa-eye"></span></button></li>
-                                    <li><button title="Send message"><span class="fa fa-envelope-o"></span></button></li>
-                                    <li><button title="Approve"><span class="fa fa-check"></span></button></li>
-                                    <li><button title="Reject"><span class="fa fa-ban"></span></button></li>
-                                    <li><button title="Delete"><span class="fa fa-trash-o"></span></button></li>
-                                </ul>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><input type="checkbox" class="form-check-input"></td>
-                        <td style="width: 3%;">
-                            <div class="pxp-company-dashboard-candidate-avatar pxp-cover" style="background-image: url();"></div>
-                        </td>
-                        <td>
-                            <a href="#">
-                                <div class="pxp-company-dashboard-job-title">Rebecca Eason</div>
-                                <div class="pxp-company-dashboard-job-location"><span class="fa fa-globe me-1"></span>Paris, France</div>
-                            </a>
-                        </td>
-                        <td><div class="pxp-company-dashboard-job-category">Architect</div></td>
-                        <td><div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-secondary">N/A</span></div></td>
-                        <td>
-                            <div class="pxp-company-dashboard-job-date">2020/08/24 at 11:56 am</div>
-                        </td>
-                        <td>
-                            <div class="pxp-dashboard-table-options">
-                                <ul class="list-unstyled">
-                                    <li><button title="View profile"><span class="fa fa-eye"></span></button></li>
-                                    <li><button title="Send message"><span class="fa fa-envelope-o"></span></button></li>
-                                    <li><button title="Approve"><span class="fa fa-check"></span></button></li>
-                                    <li><button title="Reject"><span class="fa fa-ban"></span></button></li>
-                                    <li><button title="Delete"><span class="fa fa-trash-o"></span></button></li>
-                                </ul>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><input type="checkbox" class="form-check-input"></td>
-                        <td style="width: 3%;">
-                            <div class="pxp-company-dashboard-candidate-avatar pxp-cover" style="background-image: url();"></div>
-                        </td>
-                        <td>
-                            <a href="#">
-                                <div class="pxp-company-dashboard-job-title">Susanne Weil</div>
-                                <div class="pxp-company-dashboard-job-location"><span class="fa fa-globe me-1"></span>Los Angeles, CA</div>
-                            </a>
-                        </td>
-                        <td><div class="pxp-company-dashboard-job-category">UI Designer</div></td>
-                        <td><div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-success">Approved</span></div></td>
-                        <td>
-                            <div class="pxp-company-dashboard-job-date">2020/08/24 at 11:56 am</div>
-                        </td>
-                        <td>
-                            <div class="pxp-dashboard-table-options">
-                                <ul class="list-unstyled">
-                                    <li><button title="View profile"><span class="fa fa-eye"></span></button></li>
-                                    <li><button title="Send message"><span class="fa fa-envelope-o"></span></button></li>
-                                    <li><button title="Approve"><span class="fa fa-check"></span></button></li>
-                                    <li><button title="Reject"><span class="fa fa-ban"></span></button></li>
-                                    <li><button title="Delete"><span class="fa fa-trash-o"></span></button></li>
-                                </ul>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><input type="checkbox" class="form-check-input"></td>
-                        <td style="width: 3%;">
-                            <div class="pxp-company-dashboard-candidate-avatar pxp-cover" style="background-image: url();"></div>
-                        </td>
-                        <td>
-                            <a href="#">
-                                <div class="pxp-company-dashboard-job-title">Scott Goodwin</div>
-                                <div class="pxp-company-dashboard-job-location"><span class="fa fa-globe me-1"></span>San Francisco, CA</div>
-                            </a>
-                        </td>
-                        <td><div class="pxp-company-dashboard-job-category">Software Developer</div></td>
-                        <td><div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-success">Approved</span></div></td>
-                        <td>
-                            <div class="pxp-company-dashboard-job-date">2020/08/24 at 11:56 am</div>
-                        </td>
-                        <td>
-                            <div class="pxp-dashboard-table-options">
-                                <ul class="list-unstyled">
-                                    <li><button title="View profile"><span class="fa fa-eye"></span></button></li>
-                                    <li><button title="Send message"><span class="fa fa-envelope-o"></span></button></li>
-                                    <li><button title="Approve"><span class="fa fa-check"></span></button></li>
-                                    <li><button title="Reject"><span class="fa fa-ban"></span></button></li>
-                                    <li><button title="Delete"><span class="fa fa-trash-o"></span></button></li>
-                                </ul>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><input type="checkbox" class="form-check-input"></td>
-                        <td style="width: 3%;">
-                            <div class="pxp-company-dashboard-candidate-avatar pxp-cover" style="background-image: url();"></div>
-                        </td>
-                        <td>
-                            <a href="#">
-                                <div class="pxp-company-dashboard-job-title">Kenneth Spiers</div>
-                                <div class="pxp-company-dashboard-job-location"><span class="fa fa-globe me-1"></span>London, UK</div>
-                            </a>
-                        </td>
-                        <td><div class="pxp-company-dashboard-job-category">Marketing Expert</div></td>
-                        <td><div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-danger">Rejected</span></div></td>
-                        <td>
-                            <div class="pxp-company-dashboard-job-date">2020/08/24 at 11:56 am</div>
-                        </td>
-                        <td>
-                            <div class="pxp-dashboard-table-options">
-                                <ul class="list-unstyled">
-                                    <li><button title="View profile"><span class="fa fa-eye"></span></button></li>
-                                    <li><button title="Send message"><span class="fa fa-envelope-o"></span></button></li>
-                                    <li><button title="Approve"><span class="fa fa-check"></span></button></li>
-                                    <li><button title="Reject"><span class="fa fa-ban"></span></button></li>
-                                    <li><button title="Delete"><span class="fa fa-trash-o"></span></button></li>
-                                </ul>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><input type="checkbox" class="form-check-input"></td>
-                        <td style="width: 3%;">
-                            <div class="pxp-company-dashboard-candidate-avatar pxp-cover" style="background-image: url();"></div>
-                        </td>
-                        <td>
-                            <a href="#">
-                                <div class="pxp-company-dashboard-job-title">Rebecca Eason</div>
-                                <div class="pxp-company-dashboard-job-location"><span class="fa fa-globe me-1"></span>Paris, France</div>
-                            </a>
-                        </td>
-                        <td><div class="pxp-company-dashboard-job-category">Architect</div></td>
-                        <td><div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-secondary">N/A</span></div></td>
-                        <td>
-                            <div class="pxp-company-dashboard-job-date">2020/08/24 at 11:56 am</div>
-                        </td>
-                        <td>
-                            <div class="pxp-dashboard-table-options">
-                                <ul class="list-unstyled">
-                                    <li><button title="View profile"><span class="fa fa-eye"></span></button></li>
-                                    <li><button title="Send message"><span class="fa fa-envelope-o"></span></button></li>
-                                    <li><button title="Approve"><span class="fa fa-check"></span></button></li>
-                                    <li><button title="Reject"><span class="fa fa-ban"></span></button></li>
-                                    <li><button title="Delete"><span class="fa fa-trash-o"></span></button></li>
-                                </ul>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><input type="checkbox" class="form-check-input"></td>
-                        <td style="width: 3%;">
-                            <div class="pxp-company-dashboard-candidate-avatar pxp-cover" style="background-image: url();"></div>
-                        </td>
-                        <td>
-                            <a href="#">
-                                <div class="pxp-company-dashboard-job-title">Susanne Weil</div>
-                                <div class="pxp-company-dashboard-job-location"><span class="fa fa-globe me-1"></span>Los Angeles, CA</div>
-                            </a>
-                        </td>
-                        <td><div class="pxp-company-dashboard-job-category">UI Designer</div></td>
-                        <td><div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-success">Approved</span></div></td>
-                        <td>
-                            <div class="pxp-company-dashboard-job-date">2020/08/24 at 11:56 am</div>
-                        </td>
-                        <td>
-                            <div class="pxp-dashboard-table-options">
-                                <ul class="list-unstyled">
-                                    <li><button title="View profile"><span class="fa fa-eye"></span></button></li>
-                                    <li><button title="Send message"><span class="fa fa-envelope-o"></span></button></li>
-                                    <li><button title="Approve"><span class="fa fa-check"></span></button></li>
-                                    <li><button title="Reject"><span class="fa fa-ban"></span></button></li>
-                                    <li><button title="Delete"><span class="fa fa-trash-o"></span></button></li>
-                                </ul>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><input type="checkbox" class="form-check-input"></td>
-                        <td style="width: 3%;">
-                            <div class="pxp-company-dashboard-candidate-avatar pxp-cover" style="background-image: url();"></div>
-                        </td>
-                        <td>
-                            <a href="#">
-                                <div class="pxp-company-dashboard-job-title">Scott Goodwin</div>
-                                <div class="pxp-company-dashboard-job-location"><span class="fa fa-globe me-1"></span>San Francisco, CA</div>
-                            </a>
-                        </td>
-                        <td><div class="pxp-company-dashboard-job-category">Software Developer</div></td>
-                        <td><div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-success">Approved</span></div></td>
-                        <td>
-                            <div class="pxp-company-dashboard-job-date">2020/08/24 at 11:56 am</div>
-                        </td>
-                        <td>
-                            <div class="pxp-dashboard-table-options">
-                                <ul class="list-unstyled">
-                                    <li><button title="View profile"><span class="fa fa-eye"></span></button></li>
-                                    <li><button title="Send message"><span class="fa fa-envelope-o"></span></button></li>
-                                    <li><button title="Approve"><span class="fa fa-check"></span></button></li>
-                                    <li><button title="Reject"><span class="fa fa-ban"></span></button></li>
-                                    <li><button title="Delete"><span class="fa fa-trash-o"></span></button></li>
-                                </ul>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><input type="checkbox" class="form-check-input"></td>
-                        <td style="width: 3%;">
-                            <div class="pxp-company-dashboard-candidate-avatar pxp-cover" style="background-image: url();"></div>
-                        </td>
-                        <td>
-                            <a href="#">
-                                <div class="pxp-company-dashboard-job-title">Kenneth Spiers</div>
-                                <div class="pxp-company-dashboard-job-location"><span class="fa fa-globe me-1"></span>London, UK</div>
-                            </a>
-                        </td>
-                        <td><div class="pxp-company-dashboard-job-category">Marketing Expert</div></td>
-                        <td><div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-danger">Rejected</span></div></td>
-                        <td>
-                            <div class="pxp-company-dashboard-job-date">2020/08/24 at 11:56 am</div>
-                        </td>
-                        <td>
-                            <div class="pxp-dashboard-table-options">
-                                <ul class="list-unstyled">
-                                    <li><button title="View profile"><span class="fa fa-eye"></span></button></li>
-                                    <li><button title="Send message"><span class="fa fa-envelope-o"></span></button></li>
-                                    <li><button title="Approve"><span class="fa fa-check"></span></button></li>
-                                    <li><button title="Reject"><span class="fa fa-ban"></span></button></li>
-                                    <li><button title="Delete"><span class="fa fa-trash-o"></span></button></li>
-                                </ul>
-                            </div>
-                        </td>
-                    </tr>
+                    {% endfor %}
                 </tbody>
             </table>
 
@@ -336,11 +94,51 @@
                 <div class="col-auto">
                     <nav class="mt-3 mt-sm-0" aria-label="Candidates pagination">
                         <ul class="pagination pxp-pagination">
-                            <li class="page-item active" aria-current="page">
-                                <span class="page-link">1</span>
-                            </li>
-                            <li class="page-item"><a class="page-link" href="#">2</a></li>
-                            <li class="page-item"><a class="page-link" href="#">3</a></li>
+                            {% if pe.has_previous %}
+                                {% if GET_params %}
+                                <li class="page-item"><a href="?{{GET_params.urlencode}}&amp;page={{pe.previous_page_number}}" class="page-link"><i class="fa fa-chevron-left" aria-hidden="true"></i></a></li>
+                                {% else %}
+                                <li class="page-item"><a href="?page={{pe.previous_page_number}}" class="page-link"><i class="fa fa-chevron-left" aria-hidden="true"></i></a></li>
+                                {% endif %}
+                            {% endif %}
+
+                            {% if pe.number|add:'-4' > 1 %}
+                                {% if GET_params %}
+                                <li class="page-item"><a href="?{{GET_params.urlencode}}&amp;page={{ pe.number|add:'-5' }}" class="page-link">&hellip;</a></li>
+                                {% else %}
+                                <li class="page-item"><a href="?page={{ pe.number|add:'-5' }}" class="page-link">&hellip;</a></li>
+                                {% endif %}
+                            {% endif %}
+
+                            {% for i in pe.paginator.page_range %}
+                                {% if pe.number == i %}
+                                    <li class="page-item active" aria-current="page">
+                                        <span class="page-link">{{pe.number}}</span>
+                                    </li>
+                                {% elif i > pe.number|add:'-5' and i < pe.number|add:'5' %}
+                                    {% if GET_params %}
+                                    <li class="page-item"><a href="?{{GET_params.urlencode}}&amp;page={{ i }}" class="page-link">{{i}}</a></li>
+                                    {% else %}
+                                    <li class="page-item"><a href="?page={{ i }}" class="page-link">{{i}}</a></li>
+                                    {% endif %}
+                                {% endif %}
+                            {% endfor %}
+
+                            {% if pe.paginator.num_pages > pe.number|add:'4' %}
+                                {% if GET_params %}
+                                <li class="page-item"><a href="?{{GET_params.urlencode}}&amp;page={{ pe.number|add:'5' }}" class="page-link">&hellip;</a></li>
+                                {% else %}
+                                <li class="page-item"><a href="?page={{ pe.number|add:'5' }}" class="page-link">&hellip;</a></li>
+                                {% endif %}
+                            {% endif %}
+
+                            {% if pe.has_next %}
+                                {% if GET_params %}
+                                <li class="page-item"><a href="?{{GET_params.urlencode}}&amp;page={{ pe.next_page_number }}" class="page-link"><i class="fa fa-chevron-right" aria-hidden="true"></i></a></li>
+                                {% else %}
+                                <li class="page-item"><a href="?page={{pe.next_page_number}}" class="page-link"><i class="fa fa-chevron-right" aria-hidden="true"></i></a></li>
+                                {% endif %}
+                            {% endif %}
                         </ul>
                     </nav>
                 </div>
@@ -365,5 +163,43 @@ $(document).ready(function () {
     $('#cinb').removeClass('pxp-active');
     $('#cnot').removeClass('pxp-active');
 })
+
+var $rows = $('#table tbody tr');
+$('#search').keyup(function() {
+    var val = $.trim($(this).val()).replace(/ +/g, ' ').toLowerCase();
+    
+    $rows.show().filter(function() {
+        var text = $(this).text().replace(/\s+/g, ' ').toLowerCase();
+        return !~text.indexOf(val);
+    }).hide();
+});
+
+
+$("[name='chek']").change(function(){
+    let a=0;
+    checkboxes = document.getElementsByName('chek');
+    let n=checkboxes.length
+    for(let i=0;i<n;i++) {
+      if(checkboxes[i].checked==false)
+      {
+        a=a+1;
+      }
+    }
+    if(a==0)
+    {
+        console.log("True")
+        $("[name=all]").prop('checked', true);
+    }
+    else
+    {
+        $("[name=all]").prop('checked', false);
+    }
+})
+function toggle(source) {
+    checkboxes = document.getElementsByName('chek');
+    for(var i=0, n=checkboxes.length;i<n;i++) {
+      checkboxes[i].checked = source.checked;
+    }
+  }
 
 {% endblock %}

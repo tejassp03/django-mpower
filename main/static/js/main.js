@@ -264,160 +264,160 @@
     });
 
     // Company dashboard charts
-    if ($('#pxp-company-dashboard-visits-chart').length > 0) {
-        var companyVisitsChartElem = document.getElementById('pxp-company-dashboard-visits-chart').getContext('2d');
+    // if ($('#pxp-company-dashboard-visits-chart').length > 0) {
+    //     var companyVisitsChartElem = document.getElementById('pxp-company-dashboard-visits-chart').getContext('2d');
 
-        var gradient = companyVisitsChartElem.createLinearGradient(0, 250, 0, 0);
-        gradient.addColorStop(0, 'rgba(255, 255, 255, 0)');
-        gradient.addColorStop(.5, 'rgba(0, 112, 201, 0.09)');
-        gradient.addColorStop(1, 'rgba(0, 112, 201, 0.12)');
+    //     var gradient = companyVisitsChartElem.createLinearGradient(0, 250, 0, 0);
+    //     gradient.addColorStop(0, 'rgba(255, 255, 255, 0)');
+    //     gradient.addColorStop(.5, 'rgba(0, 112, 201, 0.09)');
+    //     gradient.addColorStop(1, 'rgba(0, 112, 201, 0.12)');
 
-        var companyVisitsChart = new Chart(companyVisitsChartElem, {
-            type: 'line',
-            data: {
-                labels: ['Oct 06', 'Oct 07', 'Oct 08', 'Oct 09', 'Oct 10', 'Oct 11', 'Oct 12'],
-                datasets: [{
-                    label: 'Visits',
-                    data: [12, 56, 34, 78, 38, 28, 54],
-                    borderWidth: 3,
-                    borderColor: 'rgba(0, 112, 201, 1)',
-                    pointBackgroundColor: 'rgba(255, 255, 255, 0)',
-                    pointHoverBackgroundColor: 'rgba(255, 255, 255, 1)',
-                    pointBorderColor: 'rgba(66, 133, 244, 0)',
-                    pointHoverBorderColor: 'rgba(0, 112, 201, 1)',
-                    pointBorderWidth: 10,
-                    pointHoverBorderWidth: 3,
-                    pointHitRadius: 20,
-                    cubicInterpolationMode: 'monotone',
-                    fill: true,
-                    backgroundColor: gradient
-                }]
-            },
-            options: {
-                scales: {
-                    xAxes: [{
-                        ticks: {
-                            fontColor: 'rgba(153, 153, 153, 1)',
-                            maxTicksLimit: 7,
-                            maxRotation: 0
-                        },
-                        gridLines: {
-                            zeroLineColor: 'rgba(232, 232, 232, 1)',
-                            drawOnChartArea: false,
-                        },
-                    }],
-                    yAxes: [{
-                        ticks: {
-                            beginAtZero: true,
-                            fontColor: 'rgba(153, 153, 153, 1)',
-                            callback: function(value, index, values) {
-                                if (Math.floor(value) === value) {
-                                    return value;
-                                }
-                            }
-                        },
-                        gridLines: {
-                            zeroLineColor: 'rgba(232, 232, 232, 0)',
-                        },
-                    }],
-                },
-                responsive: true,
-                tooltips: {
-                    backgroundColor: 'rgba(0, 39, 69, 1)',
-                    cornerRadius: 7,
-                    mode: 'index',
-                    intersect: false,
-                    displayColors: false,
-                    xPadding: 10,
-                    yPadding: 10,
-                    titleFontColor: 'rgba(255, 255, 255, .7)',
-                    bodyFontColor: 'rgba(255, 255, 255, 1)',
-                    titleFontStyle: 'normal',
-                    bodyFontStyle: 'bold',
-                },
-                legend: {
-                    display: false,
-                }
-            }
-        });
-    }
-    if ($('#pxp-company-dashboard-app-chart').length > 0) {
-        var companyAppChartElem = document.getElementById('pxp-company-dashboard-app-chart').getContext('2d');
+    //     var companyVisitsChart = new Chart(companyVisitsChartElem, {
+    //         type: 'line',
+    //         data: {
+    //             labels: ['Oct 06', 'Oct 07', 'Oct 08', 'Oct 09', 'Oct 10', 'Oct 11', 'Oct 12'],
+    //             datasets: [{
+    //                 label: 'Visits',
+    //                 data: [12, 56, 34, 78, 38, 28, 54],
+    //                 borderWidth: 3,
+    //                 borderColor: 'rgba(0, 112, 201, 1)',
+    //                 pointBackgroundColor: 'rgba(255, 255, 255, 0)',
+    //                 pointHoverBackgroundColor: 'rgba(255, 255, 255, 1)',
+    //                 pointBorderColor: 'rgba(66, 133, 244, 0)',
+    //                 pointHoverBorderColor: 'rgba(0, 112, 201, 1)',
+    //                 pointBorderWidth: 10,
+    //                 pointHoverBorderWidth: 3,
+    //                 pointHitRadius: 20,
+    //                 cubicInterpolationMode: 'monotone',
+    //                 fill: true,
+    //                 backgroundColor: gradient
+    //             }]
+    //         },
+    //         options: {
+    //             scales: {
+    //                 xAxes: [{
+    //                     ticks: {
+    //                         fontColor: 'rgba(153, 153, 153, 1)',
+    //                         maxTicksLimit: 7,
+    //                         maxRotation: 0
+    //                     },
+    //                     gridLines: {
+    //                         zeroLineColor: 'rgba(232, 232, 232, 1)',
+    //                         drawOnChartArea: false,
+    //                     },
+    //                 }],
+    //                 yAxes: [{
+    //                     ticks: {
+    //                         beginAtZero: true,
+    //                         fontColor: 'rgba(153, 153, 153, 1)',
+    //                         callback: function(value, index, values) {
+    //                             if (Math.floor(value) === value) {
+    //                                 return value;
+    //                             }
+    //                         }
+    //                     },
+    //                     gridLines: {
+    //                         zeroLineColor: 'rgba(232, 232, 232, 0)',
+    //                     },
+    //                 }],
+    //             },
+    //             responsive: true,
+    //             tooltips: {
+    //                 backgroundColor: 'rgba(0, 39, 69, 1)',
+    //                 cornerRadius: 7,
+    //                 mode: 'index',
+    //                 intersect: false,
+    //                 displayColors: false,
+    //                 xPadding: 10,
+    //                 yPadding: 10,
+    //                 titleFontColor: 'rgba(255, 255, 255, .7)',
+    //                 bodyFontColor: 'rgba(255, 255, 255, 1)',
+    //                 titleFontStyle: 'normal',
+    //                 bodyFontStyle: 'bold',
+    //             },
+    //             legend: {
+    //                 display: false,
+    //             }
+    //         }
+    //     });
+    // }
+    // if ($('#pxp-company-dashboard-app-chart').length > 0) {
+    //     var companyAppChartElem = document.getElementById('pxp-company-dashboard-app-chart').getContext('2d');
 
-        var gradient = companyVisitsChartElem.createLinearGradient(0, 250, 0, 0);
-        gradient.addColorStop(0, 'rgba(255, 255, 255, 0)');
-        gradient.addColorStop(.5, 'rgba(255, 168, 35, 0.09)');
-        gradient.addColorStop(1, 'rgba(255, 168, 35, 0.12)');
+    //     var gradient = companyVisitsChartElem.createLinearGradient(0, 250, 0, 0);
+    //     gradient.addColorStop(0, 'rgba(255, 255, 255, 0)');
+    //     gradient.addColorStop(.5, 'rgba(255, 168, 35, 0.09)');
+    //     gradient.addColorStop(1, 'rgba(255, 168, 35, 0.12)');
 
-        var companyAppChart = new Chart(companyAppChartElem, {
-            type: 'line',
-            data: {
-                labels: ['Oct 06', 'Oct 07', 'Oct 08', 'Oct 09', 'Oct 10', 'Oct 11', 'Oct 12'],
-                datasets: [{
-                    label: 'Applications',
-                    data: [43, 81, 72, 85, 42, 65, 80],
-                    borderWidth: 3,
-                    borderColor: 'rgba(255, 168, 35, 1)',
-                    pointBackgroundColor: 'rgba(255, 255, 255, 0)',
-                    pointHoverBackgroundColor: 'rgba(255, 255, 255, 1)',
-                    pointBorderColor: 'rgba(66, 133, 244, 0)',
-                    pointHoverBorderColor: 'rgba(255, 168, 35, 1)',
-                    pointBorderWidth: 10,
-                    pointHoverBorderWidth: 3,
-                    pointHitRadius: 20,
-                    cubicInterpolationMode: 'monotone',
-                    fill: true,
-                    backgroundColor: gradient
-                }]
-            },
-            options: {
-                scales: {
-                    xAxes: [{
-                        ticks: {
-                            fontColor: 'rgba(153, 153, 153, 1)',
-                            maxTicksLimit: 7,
-                            maxRotation: 0
-                        },
-                        gridLines: {
-                            zeroLineColor: 'rgba(232, 232, 232, 1)',
-                            drawOnChartArea: false,
-                        },
-                    }],
-                    yAxes: [{
-                        ticks: {
-                            beginAtZero: true,
-                            fontColor: 'rgba(153, 153, 153, 1)',
-                            callback: function(value, index, values) {
-                                if (Math.floor(value) === value) {
-                                    return value;
-                                }
-                            }
-                        },
-                        gridLines: {
-                            zeroLineColor: 'rgba(232, 232, 232, 0)',
-                        },
-                    }],
-                },
-                responsive: true,
-                tooltips: {
-                    backgroundColor: 'rgba(0, 39, 69, 1)',
-                    cornerRadius: 7,
-                    mode: 'index',
-                    intersect: false,
-                    displayColors: false,
-                    xPadding: 10,
-                    yPadding: 10,
-                    titleFontColor: 'rgba(255, 255, 255, .7)',
-                    bodyFontColor: 'rgba(255, 255, 255, 1)',
-                    titleFontStyle: 'normal',
-                    bodyFontStyle: 'bold',
-                },
-                legend: {
-                    display: false,
-                }
-            }
-        });
-    }
+    //     var companyAppChart = new Chart(companyAppChartElem, {
+    //         type: 'line',
+    //         data: {
+    //             labels: ['Oct 06', 'Oct 07', 'Oct 08', 'Oct 09', 'Oct 10', 'Oct 11', 'Oct 12'],
+    //             datasets: [{
+    //                 label: 'Applications',
+    //                 data: [43, 81, 72, 85, 42, 65, 80],
+    //                 borderWidth: 3,
+    //                 borderColor: 'rgba(255, 168, 35, 1)',
+    //                 pointBackgroundColor: 'rgba(255, 255, 255, 0)',
+    //                 pointHoverBackgroundColor: 'rgba(255, 255, 255, 1)',
+    //                 pointBorderColor: 'rgba(66, 133, 244, 0)',
+    //                 pointHoverBorderColor: 'rgba(255, 168, 35, 1)',
+    //                 pointBorderWidth: 10,
+    //                 pointHoverBorderWidth: 3,
+    //                 pointHitRadius: 20,
+    //                 cubicInterpolationMode: 'monotone',
+    //                 fill: true,
+    //                 backgroundColor: gradient
+    //             }]
+    //         },
+    //         options: {
+    //             scales: {
+    //                 xAxes: [{
+    //                     ticks: {
+    //                         fontColor: 'rgba(153, 153, 153, 1)',
+    //                         maxTicksLimit: 7,
+    //                         maxRotation: 0
+    //                     },
+    //                     gridLines: {
+    //                         zeroLineColor: 'rgba(232, 232, 232, 1)',
+    //                         drawOnChartArea: false,
+    //                     },
+    //                 }],
+    //                 yAxes: [{
+    //                     ticks: {
+    //                         beginAtZero: true,
+    //                         fontColor: 'rgba(153, 153, 153, 1)',
+    //                         callback: function(value, index, values) {
+    //                             if (Math.floor(value) === value) {
+    //                                 return value;
+    //                             }
+    //                         }
+    //                     },
+    //                     gridLines: {
+    //                         zeroLineColor: 'rgba(232, 232, 232, 0)',
+    //                     },
+    //                 }],
+    //             },
+    //             responsive: true,
+    //             tooltips: {
+    //                 backgroundColor: 'rgba(0, 39, 69, 1)',
+    //                 cornerRadius: 7,
+    //                 mode: 'index',
+    //                 intersect: false,
+    //                 displayColors: false,
+    //                 xPadding: 10,
+    //                 yPadding: 10,
+    //                 titleFontColor: 'rgba(255, 255, 255, .7)',
+    //                 bodyFontColor: 'rgba(255, 255, 255, 1)',
+    //                 titleFontStyle: 'normal',
+    //                 bodyFontStyle: 'bold',
+    //             },
+    //             legend: {
+    //                 display: false,
+    //             }
+    //         }
+    //     });
+    // }
 
     // // Candidate dashboard charts
     // if ($('#pxp-candidate-dashboard-visits-chart').length > 0) {

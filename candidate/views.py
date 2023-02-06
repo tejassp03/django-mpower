@@ -50,6 +50,9 @@ def dashboard(request, pk):
         single_notis['ename']=emp.ename
         single_notis['eid']=emp.eid
         all_notis.append(single_notis)
+        count=count+1
+        if(count>10):
+            break
     all_applics=[]
     for i in applics:
         singappli={}

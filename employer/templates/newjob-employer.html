@@ -87,12 +87,12 @@
                 <div class="mb-3">
                     <label for="pxp-company-job-salary" class="form-label">Salary range</label>
                     <select id="pxp-company-job-salary" class="form-select" name="basicpay">
-                        <option>Select range</option>
-                        <option>$700 - $1000</option>
-                        <option>$1000 - $1200</option>
-                        <option>$1200 - $1400</option>
-                        <option>$1500 - $1800</option>
-                        <option>$2000 - $3000</option>
+                        <option value="1">$0 - $700</option>
+                        <option value="2">$700 - $1000</option>
+                        <option value="3">$1000 - $1200</option>
+                        <option value="4">$1200 - $1400</option>
+                        <option value="5">$1500 - $1800</option>
+                        <option value="6">$2000 - $3000</option>
                     </select>
                 </div>
             </div>
@@ -100,7 +100,7 @@
 
         <div class="mt-4 mt-lg-5">
             <button class="btn rounded-pill pxp-section-cta">Publish Job</button>
-            <button class="btn rounded-pill pxp-section-cta-o ms-3">Save Draft</button>
+            {% comment %} <button class="btn rounded-pill pxp-section-cta-o ms-3">Save Draft</button> {% endcomment %}
         </div>
     </form>
 </div>

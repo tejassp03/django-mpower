@@ -16,31 +16,31 @@
         <div class="row justify-content-between align-content-center">
             <div class="col-auto order-2 order-sm-1">
                 <div class="pxp-company-dashboard-jobs-bulk-actions mb-3">
-                    <select class="form-select">
-                        <option>Bulk actions</option>
-                        <option>Edit</option>
-                        <option>Delete</option>
+                    <select class="form-select" name="act">
+                        <option value="a">Bulk actions</option>
+                        {% comment %} <option>Edit</option> {% endcomment %}
+                        <option value="b">Delete</option>
                     </select>
-                    <button class="btn ms-2">Apply</button>
+                    <button class="btn ms-2" onclick="multiple()">Apply</button>
                 </div>
             </div>
             <div class="col-auto order-1 order-sm-2">
                 <div class="pxp-company-dashboard-jobs-search mb-3">
-                    <div class="pxp-company-dashboard-jobs-search-results me-3">16 jobs</div>
+                    <div class="pxp-company-dashboard-jobs-search-results me-3">{{ count }} Jobs</div>
                     <div class="pxp-company-dashboard-jobs-search-search-form">
                         <div class="input-group">
                             <span class="input-group-text"><span class="fa fa-search"></span></span>
-                            <input type="text" class="form-control" placeholder="Search jobs...">
+                            <input type="text" class="form-control" placeholder="Search jobs..." id="search">
                         </div>
                     </div>
                 </div>
             </div>
         </div>
         <div class="table-responsive">
-            <table class="table table-hover align-middle">
+            <table class="table table-hover align-middle" id="table">
                 <thead>
                     <tr>
-                        <th class="pxp-is-checkbox" style="width: 1%;"><input type="checkbox" class="form-check-input"></th>
+                        <th class="pxp-is-checkbox" style="width: 1%;"><input type="checkbox" onClick="toggle(this)" class="form-check-input" name="all"></th>
                         <th style="width: 25%;">Job</th>
                         <th style="width: 20%;">Category</th>
                         <th style="width: 12%;">Type</th>
@@ -50,256 +50,34 @@
                     </tr>
                 </thead>
                 <tbody>
+                    {% for i in pe %}
                     <tr>
-                        <td><input type="checkbox" class="form-check-input"></td>
+                        <td><input type="checkbox" name="chek" class="form-check-input" value={{ i.jobid }}></td>
                         <td>
                             <a href="#">
-                                <div class="pxp-company-dashboard-job-title">Software developer</div>
-                                <div class="pxp-company-dashboard-job-location"><span class="fa fa-globe me-1"></span>San Francisco, CA</div>
+                                <div class="pxp-company-dashboard-job-title">{{ i.title }}</div>
+                                <div class="pxp-company-dashboard-job-location"><span class="fa fa-globe me-1"></span>{{ i.location }}</div>
                             </a>
                         </td>
-                        <td><div class="pxp-company-dashboard-job-category">Software Engineering</div></td>
-                        <td><div class="pxp-company-dashboard-job-type">Full-time</div></td>
-                        <td><a href="#" class="pxp-company-dashboard-job-applications">3 Candidates</a></td>
+                        <td><div class="pxp-company-dashboard-job-category">{{ i.fnarea }}</div></td>
+                        <td><div class="pxp-company-dashboard-job-type">{{ i.jobtype }}</div></td>
+                        <td><a href="#" class="pxp-company-dashboard-job-applications">{{ i.num }} Candidates</a></td>
                         <td>
                             <div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-success">Published</span></div>
-                            <div class="pxp-company-dashboard-job-date mt-1">2020/08/24 at 11:56 am</div>
+                            <div class="pxp-company-dashboard-job-date mt-1">{{ i.postdate }}</div>
                         </td>
                         <td>
                             <div class="pxp-dashboard-table-options">
                                 <ul class="list-unstyled">
-                                    <li><button title="Edit"><span class="fa fa-pencil"></span></button></li>
-                                    <li><button title="Preview"><span class="fa fa-eye"></span></button></li>
-                                    <li><button title="Delete"><span class="fa fa-trash-o"></span></button></li>
+                                    <li><button title="Edit" id="pxp-exp-modal-button" data-bs-target="#pxp-edit-modal" data-bs-toggle="modal" onclick="expmodal('{{i.jobid}}')"><span class="fa fa-pencil"></span></button></li>
+                                    <li><button onclick="loadermodal('{{i.jobid}}')" data-bs-target="#pxp-job-modal" data-bs-toggle="modal" title="Preview"><span class="fa fa-eye"></span></button></li>
+                                    <input style="display: none" value={{i.jobid}}>
+                                    <li><button title="Delete" onclick="delfav({{i.jobid}})"><span class="fa fa-trash-o"></span></button></li>
                                 </ul>
                             </div>
                         </td>
                     </tr>
-                    <tr>
-                        <td><input type="checkbox" class="form-check-input"></td>
-                        <td>
-                            <a href="#">
-                                <div class="pxp-company-dashboard-job-title">HR Analyst</div>
-                                <div class="pxp-company-dashboard-job-location"><span class="fa fa-globe me-1"></span>Paris, France</div>
-                            </a>
-                        </td>
-                        <td><div class="pxp-company-dashboard-job-category">Human Resources</div></td>
-                        <td><div class="pxp-company-dashboard-job-type">Full-time</div></td>
-                        <td><a href="#" class="pxp-company-dashboard-job-applications">8 Candidates</a></td>
-                        <td>
-                            <div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-secondary">Draft</span></div>
-                            <div class="pxp-company-dashboard-job-date mt-1">2020/08/24 at 11:56 am</div>
-                        </td>
-                        <td>
-                            <div class="pxp-dashboard-table-options">
-                                <ul class="list-unstyled">
-                                    <li><button title="Edit"><span class="fa fa-pencil"></span></button></li>
-                                    <li><button title="Preview"><span class="fa fa-eye"></span></button></li>
-                                    <li><button title="Delete"><span class="fa fa-trash-o"></span></button></li>
-                                </ul>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><input type="checkbox" class="form-check-input"></td>
-                        <td>
-                            <a href="#">
-                                <div class="pxp-company-dashboard-job-title">Marketing Expert</div>
-                                <div class="pxp-company-dashboard-job-location"><span class="fa fa-globe me-1"></span>Los Angeles, CA</div>
-                            </a>
-                        </td>
-                        <td><div class="pxp-company-dashboard-job-category">Marketing & Communication</div></td>
-                        <td><div class="pxp-company-dashboard-job-type">Full-time</div></td>
-                        <td><a href="#" class="pxp-company-dashboard-job-applications">10 Candidates</a></td>
-                        <td>
-                            <div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-success">Published</span></div>
-                            <div class="pxp-company-dashboard-job-date mt-1">2020/08/24 at 11:56 am</div>
-                        </td>
-                        <td>
-                            <div class="pxp-dashboard-table-options">
-                                <ul class="list-unstyled">
-                                    <li><button title="Edit"><span class="fa fa-pencil"></span></button></li>
-                                    <li><button title="Preview"><span class="fa fa-eye"></span></button></li>
-                                    <li><button title="Delete"><span class="fa fa-trash-o"></span></button></li>
-                                </ul>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><input type="checkbox" class="form-check-input"></td>
-                        <td>
-                            <a href="#">
-                                <div class="pxp-company-dashboard-job-title">Software developer</div>
-                                <div class="pxp-company-dashboard-job-location"><span class="fa fa-globe me-1"></span>San Francisco, CA</div>
-                            </a>
-                        </td>
-                        <td><div class="pxp-company-dashboard-job-category">Software Engineering</div></td>
-                        <td><div class="pxp-company-dashboard-job-type">Full-time</div></td>
-                        <td><a href="#" class="pxp-company-dashboard-job-applications">3 Candidates</a></td>
-                        <td>
-                            <div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-success">Published</span></div>
-                            <div class="pxp-company-dashboard-job-date mt-1">2020/08/24 at 11:56 am</div>
-                        </td>
-                        <td>
-                            <div class="pxp-dashboard-table-options">
-                                <ul class="list-unstyled">
-                                    <li><button title="Edit"><span class="fa fa-pencil"></span></button></li>
-                                    <li><button title="Preview"><span class="fa fa-eye"></span></button></li>
-                                    <li><button title="Delete"><span class="fa fa-trash-o"></span></button></li>
-                                </ul>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><input type="checkbox" class="form-check-input"></td>
-                        <td>
-                            <a href="#">
-                                <div class="pxp-company-dashboard-job-title">HR Analyst</div>
-                                <div class="pxp-company-dashboard-job-location"><span class="fa fa-globe me-1"></span>Paris, France</div>
-                            </a>
-                        </td>
-                        <td><div class="pxp-company-dashboard-job-category">Human Resources</div></td>
-                        <td><div class="pxp-company-dashboard-job-type">Full-time</div></td>
-                        <td><a href="#" class="pxp-company-dashboard-job-applications">8 Candidates</a></td>
-                        <td>
-                            <div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-secondary">Draft</span></div>
-                            <div class="pxp-company-dashboard-job-date mt-1">2020/08/24 at 11:56 am</div>
-                        </td>
-                        <td>
-                            <div class="pxp-dashboard-table-options">
-                                <ul class="list-unstyled">
-                                    <li><button title="Edit"><span class="fa fa-pencil"></span></button></li>
-                                    <li><button title="Preview"><span class="fa fa-eye"></span></button></li>
-                                    <li><button title="Delete"><span class="fa fa-trash-o"></span></button></li>
-                                </ul>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><input type="checkbox" class="form-check-input"></td>
-                        <td>
-                            <a href="#">
-                                <div class="pxp-company-dashboard-job-title">Marketing Expert</div>
-                                <div class="pxp-company-dashboard-job-location"><span class="fa fa-globe me-1"></span>Los Angeles, CA</div>
-                            </a>
-                        </td>
-                        <td><div class="pxp-company-dashboard-job-category">Marketing & Communication</div></td>
-                        <td><div class="pxp-company-dashboard-job-type">Full-time</div></td>
-                        <td><a href="#" class="pxp-company-dashboard-job-applications">10 Candidates</a></td>
-                        <td>
-                            <div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-success">Published</span></div>
-                            <div class="pxp-company-dashboard-job-date mt-1">2020/08/24 at 11:56 am</div>
-                        </td>
-                        <td>
-                            <div class="pxp-dashboard-table-options">
-                                <ul class="list-unstyled">
-                                    <li><button title="Edit"><span class="fa fa-pencil"></span></button></li>
-                                    <li><button title="Preview"><span class="fa fa-eye"></span></button></li>
-                                    <li><button title="Delete"><span class="fa fa-trash-o"></span></button></li>
-                                </ul>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><input type="checkbox" class="form-check-input"></td>
-                        <td>
-                            <a href="#">
-                                <div class="pxp-company-dashboard-job-title">Software developer</div>
-                                <div class="pxp-company-dashboard-job-location"><span class="fa fa-globe me-1"></span>San Francisco, CA</div>
-                            </a>
-                        </td>
-                        <td><div class="pxp-company-dashboard-job-category">Software Engineering</div></td>
-                        <td><div class="pxp-company-dashboard-job-type">Full-time</div></td>
-                        <td><a href="#" class="pxp-company-dashboard-job-applications">3 Candidates</a></td>
-                        <td>
-                            <div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-success">Published</span></div>
-                            <div class="pxp-company-dashboard-job-date mt-1">2020/08/24 at 11:56 am</div>
-                        </td>
-                        <td>
-                            <div class="pxp-dashboard-table-options">
-                                <ul class="list-unstyled">
-                                    <li><button title="Edit"><span class="fa fa-pencil"></span></button></li>
-                                    <li><button title="Preview"><span class="fa fa-eye"></span></button></li>
-                                    <li><button title="Delete"><span class="fa fa-trash-o"></span></button></li>
-                                </ul>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><input type="checkbox" class="form-check-input"></td>
-                        <td>
-                            <a href="#">
-                                <div class="pxp-company-dashboard-job-title">HR Analyst</div>
-                                <div class="pxp-company-dashboard-job-location"><span class="fa fa-globe me-1"></span>Paris, France</div>
-                            </a>
-                        </td>
-                        <td><div class="pxp-company-dashboard-job-category">Human Resources</div></td>
-                        <td><div class="pxp-company-dashboard-job-type">Full-time</div></td>
-                        <td><a href="#" class="pxp-company-dashboard-job-applications">8 Candidates</a></td>
-                        <td>
-                            <div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-secondary">Draft</span></div>
-                            <div class="pxp-company-dashboard-job-date mt-1">2020/08/24 at 11:56 am</div>
-                        </td>
-                        <td>
-                            <div class="pxp-dashboard-table-options">
-                                <ul class="list-unstyled">
-                                    <li><button title="Edit"><span class="fa fa-pencil"></span></button></li>
-                                    <li><button title="Preview"><span class="fa fa-eye"></span></button></li>
-                                    <li><button title="Delete"><span class="fa fa-trash-o"></span></button></li>
-                                </ul>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><input type="checkbox" class="form-check-input"></td>
-                        <td>
-                            <a href="#">
-                                <div class="pxp-company-dashboard-job-title">Marketing Expert</div>
-                                <div class="pxp-company-dashboard-job-location"><span class="fa fa-globe me-1"></span>Los Angeles, CA</div>
-                            </a>
-                        </td>
-                        <td><div class="pxp-company-dashboard-job-category">Marketing & Communication</div></td>
-                        <td><div class="pxp-company-dashboard-job-type">Full-time</div></td>
-                        <td><a href="#" class="pxp-company-dashboard-job-applications">10 Candidates</a></td>
-                        <td>
-                            <div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-success">Published</span></div>
-                            <div class="pxp-company-dashboard-job-date mt-1">2020/08/24 at 11:56 am</div>
-                        </td>
-                        <td>
-                            <div class="pxp-dashboard-table-options">
-                                <ul class="list-unstyled">
-                                    <li><button title="Edit"><span class="fa fa-pencil"></span></button></li>
-                                    <li><button title="Preview"><span class="fa fa-eye"></span></button></li>
-                                    <li><button title="Delete"><span class="fa fa-trash-o"></span></button></li>
-                                </ul>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><input type="checkbox" class="form-check-input"></td>
-                        <td>
-                            <a href="#">
-                                <div class="pxp-company-dashboard-job-title">HR Analyst</div>
-                                <div class="pxp-company-dashboard-job-location"><span class="fa fa-globe me-1"></span>Paris, France</div>
-                            </a>
-                        </td>
-                        <td><div class="pxp-company-dashboard-job-category">Human Resources</div></td>
-                        <td><div class="pxp-company-dashboard-job-type">Full-time</div></td>
-                        <td><a href="#" class="pxp-company-dashboard-job-applications">8 Candidates</a></td>
-                        <td>
-                            <div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-secondary">Draft</span></div>
-                            <div class="pxp-company-dashboard-job-date mt-1">2020/08/24 at 11:56 am</div>
-                        </td>
-                        <td>
-                            <div class="pxp-dashboard-table-options">
-                                <ul class="list-unstyled">
-                                    <li><button title="Edit"><span class="fa fa-pencil"></span></button></li>
-                                    <li><button title="Preview"><span class="fa fa-eye"></span></button></li>
-                                    <li><button title="Delete"><span class="fa fa-trash-o"></span></button></li>
-                                </ul>
-                            </div>
-                        </td>
-                    </tr>
+                    {% endfor %}
                 </tbody>
             </table>
 
@@ -307,17 +85,159 @@
                 <div class="col-auto">
                     <nav class="mt-3 mt-sm-0" aria-label="Jobs list pagination">
                         <ul class="pagination pxp-pagination">
-                            <li class="page-item active" aria-current="page">
-                                <span class="page-link">1</span>
-                            </li>
-                            <li class="page-item"><a class="page-link" href="#">2</a></li>
-                            <li class="page-item"><a class="page-link" href="#">3</a></li>
+                            {% if pe.has_previous %}
+                                {% if GET_params %}
+                                <li class="page-item"><a href="?{{GET_params.urlencode}}&amp;page={{pe.previous_page_number}}" class="page-link"><i class="fa fa-chevron-left" aria-hidden="true"></i></a></li>
+                                {% else %}
+                                <li class="page-item"><a href="?page={{pe.previous_page_number}}" class="page-link"><i class="fa fa-chevron-left" aria-hidden="true"></i></a></li>
+                                {% endif %}
+                            {% endif %}
+
+                            {% if pe.number|add:'-4' > 1 %}
+                                {% if GET_params %}
+                                <li class="page-item"><a href="?{{GET_params.urlencode}}&amp;page={{ pe.number|add:'-5' }}" class="page-link">&hellip;</a></li>
+                                {% else %}
+                                <li class="page-item"><a href="?page={{ pe.number|add:'-5' }}" class="page-link">&hellip;</a></li>
+                                {% endif %}
+                            {% endif %}
+
+                            {% for i in pe.paginator.page_range %}
+                                {% if pe.number == i %}
+                                    <li class="page-item active" aria-current="page">
+                                        <span class="page-link">{{pe.number}}</span>
+                                    </li>
+                                {% elif i > pe.number|add:'-5' and i < pe.number|add:'5' %}
+                                    {% if GET_params %}
+                                    <li class="page-item"><a href="?{{GET_params.urlencode}}&amp;page={{ i }}" class="page-link">{{i}}</a></li>
+                                    {% else %}
+                                    <li class="page-item"><a href="?page={{ i }}" class="page-link">{{i}}</a></li>
+                                    {% endif %}
+                                {% endif %}
+                            {% endfor %}
+
+                            {% if pe.paginator.num_pages > pe.number|add:'4' %}
+                                {% if GET_params %}
+                                <li class="page-item"><a href="?{{GET_params.urlencode}}&amp;page={{ pe.number|add:'5' }}" class="page-link">&hellip;</a></li>
+                                {% else %}
+                                <li class="page-item"><a href="?page={{ pe.number|add:'5' }}" class="page-link">&hellip;</a></li>
+                                {% endif %}
+                            {% endif %}
+
+                            {% if pe.has_next %}
+                                {% if GET_params %}
+                                <li class="page-item"><a href="?{{GET_params.urlencode}}&amp;page={{ pe.next_page_number }}" class="page-link"><i class="fa fa-chevron-right" aria-hidden="true"></i></a></li>
+                                {% else %}
+                                <li class="page-item"><a href="?page={{pe.next_page_number}}" class="page-link"><i class="fa fa-chevron-right" aria-hidden="true"></i></a></li>
+                                {% endif %}
+                            {% endif %}
                         </ul>
                     </nav>
                 </div>
                 <div class="col-auto">
-                    <a href="#" class="btn rounded-pill pxp-section-cta mt-3 mt-sm-0">Show me more<span class="fa fa-angle-right"></span></a>
+                    {% comment %} <a href="#" class="btn rounded-pill pxp-section-cta mt-3 mt-sm-0">Show me more<span class="fa fa-angle-right"></span></a> {% endcomment %}
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade pxp-user-modal" id="pxp-edit-modal" aria-hidden="true" aria-labelledby="expModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered" style="
+    display: flex;
+    align-items: center;
+    justify-content: center;">
+        <div class="modal-content" style="width: 100vw; display: flex; flex-direction: row; align-items: center">
+            <div class="modal-body" style="width: 60vw; padding: 15px 15px !important">
+                <div class="pxp-dashboard-content-details" style="margin-right:0px; box-shadow: none; padding: 0px">
+                    <form>
+                        <div class="row mt-4 mt-lg-5">
+                            <div class="col-xxl-6">
+                                <div class="mb-3">
+                                    <label for="pxp-company-job-title" class="form-label">Job title</label>
+                                    <input type="text" id="pxp-company-job-title" class="form-control" placeholder="Add title" name="title">
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-xxl-3">
+                                <label for="pxp-company-job-location" class="form-label">Location</label>
+                                <input type="text" id="pxp-company-job-location" class="form-control" placeholder="E.g. San Francisco, CA" name="location">
+                            </div>
+                            <div class="col-md-6 col-xxl-3">
+                                <div class="mb-3">
+                                    <label for="pxp-company-job-category" class="form-label">Category</label>
+                                    <select id="pxp-company-job-category" class="form-select" name="fnarea">
+                                        <option>Select a category</option>
+                                        <option>Marketing & Communication</option>
+                                        <option>Software Engineering</option>
+                                        <option>Project Management</option>
+                                        <option>Finance</option>
+                                        <option>Retail</option>
+                                        <option>Sales</option>
+                                        <option>Manufacturing</option>
+                                        <option>IT</option>
+                                        <option>Business Development</option>
+                                        <option>Human Resources</option>
+                                        <option>Customer Service</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                
+                        <div class="mb-3">
+                            <label for="pxp-company-job-description" class="form-label">Job description</label>
+                            <textarea class="form-control" id="pxp-company-job-description" placeholder="Type the description here..." name="description"></textarea>
+                        </div>
+                
+                        <div class="row">
+                            <div class="col-md-6 col-xxl-3">
+                                <div class="mb-3">
+                                    <label for="pxp-company-job-experience" class="form-label">Experience</label>
+                                    <input type="text" id="pxp-company-job-experience" class="form-control" placeholder="E.g. Minimum 3 years" name="experience">
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-xxl-3">
+                                <div class="mb-3">
+                                    <label for="pxp-company-job-level" class="form-label">Career level</label>
+                                    <select id="pxp-company-job-level" class="form-select" name="careerlevel">
+                                        <option>No Experience</option>
+                                        <option>Entry-Level</option>
+                                        <option>Mid-Level</option>
+                                        <option>Senior-Level</option>
+                                        <option>Manager / Executive</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-xxl-3">
+                                <div class="mb-3">
+                                    <label for="pxp-company-job-type" class="form-label">Employment type</label>
+                                    <select id="pxp-company-job-type" class="form-select" name="jobtype">
+                                        <option>Full Time</option>
+                                        <option>Part Time</option>
+                                        <option>Remote</option>
+                                        <option>Internship</option>
+                                        <option>Contract</option>
+                                        <option>Training</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-xxl-3">
+                                <div class="mb-3">
+                                    <label for="pxp-company-job-salary" class="form-label">Salary range</label>
+                                    <select id="pxp-company-job-salary" class="form-select" name="basicpay">
+                                        <option value="1">$0 - $700</option>
+                                        <option value="2">$700 - $1000</option>
+                                        <option value="3">$1000 - $1200</option>
+                                        <option value="4">$1200 - $1400</option>
+                                        <option value="5">$1500 - $1800</option>
+                                        <option value="6">$2000 - $3000</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <input style="display: none" name="jobidm">
+                <button class="btn rounded-pill pxp-subsection-cta" onclick="jobmodalsub()">Edit Job</button>
             </div>
         </div>
     </div>
@@ -337,5 +257,145 @@ $(document).ready(function () {
     $('#cinb').removeClass('pxp-active');
     $('#cnot').removeClass('pxp-active');
 })
+
+var $rows = $('#table tbody tr');
+$('#search').keyup(function() {
+    var val = $.trim($(this).val()).replace(/ +/g, ' ').toLowerCase();
+    
+    $rows.show().filter(function() {
+        var text = $(this).text().replace(/\s+/g, ' ').toLowerCase();
+        return !~text.indexOf(val);
+    }).hide();
+});
+
+$("[name='chek']").change(function(){
+    let a=0;
+    checkboxes = document.getElementsByName('chek');
+    let n=checkboxes.length
+    for(let i=0;i<n;i++) {
+      if(checkboxes[i].checked==false)
+      {
+        a=a+1;
+      }
+    }
+    if(a==0)
+    {
+        console.log("True")
+        $("[name=all]").prop('checked', true);
+    }
+    else
+    {
+        $("[name=all]").prop('checked', false);
+    }
+})
+function delfav(id)
+{
+    $.ajax(
+        {
+            type:"POST",
+            url: "",
+            data:{
+                    'job_id': id,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function( data ) 
+            {
+                location.reload()
+            }
+    })
+}
+
+function multiple()
+{
+    let action=$("[name='act']").val();
+    if(action=='a')
+    {
+        alert("Please select an appropriate action")
+        return;
+    }
+    let ids=[];
+    $("[name='chek']:checked").map(function () {
+        ids.push(this.value);
+    })
+    if(ids.length==0)
+    {
+        alert("Please select at least one of the records to apply delete operation")
+        return;
+    }
+    $.ajax(
+        {
+            type:"POST",
+            url: "",
+            data:{
+                    'ids': ids,
+                    'act': "delall",
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function( data ) 
+            {
+                location.reload()
+            }
+    })
+}
+
+function toggle(source) {
+    checkboxes = document.getElementsByName('chek');
+    for(var i=0, n=checkboxes.length;i<n;i++) {
+      checkboxes[i].checked = source.checked;
+    }
+  }
+
+  function expmodal(id)
+  {
+      $.ajax(
+      {
+          type:"GET",
+          url: "{% url 'employer:edit_job' pk=pk %}",
+          data:{
+                  jobid: id
+          },
+          success: function( data ) 
+          {
+              $('[name="jobidm"]').val(JSON.parse(data['info'])[0].jobid);
+              $('[name="title"]').val(JSON.parse(data['info'])[0].title);
+              $('[name="location"]').val(JSON.parse(data['info'])[0].location);
+              $('[name="fnarea"]').val(JSON.parse(data['info'])[0].fnarea);
+              $('[name="description"]').val(JSON.parse(data['info'])[0].jobdesc);
+              $('[name="experience"]').val(JSON.parse(data['info'])[0].experience);
+              $('[name="careerlevel"]').val(JSON.parse(data['info'])[0].careerlevel);
+              $('[name="jobtype"]').val(JSON.parse(data['info'])[0].jobtype);
+              $('[name="basicpay"]').val(JSON.parse(data['info'])[0].basicpay);
+          }
+      })
+  }
+  
+  function jobmodalsub()
+  {
+      $.ajax(
+      {
+          type:"POST",
+          url: "{% url 'employer:edit_job' pk=pk %}",
+          data:{
+                  jobid: $('[name="jobidm"]').val(),
+                  title: $('[name="title"]').val(),
+                  location: $('[name="location"]').val(),
+                  fnarea: $('[name="fnarea"]').val(),
+                  description: $('[name="description"]').val(),
+                  experience: $('[name="experience"]').val(),
+                  careerlevel: $('[name="careerlevel"]').val(),
+                  jobtype: $('[name="jobtype"]').val(),
+                  basicpay: $('[name="basicpay"]').val(),
+                  csrfmiddlewaretoken: '{{ csrf_token }}'
+          },
+          success: function( data ) 
+          {
+             alert("Data updated successfully");
+             window.location.reload()
+          }
+      })
+  }
+  
+
+
 
 {% endblock %}

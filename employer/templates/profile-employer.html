@@ -35,14 +35,22 @@
                 </div>
                 <div class="mb-3">
                     <label for="pxp-company-website" class="form-label">Website</label>
+                    {% if context.website == None %}
+                    <input type="url" id="pxp-company-website" class="form-control" placeholder="https://" name="website">
+                    {% else %}
                     <input type="url" id="pxp-company-website" class="form-control" placeholder="https://" name="website" value="{{ context.website }}">
+                    {% endif %}
                 </div>
             </div>
             <div class="col-xxl-4">
                 <div class="form-label">&nbsp;</div>
                 <div class="pxp-company-cover mb-3">
-                    <input type="file" id="pxp-company-cover-choose-file" accept="image/*">
-                    <label for="pxp-company-cover-choose-file" class="pxp-cover"><span>Upload Cover Image</span></label>
+                    <input type="file" id="pxp-company-cover-choose-file" accept="image/*" name="cover">
+                    {% if context.cover %}
+                        <label for="pxp-company-cover-choose-file" class="pxp-cover" style="background-image: url('{{ context.cover.url }}')"><span></span></label>
+                    {% else %}
+                        <label for="pxp-company-cover-choose-file" class="pxp-cover"><span>Upload Cover Image</span></label>
+                    {% endif %}
                 </div>
                 <div class="pxp-company-logo mb-3">
                     <input type="file" id="pxp-company-logo-choose-file" accept="image/*" name="logo">
@@ -57,20 +65,32 @@
 
         <div class="mb-3">
             <label for="pxp-company-about" class="form-label">About the company</label>
+            {% if context.profile == None %}
+            <textarea class="form-control" id="pxp-company-about" placeholder="Type your info here..." name="profile"></textarea>
+            {% else %}
             <textarea class="form-control" id="pxp-company-about" placeholder="Type your info here..." name="profile">{{ context.profile }}</textarea>
+            {% endif %}
         </div>
 
         <div class="row">
             <div class="col-md-4">
                 <div class="mb-3">
                     <label for="pxp-company-industry" class="form-label">Industry</label>
+                    {% if context.industry == None %}
+                    <input type="text" id="pxp-company-industry" class="form-control" placeholder="E.g. Software" name="industry">
+                    {% else %}
                     <input type="text" id="pxp-company-industry" class="form-control" placeholder="E.g. Software" name="industry" value="{{ context.industry }}">
+                    {% endif %}
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="mb-3">
                     <label for="pxp-company-founded" class="form-label">Founded in</label>
+                    {% if context.yearfounded == None %}
+                    <input type="text" id="pxp-company-founded" class="form-control" placeholder="E.g. 2001" name="yearfounded">
+                    {% else %}
                     <input type="text" id="pxp-company-founded" class="form-control" placeholder="E.g. 2001" name="yearfounded" value="{{ context.yearfounded }}">
+                    {% endif %}
                 </div>
             </div>
             <div class="col-md-4">
@@ -95,19 +115,31 @@
                 <div class="col-md-6">
                     <div class="mb-3">
                         <label for="pxp-company-country" class="form-label">Country/State</label>
+                        {% if context.location == None %}
+                        <input type="text" id="pxp-company-country" class="form-control" placeholder="E.g. United States, CA" name="location">
+                        {% else %}
                         <input type="text" id="pxp-company-country" class="form-control" placeholder="E.g. United States, CA" name="location" value="{{ context.location }}">
+                        {% endif %}
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="mb-3">
                         <label for="pxp-company-city" class="form-label">City</label>
+                        {% if context.city == None %}
+                        <input type="text" id="pxp-company-city" class="form-control" placeholder="E.g. San Francisco" name="city">
+                        {% else %}
                         <input type="text" id="pxp-company-city" class="form-control" placeholder="E.g. San Francisco" name="city" value="{{ context.city }}">
+                        {% endif %}
                     </div>
                 </div>
             </div>
             <div class="mb-3">
                 <label for="pxp-company-address" class="form-label">Address</label>
+                {% if context.address == None %}
+                <input type="text" id="pxp-company-address" class="form-control" placeholder="Type full address here..." name="address">
+                {% else %}
                 <input type="text" id="pxp-company-address" class="form-control" placeholder="Type full address here..." name="address" value="{{ context.address }}">
+                {% endif %}
             </div>
         </div>
 
@@ -117,25 +149,41 @@
                 <div class="col-md-6">
                     <div class="mb-3">
                         <label for="pxp-company-facebook" class="form-label">Facebook</label>
+                        {% if context.fblink == None %}
+                        <input type="url" id="pxp-company-facebook" class="form-control" placeholder="https://" name="fblink">
+                        {% else %}
                         <input type="url" id="pxp-company-facebook" class="form-control" placeholder="https://" name="fblink" value="{{ context.fblink }}">
+                        {% endif %}
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="mb-3">
                         <label for="pxp-company-twitter" class="form-label">Twitter</label>
+                        {% if context.twlink == None %}
+                        <input type="url" id="pxp-company-twitter" class="form-control" placeholder="https://" name="twlink">
+                        {% else %}
                         <input type="url" id="pxp-company-twitter" class="form-control" placeholder="https://" name="twlink" value="{{ context.twlink }}">
+                        {% endif %}
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="mb-3">
                         <label for="pxp-company-instagram" class="form-label">Instagram</label>
+                        {% if context.inlink == None %}
+                        <input type="url" id="pxp-company-instagram" class="form-control" placeholder="https://" name="inlink">
+                        {% else %}
                         <input type="url" id="pxp-company-instagram" class="form-control" placeholder="https://" name="inlink" value="{{ context.inlink }}">
+                        {% endif %}
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="mb-3">
                         <label for="pxp-company-linkedin" class="form-label">Linkedin</label>
+                        {% if context.lnlink == None %}
+                        <input type="url" id="pxp-company-linkedin" class="form-control" placeholder="https://" name="lnlink">
+                        {% else %}
                         <input type="url" id="pxp-company-linkedin" class="form-control" placeholder="https://" name="lnlink" value="{{ context.lnlink }}">
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -161,6 +209,13 @@ $(document).ready(function () {
     $('#ccha').removeClass('pxp-active');
     $('#cinb').removeClass('pxp-active');
     $('#cnot').removeClass('pxp-active');
+    for(let i=0;i<7;i++)
+    {
+        if($('option')[i].value == {{ context.size }})
+        {
+            $('select').val({{ context.size }});
+        }
+    }
 })
 
 {% endblock %}
