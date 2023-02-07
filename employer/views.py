@@ -269,6 +269,34 @@ def manage(request, pk):
     return render(request, 'managejob-employer.html', {'pk': pk, 'pe': page_obj, 'count': count})
 
 def candidates(request, pk):
+    if request.method=="POST":
+        if 'approve' in request.POST:
+            apps=Application.objects.get(apply_id=request.POST['apply_id'])
+            apps.status=1
+            apps.save()
+            return redirect('employer:candidates', pk=pk)
+        if 'reject' in request.POST:
+            apps=Application.objects.get(apply_id=request.POST['apply_id'])
+            apps.status=2
+            apps.save()
+            return redirect('employer:candidates', pk=pk)
+        if 'act' in request.POST:
+            if(request.POST['act']=="delall"):
+                for i in request.POST.getlist('ids[]'):
+                    Application.objects.filter(apply_id=i).delete()
+            if(request.POST['act']=="appall"):
+                for i in request.POST.getlist('ids[]'):
+                    apps=Application.objects.get(apply_id=i)
+                    apps.status=1
+                    apps.save()
+            if(request.POST['act']=="rejall"):
+                for i in request.POST.getlist('ids[]'):
+                    apps=Application.objects.get(apply_id=i)
+                    apps.status=2
+                    apps.save()
+            return redirect('employer:candidates', pk=pk)
+        Application.objects.filter(apply_id=request.POST['apply_id']).delete()
+        return redirect('employer:candidates', pk=pk)
     applics=Application.objects.filter(eid=pk)
     all_can=[]
     for i in applics:
@@ -283,6 +311,7 @@ def candidates(request, pk):
         single_can['title']=job.title
         single_can['status']=i.status
         single_can['date_applied']=i.date_applied
+        single_can['apply_id']=i.apply_id
         all_can.append(single_can)
     count=len(all_can)
     GET_params = request.GET.copy()
@@ -298,6 +327,23 @@ def candidates(request, pk):
     except EmptyPage:
         page_obj = p.page(p.num_pages)
     return render(request, 'candidates-employer.html', {'pk': pk, 'pe': page_obj, 'count': count})
+
+def get_candidate(request, pk):
+    candidate = JobSeeker.objects.get(user_id=request.GET['user_id'])
+    loger = Login.objects.get(log_id=candidate.log_id.log_id)
+    cand={}
+    if(candidate.photo):
+        cand['photo']=candidate.photo.url
+    cand['name']=candidate.name
+    cand['about']=candidate.about
+    cand['email']=loger.email
+    cand['location']=candidate.location
+    cand['phone']=candidate.phone
+    if(candidate.skills):
+        cand['skills']=candidate.skills.split(",")
+    work=ExperienceJob.objects.filter(user_id=candidate.user_id)
+    edu=Education.objects.filter(user_id=candidate.user_id)
+    return JsonResponse({'info': dumps(cand, default=str), 'work': dumps(list(work.values())), 'edu': dumps(list(edu.values()))})
 
 def subscriptions(request, pk):
     return render(request, 'subscriptions-employer.html', {'pk': pk})

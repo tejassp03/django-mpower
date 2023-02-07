@@ -17,6 +17,7 @@ urlpatterns = [
 	path('cnotifications/', views.cnotifications, name='cnotifications'),
 	path('manage_job/cjobapp/', views.jobapp, name='cjobapp'),
 	path('edit_job/', views.edit_job, name='edit_job'),
+	path('get_candidate', views.get_candidate, name='get_candidate'),
 	path('logout/', views.logout, name='clogout'),
 	path('under_development/', views.under_development, name='under_development'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
