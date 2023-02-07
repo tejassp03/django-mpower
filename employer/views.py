@@ -339,6 +339,7 @@ def get_candidate(request, pk):
     cand['email']=loger.email
     cand['location']=candidate.location
     cand['phone']=candidate.phone
+    cand['title']=candidate.title
     if(candidate.skills):
         cand['skills']=candidate.skills.split(",")
     work=ExperienceJob.objects.filter(user_id=candidate.user_id)
@@ -373,7 +374,9 @@ def change_pass(request, pk):
     return render(request, 'password-employer.html', {'pk': pk})
 
 def cinbox(request, pk):
-    return render(request, 'cinbox-employer.html', {'pk': pk})
+    loger=Login.objects.get(email=request.session['email'])
+    threads=Threads.objects.filter(sender=loger.log_id)
+    return render(request, 'cinbox-employer.html', {'pk': pk, 'threads': threads})
 
 def cnotifications(request, pk):
     loger=Login.objects.get(email=request.session['email'])
