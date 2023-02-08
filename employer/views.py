@@ -376,7 +376,6 @@ def change_pass(request, pk):
             user.password=make_password(request.POST['new'])
             user.save()
             request.session['password']=user.password
-            print(request.session['password'])
             messages.success(request, 'Password changed successfully')
             return redirect('employer:change_pass', pk=pk)
         else:
@@ -438,6 +437,11 @@ def sendmess(request, pk):
             mess=Messages.objects.filter(msg_id=i.msg_id)
             messages.append(dumps(list(mess.values()), default=str))
             temp_messages.append(mess)
+        notif=Notifications()
+        notif.notif_type="M"
+        notif.send_id=Login.objects.get(email=request.session['email'])
+        notif.rece_id=Login.objects.get(log_id=thread.receiver.log_id)
+        notif.save()
         return JsonResponse({'message': 'Y', 'id': request.POST['candidate'], 'thre': temp_threads, 'm': messages})
 
 
@@ -454,7 +458,7 @@ def fetch(request, pk):
     count=0
     ind_unread=[]
     for i in threads:
-        mess=Messages.objects.filter(msg_id=i.msg_id, is_read=False)
+        mess=Messages.objects.filter(msg_id=i.msg_id, receiver_user=user.log_id, is_read=False)
         si=len(mess)
         count=si+count
         ind_unread.append([i.msg_id, si])
@@ -465,7 +469,7 @@ def fetch(request, pk):
     comp_thread=Threads.objects.get(msg_id=request.GET['candidate'])
     comp_log=Login.objects.get(log_id=comp_thread.receiver.log_id)
     thread=dumps(list(Threads.objects.filter(msg_id=request.GET['candidate']).values()), default=str)
-    messa=dumps(list(Messages.objects.filter(msg_id=request.GET['candidate'], is_read=False).values()), default=str)
+    messa=dumps(list(Messages.objects.filter(msg_id=request.GET['candidate'], receiver_user=user.log_id, is_read=False).values()), default=str)
     company=dumps(list(JobSeeker.objects.filter(log_id=comp_log).values()), default=str)
     urlval=JobSeeker.objects.filter(log_id=comp_log)[0].photo.url
     return JsonResponse({'message': 'Y', 'url': "", 'mess': messages, 'thre': temp_threads, 'count': count, 'thread': thread, 'company': company ,'messa': messa, 'all_mess': mess_all, 'image': urlval, 'unread': dumps(ind_unread)})
@@ -473,17 +477,22 @@ def fetch(request, pk):
 
 def seen(request, pk):
     loger=Login.objects.get(email=request.session['email'])
-    print(request.POST['candidate'])
-    print(Messages.objects.filter(msg_id=request.POST['candidate'],  is_read=False))
     if(request.method=="POST"):
         if request.POST['candidate']=="":
             return JsonResponse({'message': 'X'})
-        messages=Messages.objects.filter(msg_id=request.POST['candidate'], sender_user=loger.log_id, is_read=False)
-        Messages.objects.filter(msg_id=request.POST['candidate'], sender_user=loger.log_id, is_read=False).update(is_read=True)
+        messages=Messages.objects.filter(msg_id=request.POST['candidate'], receiver_user=loger.log_id, is_read=False)
+        Messages.objects.filter(msg_id=request.POST['candidate'], receiver_user=loger.log_id, is_read=False).update(is_read=True)
         for i in messages:
             i.is_read=True
             i.save()
         return JsonResponse({'message': 'Y'})
+
+def inbox_count(request, pk):
+    # user=JobSeeker.objects.get(user_id=pk)
+    # num_mess=Threads.objects.filter(receiver=user.log_id, has_unread=1)
+    loger=Login.objects.get(email=request.session['email'])
+    countval=len(Messages.objects.filter(receiver_user=loger.log_id, is_read=False))
+    return JsonResponse({'count': countval})
 
 def cnotifications(request, pk):
     loger=Login.objects.get(email=request.session['email'])

@@ -42,10 +42,10 @@
                             <div class="mt-2 d-flex justify-content-between">
                                 {% if i.end == "y" %}
                                 <div class="pxp-dashboard-inbox-list-item-text pxp-text-light" style="text-overflow: ellipsis; word-wrap: nowrap; overflow: hidden">You: {{ i.body }}</div>
-                                <div class="pxp-dashboard-inbox-list-item-no ms-3"><span class="badge rounded-pill">3</span></div>
+                                <div class="pxp-dashboard-inbox-list-item-no ms-3"><span class="badge rounded-pill" id="count{{i.msg_id}}"></span></div>
                                 {% elif i.end == "c" %}
                                 <div class="pxp-dashboard-inbox-list-item-text pxp-text-light" style="text-overflow: ellipsis; word-wrap: nowrap; overflow: hidden">{{ i.name }}: {{ i.body }}</div>
-                                <div class="pxp-dashboard-inbox-list-item-no ms-3"><span class="badge rounded-pill">3</span></div>
+                                <div class="pxp-dashboard-inbox-list-item-no ms-3"><span class="badge rounded-pill" id="count{{i.msg_id}}"></span></div>
                                 {% endif %}
                             </div>
                         </a>
@@ -180,8 +180,6 @@ $(document).ready(function () {
         let ab='#'+{{ threads.0.msg_id }};
         $(ab).addClass('pxp-active')
     }
-
-
     setInterval(mesRec, 10000);
     function mesRec()
     {
@@ -195,28 +193,43 @@ $(document).ready(function () {
         success: function( data ) 
         {
             let unread=JSON.parse(data['unread']);
+            for(let i=0;i<unread.length;i++)
+            {
+                let idval='#count'+unread[i][0];
+                if(unread[i][1]>0)
+                {
+                    $(idval).text(unread[i][1]);
+                }
+                else
+                {
+                    $(idval).text("");
+                }
+            }
             if(data['message']=='X')
             {
                 return;
             }
-            $.ajax(
+            if(window.innerWidth >= 1400 )
             {
-                type:"POST",
-                url: "seen/",
-                data:{
-                        candidate: $('[name="candidate"]').val(),
-                        csrfmiddlewaretoken: '{{ csrf_token }}'
-                },
-                success: function( data ) 
+                $.ajax(
                 {
-                    if(data['message']=='X')
+                    type:"POST",
+                    url: "seen/",
+                    data:{
+                            candidate: $('[name="candidate"]').val(),
+                            csrfmiddlewaretoken: '{{ csrf_token }}'
+                    },
+                    success: function( data ) 
                     {
-                        return;
-                    }
-                    let mpower="";
-                },
-                async: false
-            })
+                        if(data['message']=='X')
+                        {
+                            return;
+                        }
+                        let mpower="";
+                    },
+                    async: false
+                })
+            }
             let mes=data['messa'];
             let thre=data['thread'];
             let company=data['company'];
@@ -252,7 +265,7 @@ $(document).ready(function () {
                     }
                     let secindiv=document.createElement('div');
                     secindiv.setAttribute('class', 'pxp-dashboard-inbox-messages-item-name ms-2')
-                    secindiv.innerHTML=JSON.parse(company)[0].ename
+                    secindiv.innerHTML=JSON.parse(company)[0].name
                     let thiindiv=document.createElement('div');
                     thiindiv.setAttribute('class', 'pxp-dashboard-inbox-messages-item-time pxp-text-light ms-3')
                     thiindiv.innerHTML=moment(ms[i].date.slice(0, 19)).format("MMM. D, YYYY, h:mm a")
@@ -321,6 +334,8 @@ $(document).ready(function () {
 
 function caller(id, mess, thre1)
 {
+    let idval='#count'+id;
+    $(idval).text("");
     $('.threads').removeClass('pxp-active');
     let ab='#'+id;
     $(ab).addClass('pxp-active')  

@@ -55,7 +55,11 @@
                     <li id="cinb">
                         <a href="{% url 'employer:cinbox' pk=pk %}" class="d-flex justify-content-between align-items-center">
                             <div><span class="fa fa-envelope-o"></span>Inbox</div>
-                            <span class="badge rounded-pill">14</span>
+                            {% if count == 0 %}
+                            <span class="badge rounded-pill" id="countinbox"></span>
+                            {% else %}
+                            <span class="badge rounded-pill" id="countinbox">{{ count }}</span>
+                            {% endif %}
                         </a>
                     </li>
                     <li id="cnot">
@@ -109,7 +113,7 @@
                             <nav class="pxp-nav-mobile">
                                 <ul class="navbar-nav justify-content-end flex-grow-1">
                                     <li class="pxp-dropdown-header">Company tools</li>
-                                    <li class="nav-item"><a href="{% url 'candidate:dashboard' pk=pk %}"><span class="fa fa-home"></span>Dashboard</a></li>
+                                    <li class="nav-item"><a href="{% url 'employer:cdashboard' pk=pk %}"><span class="fa fa-home"></span>Dashboard</a></li>
                                     <li class="nav-item"><a href="{% url 'employer:cedit' pk=pk %}"><span class="fa fa-pencil"></span>Edit Profile</a></li>
                                     <li class="nav-item"><a href="{% url 'employer:newjob' pk=pk %}"><span class="fa fa-file-text-o"></span>New Job Offer</a></li>
                                     <li class="nav-item"><a href="{% url 'employer:manage' pk=pk %}"><span class="fa fa-briefcase"></span>Manage Jobs</a></li>
@@ -120,7 +124,11 @@
                                     <li class="nav-item">
                                         <a href="{% url 'employer:cinbox' pk=pk %}" class="d-flex justify-content-between align-items-center">
                                             <div><span class="fa fa-envelope-o"></span>Inbox</div>
-                                            <span class="badge rounded-pill">14</span>
+                                            {% if count == 0 %}
+                                            <span class="badge rounded-pill" id="countinbox2"></span>
+                                            {% else %}
+                                            <span class="badge rounded-pill" id="countinbox2">{{ count }}</span>
+                                            {% endif %}
                                         </a>
                                     </li>
                                     <li class="nav-item">
@@ -449,6 +457,34 @@
                     el.innerHTML = '{{request.session.name}}'[0]
                 })
             })
+
+            setInterval(getCount, 10000);
+            function getCount()
+            {
+                let url = "{% url 'employer:inbox_count' pk %}"
+                $.ajax(
+                {
+                    type:"GET",
+                    url: url,
+                    data:{
+                    },
+                    success: function( data ) 
+                    {
+                        if(data['count']!=0)
+                        {
+                            $('#countinbox').text(data['count'])
+                            $('#countinbox2').text(data['count'])
+                        }
+                        else
+                        {
+                            $('#countinbox').text("")
+                            $('#countinbox2').text("")
+                        }
+                    },
+                    async: false
+                })
+            }
+
             function loadermodal(id)
         {
             $.ajax(

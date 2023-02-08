@@ -7,6 +7,7 @@ app_name = 'employer'
 
 urlpatterns = [
 	path('', views.dashboard, name='cdashboard'),
+	path('inbox_count/', views.inbox_count, name='inbox_count'),
 	path('newjob/', views.newjob, name='newjob'),
 	path('edit_profile/', views.edit, name='cedit'),
 	path('manage_job/', views.manage, name='manage'),
