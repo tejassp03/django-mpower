@@ -349,8 +349,13 @@ def inbox(request, pk):
                 recent_mess.append(["c", recent[0].body, str(recent[0].date.hour)+":"+str(recent[0].date.minute), c_u])
             else:
                 recent_mess.append(["e", recent[0].body, str(recent[0].date.hour)+":"+str(recent[0].date.minute), c_u])
+        else:
+            recent_mess.append(["x", None, i.date, None, None])
     if(temp_empls):
         first=temp_empls[0]
+    print(threads)
+    print(temp_empls)
+    print(recent_mess)
     return render(request, 'inbox-candidate.html', {'pk': pk, 'threads': threads, 'first': first ,'mess': messages, 'thre': temp_threads, 'm': temp_messages, 'emp': empls, 'initial': zip(threads, temp_empls, recent_mess)})
 
 
@@ -442,11 +447,12 @@ def fetchmess(request, pk):
     return JsonResponse({'message': 'Y', 'url': "", 'mess': messages, 'thre': temp_threads, 'count': count, 'thread': thread, 'company': company ,'messa': messa, 'all_mess': mess_all, 'image': urlval, 'unread': dumps(ind_unread)})
 
 def seenmes(request, pk):
+    loger=Login.objects.get(email=request.session['email'])
     if(request.method=="POST"):
         if request.POST['employer']=="":
             return JsonResponse({'message': 'X'})
-        messages=Messages.objects.filter(msg_id=request.POST['employer'], is_read=False)
-        Messages.objects.filter(msg_id=request.POST['employer'], is_read=False).update(is_read=True)
+        messages=Messages.objects.filter(msg_id=request.POST['employer'], sender_user=loger.log_id, is_read=False)
+        Messages.objects.filter(msg_id=request.POST['employer'], sender_user=loger.log_id, is_read=False).update(is_read=True)
         for i in messages:
             i.is_read=True
             i.save()

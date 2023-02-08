@@ -554,6 +554,7 @@
                         document.getElementById('photoimage').append(ab)
                     }
                     let ul=$('#skillsadder');
+                    ul.empty();
                     let skil=datainfo.skills;
                     if(skil.length>0)
                     {
@@ -572,6 +573,7 @@
                     }
                     let work=JSON.parse(data['work']);
                     let bigdiv=document.getElementById('expadder');
+                    bigdiv.innerHTML="";
                     if(work.length>0)
                     {
                         for(let i=0;i<work.length;i++)
@@ -616,7 +618,7 @@
 
                     let edu=JSON.parse(data['edu']);
                     let bigdiv2=document.getElementById('eduadder');
-                    console.log(edu);
+                    bigdiv2.innerHTML="";
                     if(edu.length>0)
                     {
                         for(let i=0;i<edu.length;i++)

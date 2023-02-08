@@ -136,6 +136,7 @@ class Threads(models.Model):
     sender = models.ForeignKey(Login, on_delete=models.CASCADE, related_name='sender')
     receiver = models.ForeignKey(Login, on_delete=models.CASCADE, related_name='receiver')
     has_unread = models.BooleanField(default=False)
+    date = models.DateTimeField(default=timezone.now)
     class Meta:
         db_table = "threads"
 

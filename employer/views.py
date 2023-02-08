@@ -332,6 +332,7 @@ def get_candidate(request, pk):
     candidate = JobSeeker.objects.get(user_id=request.GET['user_id'])
     loger = Login.objects.get(log_id=candidate.log_id.log_id)
     cand={}
+    emp=Employer.objects.get(eid=pk)
     if(candidate.photo):
         cand['photo']=candidate.photo.url
     cand['name']=candidate.name
@@ -344,6 +345,16 @@ def get_candidate(request, pk):
         cand['skills']=candidate.skills.split(",")
     work=ExperienceJob.objects.filter(user_id=candidate.user_id)
     edu=Education.objects.filter(user_id=candidate.user_id)
+    visit=ProfileVisits()
+    visit.e_id=emp
+    visit.user_id=candidate
+    visit.user_type="c"
+    visit.save()
+    notif=Notifications()
+    notif.notif_type="V"
+    notif.send_id=Login.objects.get(email=request.session['email'])
+    notif.rece_id=loger
+    notif.save()
     return JsonResponse({'info': dumps(cand, default=str), 'work': dumps(list(work.values())), 'edu': dumps(list(edu.values()))})
 
 def subscriptions(request, pk):
@@ -376,7 +387,103 @@ def change_pass(request, pk):
 def cinbox(request, pk):
     loger=Login.objects.get(email=request.session['email'])
     threads=Threads.objects.filter(sender=loger.log_id)
-    return render(request, 'cinbox-employer.html', {'pk': pk, 'threads': threads})
+    temp_threads=[dumps(list(threads.values()), default=str)]
+    all_threads=[]
+    all_messages=[]
+    messages=[]
+    for i in threads:
+        single_thread={}
+        mess=Messages.objects.filter(msg_id=i.msg_id).order_by("date")
+        messages.append(dumps(list(mess.values()), default=str))
+        all_messages.append(mess)
+        n=len(mess)
+        if(n==0):
+            single_thread['date']=i.date
+            single_thread['body']=""
+            single_thread['end']="x"
+        else:
+            single_thread['date']=mess[n-1].date
+            single_thread['body']=mess[n-1].body
+            if(mess[n-1].sender_user.log_id==loger.log_id):
+                single_thread['end']="y"
+            else:
+                single_thread['end']="c"
+        single_thread['msg_id']=i.msg_id
+        recei=JobSeeker.objects.get(log_id=i.receiver.log_id)
+        single_thread['name']=recei.name
+        single_thread['photo']=recei.photo
+        single_thread['sender']=i.sender
+        single_thread['receiver']=i.receiver
+        all_threads.append(single_thread)
+    all_threads.reverse()
+    all_messages.reverse()
+    return render(request, 'cinbox-employer.html', {'pk': pk, 'threads': all_threads, 'm': all_messages, 'mess': messages, 'thre': temp_threads})
+
+
+def sendmess(request, pk):
+    if(request.method=="POST"):
+        thread=Threads.objects.get(msg_id=request.POST['candidate'])
+        message=Messages()
+        message.msg_id=thread
+        message.sender_user=Login.objects.get(email=request.session['email'])
+        message.receiver_user=Login.objects.get(log_id=thread.receiver.log_id)
+        message.body=request.POST['message']
+        message.save()
+        user=Login.objects.get(email=request.session['email'])
+        threads=Threads.objects.filter(sender=user.log_id)
+        temp_threads=[dumps(list(threads.values()), default=str)]
+        messages=[]
+        temp_messages=[]
+        for i in threads:
+            mess=Messages.objects.filter(msg_id=i.msg_id)
+            messages.append(dumps(list(mess.values()), default=str))
+            temp_messages.append(mess)
+        return JsonResponse({'message': 'Y', 'id': request.POST['candidate'], 'thre': temp_threads, 'm': messages})
+
+
+def fetch(request, pk):
+    if request.GET['candidate']=="":
+        return JsonResponse({'message': 'X'})
+    user=Login.objects.get(email=request.session['email'])
+    threads=Threads.objects.filter(sender=user.log_id)
+    temp_threads=[dumps(list(threads.values()), default=str)]
+    messages=[]
+    temp_messages=[]
+    mess_all=[]
+    urlval=""
+    count=0
+    ind_unread=[]
+    for i in threads:
+        mess=Messages.objects.filter(msg_id=i.msg_id, is_read=False)
+        si=len(mess)
+        count=si+count
+        ind_unread.append([i.msg_id, si])
+        messages.append(dumps(list(mess.values()), default=str))
+        temp_messages.append(mess)
+        mess=Messages.objects.filter(msg_id=i.msg_id)
+        mess_all.append(dumps(list(mess.values()), default=str))
+    comp_thread=Threads.objects.get(msg_id=request.GET['candidate'])
+    comp_log=Login.objects.get(log_id=comp_thread.receiver.log_id)
+    thread=dumps(list(Threads.objects.filter(msg_id=request.GET['candidate']).values()), default=str)
+    messa=dumps(list(Messages.objects.filter(msg_id=request.GET['candidate'], is_read=False).values()), default=str)
+    company=dumps(list(JobSeeker.objects.filter(log_id=comp_log).values()), default=str)
+    urlval=JobSeeker.objects.filter(log_id=comp_log)[0].photo.url
+    return JsonResponse({'message': 'Y', 'url': "", 'mess': messages, 'thre': temp_threads, 'count': count, 'thread': thread, 'company': company ,'messa': messa, 'all_mess': mess_all, 'image': urlval, 'unread': dumps(ind_unread)})
+
+
+def seen(request, pk):
+    loger=Login.objects.get(email=request.session['email'])
+    print(request.POST['candidate'])
+    print(Messages.objects.filter(msg_id=request.POST['candidate'],  is_read=False))
+    if(request.method=="POST"):
+        if request.POST['candidate']=="":
+            return JsonResponse({'message': 'X'})
+        messages=Messages.objects.filter(msg_id=request.POST['candidate'], sender_user=loger.log_id, is_read=False)
+        Messages.objects.filter(msg_id=request.POST['candidate'], sender_user=loger.log_id, is_read=False).update(is_read=True)
+        for i in messages:
+            i.is_read=True
+            i.save()
+        return JsonResponse({'message': 'Y'})
 
 def cnotifications(request, pk):
     loger=Login.objects.get(email=request.session['email'])
