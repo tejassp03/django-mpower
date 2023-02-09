@@ -18,6 +18,7 @@ urlpatterns = [
 	path('cinbox/sendmess/', views.sendmess, name="sendmess"),
 	path('cinbox/fetch/', views.fetch, name="fetch"),
 	path('cinbox/seen/', views.seen, name='seen'),
+	path('cinbox/delete/', views.delete_mess, name='delete_mess'),
 	path('cnotifications/', views.cnotifications, name='cnotifications'),
 	path('manage_job/cjobapp/', views.jobapp, name='cjobapp'),
 	path('edit_job/', views.edit_job, name='edit_job'),

@@ -494,6 +494,11 @@ def inbox_count(request, pk):
     countval=len(Messages.objects.filter(receiver_user=loger.log_id, is_read=False))
     return JsonResponse({'count': countval})
 
+def delete_mess(request, pk):
+    if request.method == "POST":
+        Threads.objects.get(msg_id=request.POST['candidate']).delete()
+        return JsonResponse({'message': 'a'})
+
 def cnotifications(request, pk):
     loger=Login.objects.get(email=request.session['email'])
     notifs=Notifications.objects.filter(rece_id=loger.log_id).order_by('-datetime')

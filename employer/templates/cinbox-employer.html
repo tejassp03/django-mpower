@@ -69,7 +69,7 @@
                     </div>
                     <div class="d-flex align-items-center">
                         <div class="pxp-dashboard-inbox-list-item-options">
-                            <button title="Delete conversation"><span class="fa fa-trash-o"></span></button>
+                            <button title="Delete conversation" onclick="deletemess({{threads.0.msg_id}})"><span class="fa fa-trash-o"></span></button>
                         </div>
                         <button class="btn rounded-pill pxp-dashboard-inbox-messages-close-btn d-inline-block d-xxl-none"><span class="fa fa-angle-left"></span> Back</button>
                     </div>
@@ -332,6 +332,24 @@ $(document).ready(function () {
     }
 })
 
+function deletemess(id)
+{
+    $.ajax(
+    {
+        type:"POST",
+        url: "delete/",
+        data:{
+                candidate: id,
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+        },
+        success: function( data ) 
+        {
+            location.reload();
+        }, 
+        async: false
+     })
+}
+
 function caller(id, mess, thre1)
 {
     let idval='#count'+id;
@@ -426,9 +444,20 @@ let backbutton=document.createElement('button');
 backbutton.setAttribute('class', 'btn rounded-pill pxp-dashboard-inbox-messages-close-btn d-inline-block d-xxl-none');
 let backspan=document.createElement('span');
 backspan.setAttribute('class', 'fa fa-angle-left');
-backspan.innerHTML=' Back'
+backspan.innerHTML=' Back';
+let deleteicondiv=document.createElement('div');
+deleteicondiv.setAttribute('class', 'pxp-dashboard-inbox-list-item-options');
+let delbutton=document.createElement('button');
+delbutton.setAttribute('title', 'Delete conversation');
+let callerfunction="deletemess("+id+")";
+delbutton.setAttribute('onclick', callerfunction);
+let spandeldiv=document.createElement('span');
+spandeldiv.setAttribute('class', 'fa fa-trash-o');
+delbutton.append(spandeldiv);
+deleteicondiv.append(delbutton);
 backbutton.append(backspan);
-deleterdiv.append(icondiv)
+deleterdiv.append(icondiv);
+deleterdiv.append(deleteicondiv);
 deleterdiv.append(backbutton);
 headerdiv.append(photodiv);
 headerdiv.append(deleterdiv);
