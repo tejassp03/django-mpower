@@ -41,10 +41,10 @@
                             </div>
                             <div class="mt-2 d-flex justify-content-between">
                                 {% if i.end == "y" %}
-                                <div class="pxp-dashboard-inbox-list-item-text pxp-text-light" style="text-overflow: ellipsis; word-wrap: nowrap; overflow: hidden">You: {{ i.body }}</div>
+                                <div class="pxp-dashboard-inbox-list-item-text pxp-text-light" id="you" style="text-overflow: ellipsis; word-wrap: nowrap; overflow: hidden">You: {{ i.body }}</div>
                                 <div class="pxp-dashboard-inbox-list-item-no ms-3"><span class="badge rounded-pill" id="count{{i.msg_id}}"></span></div>
                                 {% elif i.end == "c" %}
-                                <div class="pxp-dashboard-inbox-list-item-text pxp-text-light" style="text-overflow: ellipsis; word-wrap: nowrap; overflow: hidden">{{ i.name }}: {{ i.body }}</div>
+                                <div class="pxp-dashboard-inbox-list-item-text pxp-text-light" id="they" style="text-overflow: ellipsis; word-wrap: nowrap; overflow: hidden">{{ i.name }}: {{ i.body }}</div>
                                 <div class="pxp-dashboard-inbox-list-item-no ms-3"><span class="badge rounded-pill" id="count{{i.msg_id}}"></span></div>
                                 {% endif %}
                             </div>
@@ -57,6 +57,8 @@
         <div class="col-xxl-8" id="messages-shower">
             <div class="pxp-dashboard-inbox-messages-container">
                 {% if threads|length == 0 %}
+                {% elif shower != "" %}
+                <input style="display: none" class="sho" id={{shower}} value={{shower}} />
                 {% else %}
                 <div class="pxp-dashboard-inbox-messages-header">
                     <div class="pxp-dashboard-inbox-list-item-left">
@@ -136,6 +138,11 @@
 
 {% block script %}
 
+if($('.sho').val())
+{
+    caller($('.sho').val(), '{{mess}}', '{{thre}}')
+}
+
 var $rows = $('#table li');
 $('#search').keyup(function() {
     var val = $.trim($(this).val()).replace(/ +/g, ' ').toLowerCase();
@@ -156,6 +163,21 @@ $(document).ready(function () {
     $('#ccha').removeClass('pxp-active');
     $('#cinb').addClass('pxp-active');
     $('#cnot').removeClass('pxp-active');
+
+    if('{{shower}}')
+    {
+        $('.threads').removeClass('pxp-active');
+        let finalid="#"+'{{shower}}'
+        $(finalid).addClass('pxp-active');
+    }
+    else
+    {
+        if({{threads|length}})
+        {
+            let ab='#'+{{ threads.0.msg_id }};
+            $(ab).addClass('pxp-active')
+        }
+    }
     $('.pxp-dashboard-inbox-messages-content').scrollTop($('.pxp-dashboard-inbox-messages-content')[0].scrollHeight);
     $('#sender1').click(function(e){
         e.preventDefault();
@@ -175,11 +197,11 @@ $(document).ready(function () {
          })
     })
 
-    if({{threads|length}})
+    {% comment %} if({{threads|length}})
     {
         let ab='#'+{{ threads.0.msg_id }};
         $(ab).addClass('pxp-active')
-    }
+    } {% endcomment %}
     setInterval(mesRec, 10000);
     function mesRec()
     {
@@ -192,6 +214,8 @@ $(document).ready(function () {
         },
         success: function( data ) 
         {
+            let recent=JSON.part(data['rece']);
+            
             let unread=JSON.parse(data['unread']);
             for(let i=0;i<unread.length;i++)
             {
@@ -620,5 +644,7 @@ $(".profileimage").each(function(i, el) {
     el.innerHTML = '{{request.session.name}}'[0]
 })
 }
+
+
 
 {% endblock %}

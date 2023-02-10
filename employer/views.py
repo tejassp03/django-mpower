@@ -15,7 +15,7 @@ def dashboard(request, pk):
     context = Employer.objects.get(eid=pk)
     jobs = Jobs.objects.filter(eid=pk)
     applics = Application.objects.filter(eid=pk)
-    visits = ProfileVisits.objects.filter(user_type="e")
+    visits = ProfileVisits.objects.filter(user_type="e", e_id=pk)
     all_notis = []
     count=0
     recent_candidates=[]
@@ -27,7 +27,7 @@ def dashboard(request, pk):
         user=JobSeeker.objects.get(log_id=i.send_id)
         single_notis['name']=user.name
         single_notis['user_id']=user.user_id
-        heapq.heappush(recent_candidates, (i.datetime, user.user_id, user.photo, user.name, user.title, user.location))
+        heapq.heappush(recent_candidates, (i.datetime, user.user_id, user.photo, user.name, user.title, user.location, i.send_id.log_id))
         # recent_candidates.put([i.datetime, user.user_id, user.photo, user.name, user.title, user.location])
         if i.job_id:
             job=jobs.filter(jobid=i.job_id.jobid)
@@ -40,6 +40,9 @@ def dashboard(request, pk):
     threads = Threads.objects.filter(sender=context.log_id)
     countunmess=0
     recent_mess=[]
+    # for i in applics:
+    #     jobseek=JobSeeker.objects.get(user_id=i.user_id.user_id)
+    #     heapq.heappush(recent_candidates, (i.date_applied, jobseek.user_id, jobseek.photo, jobseek.name, jobseek.title, jobseek.location))
     for i in threads:
         mess=Messages.objects.filter(msg_id=i.msg_id, receiver_user=context.log_id.log_id).order_by("-date")
         if(len(mess)>0):
@@ -312,8 +315,11 @@ def candidates(request, pk):
         single_can['status']=i.status
         single_can['date_applied']=i.date_applied
         single_can['apply_id']=i.apply_id
+        single_can['log_id']=user.log_id.log_id
         all_can.append(single_can)
     count=len(all_can)
+    all_can = sorted(all_can, key=lambda d: d['date_applied'])
+    all_can.reverse()
     GET_params = request.GET.copy()
     if('page' in GET_params):
         last=GET_params['page'][-1]
@@ -384,6 +390,10 @@ def change_pass(request, pk):
     return render(request, 'password-employer.html', {'pk': pk})
 
 def cinbox(request, pk):
+    shower=""
+    if 'thread' in request.session:
+        shower=request.session['thread']
+        del request.session['thread']
     loger=Login.objects.get(email=request.session['email'])
     threads=Threads.objects.filter(sender=loger.log_id)
     temp_threads=[dumps(list(threads.values()), default=str)]
@@ -416,7 +426,7 @@ def cinbox(request, pk):
         all_threads.append(single_thread)
     all_threads.reverse()
     all_messages.reverse()
-    return render(request, 'cinbox-employer.html', {'pk': pk, 'threads': all_threads, 'm': all_messages, 'mess': messages, 'thre': temp_threads})
+    return render(request, 'cinbox-employer.html', {'pk': pk, 'threads': all_threads, 'm': all_messages, 'mess': messages, 'thre': temp_threads, 'shower': shower})
 
 
 def sendmess(request, pk):
@@ -457,6 +467,7 @@ def fetch(request, pk):
     urlval=""
     count=0
     ind_unread=[]
+    rece=[]
     for i in threads:
         mess=Messages.objects.filter(msg_id=i.msg_id, receiver_user=user.log_id, is_read=False)
         si=len(mess)
@@ -465,6 +476,8 @@ def fetch(request, pk):
         messages.append(dumps(list(mess.values()), default=str))
         temp_messages.append(mess)
         mess=Messages.objects.filter(msg_id=i.msg_id)
+        if(len(mess)):
+            rece.append([mess[len(mess)-1].body])
         mess_all.append(dumps(list(mess.values()), default=str))
     comp_thread=Threads.objects.get(msg_id=request.GET['candidate'])
     comp_log=Login.objects.get(log_id=comp_thread.receiver.log_id)
@@ -472,7 +485,7 @@ def fetch(request, pk):
     messa=dumps(list(Messages.objects.filter(msg_id=request.GET['candidate'], receiver_user=user.log_id, is_read=False).values()), default=str)
     company=dumps(list(JobSeeker.objects.filter(log_id=comp_log).values()), default=str)
     urlval=JobSeeker.objects.filter(log_id=comp_log)[0].photo.url
-    return JsonResponse({'message': 'Y', 'url': "", 'mess': messages, 'thre': temp_threads, 'count': count, 'thread': thread, 'company': company ,'messa': messa, 'all_mess': mess_all, 'image': urlval, 'unread': dumps(ind_unread)})
+    return JsonResponse({'message': 'Y', 'url': "", 'mess': messages, 'thre': temp_threads, 'count': count, 'thread': thread, 'company': company ,'messa': messa, 'all_mess': mess_all, 'image': urlval, 'unread': dumps(ind_unread), 'rece': rece})
 
 
 def seen(request, pk):
@@ -498,6 +511,22 @@ def delete_mess(request, pk):
     if request.method == "POST":
         Threads.objects.get(msg_id=request.POST['candidate']).delete()
         return JsonResponse({'message': 'a'})
+
+def createthread(request, pk):
+    if request.method=="POST":
+        loger=Employer.objects.get(eid=pk)
+        msg=Threads.objects.filter(sender=loger.log_id.log_id, receiver=request.POST['receiver'])
+        if(len(msg)>0):
+            request.session['thread']=msg[0].msg_id
+            return JsonResponse({'url': ""})
+        else:
+            newthread=Threads()
+            newthread.sender=loger.log_id
+            newthread.receiver=Login.objects.get(log_id=request.POST['receiver'])
+            newthread.save()
+            request.session['thread']=newthread.msg_id
+            return JsonResponse({'url': ""})
+    return JsonResponse({'url': ""})
 
 def cnotifications(request, pk):
     loger=Login.objects.get(email=request.session['email'])

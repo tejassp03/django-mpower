@@ -37,9 +37,6 @@ from django.db.models import Max, Min
 
 @csrf_exempt
 def index(request):
-	jobs=Jobs.objects.all()
-	locations=jobs.order_by().values('location').distinct()
-	titles=jobs.order_by().values('title').distinct()
 	if request.method == 'POST':
 		user=Login.objects.filter(email=request.POST['c_email'])
 		if(len(user)==0):
@@ -83,6 +80,9 @@ def index(request):
 					return JsonResponse({'message': 'Y', 'url': urlval})
 			else:
 				return JsonResponse({'message': 'X'})
+	jobs=Jobs.objects.all()
+	locations=jobs.order_by().values('location').distinct()
+	titles=jobs.order_by().values('title').distinct()
 	return render(request, 'index.html', {'locations': locations, 'titles': titles})
 
 def view_function(request):

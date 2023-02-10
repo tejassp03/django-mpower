@@ -84,7 +84,7 @@
                             <div class="pxp-dashboard-table-options">
                                 <ul class="list-unstyled">
                                     <li><button title="View profile" id="pxp-candidate-modal-button" data-bs-target="#pxp-candidate-modal" data-bs-toggle="modal" onclick="candidatemodal('{{i.user_id}}')"><span class="fa fa-eye"></span></button></li>
-                                    <li><button title="Send message"><span class="fa fa-envelope-o"></span></button></li>
+                                    <li><button title="Send message" onclick="messageclick({{i.log_id}})"><span class="fa fa-envelope-o"></span></button></li>
                                     <li><button title="Approve" onclick="approve({{i.apply_id}})"><span class="fa fa-check"></span></button></li>
                                     <li><button title="Reject" onclick="reject({{i.apply_id}})"><span class="fa fa-ban"></span></button></li>
                                     <li><button title="Delete" onclick="delcan({{i.apply_id}})"><span class="fa fa-trash-o"></span></button></li>

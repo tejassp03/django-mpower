@@ -11,6 +11,7 @@ from itertools import chain
 from django.template import RequestContext
 
 from datetime import date, timedelta, datetime
+import heapq
 
 
 # Create your views here.
@@ -22,7 +23,6 @@ def dashboard(request, pk):
     num_notif = Notifications.objects.filter(rece_id=context.log_id).order_by('-datetime')
     all_notis=[]
     threads = Threads.objects.filter(receiver=userobj.log_id)
-    threadval = threads.filter(receiver=userobj.log_id, has_unread=1)
     countunmess=0
     recent_mess=[]
     for i in threads:
@@ -66,104 +66,108 @@ def dashboard(request, pk):
         singappli['ename']=com.ename
         singappli['logo']=com.logo
         all_applics.append(singappli)
-    def cacl2(par):
-        graph_val=[]
-        dates=[]
-        count_7=0
-        for i in range(0, 7):
-            d=date.today()-timedelta(days=i)
-            temp=None
-            if(par=="a"):
-                temp = applics.filter(date_applied__year=d.year, date_applied__month=d.month, date_applied__day=d.day)
-            else:
-                temp=profile.filter(visiting_time__year=d.year, visiting_time__month=d.month, visiting_time__day=d.day)
-            graph_val.append(len(temp))
-            dates.append(d)
-            count_7=count_7+len(temp)
-        graph_val.reverse()
-        dates.reverse()
-        return graph_val, dates, count_7
-    graph_val, dates, count_7=cacl2("a")
-    graph_val2, dates2, vcount_7=cacl2("v")
-    def cacl(dur, par):
-        graph_val=[]
-        dates=[]
-        mapin={}
-        count=0
-        for i in range(0, dur):
-            d=date.today()-timedelta(days=i)
-            temp=0
-            if par=="a":
-                temp = len(applics.filter(date_applied__year=d.year, date_applied__month=d.month, date_applied__day=d.day))
-            else:
-                temp=len(profile.filter(visiting_time__year=d.year, visiting_time__month=d.month, visiting_time__day=d.day))
-            graph_val.append(temp)
-            count=count+temp
-            if temp in mapin.keys():
-                mapin[temp].append(d)
-            else:
-                mapin[temp]=[d]
-        graph_val.sort(reverse=True)
-        final30=[]
-        datefinal30=[]
-        finaldic={}
-        for i in graph_val:
-            if(len(final30)>=7):
-                break
-            for j in mapin[i]:
-                if(len(datefinal30)>=7):
-                    break
-                if j not in datefinal30:
-                    final30.append(i)
-                    datefinal30.append(j)
-                    finaldic[j]=i
-        datefinal30.sort()
-        pas30=[]
-        pasdat30=[]
-        for i in datefinal30:
-            pas30.append(finaldic[i])
-            pasdat30.append(i)
-        return pas30, pasdat30, count
-    pas30, pasdat30, count_30 = cacl(30, "a")
-    pas60, pasdat60, count_60 = cacl(60, "a")
-    pas90, pasdat90, count_90 = cacl(90, "a")
-    pas365, pasdat365, count_365 = cacl(365, "a")
-    vis30, visdat30, vcount_30 = cacl(30, "v")
-    vis60, visdat60, vcount_60 = cacl(60, "v")
-    vis90, visdat90, vcount_90 = cacl(90, "v")
-    vis365, visdat365, vcount_365 = cacl(365, "v")
-    charts_context={}
-    charts_context['pastsev']=dumps(graph_val)
-    charts_context['dates']=dumps(dates, default=str)
-    charts_context['count_7']=dumps(count_7)
-    charts_context['pastthi']=dumps(pas30)
-    charts_context['dates30']=dumps(pasdat30, default=str)
-    charts_context['count_30']=dumps(count_30)
-    charts_context['pastsix']=dumps(pas60)
-    charts_context['dates60']=dumps(pasdat60, default=str)
-    charts_context['count_60']=dumps(count_60)
-    charts_context['pastnin']=dumps(pas90)
-    charts_context['dates90']=dumps(pasdat90, default=str)
-    charts_context['count_90']=dumps(count_90)
-    charts_context['pastyea']=dumps(pas365)
-    charts_context['dates365']=dumps(pasdat365, default=str)
-    charts_context['count_365']=dumps(count_365)
 
-    charts_context['vpastsev']=dumps(graph_val2)
-    charts_context['vdates']=dumps(dates2, default=str)
-    charts_context['vcount_7']=dumps(vcount_7)
-    charts_context['vpastthi']=dumps(vis30)
-    charts_context['vdates30']=dumps(visdat30, default=str)
-    charts_context['vcount_30']=dumps(vcount_30)
-    charts_context['vpastsix']=dumps(vis60)
-    charts_context['vdates60']=dumps(visdat60, default=str)
-    charts_context['vcount_60']=dumps(vcount_60)
-    charts_context['vpastnin']=dumps(vis90)
-    charts_context['vdates90']=dumps(visdat90, default=str)
-    charts_context['vcount_90']=dumps(vcount_90)
-    charts_context['vpastyea']=dumps(vis365)
-    charts_context['vdates365']=dumps(visdat365, default=str)
-    charts_context['vcount_365']=dumps(vcount_365)
+
+    visits = ProfileVisits.objects.filter(user_type="c", user_id=pk)
+    applics_chart=[]
+    applics_7=[]
+    applics_30=[]
+    applics_60=[]
+    applics_90=[]
+    applics_365=[]
+    counts=[]
+    cou=0
+
+    visits_chart=[]
+    visits_7=[]
+    visits_30=[]
+    visits_60=[]
+    visits_90=[]
+    visits_365=[]
+    countsv=[]
+    couv=0
+    for i in range(0, 365):
+        d=date.today()-timedelta(days=i)
+        temp = applics.filter(date_applied__year=d.year, date_applied__month=d.month, date_applied__day=d.day)
+        n=len(temp)
+        heapq.heappush(applics_chart, (-1*(n), n, d))
+        cou=cou+n
+        temp = visits.filter(visiting_time__year=d.year, visiting_time__month=d.month, visiting_time__day=d.day)
+        n=len(temp)
+        heapq.heappush(visits_chart, (-1*(n), n, d))
+        couv=couv+n
+        if(len(applics_chart)==7):
+            counts.append(cou)
+            countsv.append(couv)
+            for j in range(0, 7):
+                applics_7.append([applics_chart[j][2], applics_chart[j][1]])
+                visits_7.append([visits_chart[j][2], visits_chart[j][1]])
+        if(len(applics_chart)==30):
+            counts.append(cou)
+            countsv.append(couv)
+            for j in range(0, 7):
+                applics_30.append([applics_chart[j][2], applics_chart[j][1]])
+                visits_30.append([visits_chart[j][2], visits_chart[j][1]])
+        if(len(applics_chart)==60):
+            counts.append(cou)
+            countsv.append(couv)
+            for j in range(0, 7):
+                applics_60.append([applics_chart[j][2], applics_chart[j][1]])
+                visits_60.append([visits_chart[j][2], visits_chart[j][1]])
+        if(len(applics_chart)==90):
+            counts.append(cou)
+            countsv.append(couv)
+            for j in range(0, 7):
+                applics_90.append([applics_chart[j][2], applics_chart[j][1]])
+                visits_90.append([visits_chart[j][2], visits_chart[j][1]])
+        if(len(applics_chart)==364):
+            counts.append(cou)
+            countsv.append(couv)
+            for j in range(0, 7):
+                applics_365.append([applics_chart[j][2], applics_chart[j][1]])
+                visits_365.append([visits_chart[j][2], visits_chart[j][1]])
+    applics_7.sort()
+    applics_30.sort()
+    applics_60.sort()
+    applics_90.sort()
+    applics_365.sort()
+    visits_7.sort()
+    visits_30.sort()
+    visits_60.sort()
+    visits_90.sort()
+    visits_365.sort()
+    charts_context={}
+    charts_context['pastsev']=dumps([item[1] for item in applics_7])
+    charts_context['dates']=dumps([item[0] for item in applics_7], default=str)
+    charts_context['count_7']=dumps(counts[0])
+    charts_context['pastthi']=dumps([item[1] for item in applics_30])
+    charts_context['dates30']=dumps([item[0] for item in applics_30], default=str)
+    charts_context['count_30']=dumps(counts[1])
+    charts_context['pastsix']=dumps([item[1] for item in applics_60])
+    charts_context['dates60']=dumps([item[0] for item in applics_60], default=str)
+    charts_context['count_60']=dumps(counts[2])
+    charts_context['pastnin']=dumps([item[1] for item in applics_60])
+    charts_context['dates90']=dumps([item[0] for item in applics_60], default=str)
+    charts_context['count_90']=dumps(counts[3])
+    charts_context['pastyea']=dumps([item[1] for item in applics_365])
+    charts_context['dates365']=dumps([item[0] for item in applics_365], default=str)
+    charts_context['count_365']=dumps(counts[4])
+
+    charts_context['vpastsev']=dumps([item[1] for item in visits_7])
+    charts_context['vdates']=dumps([item[0] for item in visits_7], default=str)
+    charts_context['vcount_7']=dumps(countsv[0])
+    charts_context['vpastthi']=dumps([item[1] for item in visits_30])
+    charts_context['vdates30']=dumps([item[0] for item in visits_30], default=str)
+    charts_context['vcount_30']=dumps(countsv[1])
+    charts_context['vpastsix']=dumps([item[1] for item in visits_60])
+    charts_context['vdates60']=dumps([item[0] for item in visits_60], default=str)
+    charts_context['vcount_60']=dumps(countsv[2])
+    charts_context['vpastnin']=dumps([item[1] for item in visits_90])
+    charts_context['vdates90']=dumps([item[0] for item in visits_90], default=str)
+    charts_context['vcount_90']=dumps(countsv[3])
+    charts_context['vpastyea']=dumps([item[1] for item in visits_365])
+    charts_context['vdates365']=dumps([item[0] for item in visits_365], default=str)
+    charts_context['vcount_365']=dumps(countsv[4])
     return render(request, 'dashboard-candidate.html', {'user': context, 'applications': all_applics, 'pk': pk, 'profile': profile, 'notifics': all_notis, 'messcount': countunmess, 'charts': charts_context, 'recent': recent_mess_temp})
 
 

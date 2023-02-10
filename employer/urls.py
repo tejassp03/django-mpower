@@ -19,6 +19,7 @@ urlpatterns = [
 	path('cinbox/fetch/', views.fetch, name="fetch"),
 	path('cinbox/seen/', views.seen, name='seen'),
 	path('cinbox/delete/', views.delete_mess, name='delete_mess'),
+	path('createthread/', views.createthread, name='createthread'),
 	path('cnotifications/', views.cnotifications, name='cnotifications'),
 	path('manage_job/cjobapp/', views.jobapp, name='cjobapp'),
 	path('edit_job/', views.edit_job, name='edit_job'),

@@ -55,10 +55,10 @@
                     <li id="cinb">
                         <a href="{% url 'employer:cinbox' pk=pk %}" class="d-flex justify-content-between align-items-center">
                             <div><span class="fa fa-envelope-o"></span>Inbox</div>
-                            {% if count == 0 %}
+                            {% if countunmess == 0 %}
                             <span class="badge rounded-pill" id="countinbox"></span>
                             {% else %}
-                            <span class="badge rounded-pill" id="countinbox">{{ count }}</span>
+                            <span class="badge rounded-pill" id="countinbox">{{ countunmess }}</span>
                             {% endif %}
                         </a>
                     </li>
@@ -124,10 +124,10 @@
                                     <li class="nav-item">
                                         <a href="{% url 'employer:cinbox' pk=pk %}" class="d-flex justify-content-between align-items-center">
                                             <div><span class="fa fa-envelope-o"></span>Inbox</div>
-                                            {% if count == 0 %}
+                                            {% if countunmess == 0 %}
                                             <span class="badge rounded-pill" id="countinbox2"></span>
                                             {% else %}
-                                            <span class="badge rounded-pill" id="countinbox2">{{ count }}</span>
+                                            <span class="badge rounded-pill" id="countinbox2">{{ countunmess }}</span>
                                             {% endif %}
                                         </a>
                                     </li>
@@ -698,7 +698,24 @@
                 }
             })
         }
-                {% block script %}
+
+        function messageclick(id)
+        {
+            $.ajax(
+                {
+                    type:"POST",
+                    url: "{% url 'employer:createthread' pk %}",
+                    data:{
+                        receiver: id,
+                        csrfmiddlewaretoken: '{{ csrf_token }}'
+                    },
+                    success: function( data ) 
+                    {
+                        window.location="{% url 'employer:cinbox' pk %}";
+                    },
+                })
+        }
+            {% block script %}
             {% endblock script %}
         </script>
         <script src="{% static 'js/main.js' %}"></script>

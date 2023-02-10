@@ -72,12 +72,12 @@
                             {% csrf_token %}
                             {% comment %} <input value="candidate" style="display: none" name="user"/> {% endcomment %}
                             <div class="form-floating mb-3">
-                                <input type="email" class="form-control" name="c_email" id="pxp-signin-email" placeholder="Email address">
+                                <input type="email" class="form-control" name="c_email" id="pxp-signin-email" placeholder="Email address" onkeyup="inputchanger()">
                                 <label for="pxp-signin-email">Email address</label>
                                 <span class="fa fa-envelope-o"></span>
                             </div>
                             <div class="form-floating mb-3">
-                                <input type="password" class="form-control" name="c_pass" id="pxp-signin-password" placeholder="Password">
+                                <input type="password" class="form-control" name="c_pass" id="pxp-signin-password" placeholder="Password"  onkeyup="inputchanger()">
                                 <label for="pxp-signin-password">Password</label>
                                 <span class="fa fa-lock"></span>
                             </div>
@@ -104,12 +104,12 @@
                             {% csrf_token %}
                             {% comment %} <input value="employer" style="display: none" name="user"/> {% endcomment %}
                             <div class="form-floating mb-3">
-                                <input type="email" class="form-control" id="pxp-signin-email" placeholder="Email address" name="e_email">
+                                <input type="email" class="form-control" id="pxp-signin-email" placeholder="Email address" name="e_email"  onkeyup="inputchanger()">
                                 <label for="pxp-signin-email">Email address</label>
                                 <span class="fa fa-envelope-o"></span>
                             </div>
                             <div class="form-floating mb-3">
-                                <input type="password" class="form-control" id="pxp-signin-password" placeholder="Password" name="e_pass">
+                                <input type="password" class="form-control" id="pxp-signin-password" placeholder="Password" name="e_pass"  onkeyup="inputchanger()">
                                 <label for="pxp-signin-password">Password</label>
                                 <span class="fa fa-lock"></span>
                             </div>
@@ -393,12 +393,22 @@
                                 $('#signer2').text('Login Successful')
                                 $('#signer2').css({'background': 'green', 'border': '1px solid green'})
                             }
-                            setTimeout(() => {FetchData();}, 1000)
                             window.location = data['url'];
                         }
                     }
                 })
             })
+        function inputchanger()
+        {
+            $('#signer').css({'display': 'none'})
+            $('#signer2').css({'display': 'none'})
+        }
+        $('#pxp-signin-modal').on('keypress', function (event) {
+            var keycode = (event.keyCode ? event.keyCode : event.which);
+            if(keycode == '13'){
+              $('#pxp-signin-modal .show .signinbut').click();
+            }
+          });
         {% block script %}
         {% endblock script %}
         </script>
