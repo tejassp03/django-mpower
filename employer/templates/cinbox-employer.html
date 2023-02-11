@@ -41,10 +41,10 @@
                             </div>
                             <div class="mt-2 d-flex justify-content-between">
                                 {% if i.end == "y" %}
-                                <div class="pxp-dashboard-inbox-list-item-text pxp-text-light" id="you" style="text-overflow: ellipsis; word-wrap: nowrap; overflow: hidden">You: {{ i.body }}</div>
+                                <div class="pxp-dashboard-inbox-list-item-text pxp-text-light idrec{{i.msg_id}}" id="you{{i.msg_id}}" style="text-overflow: ellipsis; word-wrap: nowrap; overflow: hidden">You: {{ i.body }}</div>
                                 <div class="pxp-dashboard-inbox-list-item-no ms-3"><span class="badge rounded-pill" id="count{{i.msg_id}}"></span></div>
                                 {% elif i.end == "c" %}
-                                <div class="pxp-dashboard-inbox-list-item-text pxp-text-light" id="they" style="text-overflow: ellipsis; word-wrap: nowrap; overflow: hidden">{{ i.name }}: {{ i.body }}</div>
+                                <div class="pxp-dashboard-inbox-list-item-text pxp-text-light idrec{{i.msg_id}}" id="they{{i.msg_id}}" style="text-overflow: ellipsis; word-wrap: nowrap; overflow: hidden">{{ i.name }}: {{ i.body }}</div>
                                 <div class="pxp-dashboard-inbox-list-item-no ms-3"><span class="badge rounded-pill" id="count{{i.msg_id}}"></span></div>
                                 {% endif %}
                             </div>
@@ -214,8 +214,12 @@ $(document).ready(function () {
         },
         success: function( data ) 
         {
-            let recent=JSON.part(data['rece']);
-            
+            let recent=JSON.parse(data['rece']);
+            for(let i=0;i<recent.length;i++)
+            {
+                let idrec=".idrec"+recent[i].msg_id;
+                $(idrec).text(recent[i].body);
+            }
             let unread=JSON.parse(data['unread']);
             for(let i=0;i<unread.length;i++)
             {

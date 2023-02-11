@@ -63,10 +63,26 @@
                                         <span class="fa fa-share-alt">
                                     </span></button>
                                     <ul class="dropdown-menu pxp-single-job-share-dropdown" aria-labelledby="socialShareBtn">
+                                        {% if company_details.fblink == none %}
                                         <li><a class="dropdown-item" href="#"><span class="fa fa-facebook"></span> Facebook</a></li>
+                                        {% else %}
+                                        <li><a class="dropdown-item" href="{{ company_details.fblink }}" target="_blank"><span class="fa fa-facebook"></span> Facebook</a></li>
+                                        {% endif %}
+                                        {% if company_details.twlink == none %}
                                         <li><a class="dropdown-item" href="#"><span class="fa fa-twitter"></span> Twitter</a></li>
-                                        <li><a class="dropdown-item" href="#"><span class="fa fa-pinterest"></span> Pinterest</a></li>
+                                        {% else %}
+                                        <li><a class="dropdown-item" href="{{ company_details.twlink }}" target="_blank"><span class="fa fa-twitter"></span> Twitter</a></li>
+                                        {% endif %}
+                                        {% if company_details.twlink == none %}
+                                        <li><a class="dropdown-item" href="#"><span class="fa fa-instagram"></span> Instagram</a></li>
+                                        {% else %}
+                                        <li><a class="dropdown-item" href="{{ company_details.inlink }}" target="_blank"><span class="fa fa-instagram"></span> Instagram</a></li>
+                                        {% endif %}
+                                        {% if company_details.twlink == none %}
                                         <li><a class="dropdown-item" href="#"><span class="fa fa-linkedin"></span> LinkedIn</a></li>
+                                        {% else %}
+                                        <li><a class="dropdown-item" href="{{ company_details.lnlink }}" target="_blank"><span class="fa fa-linkedin"></span> LinkedIn</a></li>
+                                        {% endif %}
                                     </ul>
                                 </div>
                                 <button class="btn ms-2 pxp-single-job-apply-btn rounded-pill">Apply Now</button>
@@ -124,15 +140,27 @@
                         </div>
                         <div class="mt-4">
                             <div class="pxp-single-job-side-info-label pxp-text-light">Work Level</div>
-                            <div class="pxp-single-job-side-info-data">Senior Level</div>
+                            <div class="pxp-single-job-side-info-data">{{ job_details.careerlevel }}</div>
                         </div>
                         <div class="mt-4">
                             <div class="pxp-single-job-side-info-label pxp-text-light">Employment Type</div>
-                            <div class="pxp-single-job-side-info-data">Full Time</div>
+                            <div class="pxp-single-job-side-info-data">{{ job_details.jobtype }}</div>
                         </div>
                         <div class="mt-4">
                             <div class="pxp-single-job-side-info-label pxp-text-light">Salary</div>
-                            <div class="pxp-single-job-side-info-data">${{ job_details.basicpay }}</div>
+                            {% if job_details.basicpay == "1" %}
+                            <div class="pxp-single-job-side-info-data">$0 - $700</div>
+                            {% elif job_details.basicpay == "2" %}
+                            <div class="pxp-single-job-side-info-data">$700 - $1000</div>
+                            {% elif job_details.basicpay == "3" %}
+                            <div class="pxp-single-job-side-info-data">$1000 - $1200</div>
+                            {% elif job_details.basicpay == "4" %}
+                            <div class="pxp-single-job-side-info-data">$1200 - $1400</div>
+                            {% elif job_details.basicpay == "5" %}
+                            <div class="pxp-single-job-side-info-data">$1500 - $1800</div>
+                            {% elif job_details.basicpay == "6" %}
+                            <div class="pxp-single-job-side-info-data">$2000 - $3000</div>
+                            {% endif %}
                         </div>
                     </div>
                     <div class="mt-3 mt-lg-4 pxp-single-job-side-panel">
@@ -153,11 +181,25 @@
                         </div>
                         <div class="mt-4">
                             <div class="pxp-single-job-side-info-label pxp-text-light">Company size</div>
-                            <div class="pxp-single-job-side-info-data">50-100</div>
+                            {% if company_details.size == "1" %}
+                            <div class="pxp-single-job-side-info-data">&lt; 50 employees</div>
+                            {% elif company_details.size == "2" %}
+                            <div class="pxp-single-job-side-info-data">50 - 100 employees</div>
+                            {% elif company_details.size == "3" %}
+                            <div class="pxp-single-job-side-info-data">100 - 150 employees</div>
+                            {% elif company_details.size == "4" %}
+                            <div class="pxp-single-job-side-info-data">150 - 200 employees</div>
+                            {% elif company_details.size == "5" %}
+                            <div class="pxp-single-job-side-info-data">200 - 250 employees</div>
+                            {% elif company_details.size == "6" %}
+                            <div class="pxp-single-job-side-info-data">250 - 300 employees</div>
+                            {% elif company_details.size == "7" %}
+                            <div class="pxp-single-job-side-info-data">&gt; 300 employees</div>
+                            {% endif %}
                         </div>
                         <div class="mt-4">
                             <div class="pxp-single-job-side-info-label pxp-text-light">Founded in</div>
-                            <div class="pxp-single-job-side-info-data">2005</div>
+                            <div class="pxp-single-job-side-info-data">{{ company_details.yearfounded }}</div>
                         </div>
                         <div class="mt-4">
                             <div class="pxp-single-job-side-info-label pxp-text-light">Phone</div>
@@ -165,7 +207,7 @@
                         </div>
                         <div class="mt-4">
                             <div class="pxp-single-job-side-info-label pxp-text-light">Email</div>
-                            <div class="pxp-single-job-side-info-data">office@craftgenics.com</div>
+                            <div class="pxp-single-job-side-info-data">{{ loger.email }}</div>
                         </div>
                         <div class="mt-4">
                             <div class="pxp-single-job-side-info-label pxp-text-light">Location</div>
@@ -173,15 +215,35 @@
                         </div>
                         <div class="mt-4">
                             <div class="pxp-single-job-side-info-label pxp-text-light">Website</div>
-                            <div class="pxp-single-job-side-info-data"><a href="#">www.craftgenics.com</a></div>
+                            {% if company_details.website %}
+                            <div class="pxp-single-job-side-info-data"><a href="{{company_details.website}}" target="_blank">{{ company_details.website }}</a></div>
+                            {% else %}
+                            <div class="pxp-single-job-side-info-data"><a href="#">None</a></div>
+                            {% endif %}
                         </div>
                         <div class="mt-4">
                             <div class="pxp-single-job-side-info-data">
                                 <ul class="list-unstyled pxp-single-job-side-info-social">
+                                    {% if company_details.fblink == none %}
                                     <li><a href="#"><span class="fa fa-facebook"></span></a></li>
+                                    {% else %}
+                                    <li><a href="{{ company_details.fblink }}" target="_blank"><span class="fa fa-facebook"></span></a></li>
+                                    {% endif %}
+                                    {% if company_details.twlink == none %}
                                     <li><a href="#"><span class="fa fa-twitter"></span></a></li>
+                                    {% else %}
+                                    <li><a href="{{ company_details.twlink }}" target="_blank"><span class="fa fa-twitter"></span></a></li>
+                                    {% endif %}
+                                    {% if company_details.twlink == none %}
                                     <li><a href="#"><span class="fa fa-instagram"></span></a></li>
+                                    {% else %}
+                                    <li><a href="{{ company_details.inlink }}" target="_blank"><span class="fa fa-instagram"></span></a></li>
+                                    {% endif %}
+                                    {% if company_details.twlink == none %}
                                     <li><a href="#"><span class="fa fa-linkedin"></span></a></li>
+                                    {% else %}
+                                    <li><a href="{{ company_details.lnlink }}" target="_blank"><span class="fa fa-linkedin"></span></a></li>
+                                    {% endif %}
                                 </ul>
                             </div>
                         </div>

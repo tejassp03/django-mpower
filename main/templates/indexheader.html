@@ -182,7 +182,11 @@
                 </ul>
             </nav>
             <nav class="pxp-user-nav d-none d-sm-flex">
-                <a ref="{% url 'main:postjob' %}" class="btn rounded-pill pxp-nav-btn">Post a Job</a>
+                {% if 'type' in request.session %}
+                {% if request.session.type == "e" %}
+                <a href="{% url 'employer:newjob' pk=request.session.pk %}" class="btn rounded-pill pxp-nav-btn">Post a Job</a>
+                {% endif %}
+                {% endif %}
                 
                 {% if 'email' in request.session %}
                 {% if request.session.type == "c" %}

@@ -476,8 +476,13 @@ def fetch(request, pk):
         messages.append(dumps(list(mess.values()), default=str))
         temp_messages.append(mess)
         mess=Messages.objects.filter(msg_id=i.msg_id)
-        if(len(mess)):
-            rece.append([mess[len(mess)-1].body])
+        n=len(mess)
+        if(n>0):
+            if(mess[n-1].sender_user.log_id==user.log_id):
+                rece.append({'msg_id': i.msg_id, 'body': "You: "+mess[len(mess)-1].body, 'type': "e"})
+            else:
+                username=JobSeeker.objects.get(log_id=mess[n-1].sender_user.log_id)
+                rece.append({'msg_id': i.msg_id, 'body': username.name+": "+mess[len(mess)-1].body, 'type': "c"})
         mess_all.append(dumps(list(mess.values()), default=str))
     comp_thread=Threads.objects.get(msg_id=request.GET['candidate'])
     comp_log=Login.objects.get(log_id=comp_thread.receiver.log_id)
@@ -485,7 +490,7 @@ def fetch(request, pk):
     messa=dumps(list(Messages.objects.filter(msg_id=request.GET['candidate'], receiver_user=user.log_id, is_read=False).values()), default=str)
     company=dumps(list(JobSeeker.objects.filter(log_id=comp_log).values()), default=str)
     urlval=JobSeeker.objects.filter(log_id=comp_log)[0].photo.url
-    return JsonResponse({'message': 'Y', 'url': "", 'mess': messages, 'thre': temp_threads, 'count': count, 'thread': thread, 'company': company ,'messa': messa, 'all_mess': mess_all, 'image': urlval, 'unread': dumps(ind_unread), 'rece': rece})
+    return JsonResponse({'message': 'Y', 'url': "", 'mess': messages, 'thre': temp_threads, 'count': count, 'thread': thread, 'company': company ,'messa': messa, 'all_mess': mess_all, 'image': urlval, 'unread': dumps(ind_unread), 'rece': dumps(rece)})
 
 
 def seen(request, pk):

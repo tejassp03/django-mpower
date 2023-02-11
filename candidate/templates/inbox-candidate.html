@@ -39,13 +39,13 @@
                             </div>
                             <div class="mt-2 d-flex justify-content-between">
                                 {% if k.0 == "c" %}
-                                    <div class="pxp-dashboard-inbox-list-item-text pxp-text-light" style="text-overflow: ellipsis;
+                                    <div class="pxp-dashboard-inbox-list-item-text pxp-text-light idrec{{i.msg_id}}" style="text-overflow: ellipsis;
                                     word-wrap: nowrap; overflow: hidden">You: {{k.1}}</div>
                                 {% elif k.0 == "x" %}
-                                <div class="pxp-dashboard-inbox-list-item-text pxp-text-light" style="text-overflow: ellipsis;
+                                <div class="pxp-dashboard-inbox-list-item-text pxp-text-light  idrec{{i.msg_id}}" style="text-overflow: ellipsis;
                                 word-wrap: nowrap; overflow: hidden"></div>
                                 {% else %}
-                                    <div class="pxp-dashboard-inbox-list-item-text pxp-text-light" style="text-overflow: ellipsis;
+                                    <div class="pxp-dashboard-inbox-list-item-text pxp-text-light  idrec{{i.msg_id}}" style="text-overflow: ellipsis;
                                     word-wrap: nowrap; overflow: hidden">{{ j.ename }}: {{k.1}}</div>
                                 {% endif %}
                                 {% if k.3 == 0 %}
@@ -200,6 +200,12 @@ $(document).ready(function () {
         },
         success: function( data ) 
         {
+            let recent=JSON.parse(data['rece']);
+            for(let i=0;i<recent.length;i++)
+            {
+                let idrec=".idrec"+recent[i].msg_id;
+                $(idrec).text(recent[i].body);
+            }
             let unread=JSON.parse(data['unread']);
             for(let i=0;i<unread.length;i++)
             {

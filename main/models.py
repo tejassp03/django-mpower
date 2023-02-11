@@ -68,7 +68,7 @@ class Jobs(models.Model):
     jobdesc = models.CharField(max_length=700, default=None, null=True)
     vacno = models.IntegerField(default=None, null=True)
     experience = models.CharField(max_length=100, default=None, null=True)
-    basicpay = models.IntegerField(default=None, null=True)
+    basicpay = models.CharField(max_length=50, default=None, null=True)
     fnarea = models.CharField(max_length=100, default=None, null=True)
     location = models.CharField(max_length=200, default=None, null=True)
     industry = models.CharField(max_length=200, default=None, null=True)

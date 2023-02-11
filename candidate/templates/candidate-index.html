@@ -250,10 +250,10 @@
                                                                     <span class="fa fa-share-alt">
                                                                 </span></button>
                                                                 <ul class="dropdown-menu pxp-single-job-share-dropdown" aria-labelledby="socialShareBtn">
-                                                                    <li><a class="dropdown-item" href="#"><span class="fa fa-facebook"></span> Facebook</a></li>
-                                                                    <li><a class="dropdown-item" href="#"><span class="fa fa-twitter"></span> Twitter</a></li>
-                                                                    <li><a class="dropdown-item" href="#"><span class="fa fa-pinterest"></span> Pinterest</a></li>
-                                                                    <li><a class="dropdown-item" href="#"><span class="fa fa-linkedin"></span> LinkedIn</a></li>
+                                                                    <li><a class="dropdown-item" href="#" id="fb"><span class="fa fa-facebook"></span> Facebook</a></li>
+                                                                    <li><a class="dropdown-item" href="#" id="tw"><span class="fa fa-twitter"></span> Twitter</a></li>
+                                                                    <li><a class="dropdown-item" href="#" id="in"><span class="fa fa-instagram"></span> Instagram</a></li>
+                                                                    <li><a class="dropdown-item" href="#" id="ln"><span class="fa fa-linkedin"></span> LinkedIn</a></li>
                                                                 </ul>
                                                             </div>
                                                         </div>
@@ -306,11 +306,11 @@
                                                     </div>
                                                     <div class="mt-4">
                                                         <div class="pxp-single-job-side-info-label pxp-text-light">Work Level</div>
-                                                        <div class="pxp-single-job-side-info-data">Senior Level</div>
+                                                        <div class="pxp-single-job-side-info-data" id="lev"></div>
                                                     </div>
                                                     <div class="mt-4">
                                                         <div class="pxp-single-job-side-info-label pxp-text-light">Employment Type</div>
-                                                        <div class="pxp-single-job-side-info-data">Full Time</div>
+                                                        <div class="pxp-single-job-side-info-data" id="jobtype"></div>
                                                     </div>
                                                     <div class="mt-4">
                                                         <div class="pxp-single-job-side-info-label pxp-text-light">Salary</div>
@@ -327,23 +327,23 @@
                                                     </div>
                                                     <div class="mt-4">
                                                         <div class="pxp-single-job-side-info-label pxp-text-light">Industry</div>
-                                                        <div class="pxp-single-job-side-info-data" id="indus">Software</div>
+                                                        <div class="pxp-single-job-side-info-data" id="indus"></div>
                                                     </div>
                                                     <div class="mt-4">
                                                         <div class="pxp-single-job-side-info-label pxp-text-light">Company size</div>
-                                                        <div class="pxp-single-job-side-info-data">50-100</div>
+                                                        <div class="pxp-single-job-side-info-data" id="size"></div>
                                                     </div>
                                                     <div class="mt-4">
                                                         <div class="pxp-single-job-side-info-label pxp-text-light">Founded in</div>
-                                                        <div class="pxp-single-job-side-info-data">2005</div>
+                                                        <div class="pxp-single-job-side-info-data" id="yearfounded"></div>
                                                     </div>
                                                     <div class="mt-4">
                                                         <div class="pxp-single-job-side-info-label pxp-text-light">Phone</div>
-                                                        <div class="pxp-single-job-side-info-data">0124 456 789</div>
+                                                        <div class="pxp-single-job-side-info-data" id="phone"></div>
                                                     </div>
                                                     <div class="mt-4">
                                                         <div class="pxp-single-job-side-info-label pxp-text-light">Email</div>
-                                                        <div class="pxp-single-job-side-info-data">office@craftgenics.com</div>
+                                                        <div class="pxp-single-job-side-info-data" id="ema"></div>
                                                     </div>
                                                     <div class="mt-4">
                                                         <div class="pxp-single-job-side-info-label pxp-text-light">Location</div>
@@ -351,15 +351,15 @@
                                                     </div>
                                                     <div class="mt-4">
                                                         <div class="pxp-single-job-side-info-label pxp-text-light">Website</div>
-                                                        <div class="pxp-single-job-side-info-data"><a href="#">www.craftgenics.com</a></div>
+                                                        <div class="pxp-single-job-side-info-data"><a href="#" id="webs"></a></div>
                                                     </div>
                                                     <div class="mt-4">
                                                         <div class="pxp-single-job-side-info-data">
                                                             <ul class="list-unstyled pxp-single-job-side-info-social">
-                                                                <li><a href="#"><span class="fa fa-facebook"></span></a></li>
-                                                                <li><a href="#"><span class="fa fa-twitter"></span></a></li>
-                                                                <li><a href="#"><span class="fa fa-instagram"></span></a></li>
-                                                                <li><a href="#"><span class="fa fa-linkedin"></span></a></li>
+                                                                <li><a href="#" id="fb2"><span class="fa fa-facebook"></span></a></li>
+                                                                <li><a href="#" id="tw2"><span class="fa fa-twitter"></span></a></li>
+                                                                <li><a href="#" id="in2"><span class="fa fa-instagram"></span></a></li>
+                                                                <li><a href="#" id="ln2"><span class="fa fa-linkedin"></span></a></li>
                                                             </ul>
                                                         </div>
                                                     </div>
@@ -440,7 +440,33 @@
                     $('#datesh').text(JSON.parse(data['info'])[0].postdate);
                     $('#desc').text(JSON.parse(data['info'])[0].jobdesc);
                     $('#exp').text(JSON.parse(data['info'])[0].experience);
-                    $('#sal').text(JSON.parse(data['info'])[0].basicpay);
+                    $('#lev').text(JSON.parse(data['info'])[0].careerlevel);
+                    $('#jobtype').text(JSON.parse(data['info'])[0].jobtype);
+                    let sal=JSON.parse(data['info'])[0].basicpay;
+                    if(sal=="1")
+                    {
+                        $('#sal').text("$0 - $700");
+                    }
+                    else if(sal=="2")
+                    {
+                        $('#sal').text("$700 - $1000");
+                    }
+                    else if(sal=="3")
+                    {
+                        $('#sal').text("$1000 - $1200");
+                    }
+                    else if(sal=="4")
+                    {
+                        $('#sal').text("$1200 - $1400");
+                    }
+                    else if(sal=="5")
+                    {
+                        $('#sal').text("$1500 - $1800");
+                    }
+                    else if(sal=="6")
+                    {
+                        $('#sal').text("$2000 - $3000");
+                    }
                     $('#comna').text(JSON.parse(data['company'])[0].ename);
                     $('#indus').text(JSON.parse(data['company'])[0].industry);
                     $('#locat').text(JSON.parse(data['company'])[0].location);
@@ -454,6 +480,79 @@
                         ab.style.width='4rem';
                         ab.style.height='4rem';
                         document.getElementById('coverimage').append(ab)
+                    }
+                    let siz=JSON.parse(data['company'])[0].size;
+                    if(siz=="1")
+                    {
+                        $('#size').text('< 50 employees')
+                    }
+                    else if(siz=="2")
+                    {
+                        $('#size').text('50 - 100 employees')
+                    }
+                    else if(siz=="3")
+                    {
+                        $('#size').text('100 - 150 employees')
+                    }
+                    else if(siz=="4")
+                    {
+                        $('#size').text('150 - 200 employees')
+                    }
+                    else if(siz=="5")
+                    {
+                        $('#size').text('200 - 250 employees')
+                    }
+                    else if(siz=="6")
+                    {
+                        $('#size').text('250 - 300 employees')
+                    }
+                    else if(siz=="7")
+                    {
+                        $('#size').text('> 300 employees')
+                    }
+                    $('#yearfounded').text(JSON.parse(data['company'])[0].yearfounded);
+                    $('#phone').text(JSON.parse(data['company'])[0].phone);
+                    $('#ema').text(JSON.parse(data['emai']).email);
+                    $('#webs').text(JSON.parse(data['company'])[0].website);
+                    let fbl=JSON.parse(data['company'])[0].fblink;
+                    if(fbl)
+                    {
+                        let fblink=document.getElementById('fb');
+                        fblink.setAttribute('href', fbl)
+                        fblink.setAttribute('target', '_blank')
+                        fblink=document.getElementById('fb2');
+                        fblink.setAttribute('href', fbl)
+                        fblink.setAttribute('target', '_blank')
+                    }
+                    let twl=JSON.parse(data['company'])[0].twlink;
+                    if(twl)
+                    {
+                        let twlink=document.getElementById('tw');
+                        twlink.setAttribute('href', twl)
+                        twlink.setAttribute('target', '_blank')
+                        twlink=document.getElementById('tw2');
+                        twlink.setAttribute('href', twl)
+                        twlink.setAttribute('target', '_blank')
+                    }
+                    let inl=JSON.parse(data['company'])[0].inlink;
+                    if(inl)
+                    {
+                        let inlink=document.getElementById('in');
+                        inlink.setAttribute('href', inl)
+                        inlink.setAttribute('target', '_blank')
+                        inlink=document.getElementById('in2');
+                        inlink.setAttribute('href', inl)
+                        inlink.setAttribute('target', '_blank')
+                    }
+                    let lnl=JSON.parse(data['company'])[0].lnlink;
+                    if(lnl)
+                    {
+                        let lnlink=document.getElementById('ln');
+                        lnlink.setAttribute('href', lnl)
+                        lnlink.setAttribute('target', '_blank')
+                        lnlink=document.getElementById('ln2');
+                        lnlink.setAttribute('href', lnl)
+                        lnlink.setAttribute('target', '_blank')
                     }
                     {% comment %} $('#coverimage').css({'background-image': "url($urln)"}) {% endcomment %}
                 }

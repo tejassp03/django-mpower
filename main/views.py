@@ -202,16 +202,8 @@ def findjobs(request):
 		jobs=jobs.filter(experience__in=request.GET.getlist('exp'))
 		exp_sel=request.GET.getlist('exp')
 	if 'sal' in request.GET:
-		minval=-1
-		maxval=-1
-		for i in request.GET.getlist('sal'):
-			ab=i.split(',')
-			if int(ab[0])<minval:
-				minval=int(ab[0])
-			if int(ab[1])>maxval:
-				maxval=int(ab[1])
-			sal_sel.append([int(ab[0]), int(ab[1])])
-		jobs=jobs.filter(basicpay__range=(minval, maxval))
+		jobs=jobs.filter(basicpay__in=request.GET.getlist('sal'))
+		sal_sel=request.GET.getlist('sal')
 	if 'datesort' in request.GET:
 		d_val=request.GET['datesort']
 		if(request.GET['datesort']=="2"):
@@ -247,36 +239,22 @@ def findjobs(request):
 	categories=jobs.order_by().values('fnarea').distinct()
 	locations=jobs.order_by().values('location').distinct()
 	titles=jobs.order_by().values('title').distinct()
-	jobtype=Jobs.objects.order_by().values('jobtype').distinct()
-	emptype=Jobs.objects.order_by().values('experience').distinct()
-	max_sal=Jobs.objects.all().aggregate(Max('basicpay'))
-	min_sal=Jobs.objects.all().aggregate(Min('basicpay'))
-	saltype=[]
-	diff=None
-	if(count!=0):
-		diff=(max_sal['basicpay__max']-min_sal['basicpay__min'])//5
-		if(diff==0):
-			saltype.append([0, 1000*round(min_sal['basicpay__min']/1000)])
-		else:
-			for i in range(0,5):
-				if saltype:
-					if saltype[-1][1]!=1000*round((saltype[-1][1]+diff)/1000):
-						saltype.append([saltype[-1][1], 1000*round((saltype[-1][1]+diff)/1000)])
-				else:
-					saltype.append([0, 1000*round(min_sal['basicpay__min']/1000)])
-					if 1000*round(min_sal['basicpay__min']/1000)!=1000*round((min_sal['basicpay__min']+diff)/1000):
-						saltype.append([1000*round(min_sal['basicpay__min']/1000), 1000*round((min_sal['basicpay__min']+diff)/1000)])
+	jobtype=jobs.order_by().values('jobtype').distinct()
+	emptype=jobs.order_by().values('experience').distinct()
+	salary=jobs.order_by('basicpay').values('basicpay').distinct()
 	countjob=[]
 	countemp=[]
 	countsal=[]
 	for i in jobtype:
-		countjob.append(len(Jobs.objects.filter(jobtype=i['jobtype'])))
+		countjob.append(len(jobs.filter(jobtype=i['jobtype'])))
 	for i in emptype:
-		countemp.append(len(Jobs.objects.filter(experience=i['experience'])))
-	for i in saltype:
-		countsal.append(len(Jobs.objects.filter(basicpay__range=(i[0], i[1]))))
+		countemp.append(len(jobs.filter(experience=i['experience'])))
+	for i in salary:
+		countsal.append(len(jobs.filter(basicpay=i['basicpay'])))
+	print(sal_sel)
+	print(salary)
 	context={'c': c_val, 'l': l_val, 't': t_val, 'd': d_val, 'sel': emp_sel, 'eel': exp_sel, 'els': sal_sel}
-	return render(request, 'jobs.html', {'page_obj': page_obj, 'pe': page_obj, 'count': count, 'locations': locations, 'titles': titles, 'categories': categories, 'GET_params':GET_params, 'jobtype': zip(jobtype, countjob), 'emptype': zip(emptype, countemp), 'saltype': zip(saltype, countsal), 'context': context})
+	return render(request, 'jobs.html', {'page_obj': page_obj, 'pe': page_obj, 'count': count, 'locations': locations, 'titles': titles, 'categories': categories, 'GET_params':GET_params, 'jobtype': zip(jobtype, countjob), 'emptype': zip(emptype, countemp), 'saltype': zip(salary, countsal), 'context': context})
 
 def profile_completion(request, pk):
 	if request.method=='POST':
@@ -590,5 +568,6 @@ def singlejob(request, pk2):
 	jobdet=Jobs.objects.get(jobid=pk2)
 	companydet=Employer.objects.get(eid=jobdet.eid.eid)
 	liked=LikedJobs.objects.filter(job_id=pk2)
-	return render(request, 'singlejob.html', {'job_details': jobdet, 'company_details': companydet, 'liked': liked})
+	loger=Login.objects.get(log_id=companydet.log_id.log_id)
+	return render(request, 'singlejob.html', {'job_details': jobdet, 'company_details': companydet, 'liked': liked, 'loger': loger})
 

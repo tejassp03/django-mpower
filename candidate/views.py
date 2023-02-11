@@ -174,10 +174,12 @@ def dashboard(request, pk):
 def jobapp(request, pk):
     jobinfo = Jobs.objects.filter(jobid=request.GET['jobid'])
     employer = Employer.objects.filter(eid=jobinfo[0].eid.eid)
+    email = Login.objects.get(log_id=employer[0].log_id.log_id)
+    email = {'email': email.email}
     image=""
     if(employer[0].logo):
         image = str(employer[0].logo.url)
-    return JsonResponse({'logo': image, 'info': dumps(list(jobinfo.values()), default=str), 'company': dumps(list(employer.values()))})
+    return JsonResponse({'logo': image, 'info': dumps(list(jobinfo.values()), default=str), 'company': dumps(list(employer.values())), 'emai': dumps(email)})
 
 
 def edit_profile(request, pk):
@@ -438,6 +440,7 @@ def fetchmess(request, pk):
     urlval=""
     count=0
     ind_unread=[]
+    rece=[]
     for i in threads:
         mess=Messages.objects.filter(msg_id=i.msg_id, receiver_user=user.log_id, is_read=False)
         si=len(mess)
@@ -446,6 +449,13 @@ def fetchmess(request, pk):
         messages.append(dumps(list(mess.values()), default=str))
         temp_messages.append(mess)
         mess=Messages.objects.filter(msg_id=i.msg_id)
+        n=len(mess)
+        if(n>0):
+            if(mess[n-1].sender_user.log_id==user.log_id):
+                rece.append({'msg_id': i.msg_id, 'body': "You: "+mess[len(mess)-1].body, 'type': "e"})
+            else:
+                comname=Employer.objects.get(log_id=mess[n-1].sender_user.log_id)
+                rece.append({'msg_id': i.msg_id, 'body': comname.ename+": "+mess[len(mess)-1].body, 'type': "c"})
         mess_all.append(dumps(list(mess.values()), default=str))
     comp_thread=Threads.objects.get(msg_id=request.GET['employer'])
     comp_log=Login.objects.get(log_id=comp_thread.sender.log_id)
@@ -453,7 +463,7 @@ def fetchmess(request, pk):
     messa=dumps(list(Messages.objects.filter(msg_id=request.GET['employer'], receiver_user=user.log_id, is_read=False).values()), default=str)
     company=dumps(list(Employer.objects.filter(log_id=comp_log).values()), default=str)
     urlval=Employer.objects.filter(log_id=comp_log)[0].logo.url
-    return JsonResponse({'message': 'Y', 'url': "", 'mess': messages, 'thre': temp_threads, 'count': count, 'thread': thread, 'company': company ,'messa': messa, 'all_mess': mess_all, 'image': urlval, 'unread': dumps(ind_unread)})
+    return JsonResponse({'message': 'Y', 'url': "", 'mess': messages, 'thre': temp_threads, 'count': count, 'thread': thread, 'company': company ,'messa': messa, 'all_mess': mess_all, 'image': urlval, 'unread': dumps(ind_unread), 'rece': dumps(rece)})
 
 def seenmes(request, pk):
     loger=Login.objects.get(email=request.session['email'])
