@@ -251,8 +251,6 @@ def findjobs(request):
 		countemp.append(len(jobs.filter(experience=i['experience'])))
 	for i in salary:
 		countsal.append(len(jobs.filter(basicpay=i['basicpay'])))
-	print(sal_sel)
-	print(salary)
 	context={'c': c_val, 'l': l_val, 't': t_val, 'd': d_val, 'sel': emp_sel, 'eel': exp_sel, 'els': sal_sel}
 	return render(request, 'jobs.html', {'page_obj': page_obj, 'pe': page_obj, 'count': count, 'locations': locations, 'titles': titles, 'categories': categories, 'GET_params':GET_params, 'jobtype': zip(jobtype, countjob), 'emptype': zip(emptype, countemp), 'saltype': zip(salary, countsal), 'context': context})
 

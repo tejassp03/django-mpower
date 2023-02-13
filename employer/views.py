@@ -9,6 +9,11 @@ from queue import PriorityQueue
 import heapq
 from datetime import date, timedelta, datetime
 from django.http import JsonResponse
+import PyPDF2
+import textract
+import string
+import pandas as pd
+import matplotlib.pyplot as plt
 
 # Create your views here.
 def dashboard(request, pk):
@@ -187,7 +192,8 @@ def newjob(request, pk):
         job.jobtype=request.POST['jobtype']
         job.basicpay=request.POST['basicpay']
         job.save()
-        return redirect('employer:newjob', pk=pk)
+        request.session['c_s_id']=job.jobid
+        return redirect('employer:cand_suggest', pk=pk)
     return render(request, 'newjob-employer.html', {'pk': pk})
 
 def edit(request, pk):
@@ -597,6 +603,90 @@ def edit_job(request, pk):
             job[0].save()
         return redirect('employer:manage', pk=pk)
     return JsonResponse({'info': dumps(list(job.values()), default=str)})
+
+def cand_suggest(request, pk):
+    job = Jobs.objects.filter(eid=pk)
+    candid=[]
+    sel=""
+    if ('job_id' in request.GET and request.GET['job_id']!='a') or 'c_s_id' in request.session:
+        single_job=None
+        if 'c_s_id' in request.session:
+            sel=int(request.session['c_s_id'])
+            single_job = Jobs.objects.get(jobid=request.session['c_s_id'])
+            del request.session['c_s_id']
+        else:
+            sel=int(request.GET['job_id'])
+            single_job = Jobs.objects.get(jobid=request.GET['job_id'])
+        jobs=JobSeeker.objects.all()
+        for i in jobs:
+            if i.Resume:
+                pdfFileObj = open("media/"+str(i.Resume),'rb')  
+                pdfReader = PyPDF2.PdfFileReader(pdfFileObj)
+                num_pages = pdfReader.numPages
+                count = 0
+                text = ""
+                while count < num_pages:
+                    pageObj = pdfReader.getPage(count)
+                    count +=1
+                    text += pageObj.extractText()
+                text = text.lower()
+                text = re.sub(r'\d+','',text)
+                text = text.translate(str.maketrans('','',string.punctuation))
+                terms = {'Python Developer':['black belt','capability analysis','control charts','doe','dmaic','fishbone',
+                                        'gage r&r', 'green belt','ishikawa','iso','kaizen','kpi','lean','metrics',
+                                        'pdsa','performance improvement','process improvement','quality',
+                                        'quality circles','quality tools','root cause','six sigma',
+                                        'stability analysis','statistical analysis','tqm'],      
+                    'Django Developer':['automation','bottleneck','constraints','cycle time','efficiency','fmea',
+                                            'machinery','maintenance','manufacture','line balancing','oee','operations',
+                                            'operations research','optimization','overall equipment effectiveness',
+                                            'pfmea','process','process mapping','production','resources','safety',
+                                            'stoppage','value stream mapping','utilization'],
+                    'React Developer':['abc analysis','apics','customer','customs','delivery','distribution','eoq','epq',
+                                    'fleet','forecast','inventory','logistic','materials','outsourcing','procurement',
+                                    'reorder point','rout','safety stock','scheduling','shipping','stock','suppliers',
+                                    'third party logistics','transport','transportation','traffic','supply chain',
+                                    'vendor','warehouse','wip','work in progress'],
+                    'NEXT Developer':['administration','agile','budget','cost','direction','feasibility analysis',
+                                        'finance','kanban','leader','leadership','management','milestones','planning',
+                                        'pmi','pmp','problem','project','risk','schedule','scrum','stakeholders'],
+                    'Project management':['administration','agile','budget','cost','direction','feasibility analysis',
+                              'finance','kanban','leader','leadership','management','milestones','planning',
+                              'pmi','pmp','problem','project','risk','schedule','scrum','stakeholders'],
+                    'Data analytics':['analytics','api','aws','big data','busines intelligence','clustering','code',
+                                    'coding','data','database','data mining','data science','deep learning','hadoop',
+                                    'hypothesis test','iot','internet','machine learning','modeling','nosql','nlp',
+                                    'predictive','programming','python','r','sql','tableau','text mining',
+                                    'visualuzation'],}
+                quality = 0
+                for area in terms.keys():
+                    if area.lower() == single_job.title.lower():
+                        for word in terms[area]:
+                            if word in text:
+                                quality +=1
+                        break
+                single_candidate={}
+                single_candidate['user_id']=i.user_id
+                single_candidate['name']=i.name
+                if i.photo:
+                    single_candidate['photo']=i.photo
+                single_candidate['score']=quality
+                single_candidate['location']=i.location
+                candid.append(single_candidate)
+    GET_params = request.GET.copy()
+    count=len(candid)
+    if('page' in GET_params):
+        last=GET_params['page'][-1]
+        GET_params['page']=last[0]
+    p=Paginator(candid, 10)
+    page_number = request.GET.get('page')
+    try:
+        page_obj = p.get_page(page_number)
+    except PageNotAnInteger:
+        page_obj = p.page(1)
+    except EmptyPage:
+        page_obj = p.page(p.num_pages)
+    return render(request, 'suggestions-employer.html', {'pk': pk, 'jobs': job, 'count': count, 'pe': page_obj, 'sel': sel})
 
 def logout(request, pk):
     employer=Login.objects.get(log_id=Employer.objects.get(eid=pk).log_id.log_id)
