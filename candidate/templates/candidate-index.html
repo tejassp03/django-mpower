@@ -558,6 +558,22 @@
                 }
             })
         }
+        function messageclick(id)
+        {
+            $.ajax(
+                {
+                    type:"POST",
+                    url: "{% url 'candidate:thread' pk %}",
+                    data:{
+                        sender: id,
+                        csrfmiddlewaretoken: '{{ csrf_token }}'
+                    },
+                    success: function( data ) 
+                    {
+                        window.location="{% url 'candidate:inbox' pk %}";
+                    },
+                })
+        }
             {% block script %}
             {% endblock script %}
         </script>

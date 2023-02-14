@@ -49,6 +49,7 @@ def dashboard(request, pk):
         emp=Employer.objects.get(log_id=i.send_id)
         single_notis['ename']=emp.ename
         single_notis['eid']=emp.eid
+        single_notis['log_id']=emp.log_id.log_id
         all_notis.append(single_notis)
         count=count+1
         if(count>10):
@@ -319,8 +320,18 @@ def edit_edu(request, pk):
         return redirect('candidate:edit', pk=pk)
     return JsonResponse({'info': dumps(list(edu.values()), default=str)})
 
+def thread(request, pk):
+    if request.method == "POST":
+        jobseek=JobSeeker.objects.get(user_id=pk)
+        threads=Threads.objects.get(sender=request.POST['sender'], receiver=jobseek.log_id.log_id)
+        request.session['thread']=threads.msg_id
+        return JsonResponse({'url': ""})
 
 def inbox(request, pk):
+    shower=""
+    if 'thread' in request.session:
+        shower=request.session['thread']
+        del request.session['thread']
     if(request.method=="POST"):
         thread=Threads.objects.get(msg_id=request.POST['employer'])
         message=Messages()
@@ -361,8 +372,8 @@ def inbox(request, pk):
         first=temp_empls[0]
     # print(threads)
     # print(temp_empls)
-    print(recent_mess)
-    return render(request, 'inbox-candidate.html', {'pk': pk, 'threads': threads, 'first': first ,'mess': messages, 'thre': temp_threads, 'm': temp_messages, 'emp': empls, 'initial': zip(threads, temp_empls, recent_mess)})
+    # print(recent_mess)
+    return render(request, 'inbox-candidate.html', {'pk': pk, 'threads': threads, 'first': first ,'mess': messages, 'thre': temp_threads, 'm': temp_messages, 'emp': empls, 'initial': zip(threads, temp_empls, recent_mess), 'shower': shower})
 
 
 def under_development(request, pk):

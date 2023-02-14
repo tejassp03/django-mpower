@@ -65,6 +65,8 @@
         <div class="col-xxl-8" id="messages-shower">
             <div class="pxp-dashboard-inbox-messages-container">
                 {% if threads|length == 0 %}
+                {% elif shower != "" %}
+                <input style="display: none" class="sho" id={{shower}} value={{shower}} />
                 {% else %}
                 <div class="pxp-dashboard-inbox-messages-header">
                     <div class="pxp-dashboard-inbox-list-item-left">
@@ -144,6 +146,11 @@
 
 {% block script %}
 
+if($('.sho').val())
+{
+    caller($('.sho').val(), '{{mess}}', '{{thre}}')
+}
+
 var $rows = $('#table li');
 $('#search').keyup(function() {
     var val = $.trim($(this).val()).replace(/ +/g, ' ').toLowerCase();
@@ -165,6 +172,21 @@ $(document).ready(function () {
     $('#res').removeClass('pxp-active');
     $('#fee').removeClass('pxp-active');
     $('#sug').removeClass('pxp-active');
+    if('{{shower}}')
+    {
+        $('.threads').removeClass('pxp-active');
+        console.log($('.threads'))
+        let finalid="#"+'{{shower}}'
+        $(finalid).addClass('pxp-active');
+    }
+    else
+    {
+        if({{threads|length}})
+        {
+            let ab='#'+{{ threads.0.msg_id }};
+            $(ab).addClass('pxp-active')
+        }
+    }
     $('.pxp-dashboard-inbox-messages-content').scrollTop($('.pxp-dashboard-inbox-messages-content')[0].scrollHeight);
     $('#sender1').click(function(e){
         e.preventDefault();

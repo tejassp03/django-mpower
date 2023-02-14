@@ -32,7 +32,8 @@ def dashboard(request, pk):
         user=JobSeeker.objects.get(log_id=i.send_id)
         single_notis['name']=user.name
         single_notis['user_id']=user.user_id
-        heapq.heappush(recent_candidates, (i.datetime, user.user_id, user.photo, user.name, user.title, user.location, i.send_id.log_id))
+        single_notis['log_id']=user.log_id.log_id
+        heapq.heappush(recent_candidates, (i.datetime, user.user_id, user.photo, user.name, user.title, user.location, user.log_id.log_id))
         # recent_candidates.put([i.datetime, user.user_id, user.photo, user.name, user.title, user.location])
         if i.job_id:
             job=jobs.filter(jobid=i.job_id.jobid)
@@ -58,7 +59,7 @@ def dashboard(request, pk):
             jobseek=JobSeeker.objects.get(log_id=mess[0].sender_user.log_id)
             tempval.append(jobseek.name)
             tempval.append(jobseek.photo)
-            heapq.heappush(recent_candidates, (mess[0].date, jobseek.user_id, jobseek.photo, jobseek.name, jobseek.title, jobseek.location))
+            heapq.heappush(recent_candidates, (mess[0].date, jobseek.user_id, jobseek.photo, jobseek.name, jobseek.title, jobseek.location, jobseek.log_id.log_id))
             # recent_candidates.put([mess[0].date, jobseek.user_id, jobseek.photo, jobseek.name, jobseek.title, jobseek.location])
             recent_mess.append(tempval)
     finalrecent=[]
@@ -553,6 +554,7 @@ def cnotifications(request, pk):
         single_notif['datetime']=i.datetime
         user = JobSeeker.objects.get(log_id=i.send_id)
         single_notif['user_id']=user.user_id
+        single_notif['log_id']=user.log_id
         single_notif['name']=user.name
         if i.job_id:
             jobs = Jobs.objects.get(jobid=i.job_id.jobid)

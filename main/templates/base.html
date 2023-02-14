@@ -385,12 +385,18 @@
                             {
                                 $('#signer').css({'display': 'block'})
                                 $('#signer').text('Login Successful')
+                                setTimeout(function(){
+                                    $('#signer').text('Redirecting...');
+                                }, 1000)
                                 $('#signer').css({'background': 'green', 'border': '1px solid green'})
                             }
                             else
                             {
                                 $('#signer2').css({'display': 'block'})
                                 $('#signer2').text('Login Successful')
+                                setTimeout(function(){
+                                    $('#signer2').text('Redirecting...');
+                                }, 1000)
                                 $('#signer2').css({'background': 'green', 'border': '1px solid green'})
                             }
                             window.location = data['url'];
