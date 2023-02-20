@@ -215,3 +215,14 @@ class TestQues(models.Model):
     correct = models.IntegerField()
     class Meta:
         db_table = "testques"
+
+class TestUser(models.Model):
+    testuser_id = models.AutoField(primary_key=True)
+    user_id = models.ForeignKey(JobSeeker, on_delete=models.CASCADE, blank=True, null=True)
+    test_id = models.ForeignKey(Test, on_delete=models.CASCADE, blank=True, null=True)
+    correct_answers = models.IntegerField(default=0)
+    total_ques = models.IntegerField(default=0)
+    answers = models.CharField(max_length=100, default=None, null=True)
+    date = models.DateTimeField(default=timezone.now)
+    class Meta:
+        db_table = "testuser"

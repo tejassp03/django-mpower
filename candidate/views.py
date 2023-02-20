@@ -712,6 +712,50 @@ def company(request, pk):
     notif.save()
     return JsonResponse({'info': dumps(list(cominfo.values()), default=str), 'emai': dumps(email), 'logo': image, 'cover': cover})
 
+def tests(request, pk):
+    test=TestUser.objects.filter(user_id=pk)
+    all_test=[]
+    for i in test:
+        single_test={}
+        single_test['test_id']=i.test_id.test_id
+        testinfo=TestInfo.objects.get(test_id=i.test_id.test_id)
+        single_test['name']=testinfo.test_name
+        single_test['timelimit']=testinfo.time_limit
+        emp=Employer.objects.get(eid=testinfo.eid.eid)
+        single_test['eid']=emp.eid
+        single_test['ename']=emp.ename
+        all_test.append(single_test)
+    count=len(all_test)
+    GET_params = request.GET.copy()
+    if('page' in GET_params):
+        last=GET_params['page'][-1]
+        GET_params['page']=last[0]
+    p=Paginator(all_test, 5)
+    page_number = request.GET.get('page')
+    try:
+        page_obj = p.get_page(page_number)
+    except PageNotAnInteger:
+        page_obj = p.page(1)
+    except EmptyPage:
+        page_obj = p.page(p.num_pages)
+    return render(request, 'tests-candidate.html', {'pk': pk, 'all_app': page_obj, 'count': count})
+
+def attempt(request, pk, pk2):
+    testinfo=TestInfo.objects.get(test_id=pk2)
+    testques=TestQues.objects.filter(testinfoid=testinfo.testinfoid)
+    name=testinfo.test_name
+    all_ques=[]
+    for i in testques:
+        single_ques={}
+        single_ques['ques_id']=i.ques_id
+        single_ques['question']=i.ques_name
+        single_ques['opt1']=i.option1
+        single_ques['opt2']=i.option2
+        single_ques['opt3']=i.option3
+        single_ques['opt4']=i.option4
+        all_ques.append(single_ques)
+    return render(request, 'attempt-employer.html', {'pk': pk, 'pk2': pk2, 'test': all_ques, 'name': name})
+
 def logout(request, pk):
     user=Login.objects.get(log_id=JobSeeker.objects.get(user_id=pk).log_id.log_id)
     user.status=0

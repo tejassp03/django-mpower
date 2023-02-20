@@ -39,6 +39,7 @@
                     <li id="app"><a href="{% url 'candidate:applications' pk=pk %}"><span class="fa fa-file-text-o"></span>Applications</a></li>
                     <li id="fav"><a href="{% url 'candidate:favjobs' pk=pk %}"><span class="fa fa-heart-o"></span>Favourite Jobs</a></li>
                     <li id="cha" ><a href="{% url 'candidate:change' pk=pk %}"><span class="fa fa-lock"></span>Change Password</a></li>
+                    <li id="tes" ><a href="{% url 'candidate:tests' pk=pk %}"><span class="fa fa-question"></span>Tests</a></li>
                     {% comment %} <li><a href="candidate-dashboard-applications.html"><span class="fa fa-file-text-o"></span>Apllications</a></li>
                     <li><a href="candidate-dashboard-fav-jobs.html"><span class="fa fa-heart-o"></span>Favourite Jobs</a></li>
                     <li><a href="candidate-dashboard-password.html"><span class="fa fa-lock"></span>Change Password</a></li> {% endcomment %}
@@ -133,6 +134,7 @@
                                     <li class="nav-item"><a href="{% url 'candidate:applications' pk=pk %}"><span class="fa fa-file-text-o"></span>Applications</a></li>
                                     <li class="nav-item"><a href="{% url 'candidate:favjobs' pk=pk %}"><span class="fa fa-heart-o"></span>Favourite Jobs</a></li>
                                     <li class="nav-item"><a href="{% url 'candidate:change' pk=pk %}"><span class="fa fa-lock"></span>Change Password</a></li>
+                                    <li class="nav-item"><a href="{% url 'candidate:tests' pk=pk %}"><span class="fa fa-question"></span>Tests</a></li>
                                     {% comment %} <li class="nav-item"><a href="candidate-dashboard-applications.html"><span class="fa fa-file-text-o"></span>Apllications</a></li>
                                     <li class="nav-item"><a href="candidate-dashboard-fav-jobs.html"><span class="fa fa-heart-o"></span>Favourite Jobs</a></li>
                                     <li class="nav-item"><a href="candidate-dashboard-password.html"><span class="fa fa-lock"></span>Change Password</a></li> {% endcomment %}

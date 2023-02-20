@@ -1,13 +1,12 @@
 {% extends 'candidate-index.html' %}
 
 {% block title %}
-<title>mpower - Candidate dashboard - Applications</title>
+<title>mpower - Candidate dashboard - All tests</title>
 {% endblock %}
 
 {% block content %}
 {% load static %}
 {% load humanize %}
-
 
 <div class="pxp-dashboard-content-details">
     {% if messages %}
@@ -17,27 +16,27 @@
         {% endif %}
         {% endfor %}
     {% endif %}
-    <h1>Applications</h1>
-    <p class="pxp-text-light">Detailed list of your job applications.</p>
+    <h1>All tests</h1>
+    <p class="pxp-text-light">Completed all the tests.</p>
 
     <div class="mt-4 mt-lg-5">
         <div class="row justify-content-between align-content-center">
             <div class="col-auto order-2 order-sm-1">
-                <div class="pxp-candidate-dashboard-jobs-bulk-actions mb-3">
+                {% comment %} <div class="pxp-candidate-dashboard-jobs-bulk-actions mb-3">
                     <select class="form-select" name="act">
                         <option value="a">Bulk actions</option>
                         <option value="b">Delete</option>
                     </select>
                     <button class="btn ms-2" onclick="multiple()">Apply</button>
-                </div>
+                </div> {% endcomment %}
             </div>
             <div class="col-auto order-1 order-sm-2">
                 <div class="pxp-candidate-dashboard-jobs-search mb-3">
-                    <div class="pxp-candidate-dashboard-jobs-search-results me-3">{{ all_app|length }} job applications</div>
+                    <div class="pxp-candidate-dashboard-jobs-search-results me-3">{{ count }} Tests</div>
                     <div class="pxp-candidate-dashboard-jobs-search-search-form">
                         <div class="input-group">
                             <span class="input-group-text"><span class="fa fa-search"></span></span>
-                            <input type="text" class="form-control" placeholder="Search jobs..." id="search">
+                            <input type="text" class="form-control" placeholder="Search tests..." id="search">
                         </div>
                     </div>
                 </div>
@@ -47,38 +46,41 @@
             <table class="table table-hover align-middle" id="table">
                 <thead>
                     <tr>
-                        <th class="pxp-is-checkbox" style="width: 1%;"><input type="checkbox" onClick="toggle(this)" class="form-check-input" name="all"></th>
-                        <th style="width: 25%;">Job</th>
+                        {% comment %} <th class="pxp-is-checkbox" style="width: 1%;"><input type="checkbox" onClick="toggle(this)" class="form-check-input" name="all"></th> {% endcomment %}
+                        <th style="width: 25%;">Name</th>
                         <th style="width: 15%;">Company</th>
-                        <th style="width: 20%;">Category</th>
-                        <th style="width: 12%;">Type</th>
-                        <th>Date<span class="fa fa-angle-up ms-3"></span></th>
+                        <th>Time limit<span class="fa fa-angle-up ms-3"></span></th>
                         <th>&nbsp;</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for i in all_app %}
                     <tr>
-                        <td><input type="checkbox" name="chek" class="form-check-input" value={{ i.apply_id }}></td>
+                        {% comment %} <td><input type="checkbox" name="chek" class="form-check-input" value={{ i.apply_id }}></td> {% endcomment %}
                         <td>
-                            <a href="#">
-                                <div class="pxp-candidate-dashboard-job-title" onclick="loadermodal('{{i.jobid}}')" data-bs-target="#pxp-job-modal" data-bs-toggle="modal">{{ i.title }}</div>
-                                <div class="pxp-candidate-dashboard-job-location"><span class="fa fa-globe me-1"></span>{{ i.location }}</div>
+                            <a href="{% url 'candidate:attempt' pk i.test_id %}">
+                                <div class="pxp-candidate-dashboard-job-title">{{ i.name }}</div>
+                                {% comment %} <div class="pxp-candidate-dashboard-job-location"><span class="fa fa-globe me-1"></span>{{ i.location }}</div> {% endcomment %}
                             </a>
                         </td>
                         <td><a href="#" class="pxp-candidate-dashboard-job-company" onclick="companyload({{i.eid}})" data-bs-target="#pxp-company-modal" data-bs-toggle="modal">{{ i.ename }}</a></td>
-                        <td><div class="pxp-candidate-dashboard-job-category">{{ i.fnarea }}</div></td>
-                        <td><div class="pxp-candidate-dashboard-job-type">{{ i.jobtype }}</div></td>
-                        <td><div class="pxp-candidate-dashboard-job-date mt-1">{{ i.date_applied|naturaltime }}</div></td>
-                        <td>
+                        {% comment %} <td><div class="pxp-candidate-dashboard-job-category">{{ i.fnarea }}</div></td>
+                        <td><div class="pxp-candidate-dashboard-job-type">{{ i.jobtype }}</div></td> {% endcomment %}
+                        <td><div class="pxp-candidate-dashboard-job-date mt-1">{{ i.timelimit }} Minutes</div></td>
+                        {% comment %} <td>
                             <div class="pxp-dashboard-table-options">
                                 <ul class="list-unstyled">
                                     <li><button title="Preview" onclick="loadermodal('{{i.jobid}}')" data-bs-target="#pxp-job-modal" data-bs-toggle="modal"><span class="fa fa-eye"></span></button></li>
                                     <input style="display: none" value={{i.apply_id}}>
-                                    <li><button title="Delete" onclick="delapp({{i.apply_id}})"><span class="fa fa-trash-o"></span></button></li>
+                                    <li><button>Attemp test</button></li>
                                 </ul>
                             </div>
-                        </td>
+                        </td> {% endcomment %}.
+                        <td>
+                        <div class="pxp-candidate-dashboard-jobs-bulk-actions mb-3">
+                            <a class="btn ms-2" href="{% url 'candidate:attempt' pk i.test_id %}">Attempt</a>
+                        </div>
+                    </td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -147,7 +149,7 @@
 $(document).ready(function () {
     $('#das').removeClass('pxp-active');
     $('#edi').removeClass('pxp-active');
-    $('#app').addClass('pxp-active');
+    $('#app').removeClass('pxp-active');
     $('#fav').removeClass('pxp-active');
     $('#cha').removeClass('pxp-active');
     $('#inb').removeClass('pxp-active');
@@ -155,7 +157,7 @@ $(document).ready(function () {
     $('#res').removeClass('pxp-active');
     $('#fee').removeClass('pxp-active');
     $('#sug').removeClass('pxp-active');
-    $('#tes').removeClass('pxp-active');
+    $('#tes').addClass('pxp-active');
 })
 
 var $rows = $('#table tbody tr');
@@ -167,82 +169,4 @@ $('#search').keyup(function() {
         return !~text.indexOf(val);
     }).hide();
 });
-
-$("[name='chek']").change(function(){
-    let a=0;
-    checkboxes = document.getElementsByName('chek');
-    let n=checkboxes.length
-    for(let i=0;i<n;i++) {
-      if(checkboxes[i].checked==false)
-      {
-        a=a+1;
-      }
-    }
-    if(a==0)
-    {
-        console.log("True")
-        $("[name=all]").prop('checked', true);
-    }
-    else
-    {
-        $("[name=all]").prop('checked', false);
-    }
-})
-function delapp(id)
-{
-    $.ajax(
-        {
-            type:"POST",
-            url: "",
-            data:{
-                    'apply_id': id,
-                    csrfmiddlewaretoken: '{{ csrf_token }}'
-            },
-            success: function( data ) 
-            {
-                location.reload()
-            }
-    })
-}
-
-function multiple()
-{
-    let action=$("[name='act']").val();
-    if(action=='a')
-    {
-        alert("Please select an appropriate action")
-        return;
-    }
-    let ids=[];
-    $("[name='chek']:checked").map(function () {
-        ids.push(this.value);
-    })
-    if(ids.length==0)
-    {
-        alert("Please select at least one of the records to apply delete operation")
-        return;
-    }
-    $.ajax(
-        {
-            type:"POST",
-            url: "",
-            data:{
-                    'ids': ids,
-                    'act': "delall",
-                    csrfmiddlewaretoken: '{{ csrf_token }}'
-            },
-            success: function( data ) 
-            {
-                location.reload()
-            }
-    })
-}
-
-function toggle(source) {
-    checkboxes = document.getElementsByName('chek');
-    for(var i=0, n=checkboxes.length;i<n;i++) {
-      checkboxes[i].checked = source.checked;
-    }
-  }
 {% endblock %}
-

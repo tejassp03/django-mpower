@@ -3,13 +3,13 @@
 {% load humanize %}
 
 {% block title %}
-<title>mpower - Company dashboard - Create Quiz</title>
+<title>mpower - Company dashboard - Create test</title>
 {% endblock %}
 {% block content %}
 
 <div class="pxp-dashboard-content-details">
-    <h1>Create Quiz</h1>
-    <p class="pxp-text-light">Create a quiz for a particular job.</p>
+    <h1>Create test</h1>
+    <p class="pxp-text-light">Create a test for a particular job.</p>
     <form method="post">
         {% csrf_token %}
         <div class="mt-4 mt-lg-5">
@@ -34,7 +34,7 @@
                             </div>
                         </div>
                         <div class="pxp-company-dashboard-jobs-bulk-actions mb-3">
-                            <button class="btn" style="padding: 1rem">Submit Quiz</button>
+                            <button class="btn" style="padding: 1rem">Create Test</button>
                         </div>
                     </div>
                     </div>
