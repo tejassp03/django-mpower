@@ -1,0 +1,202 @@
+{% extends 'employer-index.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}
+<title>mpower - Company dashboard - Create Quiz</title>
+{% endblock %}
+{% block content %}
+
+<div class="pxp-dashboard-content-details">
+    <h1>Create Quiz</h1>
+    <p class="pxp-text-light">Create a quiz for a particular job.</p>
+    <form method="post">
+        {% csrf_token %}
+        <div class="mt-4 mt-lg-5">
+            <div class="row justify-content-between align-content-center">
+                <div class="col-auto order-1 order-sm-2">
+                    <div class="pxp-company-dashboard-jobs-search mb-3" style="align-items: flex-start; flex-direction: column">
+                        <div class="pxp-company-dashboard-jobs-search-search-form" style="display: flex; align-items: center">
+                            <div style="margin-right: 4px; width: 16rem">
+                                Name: 
+                            </div>
+                            <div class="input-group">
+                                <input type="text" class="form-control" placeholder="Enter name" name="name" required>
+                            </div>
+                        </div>
+                        <div style="display: flex; align-items: baseline">
+                        <div class="pxp-company-dashboard-jobs-search-search-form mt-3" style="display: flex; align-items: center">
+                            <div style="margin-right: 4px; width: 16rem">
+                                Time limit (minutes): 
+                            </div>
+                            <div class="input-group">
+                                <input type="text" class="form-control" placeholder="Enter time" name="timelimit" required>
+                            </div>
+                        </div>
+                        <div class="pxp-company-dashboard-jobs-bulk-actions mb-3">
+                            <button class="btn" style="padding: 1rem">Submit Quiz</button>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+            </div>
+            <div class="table-responsive">
+            </div>
+        </div>
+        <hr />
+        <div id="quiz">
+            <div class="queswithopt">
+                <div class="singlequestion">
+                    <div class="questondesc" style="display: flex; align-items: baseline">
+                        Q. &nbsp;<input type="text" class="form-control" name="desc" placeholder="Question" required/>
+                    </div>
+                </div>
+                <div class="options" style="display: flex; flex-wrap: wrap; justify-content: space-around">
+                    <div class="questondesc col-5 mt-1" style="display: flex; align-items: baseline">
+                        <span style="width: 6rem">Option 1. &nbsp;</span><input type="text" class="form-control" name="optdesc" placeholder="Option" required/>
+                    </div>
+                    <div class="questondesc col-5 mt-1" style="display: flex; align-items: baseline">
+                        <span style="width: 6rem">Option 2. &nbsp;</span><input type="text" class="form-control" name="optdesc" placeholder="Option" required/>
+                    </div>
+                    <div class="questondesc col-5 mt-1" style="display: flex; align-items: baseline">
+                        <span style="width: 6rem">Option 3. &nbsp;</span><input type="text" class="form-control" name="optdesc" placeholder="Option" required/>
+                    </div>
+                    <div class="questondesc col-5 mt-1" style="display: flex; align-items: baseline">
+                        <span style="width: 6rem">Option 4. &nbsp;</span><input type="text" class="form-control" name="optdesc" placeholder="Option" required/>
+                    </div>
+                </div>
+                <div class="pxp-company-dashboard-jobs-bulk-actions mb-3 col-5">
+                    <div>
+                        Answer: 
+                    </div>
+                    <select class="form-select" name="correct">
+                        <option value=1>Option 1</option>
+                        <option value=2>Option 2</option>
+                        <option value=3>Option 3</option>
+                        <option value=4>Option 4</option>
+                    </select>
+                </div>
+            </div>
+            <hr />
+        </div>
+    </form>
+    <div class="pxp-company-dashboard-jobs-bulk-actions mb-3" id="ext" style="align-items: flex-start">
+    <button class="btn" onclick="addques()" style="padding: 1rem">Add Question</button>
+    </div>
+</div>
+
+{% endblock content%}
+
+{% block script %}
+$(document).ready(function () {
+$('#cdas').removeClass('pxp-active');
+$('#cedi').removeClass('pxp-active');
+$('#cnew').removeClass('pxp-active');
+$('#cman').removeClass('pxp-active');
+$('#ccan').removeClass('pxp-active');
+$('#csub').removeClass('pxp-active');
+$('#ccha').removeClass('pxp-active');
+$('#cinb').removeClass('pxp-active');
+$('#cnot').removeClass('pxp-active');
+$('#scn').removeClass('pxp-active');
+$('#qui').addClass('pxp-active');
+})
+
+function removeques()
+{
+    let div=document.getElementsByClassName('queswithopt');
+    $('.queswithopt').last().remove();
+    $('#quiz').children().last().remove();
+    if(div.length==1)
+    {
+        $('#questremove').remove();
+    }
+}
+
+function addques()
+{
+    let div=document.createElement('div');
+    div.setAttribute('class', 'queswithopt')
+    let quesdiv=document.createElement('div');
+    quesdiv.setAttribute('class', 'singlequestion');
+    let descdiv=document.createElement('div');
+    descdiv.setAttribute('class', 'questondesc');
+    descdiv.setAttribute('style', 'display: flex; align-items: baseline');
+    descdiv.innerHTML='Q. &nbsp;<input type="text" class="form-control" name="desc" placeholder="Question" required/>';
+    quesdiv.append(descdiv);
+    div.append(quesdiv);
+    let optdiv=document.createElement('div');
+    optdiv.setAttribute('class', 'options');
+    optdiv.setAttribute('style', 'display: flex; flex-wrap: wrap; justify-content: space-around');
+    let optdescdiv=document.createElement('div');
+    optdescdiv.setAttribute('class', 'questondesc col-5 mt-1');
+    optdescdiv.setAttribute('style', 'display: flex; align-items: baseline')
+    optdescdiv.innerHTML='<span style="width: 6rem">Option 1. &nbsp;</span><input type="text" class="form-control" name="optdesc" placeholder="Option" required/>';
+    optdiv.append(optdescdiv);
+    let optdescdiv2=document.createElement('div');
+    optdescdiv2.setAttribute('class', 'questondesc col-5 mt-1');
+    optdescdiv2.setAttribute('style', 'display: flex; align-items: baseline')
+    optdescdiv2.innerHTML='<span style="width: 6rem">Option 2. &nbsp;</span><input type="text" class="form-control" name="optdesc" placeholder="Option" required/>';
+    optdiv.append(optdescdiv2);
+    let optdescdiv3=document.createElement('div');
+    optdescdiv3.setAttribute('class', 'questondesc col-5 mt-1');
+    optdescdiv3.setAttribute('style', 'display: flex; align-items: baseline')
+    optdescdiv3.innerHTML='<span style="width: 6rem">Option 3. &nbsp;</span><input type="text" class="form-control" name="optdesc" placeholder="Option" required/>';
+    optdiv.append(optdescdiv3);
+    let optdescdiv4=document.createElement('div');
+    optdescdiv4.setAttribute('class', 'questondesc col-5 mt-1');
+    optdescdiv4.setAttribute('style', 'display: flex; align-items: baseline')
+    optdescdiv4.innerHTML='<span style="width: 6rem">Option 4. &nbsp;</span><input type="text" class="form-control" name="optdesc" placeholder="Option" required/>';
+    optdiv.append(optdescdiv4);
+    div.append(optdiv);
+    let corrans=document.createElement('div');
+    corrans.setAttribute('class', 'pxp-company-dashboard-jobs-bulk-actions mb-3');
+    corrans.setAttribute('style', 'width: 25rem');
+    let textans=document.createElement('div');
+    textans.setAttribute('style', 'width: 13rem');
+    textans.innerHTML="Correct answer:"
+    corrans.append(textans);
+    let select=document.createElement('select');
+    select.setAttribute('class', 'form-select');
+    select.setAttribute('name', 'correct');
+    let option=document.createElement('option');
+    option.setAttribute('value', 1);
+    option.innerHTML="Option 1";
+    select.append(option);
+    let option2=document.createElement('option');
+    option2.setAttribute('value', 2);
+    option2.innerHTML="Option 2";
+    select.append(option2);
+    let option3=document.createElement('option');
+    option3.setAttribute('value', 3);
+    option3.innerHTML="Option 3";
+    select.append(option3);
+    let option4=document.createElement('option');
+    option4.setAttribute('value', 4);
+    option4.innerHTML="Option 4";
+    select.append(option4);
+    corrans.append(select);
+    div.append(corrans);
+    let hr=document.createElement('hr');
+    let maindiv=document.getElementById('quiz');
+    quiz.append(div);
+    let removediv=document.createElement('div');
+    removediv.setAttribute('class', 'pxp-company-dashboard-jobs-bulk-actions mb-3');
+    removediv.setAttribute('id', 'questremove');
+    let delbut=document.createElement('button');
+    delbut.setAttribute('class', 'btn');
+    delbut.setAttribute('onclick', 'removeques()');
+    delbut.setAttribute('style', 'padding: 1rem');
+    delbut.innerHTML="Remove Question";
+    removediv.append(delbut);
+    quiz.append(hr);
+    let externdiv=document.getElementById('ext');
+    let allque=document.getElementsByClassName('queswithopt');
+    console.log(allque.length);
+    if(allque.length==2)
+    {
+        externdiv.append(removediv);
+    }
+}
+
+{% endblock %}

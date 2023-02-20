@@ -35,6 +35,25 @@
                             </div>
                         </td>
                     </tr>
+                    {% elif i.notif_type == "V" %}
+                    <tr>
+                        <td style="width: 75%;">
+                            <div class="pxp-dashboard-notifications-item-left">
+                                <div class="pxp-dashboard-notifications-item-type"><span class="fa fa-user-circle-o"></span></div>
+                                <div class="pxp-dashboard-notifications-item-message">
+                                    <a href="#" data-bs-target="#pxp-candidate-modal" data-bs-toggle="modal" onclick="candidatemodal('{{i.user_id}}')">{{ i.name }}</a> viewed your profile.
+                                </div>
+                            </div>
+                        </td>
+                        <td style="width: 20%;"><div class="pxp-dashboard-notifications-item-right">{{ i.datetime|naturaltime }}</div></td>
+                        <td>
+                            <div class="pxp-dashboard-table-options">
+                                <ul class="list-unstyled">
+                                    {% comment %} <li><button title="Delete"><span class="fa fa-trash-o"></span></button></li> {% endcomment %}
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
                     {% else %}
                     <tr>
                         <td style="width: 75%;">
@@ -136,6 +155,7 @@ $('#ccha').removeClass('pxp-active');
 $('#cinb').removeClass('pxp-active');
 $('#cnot').addClass('pxp-active');
 $('#scn').removeClass('pxp-active');
+$('#qui').removeClass('pxp-active');
 })
 
 {% endblock %}

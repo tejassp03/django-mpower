@@ -49,6 +49,7 @@
                     <li id="ccan"><a href="{% url 'employer:candidates' pk=pk %}"><span class="fa fa-user-circle-o"></span>Candidates</a></li>
                     <li id="csub"><a href="{% url 'employer:subscriptions' pk=pk %}"><span class="fa fa-credit-card"></span>Subscriptions</a></li>
                     <li id="ccha"><a href="{% url 'employer:change_pass' pk=pk %}"><span class="fa fa-lock"></span>Change Password</a></li>
+                    <li id="qui"><a href="{% url 'employer:test' pk=pk %}"><span class="fa fa-question"></span>Create Test</a></li>
                 </ul>
                 <div class="pxp-dashboard-side-label mt-3 mt-lg-4">Insights</div>
                 <ul class="list-unstyled">
@@ -129,6 +130,7 @@
                                     <li class="nav-item"><a href="{% url 'employer:candidates' pk=pk %}"><span class="fa fa-user-circle-o"></span>Candidates</a></li>
                                     <li class="nav-item"><a href="{% url 'employer:subscriptions' pk=pk %}"><span class="fa fa-credit-card"></span>Subscriptions</a></li>
                                     <li class="nav-item"><a href="{% url 'employer:change_pass' pk=pk %}"><span class="fa fa-lock"></span>Change Password</a></li>
+                                    <li class="nav-item"><a href="{% url 'employer:test' pk=pk %}"><span class="fa fa-question"></span>Create Test</a></li>
                                     <li class="pxp-dropdown-header mt-4">Insights</li>
                                     <li class="nav-item">
                                         <a href="{% url 'employer:cinbox' pk=pk %}" class="d-flex justify-content-between align-items-center">
@@ -173,7 +175,9 @@
                             {% if notis|length %}
                                 {% for i in notis %}
                                 {% if i.notif_type == "M" %}
-                                <li><a class="dropdown-item" href="{% url 'employer:under_development' pk=pk %}"><strong>{{ i.name }}</strong> sent you a message. <span class="pxp-is-time">{{ i.datetime|naturaltime }}</span></a></li>
+                                <li><a class="dropdown-item" href="#" onclick="messageclick({{i.log_id}})"><strong>{{ i.name }}</strong> sent you a message. <span class="pxp-is-time">{{ i.datetime|naturaltime }}</span></a></li>
+                                {% elif i.notif_type == "V" %}
+                                <li><a class="dropdown-item" href="#" data-bs-target="#pxp-candidate-modal" data-bs-toggle="modal" onclick="candidatemodal('{{i.user_id}}')"><strong>{{ i.name }}</strong> viewed your profile. <span class="pxp-is-time">{{ i.datetime|naturaltime }}</span></a></li>
                                 {% else %}
                                 <li><a class="dropdown-item" href="{% url 'employer:under_development' pk=pk %}"><strong>{{ i.name }}</strong> applied for <strong>{{ i.title }}</strong>. <span class="pxp-is-time">{{ i.datetime|naturaltime }}</span></a></li>
                                 {% endif %}
@@ -227,23 +231,12 @@
                                                 <div class="col-xl-8 col-xxl-6">
                                                     <h1 id="jobtitle"></h1>
                                                     <div class="pxp-single-job-company-location">
-                                                        by <a href="single-company-1.html" class="pxp-single-job-company" id="comname"></a> in 
+                                                        In 
                                                         <a href="jobs-list-1.html" class="pxp-single-job-location" id="loca"></a>
                                                     </div>
                                                 </div>
                                                 <div class="col-auto">
                                                     <div class="pxp-single-job-options mt-4 col-xl-0">
-                                                        <div class="dropdown ms-2">
-                                                            <button class="btn pxp-single-job-share-btn dropdown-toggle" type="button" id="socialShareBtn" data-bs-toggle="dropdown" aria-expanded="false">
-                                                                <span class="fa fa-share-alt">
-                                                            </span></button>
-                                                            <ul class="dropdown-menu pxp-single-job-share-dropdown" aria-labelledby="socialShareBtn">
-                                                                <li><a class="dropdown-item" href="#"><span class="fa fa-facebook"></span> Facebook</a></li>
-                                                                <li><a class="dropdown-item" href="#"><span class="fa fa-twitter"></span> Twitter</a></li>
-                                                                <li><a class="dropdown-item" href="#"><span class="fa fa-pinterest"></span> Pinterest</a></li>
-                                                                <li><a class="dropdown-item" href="#"><span class="fa fa-linkedin"></span> LinkedIn</a></li>
-                                                            </ul>
-                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -264,25 +257,17 @@
                                                 <h4>Overview</h4>
                                                 <p id="desc"></p>
                                                 <div class="mt-4">
-                                                    <h4>Responsabilities</h4>
-                                                    <ul>
-                                                        <li>Be involved in every step of the product design cycle from discovery to developer handoff and user acceptance testing.</li>
-                                                        <li>Work with BAs, product managers and tech teams to lead the Product Design</li>
-                                                        <li>Maintain quality of the design process and ensure that when designs are translated into code they accurately reflect the design specifications.</li>
-                                                        <li>Accurately estimate design tickets during planning sessions.</li>
-                                                        <li>Contribute to sketching sessions involving non-designersCreate, iterate and maintain UI deliverables including sketch files, style guides, high fidelity prototypes, micro interaction specifications and pattern libraries.</li>
-                                                        <li>Ensure design choices are data led by identifying assumptions to test each sprint, and work with the analysts in your team to plan moderated usability test sessions.</li>
-                                                        <li>Design pixel perfect responsive UI’s and understand that adopting common interface patterns is better for UX than reinventing the wheel</li>
-                                                        <li>Present your work to the wider business at Show &amp; Tell sessions.</li>
+                                                    <h4>Responsibilities</h4>
+                                                    <ul id="resp">
                                                     </ul>
                                                 </div>
                                                 <div class="mt-4">
                                                     <h4>Requirements</h4>
-                                                    <ul><li>4+ years of system administration experience with the Microsoft Server platform (2012/2016, Microsoft IIS, Active Directory)</li><li>3+ years of hands-on system administration experience with AWS (EC2, Elastic Load Balancing, Multi AZ, etc.)</li><li>4+ years of SQL Server, MySQL</li><li>Working knowledge of Encryption techniques and protocols, Multi-factor authentication, Data protection, Penetration testing, Security threats</li><li>Bachelor's Degree, or 4+ years of hands-on IT experience</li></ul>
+                                                    <ul id="requ"></ul>
                                                 </div>
                                                 <div class="mt-4">
                                                     <h4>Skills</h4>
-                                                    <ul><li>Programming experience developing web applications with the Microsoft .NET stack and a basic knowledge of SQL</li><li>Development experience with Angular, Node.JS, or ColdFusion</li><li>HTML, CSS, XHTML, XML</li><li>Hypervisors, SAN’s, load balancers, firewalls, and Web Application Firewall (WAF)</li><li>Experience with Higher Logic (a collaboration platform)</li><li>MongoDB, Drupal</li><li>Mobile App Development (iOS and Android)</li><li>Episerver CMS</li><li>Microsoft Team Foundation Server</li><li>Speaker Management System (Planstone)</li></ul>
+                                                    <ul id="skil"></ul>
                                                 </div>
                                             </div>
                                         </div>
@@ -303,53 +288,6 @@
                                                 <div class="mt-4">
                                                     <div class="pxp-single-job-side-info-label pxp-text-light">Salary</div>
                                                     <div class="pxp-single-job-side-info-data" id="sal"></div>
-                                                </div>
-                                            </div>
-                                            <div class="mt-3 mt-lg-4 pxp-single-job-side-panel">
-                                                <div class="pxp-single-job-side-company">
-                                                    <div class="pxp-single-job-side-company-logo pxp-cover" id="coverimage"></div>
-                                                    <div class="pxp-single-job-side-company-profile">
-                                                        <div class="pxp-single-job-side-company-name" id="comna"></div>
-                                                        <a href="single-company-1.html">View profile</a>
-                                                    </div>
-                                                </div>
-                                                <div class="mt-4">
-                                                    <div class="pxp-single-job-side-info-label pxp-text-light">Industry</div>
-                                                    <div class="pxp-single-job-side-info-data" id="indus">Software</div>
-                                                </div>
-                                                <div class="mt-4">
-                                                    <div class="pxp-single-job-side-info-label pxp-text-light">Company size</div>
-                                                    <div class="pxp-single-job-side-info-data">50-100</div>
-                                                </div>
-                                                <div class="mt-4">
-                                                    <div class="pxp-single-job-side-info-label pxp-text-light">Founded in</div>
-                                                    <div class="pxp-single-job-side-info-data">2005</div>
-                                                </div>
-                                                <div class="mt-4">
-                                                    <div class="pxp-single-job-side-info-label pxp-text-light">Phone</div>
-                                                    <div class="pxp-single-job-side-info-data">0124 456 789</div>
-                                                </div>
-                                                <div class="mt-4">
-                                                    <div class="pxp-single-job-side-info-label pxp-text-light">Email</div>
-                                                    <div class="pxp-single-job-side-info-data">office@craftgenics.com</div>
-                                                </div>
-                                                <div class="mt-4">
-                                                    <div class="pxp-single-job-side-info-label pxp-text-light">Location</div>
-                                                    <div class="pxp-single-job-side-info-data" id="locat"></div>
-                                                </div>
-                                                <div class="mt-4">
-                                                    <div class="pxp-single-job-side-info-label pxp-text-light">Website</div>
-                                                    <div class="pxp-single-job-side-info-data"><a href="#">www.craftgenics.com</a></div>
-                                                </div>
-                                                <div class="mt-4">
-                                                    <div class="pxp-single-job-side-info-data">
-                                                        <ul class="list-unstyled pxp-single-job-side-info-social">
-                                                            <li><a href="#"><span class="fa fa-facebook"></span></a></li>
-                                                            <li><a href="#"><span class="fa fa-twitter"></span></a></li>
-                                                            <li><a href="#"><span class="fa fa-instagram"></span></a></li>
-                                                            <li><a href="#"><span class="fa fa-linkedin"></span></a></li>
-                                                        </ul>
-                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -547,16 +485,50 @@
                     $('#comna').text(JSON.parse(data['company'])[0].ename);
                     $('#indus').text(JSON.parse(data['company'])[0].industry);
                     $('#locat').text(JSON.parse(data['company'])[0].location);
-                    let urln=data['logo'];
-                    $('#coverim').remove();
-                    if(urln)
+                    let ski=JSON.parse(data['info'])[0].skills;
+                    let lu=document.getElementById('skil');
+                    while (lu.firstChild) {
+                        lu.removeChild(lu.lastChild);
+                    }
+                    if(ski)
                     {
-                        let ab=document.createElement('img')
-                        ab.setAttribute('src', urln);
-                        ab.setAttribute('id', 'coverim');
-                        ab.style.width='4rem';
-                        ab.style.height='4rem';
-                        document.getElementById('coverimage').append(ab)
+                        ski=ski.split("\n");
+                        for(let i=0;i<ski.length;i++)
+                        {
+                            let il=document.createElement('li');
+                            il.innerHTML=ski[i];
+                            lu.append(il);
+                        }
+                    }
+                    let resp=JSON.parse(data['info'])[0].responsibilities;
+                    let lur=document.getElementById('resp');
+                    while (lur.firstChild) {
+                        lur.removeChild(lur.lastChild);
+                    }
+                    if(resp)
+                    {
+                        resp=resp.split("\n");
+                        for(let i=0;i<resp.length;i++)
+                        {
+                            let il=document.createElement('li');
+                            il.innerHTML=resp[i];
+                            lur.append(il);
+                        }
+                    }
+                    let reqr=JSON.parse(data['info'])[0].requirements;
+                    let luq=document.getElementById('requ');
+                    while (luq.firstChild) {
+                        luq.removeChild(luq.lastChild);
+                    }
+                    if(reqr)
+                    {
+                        reqr=reqr.split("\n");
+                        for(let i=0;i<reqr.length;i++)
+                        {
+                            let il=document.createElement('li');
+                            il.innerHTML=reqr[i];
+                            luq.append(il);
+                        }
                     }
                 }
             })

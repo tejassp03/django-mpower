@@ -363,3 +363,72 @@ setInterval(temp, 2000);
  }
 
 
+
+ 
+# def candidates(request, pk):
+#     if request.method=="POST":
+#         if 'approve' in request.POST:
+#             apps=Application.objects.get(apply_id=request.POST['apply_id'])
+#             apps.status=1
+#             apps.save()
+#             return redirect('employer:candidates', pk=pk)
+#         if 'reject' in request.POST:
+#             apps=Application.objects.get(apply_id=request.POST['apply_id'])
+#             apps.status=2
+#             apps.save()
+#             return redirect('employer:candidates', pk=pk)
+#         if 'act' in request.POST:
+#             if(request.POST['act']=="delall"):
+#                 for i in request.POST.getlist('ids[]'):
+#                     Application.objects.filter(apply_id=i).delete()
+#             if(request.POST['act']=="appall"):
+#                 for i in request.POST.getlist('ids[]'):
+#                     apps=Application.objects.get(apply_id=i)
+#                     apps.status=1
+#                     apps.save()
+#             if(request.POST['act']=="rejall"):
+#                 for i in request.POST.getlist('ids[]'):
+#                     apps=Application.objects.get(apply_id=i)
+#                     apps.status=2
+#                     apps.save()
+#             return redirect('employer:candidates', pk=pk)
+#         Application.objects.filter(apply_id=request.POST['apply_id']).delete()
+#         return redirect('employer:candidates', pk=pk)
+#     applics=Application.objects.filter(eid=pk)
+#     jobs=Jobs.objects.filter(eid=pk).order_by('-postdate')
+#     app_count=[]
+#     for i in jobs:
+#         app_count.append(len(Application.objects.filter(job_id=i.jobid)))
+#     all_can=[]
+#     for i in applics:
+#         single_can={}
+#         user=JobSeeker.objects.get(user_id=i.user_id.user_id)
+#         single_can['user_id']=user.user_id
+#         single_can['name']=user.name
+#         single_can['location']=user.location
+#         single_can['photo']=user.photo
+#         job=Jobs.objects.get(jobid=i.job_id.jobid)
+#         single_can['jobid']=job.jobid
+#         single_can['title']=job.title
+#         single_can['status']=i.status
+#         single_can['date_applied']=i.date_applied
+#         single_can['apply_id']=i.apply_id
+#         single_can['log_id']=user.log_id.log_id
+#         all_can.append(single_can)
+#     count=len(all_can)
+#     all_can = sorted(all_can, key=lambda d: d['date_applied'])
+#     all_can.reverse()
+#     GET_params = request.GET.copy()
+#     if('page' in GET_params):
+#         last=GET_params['page'][-1]
+#         GET_params['page']=last[0]
+#     p=Paginator(all_can, 5)
+#     page_number = request.GET.get('page')
+#     try:
+#         page_obj = p.get_page(page_number)
+#     except PageNotAnInteger:
+#         page_obj = p.page(1)
+#     except EmptyPage:
+#         page_obj = p.page(p.num_pages)
+#     return render(request, 'temp-employer.html', {'pk': pk, 'pe': page_obj, 'count': count, 'jobs': jobs, 'app_count': app_count})
+#     # return render(request, 'candidates-employer.html', {'pk': pk, 'pe': page_obj, 'count': count})

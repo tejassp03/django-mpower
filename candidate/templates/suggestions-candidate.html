@@ -44,11 +44,11 @@
                     <tr>
                         <td>
                             <a href="#">
-                                <div class="pxp-candidate-dashboard-job-title">{{ i.title }}</div>
+                                <div class="pxp-candidate-dashboard-job-title" onclick="loadermodal('{{i.jobid}}')" data-bs-target="#pxp-job-modal" data-bs-toggle="modal">{{ i.title }}</div>
                                 <div class="pxp-candidate-dashboard-job-location"><span class="fa fa-globe me-1"></span>{{ i.location }}</div>
                             </a>
                         </td>
-                        <td><a href="#" class="pxp-candidate-dashboard-job-company">{{ i.ename }}</a></td>
+                        <td><a href="#" class="pxp-candidate-dashboard-job-company" onclick="companyload({{i.eid}})" data-bs-target="#pxp-company-modal" data-bs-toggle="modal">{{ i.ename }}</a></td>
                         <td><div class="pxp-candidate-dashboard-job-category">{{ i.fnarea }}</div></td>
                         <td><div class="pxp-candidate-dashboard-job-type">{{ i.jobtype }}</div></td>
                         <td><div class="pxp-candidate-dashboard-job-date mt-1">{{ i.date_applied }}</div></td>

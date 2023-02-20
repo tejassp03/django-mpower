@@ -30,7 +30,7 @@
                             <div class="pxp-dashboard-notifications-item-left">
                                 <div class="pxp-dashboard-notifications-item-type"><span class="fa fa-envelope-o"></span></div>
                                 <div class="pxp-dashboard-notifications-item-message">
-                                    <a href="#">{{ i.ename }}</a> sent you a message.
+                                    <a href="#" onclick="messageclick({{i.log_id}})">{{ i.ename }}</a> sent you a message.
                                 </div>
                             </div>
                         </td>
@@ -49,7 +49,7 @@
                             <div class="pxp-dashboard-notifications-item-left">
                                 <div class="pxp-dashboard-notifications-item-type"><span class="fa fa-briefcase"></span></div>
                                 <div class="pxp-dashboard-notifications-item-message">
-                                    <a href="#">{{ i.ename }}</a> viewed your profile.
+                                    <a href="#" onclick="companyload({{i.eid}})" data-bs-target="#pxp-company-modal" data-bs-toggle="modal">{{ i.ename }}</a> viewed your profile.
                                 </div>
                             </div>
                         </td>

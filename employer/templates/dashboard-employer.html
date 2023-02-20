@@ -117,6 +117,16 @@
                     </div>
                     <div class="pxp-dashboard-notifications-item-right">{{ i.datetime|naturaltime }}</div>
                 </div>
+                {% elif i.notif_type == "V" %}
+                <div class="pxp-dashboard-notifications-item mb-3">
+                    <div class="pxp-dashboard-notifications-item-left">
+                        <div class="pxp-dashboard-notifications-item-type"><span class="fa fa-user-circle-o"></span></div>
+                        <div class="pxp-dashboard-notifications-item-message">
+                            <a href="#" data-bs-target="#pxp-candidate-modal" data-bs-toggle="modal" onclick="candidatemodal('{{i.user_id}}')">{{ i.name }}</a> viewed your profile.
+                        </div>
+                    </div>
+                    <div class="pxp-dashboard-notifications-item-right">{{ i.datetime|naturaltime }}</div>
+                </div>
                 {% else %}
                 <div class="pxp-dashboard-notifications-item mb-3">
                     <div class="pxp-dashboard-notifications-item-left">
@@ -205,6 +215,7 @@ $(document).ready(function () {
     $('#cinb').removeClass('pxp-active');
     $('#cnot').removeClass('pxp-active');
     $('#scn').removeClass('pxp-active');
+    $('#qui').removeClass('pxp-active');
 })
 
 

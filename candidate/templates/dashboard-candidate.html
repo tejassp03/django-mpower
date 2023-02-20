@@ -122,7 +122,7 @@
                     <div class="pxp-candidate-dashboard-notifications-item-left">
                         <div class="pxp-candidate-dashboard-notifications-item-type"><span class="fa fa-user-circle-o"></span></div>
                         <div class="pxp-candidate-dashboard-notifications-item-message">
-                            <a href="#">{{ i.ename }}</a> viewed your profile.
+                            <a href="#" onclick="companyload({{i.eid}})" data-bs-target="#pxp-company-modal" data-bs-toggle="modal">{{ i.ename }}</a> viewed your profile.
                         </div>
                     </div>
                     <div class="pxp-candidate-dashboard-notifications-item-right">{{ i.datetime|naturaltime }}</div>

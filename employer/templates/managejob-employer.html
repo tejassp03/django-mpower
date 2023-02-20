@@ -55,7 +55,7 @@
                         <td><input type="checkbox" name="chek" class="form-check-input" value={{ i.jobid }}></td>
                         <td>
                             <a href="#">
-                                <div class="pxp-company-dashboard-job-title">{{ i.title }}</div>
+                                <div class="pxp-company-dashboard-job-title" onclick="loadermodal('{{i.jobid}}')" data-bs-target="#pxp-job-modal" data-bs-toggle="modal">{{ i.title }}</div>
                                 <div class="pxp-company-dashboard-job-location"><span class="fa fa-globe me-1"></span>{{ i.location }}</div>
                             </a>
                         </td>
@@ -148,7 +148,7 @@
     align-items: center;
     justify-content: center;">
         <div class="modal-content" style="width: 100vw; display: flex; flex-direction: row; align-items: center">
-            <div class="modal-body" style="width: 60vw; padding: 15px 15px !important">
+            <div class="modal-body" style="width: 70vw; padding: 15px 15px !important">
                 <div class="pxp-dashboard-content-details" style="margin-right:0px; box-shadow: none; padding: 0px">
                     <form>
                         <div class="row mt-4 mt-lg-5">
@@ -186,6 +186,21 @@
                         <div class="mb-3">
                             <label for="pxp-company-job-description" class="form-label">Job description</label>
                             <textarea class="form-control" id="pxp-company-job-description" placeholder="Type the description here..." name="description"></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="pxp-company-job-description" class="form-label">Skills</label>
+                            <textarea class="form-control" id="pxp-company-job-description" placeholder="Type the skills here..." name="skills"></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="pxp-company-job-description" class="form-label">Responsibilities</label>
+                            <textarea class="form-control" id="pxp-company-job-description" placeholder="Type the responsibilities here..." name="responsibilities"></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="pxp-company-job-description" class="form-label">Requirements</label>
+                            <textarea class="form-control" id="pxp-company-job-description" placeholder="Type the requirements here..." name="requirements"></textarea>
                         </div>
                 
                         <div class="row">
@@ -257,6 +272,7 @@ $(document).ready(function () {
     $('#cinb').removeClass('pxp-active');
     $('#cnot').removeClass('pxp-active');
     $('#scn').removeClass('pxp-active');
+    $('#qui').removeClass('pxp-active');
 })
 
 var $rows = $('#table tbody tr');
@@ -281,7 +297,6 @@ $("[name='chek']").change(function(){
     }
     if(a==0)
     {
-        console.log("True")
         $("[name=all]").prop('checked', true);
     }
     else
@@ -366,6 +381,9 @@ function toggle(source) {
               $('[name="careerlevel"]').val(JSON.parse(data['info'])[0].careerlevel);
               $('[name="jobtype"]').val(JSON.parse(data['info'])[0].jobtype);
               $('[name="basicpay"]').val(JSON.parse(data['info'])[0].basicpay);
+              $('[name="skills"]').val(JSON.parse(data['info'])[0].skills);
+              $('[name="responsibilities"]').val(JSON.parse(data['info'])[0].responsibilities);
+              $('[name="requirements"]').val(JSON.parse(data['info'])[0].requirements);
           }
       })
   }
@@ -386,6 +404,9 @@ function toggle(source) {
                   careerlevel: $('[name="careerlevel"]').val(),
                   jobtype: $('[name="jobtype"]').val(),
                   basicpay: $('[name="basicpay"]').val(),
+                  skills: $('[name="skills"]').val(),
+                  responsibilities: $('[name="responsibilities"]').val(),
+                  requirements: $('[name="requirements"]').val(),
                   csrfmiddlewaretoken: '{{ csrf_token }}'
           },
           success: function( data ) 

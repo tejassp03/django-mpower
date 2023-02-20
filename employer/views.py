@@ -178,6 +178,8 @@ def dashboard(request, pk):
     charts_context['vdates365']=dumps([item[0] for item in visits_365], default=str)
     charts_context['vcount_365']=dumps(countsv[4])
     nums=[len(jobs), len(applics), countunmess]
+    if 'shower' in request.session:
+        del request.session['shower']
     return render(request, 'dashboard-employer.html', {'pk': pk, 'nums': nums, 'notifics': all_notis, 'recent': recent_mess_temp, 'candi': finalrecent, 'charts': charts_context, 'counts': counts})
 
 def newjob(request, pk):
@@ -192,9 +194,14 @@ def newjob(request, pk):
         job.careerlevel=request.POST['careerlevel']
         job.jobtype=request.POST['jobtype']
         job.basicpay=request.POST['basicpay']
+        job.skills=request.POST['skills']
+        job.responsibilities=request.POST['responsibilities']
+        job.requirements=request.POST['requirements']
         job.save()
         request.session['c_s_id']=job.jobid
         return redirect('employer:cand_suggest', pk=pk)
+    if 'shower' in request.session:
+        del request.session['shower']
     return render(request, 'newjob-employer.html', {'pk': pk})
 
 def edit(request, pk):
@@ -240,6 +247,8 @@ def edit(request, pk):
             filev=None
         context.save()
         return redirect('employer:cedit', pk=pk)
+    if 'shower' in request.session:
+        del request.session['shower']
     return render(request, 'profile-employer.html', {'pk': pk, 'context': context})
 
 def manage(request, pk):
@@ -276,38 +285,73 @@ def manage(request, pk):
         page_obj = p.page(1)
     except EmptyPage:
         page_obj = p.page(p.num_pages)
+    if 'shower' in request.session:
+        del request.session['shower']
     return render(request, 'managejob-employer.html', {'pk': pk, 'pe': page_obj, 'count': count})
 
 def candidates(request, pk):
+    shower=""
+    if 'shower' in request.session:
+        shower=request.session['shower']
     if request.method=="POST":
         if 'approve' in request.POST:
             apps=Application.objects.get(apply_id=request.POST['apply_id'])
+            request.session['shower']=apps.job_id.jobid
             apps.status=1
             apps.save()
             return redirect('employer:candidates', pk=pk)
         if 'reject' in request.POST:
             apps=Application.objects.get(apply_id=request.POST['apply_id'])
+            request.session['shower']=apps.job_id.jobid
             apps.status=2
             apps.save()
             return redirect('employer:candidates', pk=pk)
         if 'act' in request.POST:
             if(request.POST['act']=="delall"):
                 for i in request.POST.getlist('ids[]'):
-                    Application.objects.filter(apply_id=i).delete()
+                    ap=Application.objects.filter(apply_id=i)
+                    request.session['shower']=ap[0].job_id.jobid
+                    ap.delete()
             if(request.POST['act']=="appall"):
                 for i in request.POST.getlist('ids[]'):
                     apps=Application.objects.get(apply_id=i)
                     apps.status=1
                     apps.save()
+                    request.session['shower']=apps.job_id.jobid
             if(request.POST['act']=="rejall"):
                 for i in request.POST.getlist('ids[]'):
                     apps=Application.objects.get(apply_id=i)
                     apps.status=2
                     apps.save()
+                    request.session['shower']=apps.job_id.jobid
             return redirect('employer:candidates', pk=pk)
-        Application.objects.filter(apply_id=request.POST['apply_id']).delete()
+        ap=Application.objects.filter(apply_id=request.POST['apply_id'])
+        request.session['shower']=ap[0].job_id.jobid
+        ap.delete()
         return redirect('employer:candidates', pk=pk)
     applics=Application.objects.filter(eid=pk)
+    jobs=Jobs.objects.filter(eid=pk).order_by('-postdate')
+    app_count=[]
+    single_apps=[]
+    for i in jobs:
+        app_count.append(len(Application.objects.filter(job_id=i.jobid)))
+    if(jobs):
+        s_apps=Application.objects.filter(job_id=jobs[0].jobid)
+        for i in s_apps:
+            single_can={}
+            user=JobSeeker.objects.get(user_id=i.user_id.user_id)
+            single_can['user_id']=user.user_id
+            single_can['name']=user.name
+            single_can['location']=user.location
+            single_can['photo']=user.photo
+            job=Jobs.objects.get(jobid=i.job_id.jobid)
+            single_can['jobid']=job.jobid
+            single_can['title']=job.title
+            single_can['status']=i.status
+            single_can['date_applied']=i.date_applied
+            single_can['apply_id']=i.apply_id
+            single_can['log_id']=user.log_id.log_id
+            single_apps.append(single_can)
     all_can=[]
     for i in applics:
         single_can={}
@@ -339,7 +383,7 @@ def candidates(request, pk):
         page_obj = p.page(1)
     except EmptyPage:
         page_obj = p.page(p.num_pages)
-    return render(request, 'candidates-employer.html', {'pk': pk, 'pe': page_obj, 'count': count})
+    return render(request, 'candidate-employer.html', {'pk': pk, 'pe': page_obj, 'count': count, 'jobs': jobs, 'app_count': app_count, 'single': single_apps, 'shower': shower})
 
 def get_candidate(request, pk):
     candidate = JobSeeker.objects.get(user_id=request.GET['user_id'])
@@ -394,6 +438,8 @@ def change_pass(request, pk):
         else:
             messages.error(request, "Please enter correct old password")
             return redirect('employer:change_pass', pk=pk)
+    if 'shower' in request.session:
+        del request.session['shower']
     return render(request, 'password-employer.html', {'pk': pk})
 
 def cinbox(request, pk):
@@ -433,6 +479,8 @@ def cinbox(request, pk):
         all_threads.append(single_thread)
     all_threads.reverse()
     all_messages.reverse()
+    if 'shower' in request.session:
+        del request.session['shower']
     return render(request, 'cinbox-employer.html', {'pk': pk, 'threads': all_threads, 'm': all_messages, 'mess': messages, 'thre': temp_threads, 'shower': shower})
 
 
@@ -573,9 +621,13 @@ def cnotifications(request, pk):
         page_obj = p.page(1)
     except EmptyPage:
         page_obj = p.page(p.num_pages)
+    if 'shower' in request.session:
+        del request.session['shower']
     return render(request, 'cnotifications-employer.html', {'pk': pk, 'notif': page_obj})
 
 def under_development(request, pk):
+    if 'shower' in request.session:
+        del request.session['shower']
     return render(request, 'under_develop.html', {'pk': pk})
 
 def jobapp(request, pk):
@@ -602,6 +654,9 @@ def edit_job(request, pk):
             job[0].careerlevel=request.POST['careerlevel']
             job[0].jobtype=request.POST['jobtype']
             job[0].basicpay=request.POST['basicpay']
+            job[0].skills=request.POST['skills']
+            job[0].responsibilities=request.POST['responsibilities']
+            job[0].requirements=request.POST['requirements']
             job[0].save()
         return redirect('employer:manage', pk=pk)
     return JsonResponse({'info': dumps(list(job.values()), default=str)})
@@ -688,7 +743,88 @@ def cand_suggest(request, pk):
         page_obj = p.page(1)
     except EmptyPage:
         page_obj = p.page(p.num_pages)
+    if 'shower' in request.session:
+        del request.session['shower']
     return render(request, 'suggestions-employer.html', {'pk': pk, 'jobs': job, 'count': count, 'pe': page_obj, 'sel': sel})
+
+def get_cands(request, pk):
+    applics=Application.objects.filter(job_id=request.GET['jobid'])
+    single_apps=[]
+    for i in applics:
+        single_can={}
+        user=JobSeeker.objects.get(user_id=i.user_id.user_id)
+        single_can['user_id']=user.user_id
+        single_can['name']=user.name
+        single_can['location']=user.location
+        single_can['photo']=user.photo.url
+        job=Jobs.objects.get(jobid=i.job_id.jobid)
+        single_can['jobid']=job.jobid
+        single_can['title']=job.title
+        single_can['status']=i.status
+        single_can['date_applied']=i.date_applied
+        single_can['apply_id']=i.apply_id
+        single_can['log_id']=user.log_id.log_id
+        single_apps.append(single_can)
+    return JsonResponse({'info': dumps(single_apps, default=str)})
+
+def quiz(request, pk):
+    quizzes = Quiz.objects.filter(eid=pk)
+    quiz = []
+    for i in quizzes:
+        single_quiz={}
+        single_quiz['quiz_id']=i.quiz_id
+        single_quiz['created_date']=i.created_date
+        single_quiz['time_limit']=i.time_limit
+        job=Jobs.objects.get(jobid=i.job_id.jobid)
+        single_quiz['jobid']=job.jobid
+        single_quiz['location']=job.location
+        single_quiz['title']=job.title
+        single_quiz['fnarea']=job.fnarea
+        single_quiz['jobtype']=job.jobtype
+        quiz.append(single_quiz)
+    GET_params = request.GET.copy()
+    count=len(quiz)
+    if('page' in GET_params):
+        last=GET_params['page'][-1]
+        GET_params['page']=last[0]
+    p=Paginator(quiz, 10)
+    page_number = request.GET.get('page')
+    try:
+        page_obj = p.get_page(page_number)
+    except PageNotAnInteger:
+        page_obj = p.page(1)
+    except EmptyPage:
+        page_obj = p.page(p.num_pages)
+    return render(request, 'quiz-employer.html', {'pk': pk, 'count': count, 'pe': page_obj})
+
+def create_test(request, pk):
+    if request.method=="POST":
+        test=Test()
+        test.save()
+        testinfo=TestInfo()
+        testinfo.test_id=test
+        testinfo.test_name=request.POST['name']
+        testinfo.eid=Employer.objects.get(eid=pk)
+        testinfo.time_limit=request.POST['timelimit']
+        testinfo.save()
+        info=request.POST.getlist('desc')
+        options=request.POST.getlist('optdesc')
+        correct=request.POST.getlist('correct')
+        n=len(info)
+        count=0
+        for i in range(0, n):
+            single=TestQues()
+            single.testinfoid=testinfo
+            single.ques_name=info[i]
+            single.option1=options[count]
+            single.option2=options[count+1]
+            single.option3=options[count+2]
+            single.option4=options[count+3]
+            count=count+4
+            single.correct=correct[i]
+            single.save()
+        return redirect('employer:test', pk=pk)
+    return render(request, 'create_quiz-employer.html', {'pk':pk})
 
 def logout(request, pk):
     employer=Login.objects.get(log_id=Employer.objects.get(eid=pk).log_id.log_id)
@@ -696,3 +832,10 @@ def logout(request, pk):
     employer.save()
     request.session.flush()
     return redirect('main:index')
+
+
+
+
+
+
+

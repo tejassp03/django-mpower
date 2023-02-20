@@ -18,12 +18,12 @@
             <div class="col-xxl-6">
                 <div class="mb-3">
                     <label for="pxp-company-job-title" class="form-label">Job title</label>
-                    <input type="text" id="pxp-company-job-title" class="form-control" placeholder="Add title" name="title">
+                    <input type="text" id="pxp-company-job-title" class="form-control" placeholder="Add title" name="title" reqiured>
                 </div>
             </div>
             <div class="col-md-6 col-xxl-3">
                 <label for="pxp-company-job-location" class="form-label">Location</label>
-                <input type="text" id="pxp-company-job-location" class="form-control" placeholder="E.g. San Francisco, CA" name="location">
+                <input type="text" id="pxp-company-job-location" class="form-control" placeholder="E.g. San Francisco, CA" name="location" required>
             </div>
             <div class="col-md-6 col-xxl-3">
                 <div class="mb-3">
@@ -48,7 +48,22 @@
 
         <div class="mb-3">
             <label for="pxp-company-job-description" class="form-label">Job description</label>
-            <textarea class="form-control" id="pxp-company-job-description" placeholder="Type the description here..." name="description"></textarea>
+            <textarea class="form-control" id="pxp-company-job-description" placeholder="Type the description here..." name="description" minlength=150></textarea>
+        </div>
+
+        <div class="mb-3">
+            <label for="pxp-company-job-description" class="form-label">Skills</label>
+            <textarea class="form-control" id="pxp-company-job-description" placeholder="Type the skills here..." name="skills" minlength=50></textarea>
+        </div>
+        
+        <div class="mb-3">
+            <label for="pxp-company-job-description" class="form-label">Responsibilities</label>
+            <textarea class="form-control" id="pxp-company-job-description" placeholder="Type the responsibilities here..." name="responsibilities" minlength=150></textarea>
+        </div>
+
+        <div class="mb-3">
+            <label for="pxp-company-job-description" class="form-label">Requirements</label>
+            <textarea class="form-control" id="pxp-company-job-description" placeholder="Type the requirements here..." name="requirements" minlength=150></textarea>
         </div>
 
         <div class="row">
@@ -119,6 +134,7 @@ $(document).ready(function () {
     $('#cinb').removeClass('pxp-active');
     $('#cnot').removeClass('pxp-active');
     $('#scn').removeClass('pxp-active');
+    $('#qui').removeClass('pxp-active');
 })
 
 {% endblock %}

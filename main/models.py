@@ -58,6 +58,7 @@ class Employer(models.Model):
     inlink = models.CharField(max_length=100, default=None, null=True)
     lnlink = models.CharField(max_length=100, default=None, null=True)
     cover = models.ImageField(upload_to='cover/', default=None, blank=True, null=True)
+    about = models.CharField(max_length=500, default="Not Specified", null=True)
     class Meta:
         db_table = "employer"
 
@@ -79,6 +80,8 @@ class Jobs(models.Model):
     jobtype = models.CharField(max_length=50, default="Full Time")
     skills = models.CharField(max_length=700, default=None, null=True)
     careerlevel = models.CharField(max_length=40, default="No experience", null=True)
+    responsibilities = models.CharField(max_length=700, default=None, null=True)
+    requirements = models.CharField(max_length=700, default=None, null=True)
     class Meta:
         db_table = "jobs"
 
@@ -184,4 +187,31 @@ class Notifications(models.Model):
     job_id = models.ForeignKey(Jobs, on_delete=models.CASCADE, blank=True, null=True, related_name='notif_job')
     class Meta:
         db_table = "notifications"
+    
 
+class Test(models.Model):
+    test_id = models.AutoField(primary_key=True)
+    created_date = models.DateTimeField(default=timezone.now)
+    class Meta:
+        db_table = "test"
+
+class TestInfo(models.Model):
+    testinfoid = models.AutoField(primary_key=True)
+    test_id = models.ForeignKey(Test, on_delete=models.CASCADE, blank=True, null=True)
+    test_name = models.CharField(max_length=100, default=None, null=True)
+    eid = models.ForeignKey(Employer, on_delete=models.CASCADE, default=None, null=True)
+    time_limit = models.IntegerField(default=0)
+    class Meta: 
+        db_table = "testinfo"
+
+class TestQues(models.Model):
+    ques_id = models.AutoField(primary_key=True)
+    testinfoid = models.ForeignKey(TestInfo, on_delete=models.CASCADE, blank=True, null=True)
+    ques_name = models.CharField(max_length=200, default=None, null=True)
+    option1 = models.CharField(max_length=100, default=None, null=True)
+    option2 = models.CharField(max_length=100, default=None, null=True)
+    option3 = models.CharField(max_length=100, default=None, null=True)
+    option4 = models.CharField(max_length=100, default=None, null=True)
+    correct = models.IntegerField()
+    class Meta:
+        db_table = "testques"

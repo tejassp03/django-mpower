@@ -1,0 +1,619 @@
+{% extends 'employer-index.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}
+<title>mpower - Company dashboard - Candidates</title>
+{% endblock %}
+{% block content %}
+
+<div class="pxp-dashboard-content-details">
+    <h1>Candidates</h1>
+    <p class="pxp-text-light">Detailed list of candidates that applied for your job offers.</p>
+
+    <div class="row mt-4 mt-lg-5">
+        <div class="col-xxl-4">
+            <div class="pxp-dashboard-inbox-search-form">
+                <div class="input-group">
+                    <span class="input-group-text"><span class="fa fa-search"></span></span>
+                    <input type="text" class="form-control" placeholder="Search jobs..." id="search">
+                </div>
+            </div>
+
+            <div class="mt-3 mt-lg-4 pxp-dashboard-inbox-list">
+                <ul class="list-unstyled" id="table">
+                    {% for i in jobs %}
+                    <li onclick="candifetch({{ i.jobid }})" id="{{i.jobid}}" class="acti">
+                        <a href="#" class="pxp-dashboard-inbox-list-item">
+                            <div class="pxp-dashboard-inbox-list-item-top">
+                                <div class="pxp-dashboard-inbox-list-item-left">
+                                    <div class="pxp-company-dashboard-job-title" style="font-weight: 600">{{ i.title }}</div>
+                                </div>
+                                <div class="pxp-dashboard-inbox-list-item-right">
+                                    <div class="pxp-dashboard-inbox-list-item-time">{{ i.postdate }}</div>
+                                </div>
+                            </div>
+                            <div class="mt-2 d-flex justify-content-between">
+                                <div style="color: gray"><span class="fa fa-globe me-1"></span>{{ i.location }}</div>
+                            </div>
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        <div class="col-xxl-8" id="messages-shower">
+            <div class="pxp-dashboard-inbox-messages-container">
+                {% if single|length == 0 %}
+                <div class="pxp-dashboard-inbox-messages-header">
+                    <div>
+                        No candidates
+                    </div>
+                    <div class="d-flex align-items-center">
+                        {% comment %} <div class="pxp-dashboard-inbox-list-item-options">
+                            <button title="Delete conversation" onclick="deletemess({{threads.0.msg_id}})"><span class="fa fa-trash-o"></span></button>
+                        </div> {% endcomment %}
+                        <button class="btn rounded-pill pxp-dashboard-inbox-messages-close-btn d-inline-block d-xxl-none"><span class="fa fa-angle-left"></span> Back</button>
+                    </div>
+                </div>
+                <div class="pxp-dashboard-inbox-messages-content" style="padding: 120px 5px; overflow-y: hidden; text-align: center" id="clickrem">
+                    
+                        <table class="table table-hover align-middle" id="table2">
+                            <thead>
+                                <tr>
+                                    <th class="pxp-is-checkbox" style="width: 1%;"><input type="checkbox" onClick="toggle(this)" class="form-check-input" name="all"></th>
+                                    <th colspan="2" style="width: 25%;">Name</th>
+                                    <th style="width: 15%;">Status</th>
+                                    <th>Date<span class="fa fa-angle-up ms-3"></span></th>
+                                    <th>&nbsp;</th>
+                                </tr>
+                            </thead>
+                            <tbody id="childrem">
+                            </tbody>
+                        </table>
+                    <img src="{% static 'images/nothing.jpg' %}" />
+                </div>
+                <div class="pxp-dashboard-inbox-messages-header">
+                    <div class="pxp-dashboard-inbox-search-form">
+                        <div class="input-group">
+                            <span class="input-group-text"><span class="fa fa-search"></span></span>
+                            <input type="text" class="form-control" placeholder="Search candidates..." id="search2" onkeyup="sea()">
+                        </div>
+                    </div>
+                    <div class="pxp-company-dashboard-jobs-bulk-actions" style="margin-left: auto">
+                        <select class="form-select" name="act">
+                            <option value="a">Bulk actions</option>
+                            <option value="c">Approve</option>
+                            <option value="d">Reject</option>
+                            <option value="b">Delete</option>
+                        </select>
+                        <button class="btn ms-2" onclick="multiple()">Apply</button>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        {% comment %} <div class="pxp-dashboard-inbox-list-item-options">
+                            <button title="Delete conversation" onclick="deletemess({{threads.0.msg_id}})"><span class="fa fa-trash-o"></span></button>
+                        </div> {% endcomment %}
+                        <button class="btn rounded-pill pxp-dashboard-inbox-messages-close-btn d-inline-block d-xxl-none"><span class="fa fa-angle-left"></span> Back</button>
+                    </div>
+                </div>
+                {% comment %} <div class="pxp-dashboard-inbox-list-item-left">
+                    <div class="pxp-dashboard-inbox-list-item-name ms-2" id="cands"></div>
+                </div> {% endcomment %}
+                <div class="pxp-dashboard-inbox-messages-content" style="padding: 0 5px; padding-top: 120px; padding-bottom: 50px; text-align: center">
+                    
+                    <table class="table table-hover align-middle" id="table2">
+                        <thead>
+                            <tr>
+                                <th class="pxp-is-checkbox" style="width: 1%;"><input type="checkbox" onClick="toggle(this)" class="form-check-input" name="all"></th>
+                                <th colspan="2" style="width: 25%;">Name</th>
+                                <th style="width: 15%;">Status</th>
+                                <th>Date<span class="fa fa-angle-up ms-3"></span></th>
+                                <th>&nbsp;</th>
+                            </tr>
+                        </thead>
+                        <tbody id="childrem">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+                {% else %}
+                <div class="pxp-dashboard-inbox-messages-header">
+                    <div class="pxp-dashboard-inbox-search-form">
+                        <div class="input-group">
+                            <span class="input-group-text"><span class="fa fa-search"></span></span>
+                            <input type="text" class="form-control" placeholder="Search messages..." id="search2" onkeyup="sea()">
+                        </div>
+                    </div>
+                    <div class="pxp-company-dashboard-jobs-bulk-actions" style="margin-left: auto">
+                        <select class="form-select" name="act">
+                            <option value="a">Bulk actions</option>
+                            <option value="c">Approve</option>
+                            <option value="d">Reject</option>
+                            <option value="b">Delete</option>
+                        </select>
+                        <button class="btn ms-2" onclick="multiple()">Apply</button>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        {% comment %} <div class="pxp-dashboard-inbox-list-item-options">
+                            <button title="Delete conversation" onclick="deletemess({{threads.0.msg_id}})"><span class="fa fa-trash-o"></span></button>
+                        </div> {% endcomment %}
+                        <button class="btn rounded-pill pxp-dashboard-inbox-messages-close-btn d-inline-block d-xxl-none"><span class="fa fa-angle-left"></span> Back</button>
+                    </div>
+                </div>
+                {% comment %} <div class="pxp-dashboard-inbox-list-item-left">
+                    <div class="pxp-dashboard-inbox-list-item-name ms-2" id="cands"></div>
+                </div> {% endcomment %}
+                <div class="pxp-dashboard-inbox-messages-content" style="padding: 120px 5px; text-align: center">
+                    
+                    <table class="table table-hover align-middle" id="table2">
+                        <thead>
+                            <tr>
+                                <th class="pxp-is-checkbox" style="width: 1%;"><input type="checkbox" onClick="toggle(this)" class="form-check-input" name="all"></th>
+                                <th colspan="2" style="width: 25%;">Name</th>
+                                <th style="width: 15%;">Status</th>
+                                <th>Date<span class="fa fa-angle-up ms-3"></span></th>
+                                <th>&nbsp;</th>
+                            </tr>
+                        </thead>
+                        <tbody id="childrem">
+                            {% for i in single %}
+                            <tr>
+                                <td><input type="checkbox" class="form-check-input" name="chek" value={{ i.apply_id }}></td>
+                                <td style="width: 3%;">
+                                    {% if i.photo %}
+                                    <div class="pxp-company-dashboard-candidate-avatar pxp-cover" style="background-image: url('{{i.photo.url}}');"></div>
+                                    {% else %}
+                                    <div class="pxp-company-dashboard-candidate-avatar pxp-cover" style="background-image: url('/static/images/company-logo-1.png');"></div>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="#">
+                                        <div class="pxp-company-dashboard-job-title" id="pxp-candidate-modal-button" data-bs-target="#pxp-candidate-modal" data-bs-toggle="modal" onclick="candidatemodal('{{i.user_id}}')">{{ i.name }}</div>
+                                        {% if i.location %}
+                                        <div class="pxp-company-dashboard-job-location"><span class="fa fa-globe me-1"></span>{{ i.location }}</div>
+                                        {% else %}
+                                        <div class="pxp-company-dashboard-job-location"><span class="fa fa-globe me-1"></span>Not Specified</div>
+                                        {% endif %}
+                                    </a>
+                                </td>
+                                {% if i.status == 0 %}
+                                <td><div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-secondary">Applied</span></div></td>
+                                {% elif i.status == 1 %}
+                                <td><div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-success">Approved</span></div></td>
+                                {% elif i.status == 2 %}
+                                <td><div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-danger">Rejected</span></div></td>
+                                {% endif %}
+                                <td>
+                                    <div class="pxp-company-dashboard-job-date">{{ i.date_applied }}</div>
+                                </td>
+                                <td>
+                                    <div class="pxp-dashboard-table-options">
+                                        <ul class="list-unstyled">
+                                            <li><button title="View profile" id="pxp-candidate-modal-button" data-bs-target="#pxp-candidate-modal" data-bs-toggle="modal" onclick="candidatemodal('{{i.user_id}}')"><span class="fa fa-eye"></span></button></li>
+                                            <li><button title="Send message" onclick="messageclick({{i.log_id}})"><span class="fa fa-envelope-o"></span></button></li>
+                                            <li><button title="Approve" onclick="approve({{i.apply_id}})"><span class="fa fa-check"></span></button></li>
+                                            <li><button title="Reject" onclick="reject({{i.apply_id}})"><span class="fa fa-ban"></span></button></li>
+                                            <li><button title="Delete" onclick="delcan({{i.apply_id}})"><span class="fa fa-trash-o"></span></button></li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+
+
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block script %}
+var $rows = $('#table li');
+$('#search').keyup(function() {
+    var val = $.trim($(this).val()).replace(/ +/g, ' ').toLowerCase();
+    console.log($rows)
+    $rows.show().filter(function() {
+        var text = $(this).text().replace(/\s+/g, ' ').toLowerCase();
+        return !~text.indexOf(val);
+    }).hide();
+});
+
+
+$(document).ready(function () {
+    $('#cdas').removeClass('pxp-active');
+    $('#cedi').removeClass('pxp-active');
+    $('#cnew').removeClass('pxp-active');
+    $('#cman').removeClass('pxp-active');
+    $('#ccan').addClass('pxp-active');
+    $('#csub').removeClass('pxp-active');
+    $('#ccha').removeClass('pxp-active');
+    $('#cinb').removeClass('pxp-active');
+    $('#cnot').removeClass('pxp-active');
+    $('#scn').removeClass('pxp-active');
+    $('#qui').removeClass('pxp-active');
+    let app_count={{app_count}};
+    if(app_count.length)
+    {
+        {% comment %} $('#cands').text('Candidates: '+app_count[0]); {% endcomment %}
+        let ab='#'+{{ jobs.0.jobid }};
+        $(ab).addClass('pxp-active')
+    }
+    let show='{{shower}}';
+    if(show)
+    {
+        $('.acti').removeClass('pxp-active')
+        let ab='#'+show;
+        $(ab).addClass('pxp-active')
+        candifetch(show);
+    }
+})
+function candifetch(id)
+{
+    let app_count={{app_count}};
+    {% comment %} $('#cands').text('Candidates: '+app_count[num-1]); {% endcomment %}
+    $('.acti').removeClass('pxp-active');
+    let ab='#'+id;
+    $(ab).addClass('pxp-active')
+    $.ajax(
+        {
+            type:"GET",
+            url: "{% url 'employer:get_cands' pk %}",
+            data:{
+                    'jobid': id,
+            },
+            success: function( data ) 
+            {
+                let datainfo=JSON.parse(data['info']);
+                $('#childrem tr').remove();
+                if(datainfo.length>0)
+                {
+                    $('#clickrem').remove();
+                    $('.pxp-dashboard-inbox-messages-content img').remove();
+                }
+                else
+                {
+                    $('.pxp-dashboard-inbox-messages-content img').remove();
+                    let img=document.createElement('img');
+                    img.setAttribute('src', '{% static 'images/nothing.jpg' %}')
+                    $('.pxp-dashboard-inbox-messages-content').append(img);
+                    return;
+                }
+                let finalinsert=$('#childrem');
+                for(let i=0;i<datainfo.length;i++)
+                {
+                    let tr=document.createElement('tr');
+                    let td=document.createElement('td');
+                    let input=document.createElement('input');
+                    input.setAttribute('type', 'checkbox');
+                    input.setAttribute('class', 'form-check-input');
+                    input.setAttribute('name', 'chek');
+                    input.setAttribute('value', datainfo[i].apply_id);
+                    input.setAttribute('onclick', 'tme()');
+                    td.append(input);
+                    tr.append(td);
+                    let td2=document.createElement('td');
+                    td2.style.width="3%";
+                    let div=document.createElement('div');
+                    div.setAttribute('class', 'pxp-company-dashboard-candidate-avatar pxp-cover')
+                    if(datainfo[i].photo)
+                    {
+                        let ans='url('+datainfo[i].photo+')';
+                        div.style.backgroundImage=ans;
+                    }
+                    else
+                    {
+                        div.style.backgroundImage='url({% static 'images/company-logo-1.png' %})';
+                    }
+                    td2.append(div);
+                    tr.append(td2);
+                    let td3=document.createElement('td');
+                    let a=document.createElement('a');
+                    a.setAttribute('href', '#');
+                    let adiv=document.createElement('div');
+                    adiv.setAttribute('class', 'pxp-company-dashboard-job-title');
+                    adiv.setAttribute('id', 'pxp-candidate-modal-button');
+                    adiv.setAttribute('data-bs-target', '#pxp-candidate-modal');
+                    adiv.setAttribute('data-bs-toggle', 'modal');
+                    let adivans='candidatemodal('+datainfo[i].user_id+')';
+                    adiv.setAttribute('onclick', adivans);
+                    adiv.innerHTML=datainfo[i].name;
+                    a.append(adiv);
+                    let adiv2=document.createElement('div');
+                    adiv2.setAttribute('class', 'pxp-company-dashboard-job-location');
+                    let divspan=document.createElement('span');
+                    divspan.setAttribute('class', 'fa fa-globe me-1');
+                    if(datainfo[i].location)
+                    {
+                        adiv2.innerHTML='<span class="fa fa-globe me-1"></span>'+datainfo[i].location;
+                    }
+                    else
+                    {
+                        adiv2.innerHTML='<span class="fa fa-globe me-1"></span>'+"Not Specified";
+                    }
+                    a.append(adiv2);
+                    td3.append(a);
+                    tr.append(td3);
+                    let td3a=document.createElement('td');
+                    let td3div=document.createElement('div');
+                    td3div.setAttribute('class', 'pxp-company-dashboard-job-status');
+                    let span3=document.createElement('span');
+                    if(datainfo[i].status==0)
+                    {
+                        span3.setAttribute('class', 'badge rounded-pill bg-secondary');
+                        span3.innerHTML='Applied';
+                    }
+                    else if(datainfo[i].status==1)
+                    {
+                        span3.setAttribute('class', 'badge rounded-pill bg-success');
+                        span3.innerHTML='Approved';
+                    }
+                    else if(datainfo[i].status==2)
+                    {
+                        span3.setAttribute('class', 'badge rounded-pill bg-danger');
+                        span3.innerHTML='Rejected';
+                    }
+                    td3div.append(span3);
+                    td3a.append(td3div);
+                    tr.append(td3a);
+                    let td4=document.createElement('td');
+                    let td4div=document.createElement('div');
+                    td4div.setAttribute('class', 'pxp-company-dashboard-job-date');
+                    td4div.innerHTML=moment(datainfo[i].date_applied.slice(0, 19)).format("MMM. D, YYYY, h a");
+                    td4.append(td4div);
+                    tr.append(td4);
+                    let td5=document.createElement('td');
+                    let td5div=document.createElement('div');
+                    td5div.setAttribute('class', 'pxp-dashboard-table-options');
+                    let ul=document.createElement('ul');
+                    ul.setAttribute('class', 'list-unstyled');
+                    let li1=document.createElement('li');
+                    let but1=document.createElement('button');
+                    but1.setAttribute('title', 'View profile');
+                    but1.setAttribute('id', 'pxp-candidate-modal-button');
+                    but1.setAttribute('data-bs-target', '#pxp-candidate-modal');
+                    but1.setAttribute('data-bs-toggle', 'modal');
+                    let but1ans='candidatemodal('+datainfo[i].user_id+')';
+                    but1.setAttribute('onclick', but1ans);
+                    let but1span=document.createElement('span');
+                    but1span.setAttribute('class', 'fa fa-eye');
+                    but1.append(but1span);
+                    li1.append(but1);
+                    ul.append(li1);
+                    let li2=document.createElement('li');
+                    let but2=document.createElement('button');
+                    but2.setAttribute('title', 'Send message');
+                    let but2ans='messageclick('+datainfo[i].log_id+')';
+                    but2.setAttribute('onclick', but2ans);
+                    let but2span=document.createElement('span');
+                    but2span.setAttribute('class', 'fa fa-envelope-o');
+                    but2.append(but2span);
+                    li2.append(but2);
+                    ul.append(li2);
+                    let li3=document.createElement('li');
+                    let but3=document.createElement('button');
+                    but3.setAttribute('title', 'Approve');
+                    let but3ans='approve('+datainfo[i].apply_id+')';
+                    but3.setAttribute('onclick', but3ans);
+                    let but3span=document.createElement('span');
+                    but3span.setAttribute('class', 'fa fa-check');
+                    but3.append(but3span);
+                    li3.append(but3);
+                    ul.append(li3);
+                    let li4=document.createElement('li');
+                    let but4=document.createElement('button');
+                    but4.setAttribute('title', 'Reject');
+                    let but4ans='reject('+datainfo[i].apply_id+')';
+                    but4.setAttribute('onclick', but4ans);
+                    let but4span=document.createElement('span');
+                    but4span.setAttribute('class', 'fa fa-ban');
+                    but4.append(but4span);
+                    li4.append(but4);
+                    ul.append(li4);
+                    let li5=document.createElement('li');
+                    let but5=document.createElement('button');
+                    but5.setAttribute('title', 'Delete');
+                    let but5ans='delcan('+datainfo[i].apply_id+')';
+                    but5.setAttribute('onclick', but5ans);
+                    let but5span=document.createElement('span');
+                    but5span.setAttribute('class', 'fa fa-trash-o');
+                    but5.append(but5span);
+                    li5.append(but5);
+                    ul.append(li5);
+                    td5div.append(ul);
+                    td5.append(td5div);
+                    tr.append(td5);
+                    finalinsert.append(tr);
+                }
+            }
+    })
+}
+
+function approve(id)
+{
+    $.ajax(
+        {
+            type:"POST",
+            url: "",
+            data:{
+                    'apply_id': id,
+                    'approve': "y",
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function( data ) 
+            {
+                location.reload()
+            }
+    })
+}
+
+function reject(id)
+{
+    $.ajax(
+        {
+            type:"POST",
+            url: "",
+            data:{
+                    'apply_id': id,
+                    'reject': "y",
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function( data ) 
+            {
+                location.reload()
+            }
+    })
+}
+
+function multiple()
+{
+    let action=$("[name='act']").val();
+    let actvalue="";
+    if(action=='a')
+    {
+        alert("Please select an appropriate action")
+        return;
+    }
+    let ids=[];
+    $("[name='chek']:checked").map(function () {
+        ids.push(this.value);
+    })
+    if(ids.length==0)
+    {
+        if(action=='b')
+        {
+            alert("Please select at least one of the records to apply delete operation");
+        }
+        else if(action=='c')
+        {
+            alert("Please select at least one of the records to apply approve operation");
+        }
+        else if(action=='d')
+        {
+            alert("Please select at least one of the records to apply reject operation");
+        }
+        return;
+    }
+    if(action=='b')
+    {
+        actvalue="delall";
+    }
+    else if(action=='c')
+    {
+        actvalue="appall";
+    }
+    else if(action=='d')
+    {
+        actvalue="rejall";
+    }
+    $.ajax(
+        {
+            type:"POST",
+            url: "",
+            data:{
+                    'ids': ids,
+                    'act': actvalue,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function( data ) 
+            {
+                location.reload()
+            }
+    })
+}
+
+function delcan(id)
+{
+    $.ajax(
+        {
+            type:"POST",
+            url: "",
+            data:{
+                    'apply_id': id,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function( data ) 
+            {
+                location.reload()
+            }
+    })
+}
+
+
+var $rows2 = $('#table2 tr');
+$('#search2').keyup(function() {
+    var val = $.trim($(this).val()).replace(/ +/g, ' ').toLowerCase();
+    $rows2.show().filter(function() {
+        var text = $(this).text().replace(/\s+/g, ' ').toLowerCase();
+        return !~text.indexOf(val);
+    }).hide();
+});
+
+$("[name='chek']").change(function(){
+    let a=0;
+    checkboxes = document.getElementsByName('chek');
+    let n=checkboxes.length
+    for(let i=0;i<n;i++) {
+      if(checkboxes[i].checked==false)
+      {
+        a=a+1;
+      }
+    }
+    if(a==0)
+    {
+        $("[name=all]").prop('checked', true);
+    }
+    else
+    {
+        $("[name=all]").prop('checked', false);
+    }
+})
+function toggle(source) {
+    checkboxes = document.getElementsByName('chek');
+    for(var i=0, n=checkboxes.length;i<n;i++) {
+      checkboxes[i].checked = source.checked;
+    }
+  }
+
+function tme()
+{
+    $("[name='chek']").change(function(){
+        let a=0;
+        checkboxes = document.getElementsByName('chek');
+        let n=checkboxes.length
+        for(let i=0;i<n;i++) {
+          if(checkboxes[i].checked==false)
+          {
+            a=a+1;
+          }
+        }
+        if(a==0)
+        {
+            $("[name=all]").prop('checked', true);
+        }
+        else
+        {
+            $("[name=all]").prop('checked', false);
+        }
+    })
+}
+
+function sea()
+{
+    var $rows2 = $('#table2 tr');
+    $('#search2').keyup(function() {
+        var val = $.trim($(this).val()).replace(/ +/g, ' ').toLowerCase();
+        $rows2.show().filter(function() {
+            var text = $(this).text().replace(/\s+/g, ' ').toLowerCase();
+            return !~text.indexOf(val);
+        }).hide();
+    });
+}
+
+
+{% endblock %}

@@ -13,6 +13,7 @@ def notifs(request):
                 new_data['datetime']=i.datetime
                 new_data['eid']=job.eid
                 new_data['notif_type']=i.notif_type
+                new_data['log_id']=job.log_id.log_id
                 data.append(new_data)
             return {
                 'notis' : data
@@ -29,6 +30,7 @@ def notifs(request):
                 new_data['datetime']=i.datetime
                 new_data['user_id']=cand.user_id
                 new_data['notif_type']=i.notif_type
+                new_data['log_id']=cand.log_id.log_id
                 if i.job_id:
                     jobs = Jobs.objects.get(jobid=i.job_id.jobid)
                     new_data['title']=jobs.title

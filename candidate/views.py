@@ -599,6 +599,7 @@ def notifications(request, pk):
         com = Employer.objects.get(log_id=i.send_id)
         single_notif['eid']=com.eid
         single_notif['ename']=com.ename
+        single_notif['log_id']=com.log_id.log_id
         nots.append(single_notif)
     GET_params = request.GET.copy()
     if('page' in GET_params):
@@ -661,18 +662,19 @@ def suggestions(request, pk):
     for i in jobs_skills:
         # print(user_skills)
         # print(i.skills.lower().split(","))
-        if(any(j in user_skills for j in i.skills.lower().split(","))):
-            sugg = {}
-            sugg['jobid']=i.jobid
-            sugg['title']=i.title
-            sugg['location']=i.location
-            sugg['fnarea']=i.fnarea
-            sugg['jobtype']=i.jobtype
-            sugg['date_applied']=i.postdate
-            emp=Employer.objects.get(eid=i.eid.eid)
-            sugg['ename']=emp.ename
-            sugg['eid']=emp.eid
-            all_suggest.append(sugg)
+        if i.skills:
+            if(any(j in user_skills for j in i.skills.lower().split(","))):
+                sugg = {}
+                sugg['jobid']=i.jobid
+                sugg['title']=i.title
+                sugg['location']=i.location
+                sugg['fnarea']=i.fnarea
+                sugg['jobtype']=i.jobtype
+                sugg['date_applied']=i.postdate
+                emp=Employer.objects.get(eid=i.eid.eid)
+                sugg['ename']=emp.ename
+                sugg['eid']=emp.eid
+                all_suggest.append(sugg)
     count=len(all_suggest)
     GET_params = request.GET.copy()
     if('page' in GET_params):
@@ -687,6 +689,28 @@ def suggestions(request, pk):
     except EmptyPage:
         page_obj = p.page(p.num_pages)
     return render(request, 'suggestions-candidate.html', {'pk': pk, 'fav': page_obj, 'count': count, 'pe': page_obj, 'GET_params': GET_params})
+
+def company(request, pk):
+    cominfo=Employer.objects.filter(eid=request.GET['eid'])
+    email=Login.objects.get(log_id=cominfo[0].log_id.log_id)
+    email = {'email': email.email}
+    image=""
+    if(cominfo[0].logo):
+        image = str(cominfo[0].logo.url)
+    cover=""
+    if(cominfo[0].cover):
+        cover = str(cominfo[0].cover.url)
+    visit=ProfileVisits()
+    visit.e_id=cominfo[0]
+    visit.user_id=JobSeeker.objects.get(user_id=pk)
+    visit.user_type="e"
+    visit.save()
+    notif=Notifications()
+    notif.notif_type="V"
+    notif.send_id=Login.objects.get(email=request.session['email'])
+    notif.rece_id=Login.objects.get(log_id=cominfo[0].log_id.log_id)
+    notif.save()
+    return JsonResponse({'info': dumps(list(cominfo.values()), default=str), 'emai': dumps(email), 'logo': image, 'cover': cover})
 
 def logout(request, pk):
     user=Login.objects.get(log_id=JobSeeker.objects.get(user_id=pk).log_id.log_id)

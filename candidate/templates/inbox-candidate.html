@@ -175,7 +175,6 @@ $(document).ready(function () {
     if('{{shower}}')
     {
         $('.threads').removeClass('pxp-active');
-        console.log($('.threads'))
         let finalid="#"+'{{shower}}'
         $(finalid).addClass('pxp-active');
     }
@@ -205,11 +204,11 @@ $(document).ready(function () {
             }
          })
     })
-    if({{threads|length}})
+    {% comment %} if({{threads|length}})
     {
         let ab='#'+{{ threads.0.msg_id }};
         $(ab).addClass('pxp-active')
-    }
+    } {% endcomment %}
     setInterval(mesRec, 10000);
     function mesRec()
     {
