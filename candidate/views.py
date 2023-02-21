@@ -716,15 +716,18 @@ def tests(request, pk):
     test=TestUser.objects.filter(user_id=pk)
     all_test=[]
     for i in test:
-        single_test={}
-        single_test['test_id']=i.test_id.test_id
-        testinfo=TestInfo.objects.get(test_id=i.test_id.test_id)
-        single_test['name']=testinfo.test_name
-        single_test['timelimit']=testinfo.time_limit
-        emp=Employer.objects.get(eid=testinfo.eid.eid)
-        single_test['eid']=emp.eid
-        single_test['ename']=emp.ename
-        all_test.append(single_test)
+        if i.answers:
+            single_test={}
+        else:
+            single_test={}
+            single_test['test_id']=i.test_id.test_id
+            testinfo=TestInfo.objects.get(test_id=i.test_id.test_id)
+            single_test['name']=testinfo.test_name
+            single_test['timelimit']=testinfo.time_limit
+            emp=Employer.objects.get(eid=testinfo.eid.eid)
+            single_test['eid']=emp.eid
+            single_test['ename']=emp.ename
+            all_test.append(single_test)
     count=len(all_test)
     GET_params = request.GET.copy()
     if('page' in GET_params):
@@ -755,6 +758,25 @@ def attempt(request, pk, pk2):
         single_ques['opt4']=i.option4
         all_ques.append(single_ques)
     return render(request, 'attempt-employer.html', {'pk': pk, 'pk2': pk2, 'test': all_ques, 'name': name})
+
+def submit(request, pk):
+    if request.method=="POST":
+        usertest=TestUser.objects.get(user_id=pk, test_id=request.POST['testid'])
+        testinfo=TestInfo.objects.get(test_id=request.POST['testid'])
+        testques=TestQues.objects.filter(testinfoid=testinfo.testinfoid)
+        ans=request.POST.getlist('answers[]')
+        usertest.total_ques=len(testques)
+        count=0
+        str_ans=""
+        for i, j in zip(testques, ans):
+            str_ans=str_ans+str(j)+','
+            if i.correct == int(j):
+                count=count+1
+        usertest.correct_answers=count
+        usertest.answers=str_ans
+        usertest.date=datetime.now()
+        usertest.save()
+    return JsonResponse({'message': "submitted"})
 
 def logout(request, pk):
     user=Login.objects.get(log_id=JobSeeker.objects.get(user_id=pk).log_id.log_id)

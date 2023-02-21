@@ -329,6 +329,7 @@ def candidates(request, pk):
         request.session['shower']=ap[0].job_id.jobid
         ap.delete()
         return redirect('employer:candidates', pk=pk)
+    testinfo=TestInfo.objects.filter(eid=pk)
     applics=Application.objects.filter(eid=pk)
     jobs=Jobs.objects.filter(eid=pk).order_by('-postdate')
     app_count=[]
@@ -383,7 +384,7 @@ def candidates(request, pk):
         page_obj = p.page(1)
     except EmptyPage:
         page_obj = p.page(p.num_pages)
-    return render(request, 'candidate-employer.html', {'pk': pk, 'pe': page_obj, 'count': count, 'jobs': jobs, 'app_count': app_count, 'single': single_apps, 'shower': shower})
+    return render(request, 'candidate-employer.html', {'pk': pk, 'pe': page_obj, 'count': count, 'jobs': jobs, 'app_count': app_count, 'single': single_apps, 'shower': shower, 'test': testinfo})
 
 def get_candidate(request, pk):
     candidate = JobSeeker.objects.get(user_id=request.GET['user_id'])
@@ -825,6 +826,40 @@ def create_test(request, pk):
             single.save()
         return redirect('employer:test', pk=pk)
     return render(request, 'create_quiz-employer.html', {'pk':pk})
+
+def schedule(request, pk):
+    if request.method=="POST":
+        if 'ids[]' in request.POST:
+            ids=request.POST.getlist('ids[]')
+            f=False
+            for i in ids:
+                flag=False
+                applics=Application.objects.get(apply_id=i)
+                if applics.status==3:
+                    flag=True
+                    f=True
+                if(flag==False):
+                    applics.status=3
+                    applics.save()
+                    request.session['shower']=applics.job_id.jobid
+                    testuser=TestUser()
+                    testuser.user_id=applics.user_id
+                    testinfo=TestInfo.objects.get(testinfoid=request.POST['testinfoid'])
+                    testuser.test_id=testinfo.test_id
+                    testuser.save()
+            return JsonResponse({'message': 'scheduled'})
+        applics=Application.objects.get(apply_id=request.POST['id'])
+        if applics.status==3:
+            return JsonResponse({'message': 'X'})
+        applics.status=3
+        applics.save()
+        request.session['shower']=applics.job_id.jobid
+        testuser=TestUser()
+        testuser.user_id=applics.user_id
+        testinfo=TestInfo.objects.get(testinfoid=request.POST['testinfoid'])
+        testuser.test_id=testinfo.test_id
+        testuser.save()
+    return JsonResponse({'message': 'scheduled'})
 
 def logout(request, pk):
     employer=Login.objects.get(log_id=Employer.objects.get(eid=pk).log_id.log_id)

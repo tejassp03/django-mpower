@@ -113,6 +113,7 @@ const option_list = document.querySelector(".option_list");
 const time_line = document.querySelector("header .time_line");
 const timeText = document.querySelector(".timer .time_left_txt");
 const timeCount = document.querySelector(".timer .timer_sec");
+let ans=[];
 let currques;
 start_btn.onclick = ()=>{
     info_box.classList.add("activeInfo"); 
@@ -180,10 +181,10 @@ next_btn.onclick = ()=>{
 function showQuetions(index){
     const que_text = document.querySelector(".que_text");
     let que_tag = '<span>'+ questions[index].numb + ". " + questions[index].question +'</span>';
-    let option_tag = '<div class="option"><span>'+ questions[index].options[0] +'</span></div>'
-    + '<div class="option"><span>'+ questions[index].options[1] +'</span></div>'
-    + '<div class="option"><span>'+ questions[index].options[2] +'</span></div>'
-    + '<div class="option"><span>'+ questions[index].options[3] +'</span></div>';
+    let option_tag = '<div class="option 1"><span>'+ questions[index].options[0] +'</span></div>'
+    + '<div class="option 2"><span>'+ questions[index].options[1] +'</span></div>'
+    + '<div class="option 3"><span>'+ questions[index].options[2] +'</span></div>'
+    + '<div class="option 4"><span>'+ questions[index].options[3] +'</span></div>';
     que_text.innerHTML = que_tag;
     option_list.innerHTML = option_tag;
     currques=index;
@@ -196,6 +197,7 @@ function showQuetions(index){
 let tickIconTag = '<div class="icon tick"><i class="fas fa-check"></i></div>';
 let crossIconTag = '<div class="icon cross"><i class="fas fa-times"></i></div>';
 function optionSelected(answer){
+    ans.push(answer.classList[1]);
     clearInterval(counter);
     clearInterval(counterLine);
     let userAns = answer.textContent;
@@ -208,10 +210,25 @@ function optionSelected(answer){
     next_btn.classList.add("show");
 }
 function showResult(){
+    let pk2={{pk2}};
     info_box.classList.remove("activeInfo");
     quiz_box.classList.remove("activeQuiz");
     result_box.classList.add("activeResult");
     const scoreText = result_box.querySelector(".score_text");
+    $.ajax(
+    {
+        type:"POST",
+        url: "{% url 'candidate:submit' pk %}",
+        data:{
+                answers: ans,
+                testid: pk2,
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+        },
+        success: function( data ) 
+        {
+            window.location='{% url "candidate:tests" pk %}';
+        }
+    })
 }
 function startTimer(time){
     counter = setInterval(timer, 1000);
@@ -228,6 +245,7 @@ function startTimer(time){
             const allOptions = option_list.children.length;
             let correcAns = questions[que_count].answer;
             next_btn.classList.add("show");
+            ans.push("X");
             if(currques+1>questions.length)
             {
                 clearInterval(counter);

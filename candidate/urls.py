@@ -39,6 +39,7 @@ urlpatterns = [
 	path('company/', views.company, name='company'),
 	path('tests/', views.tests, name='tests'),
 	path('attempt/<int:pk2>/', views.attempt, name='attempt'),
+	path('submit/', views.submit, name='submit'),
 	path('logout/', views.logout, name='logout')
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

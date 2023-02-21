@@ -86,6 +86,7 @@
                             <option value="c">Approve</option>
                             <option value="d">Reject</option>
                             <option value="b">Delete</option>
+                            <option value="e">Schedule Test</option>
                         </select>
                         <button class="btn ms-2" onclick="multiple()">Apply</button>
                     </div>
@@ -122,7 +123,7 @@
                     <div class="pxp-dashboard-inbox-search-form">
                         <div class="input-group">
                             <span class="input-group-text"><span class="fa fa-search"></span></span>
-                            <input type="text" class="form-control" placeholder="Search messages..." id="search2" onkeyup="sea()">
+                            <input type="text" class="form-control" placeholder="Search candidates..." id="search2" onkeyup="sea()">
                         </div>
                     </div>
                     <div class="pxp-company-dashboard-jobs-bulk-actions" style="margin-left: auto">
@@ -131,6 +132,7 @@
                             <option value="c">Approve</option>
                             <option value="d">Reject</option>
                             <option value="b">Delete</option>
+                            <option value="e">Schedule Test</option>
                         </select>
                         <button class="btn ms-2" onclick="multiple()">Apply</button>
                     </div>
@@ -183,6 +185,8 @@
                                 <td><div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-success">Approved</span></div></td>
                                 {% elif i.status == 2 %}
                                 <td><div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-danger">Rejected</span></div></td>
+                                {% elif i.status == 3 %}
+                                <td><div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-info">Test Schdeuled</span></div></td>
                                 {% endif %}
                                 <td>
                                     <div class="pxp-company-dashboard-job-date">{{ i.date_applied }}</div>
@@ -191,6 +195,7 @@
                                     <div class="pxp-dashboard-table-options">
                                         <ul class="list-unstyled">
                                             <li><button title="View profile" id="pxp-candidate-modal-button" data-bs-target="#pxp-candidate-modal" data-bs-toggle="modal" onclick="candidatemodal('{{i.user_id}}')"><span class="fa fa-eye"></span></button></li>
+                                            <li><button title="Schedule Test" id="pxp-schedule-modal-button" data-bs-target="#pxp-schedule-modal" data-bs-toggle="modal" onclick="setter('{{i.apply_id}}')"><span class="fa fa-question"></span></button></li>
                                             <li><button title="Send message" onclick="messageclick({{i.log_id}})"><span class="fa fa-envelope-o"></span></button></li>
                                             <li><button title="Approve" onclick="approve({{i.apply_id}})"><span class="fa fa-check"></span></button></li>
                                             <li><button title="Reject" onclick="reject({{i.apply_id}})"><span class="fa fa-ban"></span></button></li>
@@ -211,13 +216,36 @@
     </div>
 </div>
 
+<div class="modal fade pxp-user-modal" id="pxp-schedule-modal" aria-hidden="true" aria-labelledby="scheduleModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered widthadjuster" style="justify-content: center">
+        <div class="modal-content" style="width: 40rem">
+            <div class="modal-header" style="padding: 10px">
+                Please select the test
+            </div>
+            <hr style="margin: 0px" />
+            <div class="modal-body" style="padding: 1rem !important">
+                <div class="pxp-company-dashboard-jobs-bulk-actions" style="margin-left: auto">
+                    <select class="form-select" name="testinfo">
+                            {% for i in test %}
+                            <option value="{{ i.testinfoid }}">
+                            {{ i.test_name }}
+                            </option>
+                            {% endfor %}
+                    </select>
+                    <button class="btn ms-2" onclick="scheduletest()">Apply</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock %}
 
 {% block script %}
+let user;
 var $rows = $('#table li');
 $('#search').keyup(function() {
     var val = $.trim($(this).val()).replace(/ +/g, ' ').toLowerCase();
-    console.log($rows)
     $rows.show().filter(function() {
         var text = $(this).text().replace(/\s+/g, ' ').toLowerCase();
         return !~text.indexOf(val);
@@ -358,6 +386,11 @@ function candifetch(id)
                         span3.setAttribute('class', 'badge rounded-pill bg-danger');
                         span3.innerHTML='Rejected';
                     }
+                    else if(datainfo[i].status==3)
+                    {
+                        span3.setAttribute('class', 'badge rounded-pill bg-info');
+                        span3.innerHTML='Test Schdeuled';
+                    }
                     td3div.append(span3);
                     td3a.append(td3div);
                     tr.append(td3a);
@@ -385,6 +418,19 @@ function candifetch(id)
                     but1.append(but1span);
                     li1.append(but1);
                     ul.append(li1);
+                    let li6=document.createElement('li');
+                    let but6=document.createElement('button');
+                    but6.setAttribute('title', 'Schedule Test');
+                    but6.setAttribute('id', 'pxp-schedule-modal-button');
+                    but6.setAttribute('data-bs-target', '#pxp-schedule-modal');
+                    but6.setAttribute('data-bs-toggle', 'modal');
+                    let but6ans='setter('+datainfo[i].apply_id+')';
+                    but6.setAttribute('onclick', but6ans);
+                    let but6span=document.createElement('span');
+                    but6span.setAttribute('class', 'fa fa-question');
+                    but6.append(but6span);
+                    li6.append(but6);
+                    ul.append(li6);
                     let li2=document.createElement('li');
                     let but2=document.createElement('button');
                     but2.setAttribute('title', 'Send message');
@@ -497,6 +543,10 @@ function multiple()
         {
             alert("Please select at least one of the records to apply reject operation");
         }
+        else if(action=='e')
+        {
+            alert("Please select at least one of the records to apply schedule test");
+        }
         return;
     }
     if(action=='b')
@@ -510,6 +560,11 @@ function multiple()
     else if(action=='d')
     {
         actvalue="rejall";
+    }
+    else if(action=='e')
+    {
+        $('#pxp-schedule-modal').modal('show');
+        return;
     }
     $.ajax(
         {
@@ -613,6 +668,37 @@ function sea()
             return !~text.indexOf(val);
         }).hide();
     });
+}
+
+function setter(id)
+{
+    user=id;
+}
+function scheduletest()
+{
+    let ids=[];
+    $("[name='chek']:checked").map(function () {
+        ids.push(this.value);
+    })
+    $.ajax(
+    {
+        type:"POST",
+        url: "{% url 'employer:schedule' pk %}",
+        data:{
+                id: user,
+                ids: ids,
+                testinfoid: $("[name='testinfo']").val(),
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+        },
+        success: function( data ) 
+        {
+            if(data['message']=="X")
+            {
+                alert('Test already scheduled');
+            }
+            location.reload();
+        }
+    })
 }
 
 

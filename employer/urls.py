@@ -28,6 +28,7 @@ urlpatterns = [
 	path('cand_suggest/', views.cand_suggest, name='cand_suggest'),
 	path('quiz/cjobapp/', views.jobapp, name='cjobapp'),
 	path('create_test', views.create_test, name='test'),
+	path('schedule/', views.schedule, name='schedule'),
 	path('logout/', views.logout, name='clogout'),
 	path('under_development/', views.under_development, name='under_development'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
