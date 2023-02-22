@@ -197,6 +197,8 @@
                                 {% for i in notis %}
                                 {% if i.notif_type == "M" %}
                                 <li><a class="dropdown-item" href="#" onclick="messageclick({{i.log_id}})"><strong>{{ i.ename }}</strong> sent you a message. <span class="pxp-is-time">{{ i.datetime|naturaltime }}</span></a></li>
+                                {% elif i.notif_type == "T" %}
+                                <li><a class="dropdown-item" href="{% url 'candidate:tests' pk %}"><strong>{{ i.ename }}</strong> scheduled a test. <span class="pxp-is-time">{{ i.datetime|naturaltime }}</span></a></li>
                                 {% else %}
                                 <li><a class="dropdown-item" href="#" onclick="companyload({{i.eid}})" data-bs-target="#pxp-company-modal" data-bs-toggle="modal"><strong>{{ i.ename }}</strong> viewed your profile. <span class="pxp-is-time">{{ i.datetime|naturaltime }}</span></a></li>
                                 {% endif %}

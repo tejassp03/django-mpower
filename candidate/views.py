@@ -776,6 +776,15 @@ def submit(request, pk):
         usertest.answers=str_ans
         usertest.date=datetime.now()
         usertest.save()
+        applics=Application.objects.get(user_id=pk, test=testinfo)
+        applics.status=4
+        applics.save()
+        notif=Notifications()
+        notif.notif_type="T"
+        notif.send_id=Login.objects.get(email=request.session['email'])
+        notif.rece_id=testinfo.eid.log_id
+        notif.testuser_id=usertest
+        notif.save()
     return JsonResponse({'message': "submitted"})
 
 def logout(request, pk):

@@ -127,6 +127,16 @@
                     </div>
                     <div class="pxp-dashboard-notifications-item-right">{{ i.datetime|naturaltime }}</div>
                 </div>
+                {% elif i.notif_type == "T" %}
+                <div class="pxp-dashboard-notifications-item mb-3">
+                    <div class="pxp-dashboard-notifications-item-left">
+                        <div class="pxp-dashboard-notifications-item-type"><span class="fa fa-book"></span></div>
+                        <div class="pxp-dashboard-notifications-item-message">
+                            <a href="#" data-bs-target="#pxp-results-modal" data-bs-toggle="modal" onclick="resultsmodal('{{i.test_id}}')">{{ i.name }}</a> had attempted {{i.test_name}} test.
+                        </div>
+                    </div>
+                    <div class="pxp-dashboard-notifications-item-right">{{ i.datetime|naturaltime }}</div>
+                </div>
                 {% else %}
                 <div class="pxp-dashboard-notifications-item mb-3">
                     <div class="pxp-dashboard-notifications-item-left">

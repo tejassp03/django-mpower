@@ -85,15 +85,6 @@ class Jobs(models.Model):
     class Meta:
         db_table = "jobs"
 
-class Application(models.Model):
-    apply_id = models.AutoField(primary_key=True)
-    user_id = models.ForeignKey(JobSeeker, default=None, null=True, on_delete=models.CASCADE)
-    eid = models.ForeignKey(Employer, default=None, null=True, on_delete=models.CASCADE)
-    job_id = models.ForeignKey(Jobs, default=None, null=True, on_delete=models.CASCADE)
-    status = models.IntegerField(default=None, null=True)
-    date_applied = models.DateTimeField(default=timezone.now)
-    class Meta:
-        db_table = "application"
 
 class Selection(models.Model):
     sel_id = models.AutoField(primary_key=True)
@@ -177,18 +168,6 @@ class LikedJobs(models.Model):
     class Meta:
         db_table = "likedjobs"
 
-class Notifications(models.Model):
-    notif_id = models.AutoField(primary_key=True)
-    send_id = models.ForeignKey(Login, on_delete=models.CASCADE, blank=True, null=True, related_name='notif_sender')
-    rece_id = models.ForeignKey(Login, on_delete=models.CASCADE, blank=True, null=True, related_name='notif_receiver')
-    datetime = models.DateTimeField(default=timezone.now)
-    notif_type = models.CharField(max_length=10, default=None, null=True)
-    readed = models.BooleanField(default=False)
-    job_id = models.ForeignKey(Jobs, on_delete=models.CASCADE, blank=True, null=True, related_name='notif_job')
-    class Meta:
-        db_table = "notifications"
-    
-
 class Test(models.Model):
     test_id = models.AutoField(primary_key=True)
     created_date = models.DateTimeField(default=timezone.now)
@@ -226,3 +205,27 @@ class TestUser(models.Model):
     date = models.DateTimeField(default=timezone.now)
     class Meta:
         db_table = "testuser"
+    
+class Application(models.Model):
+    apply_id = models.AutoField(primary_key=True)
+    user_id = models.ForeignKey(JobSeeker, default=None, null=True, on_delete=models.CASCADE)
+    eid = models.ForeignKey(Employer, default=None, null=True, on_delete=models.CASCADE)
+    job_id = models.ForeignKey(Jobs, default=None, null=True, on_delete=models.CASCADE)
+    status = models.IntegerField(default=None, null=True)
+    date_applied = models.DateTimeField(default=timezone.now)
+    test = models.ForeignKey(TestInfo, default=None, blank=True, null=True, on_delete=models.CASCADE)
+    class Meta:
+        db_table = "application"
+
+
+class Notifications(models.Model):
+    notif_id = models.AutoField(primary_key=True)
+    send_id = models.ForeignKey(Login, on_delete=models.CASCADE, blank=True, null=True, related_name='notif_sender')
+    rece_id = models.ForeignKey(Login, on_delete=models.CASCADE, blank=True, null=True, related_name='notif_receiver')
+    datetime = models.DateTimeField(default=timezone.now)
+    notif_type = models.CharField(max_length=10, default=None, null=True)
+    readed = models.BooleanField(default=False)
+    job_id = models.ForeignKey(Jobs, on_delete=models.CASCADE, blank=True, null=True, related_name='notif_job')
+    testuser_id = models.ForeignKey(TestUser, on_delete=models.CASCADE, blank=True, null=True)
+    class Meta:
+        db_table = "notifications"

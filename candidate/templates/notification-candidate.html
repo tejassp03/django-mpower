@@ -43,6 +43,25 @@
                             </div>
                         </td>
                     </tr>
+                    {% elif i.notif_type == "T" %}
+                    <tr>
+                        <td style="width: 75%;">
+                            <div class="pxp-dashboard-notifications-item-left">
+                                <div class="pxp-dashboard-notifications-item-type"><span class="fa fa-book"></span></div>
+                                <div class="pxp-dashboard-notifications-item-message">
+                                    <a href="{% url 'candidate:tests' pk %}">{{ i.ename }}</a> scheduled a test.
+                                </div>
+                            </div>
+                        </td>
+                        <td style="width: 20%;"><div class="pxp-dashboard-notifications-item-right">{{ i.datetime|naturaltime }}</div></td>
+                        <td>
+                            <div class="pxp-dashboard-table-options">
+                                <ul class="list-unstyled">
+                                    {% comment %} <li><button title="Delete"><span class="fa fa-trash-o"></span></button></li> {% endcomment %}
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
                     {% else %}
                     <tr>
                         <td style="width: 75%;">

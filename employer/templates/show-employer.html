@@ -1,0 +1,364 @@
+{% extends 'employer-index.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}
+<title>mpower - Company dashboard - All tests</title>
+{% endblock %}
+{% block content %}
+
+<div class="pxp-dashboard-content-details">
+    {% if messages %}
+        {% for message in messages %}
+         {% if message.tags %}  
+         <script>alert('{{ message }}')</script>
+        {% endif %}
+        {% endfor %}
+    {% endif %}
+    <h1>All tests</h1>
+    <p class="pxp-text-light">Test that are created to evaluate candidates.</p>
+
+    <div class="mt-4 mt-lg-5">
+        <div class="row justify-content-between align-content-center">
+            <div class="col-auto order-2 order-sm-1">
+                <div class="pxp-company-dashboard-jobs-bulk-actions mb-3">
+                    <select class="form-select" name="act">
+                        <option value="a">Bulk actions</option>
+                        {% comment %} <option>Edit</option> {% endcomment %}
+                        <option value="b">Delete</option>
+                    </select>
+                    <button class="btn ms-2" onclick="multiple()">Apply</button>
+                </div>
+            </div>
+            <div class="col-auto order-1 order-sm-2">
+                <div class="pxp-company-dashboard-jobs-search mb-3">
+                    <div class="pxp-company-dashboard-jobs-search-results me-3">{{ count }} Tests</div>
+                    <div class="pxp-company-dashboard-jobs-search-search-form">
+                        <div class="input-group">
+                            <span class="input-group-text"><span class="fa fa-search"></span></span>
+                            <input type="text" class="form-control" placeholder="Search tests..." id="search">
+                        </div>
+                    </div>
+                    <div class="pxp-company-dashboard-jobs-bulk-actions"><a class="btn ms-2" href="{% url 'employer:test' pk %}">Create Test</a></div>
+                </div>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle" id="table">
+                <thead>
+                    <tr>
+                        <th class="pxp-is-checkbox" style="width: 1%;"><input type="checkbox" onClick="toggle(this)" class="form-check-input" name="all"></th>
+                        <th style="width: 15%;">Test Name</th>
+                        <th style="width: 15%;">Created Date<span class="fa fa-angle-up ms-3"></span></th>
+                        <th style="width: 15%;">Time limit</th>
+                        <th style="width: 15%;">Questions</th>
+                        <th style="width: 15%;">&nbsp;</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for i in pe %}
+                    <tr>
+                        <td><input type="checkbox" name="chek" class="form-check-input" value={{ i.test_id }}></td>
+                        <td>
+                            <a href="#">
+                                <div class="pxp-company-dashboard-job-title" onclick="testmodal('{{i.testinfoid}}')" data-bs-target="#pxp-test-modal" data-bs-toggle="modal">{{ i.name }}</div>
+                            </a>
+                        </td>
+                        <td><div class="pxp-company-dashboard-job-date mt-1">{{ i.created_date }}</div></td>
+                        <td><div class="pxp-company-dashboard-job-category">{{ i.time_limit }} Minutes</div></td>
+                        <td><a href="#" class="pxp-company-dashboard-job-applications">{{ i.num }}</a></td>
+                        <td>
+                            <div class="pxp-dashboard-table-options">
+                                <ul class="list-unstyled">
+                                    <li><button title="Edit" id="pxp-test-modal-button" data-bs-target="#pxp-test-modal" data-bs-toggle="modal" onclick="testmodal('{{ i.test_id }}')"><span class="fa fa-pencil"></span></button></li>
+                                    <input style="display: none" value={{i.test_id}}>
+                                    <li><button title="Delete" onclick="deltest({{i.test_id}})"><span class="fa fa-trash-o"></span></button></li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <div class="row mt-4 mt-lg-5 justify-content-between align-items-center">
+                <div class="col-auto">
+                    <nav class="mt-3 mt-sm-0" aria-label="Jobs list pagination">
+                        <ul class="pagination pxp-pagination">
+                            {% if pe.has_previous %}
+                                {% if GET_params %}
+                                <li class="page-item"><a href="?{{GET_params.urlencode}}&amp;page={{pe.previous_page_number}}" class="page-link"><i class="fa fa-chevron-left" aria-hidden="true"></i></a></li>
+                                {% else %}
+                                <li class="page-item"><a href="?page={{pe.previous_page_number}}" class="page-link"><i class="fa fa-chevron-left" aria-hidden="true"></i></a></li>
+                                {% endif %}
+                            {% endif %}
+
+                            {% if pe.number|add:'-4' > 1 %}
+                                {% if GET_params %}
+                                <li class="page-item"><a href="?{{GET_params.urlencode}}&amp;page={{ pe.number|add:'-5' }}" class="page-link">&hellip;</a></li>
+                                {% else %}
+                                <li class="page-item"><a href="?page={{ pe.number|add:'-5' }}" class="page-link">&hellip;</a></li>
+                                {% endif %}
+                            {% endif %}
+
+                            {% for i in pe.paginator.page_range %}
+                                {% if pe.number == i %}
+                                    <li class="page-item active" aria-current="page">
+                                        <span class="page-link">{{pe.number}}</span>
+                                    </li>
+                                {% elif i > pe.number|add:'-5' and i < pe.number|add:'5' %}
+                                    {% if GET_params %}
+                                    <li class="page-item"><a href="?{{GET_params.urlencode}}&amp;page={{ i }}" class="page-link">{{i}}</a></li>
+                                    {% else %}
+                                    <li class="page-item"><a href="?page={{ i }}" class="page-link">{{i}}</a></li>
+                                    {% endif %}
+                                {% endif %}
+                            {% endfor %}
+
+                            {% if pe.paginator.num_pages > pe.number|add:'4' %}
+                                {% if GET_params %}
+                                <li class="page-item"><a href="?{{GET_params.urlencode}}&amp;page={{ pe.number|add:'5' }}" class="page-link">&hellip;</a></li>
+                                {% else %}
+                                <li class="page-item"><a href="?page={{ pe.number|add:'5' }}" class="page-link">&hellip;</a></li>
+                                {% endif %}
+                            {% endif %}
+
+                            {% if pe.has_next %}
+                                {% if GET_params %}
+                                <li class="page-item"><a href="?{{GET_params.urlencode}}&amp;page={{ pe.next_page_number }}" class="page-link"><i class="fa fa-chevron-right" aria-hidden="true"></i></a></li>
+                                {% else %}
+                                <li class="page-item"><a href="?page={{pe.next_page_number}}" class="page-link"><i class="fa fa-chevron-right" aria-hidden="true"></i></a></li>
+                                {% endif %}
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+                <div class="col-auto">
+                    {% comment %} <a href="#" class="btn rounded-pill pxp-section-cta mt-3 mt-sm-0">Show me more<span class="fa fa-angle-right"></span></a> {% endcomment %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade pxp-user-modal" id="pxp-test-modal" aria-hidden="true" aria-labelledby="testModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered widthadjuster">
+        <div class="modal-content">
+            <div class="modal-body" style="padding: 1rem !important">
+                <section>
+                    <div class="pxp-container">
+                        <div class="pxp-single-job-content pxp-has-columns" style="margin-top: 0px">
+                            <div class="row">
+                                <div class="col-lg-7 col-xl-8 col-xxl-9">
+                                    <div class="row justify-content-between align-items-center mt-4 mt-lg-5">
+                                        <div class="col-xl-8 col-xxl-6">
+                                            <h1 id="name"></h1>
+                                        </div>
+                                    </div>
+        
+                                    <div class="pxp-single-job-content-details mt-4 mt-lg-5" id="questions">
+                                        <div id="ind">
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-5 col-xl-4 col-xxl-3">
+                                    <div class="pxp-single-job-side-panel mt-5 mt-lg-0">
+                                        <div>
+                                            <div class="pxp-single-job-side-info-label pxp-text-light">Time Limit</div>
+                                            <div class="pxp-single-job-side-info-data" id="timelimit"></div>
+                                        </div>
+                                        <div class="mt-4">
+                                            <div class="pxp-single-job-side-info-label pxp-text-light">Created Date</div>
+                                            <div class="pxp-single-job-side-info-data" id="created_date"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>        
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block script %}
+
+$(document).ready(function () {
+    $('#cdas').removeClass('pxp-active');
+    $('#cedi').removeClass('pxp-active');
+    $('#cnew').removeClass('pxp-active');
+    $('#cman').removeClass('pxp-active');
+    $('#ccan').removeClass('pxp-active');
+    $('#csub').removeClass('pxp-active');
+    $('#ccha').removeClass('pxp-active');
+    $('#cinb').removeClass('pxp-active');
+    $('#cnot').removeClass('pxp-active');
+    $('#scn').removeClass('pxp-active');
+    $('#qui').addClass('pxp-active');
+})
+
+
+var $rows = $('#table tbody tr');
+$('#search').keyup(function() {
+    var val = $.trim($(this).val()).replace(/ +/g, ' ').toLowerCase();
+    
+    $rows.show().filter(function() {
+        var text = $(this).text().replace(/\s+/g, ' ').toLowerCase();
+        return !~text.indexOf(val);
+    }).hide();
+});
+
+$("[name='chek']").change(function(){
+    let a=0;
+    checkboxes = document.getElementsByName('chek');
+    let n=checkboxes.length
+    for(let i=0;i<n;i++) {
+      if(checkboxes[i].checked==false)
+      {
+        a=a+1;
+      }
+    }
+    if(a==0)
+    {
+        $("[name=all]").prop('checked', true);
+    }
+    else
+    {
+        $("[name=all]").prop('checked', false);
+    }
+})
+
+function toggle(source) {
+    checkboxes = document.getElementsByName('chek');
+    for(var i=0, n=checkboxes.length;i<n;i++) {
+      checkboxes[i].checked = source.checked;
+    }
+}
+
+function deltest(id)
+{
+    $.ajax(
+        {
+            type:"POST",
+            url: "",
+            data:{
+                    'test_id': id,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function( data ) 
+            {
+                location.reload()
+            }
+    })
+}
+
+function multiple()
+{
+    let action=$("[name='act']").val();
+    if(action=='a')
+    {
+        alert("Please select an appropriate action")
+        return;
+    }
+    let ids=[];
+    $("[name='chek']:checked").map(function () {
+        ids.push(this.value);
+    })
+    if(ids.length==0)
+    {
+        alert("Please select at least one of the records to apply delete operation")
+        return;
+    }
+    $.ajax(
+        {
+            type:"POST",
+            url: "",
+            data:{
+                    'ids': ids,
+                    'act': "delall",
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function( data ) 
+            {
+                location.reload()
+            }
+    })
+}
+
+
+function testmodal(id)
+{
+    $.ajax(
+    {
+        type:"GET",
+        url: "{% url 'employer:test_info' pk %}",
+        data:{
+                testinfoid: id
+        },
+        success: function( data ) 
+        {
+            let datainfo=JSON.parse(data['test']);
+            $('#name').text(datainfo[0].test_name);
+            $('#timelimit').text(datainfo[0].time_limit);
+            $('#created_date').text(JSON.parse(data['date']))
+            let ques=JSON.parse(data['ques']);
+            $('#ind').remove();
+            let maindiv=document.createElement('div');
+            maindiv.setAttribute('id', 'ind');
+            let extern=$('#questions');
+            for(let i=0;i<ques.length;i++)
+            {
+                let div=document.createElement('div');
+                let h4=document.createElement('h4');
+                h4.innerText="Q. "+ques[i].ques_name;
+                div.append(h4);
+                maindiv.append(div);
+                let options=document.createElement('div');
+                let op1=document.createElement('p');
+                op1.innerText="A. "+ques[i].option1;
+                options.append(op1);
+                let op2=document.createElement('p');
+                op2.innerText="B. "+ques[i].option2;
+                options.append(op2);
+                let op3=document.createElement('p');
+                op3.innerText="C. "+ques[i].option3;
+                options.append(op3);
+                let op4=document.createElement('p');
+                op4.innerText="D. "+ques[i].option4;
+                options.append(op4);
+                maindiv.append(options);
+                let corr=document.createElement('h4');
+                let inf=ques[i].correct;
+                let ans="";
+                if(inf==1)
+                {
+                    ans="A";
+                }
+                else if(inf==2)
+                {
+                    ans="B";
+                }
+                else if(inf==3)
+                {
+                    ans="C";
+                }
+                else
+                {
+                    ans="D";
+                }
+                corr.innerText="Correct answer: "+ans;
+                maindiv.append(corr);
+                extern.append(maindiv)
+            }
+            extern.append(maindiv)
+        }
+    })
+}
+
+
+{% endblock %}

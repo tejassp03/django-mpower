@@ -1,4 +1,4 @@
-from main.models import Notifications, JobSeeker, Employer, Jobs
+from main.models import Notifications, JobSeeker, Employer, Jobs, TestInfo
 def notifs(request):
     if len(request.session.keys())!=0:
         if(request.session['type']=="c"):
@@ -35,6 +35,10 @@ def notifs(request):
                     jobs = Jobs.objects.get(jobid=i.job_id.jobid)
                     new_data['title']=jobs.title
                     new_data['jobid']=jobs.jobid
+                if i.testuser_id:
+                    testinfo=TestInfo.objects.get(test_id=i.testuser_id.test_id)
+                    new_data['test_name']=testinfo.test_name
+                    new_data['test_id']=i.testuser_id.testuser_id
                 data.append(new_data)
             return {
                 'notis' : data

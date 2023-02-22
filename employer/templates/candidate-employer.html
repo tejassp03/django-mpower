@@ -187,6 +187,8 @@
                                 <td><div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-danger">Rejected</span></div></td>
                                 {% elif i.status == 3 %}
                                 <td><div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-info">Test Schdeuled</span></div></td>
+                                {% elif i.status == 4 %}
+                                <td><div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-primary">Test Answered <br> {{ i.results }} %</span></div></td>
                                 {% endif %}
                                 <td>
                                     <div class="pxp-company-dashboard-job-date">{{ i.date_applied }}</div>
@@ -232,7 +234,7 @@
                             </option>
                             {% endfor %}
                     </select>
-                    <button class="btn ms-2" onclick="scheduletest()">Apply</button>
+                    <button class="btn ms-2" onclick="scheduletest()">Schedule</button>
                 </div>
             </div>
         </div>
@@ -390,6 +392,11 @@ function candifetch(id)
                     {
                         span3.setAttribute('class', 'badge rounded-pill bg-info');
                         span3.innerHTML='Test Schdeuled';
+                    }
+                    else if(datainfo[i].status==4)
+                    {
+                        span3.setAttribute('class', 'badge rounded-pill bg-primary');
+                        span3.innerHTML='Test Answered <br> '+datainfo[i].results+" %";
                     }
                     td3div.append(span3);
                     td3a.append(td3div);

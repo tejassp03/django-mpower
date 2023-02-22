@@ -39,6 +39,10 @@ def dashboard(request, pk):
             job=jobs.filter(jobid=i.job_id.jobid)
             single_notis['title']=job[0].title
             single_notis['jobid']=job[0].jobid
+        if i.testuser_id:
+            testinfo=TestInfo.objects.get(test_id=i.testuser_id.test_id)
+            single_notis['test_name']=testinfo.test_name
+            single_notis['test_id']=i.testuser_id.testuser_id
         all_notis.append(single_notis)
         count=count+1
         if(count>10):
@@ -352,6 +356,13 @@ def candidates(request, pk):
             single_can['date_applied']=i.date_applied
             single_can['apply_id']=i.apply_id
             single_can['log_id']=user.log_id.log_id
+            if i.status == 4:
+                testinfo1=TestInfo.objects.get(testinfoid=i.test.testinfoid)
+                testuser1=TestUser.objects.get(test_id=testinfo1.test_id.test_id, user_id=user.user_id)
+                single_can['results']=(int(testuser1.correct_answers)/int(testuser1.total_ques))*100
+                print(single_can['results'])
+            else:
+                single_can['results']=0
             single_apps.append(single_can)
     all_can=[]
     for i in applics:
@@ -368,6 +379,12 @@ def candidates(request, pk):
         single_can['date_applied']=i.date_applied
         single_can['apply_id']=i.apply_id
         single_can['log_id']=user.log_id.log_id
+        if i.status == 4:
+            testinfo1=TestInfo.objects.get(testinfoid=i.test.testinfoid)
+            testuser1=TestUser.objects.get(test_id=testinfo1.test_id.test_id, user_id=user.user_id)
+            single_can['results']=(int(testuser1.correct_answers)/int(testuser1.total_ques))*100
+        else:
+            single_can['results']=0
         all_can.append(single_can)
     count=len(all_can)
     all_can = sorted(all_can, key=lambda d: d['date_applied'])
@@ -609,6 +626,10 @@ def cnotifications(request, pk):
             jobs = Jobs.objects.get(jobid=i.job_id.jobid)
             single_notif['title']=jobs.title
             single_notif['jobid']=jobs.jobid
+        if i.testuser_id:
+            testinfo=TestInfo.objects.get(test_id=i.testuser_id.test_id)
+            single_notif['test_name']=testinfo.test_name
+            single_notif['test_id']=i.testuser_id.testuser_id
         nots.append(single_notif)
     GET_params = request.GET.copy()
     if('page' in GET_params):
@@ -762,6 +783,12 @@ def get_cands(request, pk):
         single_can['jobid']=job.jobid
         single_can['title']=job.title
         single_can['status']=i.status
+        if i.status == 4:
+            testinfo1=TestInfo.objects.get(testinfoid=i.test.testinfoid)
+            testuser1=TestUser.objects.get(test_id=testinfo1.test_id.test_id, user_id=user.user_id)
+            single_can['results']=(int(testuser1.correct_answers)/int(testuser1.total_ques))*100
+        else:
+            single_can['results']=0
         single_can['date_applied']=i.date_applied
         single_can['apply_id']=i.apply_id
         single_can['log_id']=user.log_id.log_id
@@ -797,6 +824,43 @@ def quiz(request, pk):
     except EmptyPage:
         page_obj = p.page(p.num_pages)
     return render(request, 'quiz-employer.html', {'pk': pk, 'count': count, 'pe': page_obj})
+
+def show_tests(request, pk):
+    if request.method=="POST":
+        if 'act' in request.POST:
+            for i in request.POST.getlist('ids[]'):
+                Test.objects.get(test_id=i).delete()
+            return redirect('employer:show_tests', pk=pk)
+        Test.objects.get(test_id=request.POST['test_id']).delete()
+        return redirect('employer:show_tests', pk=pk)
+    tests=TestInfo.objects.filter(eid=pk)
+    all_tests = []
+    for i in tests:
+        single_test={}
+        single_test['test_id']=i.test_id.test_id
+        single_test['testinfoid']=i.testinfoid
+        single_test['created_date']=i.test_id.created_date
+        single_test['time_limit']=i.time_limit
+        single_test['name']=i.test_name
+        questions=TestQues.objects.filter(testinfoid=i.testinfoid)
+        single_test['num']=len(questions)
+        all_tests.append(single_test)
+    sorted(all_tests, key=lambda i: i['created_date'])
+    all_tests.reverse()
+    GET_params = request.GET.copy()
+    count=len(all_tests)
+    if('page' in GET_params):
+        last=GET_params['page'][-1]
+        GET_params['page']=last[0]
+    p=Paginator(all_tests, 10)
+    page_number = request.GET.get('page')
+    try:
+        page_obj = p.get_page(page_number)
+    except PageNotAnInteger:
+        page_obj = p.page(1)
+    except EmptyPage:
+        page_obj = p.page(p.num_pages)
+    return render(request, 'show-employer.html', {'pk': pk, 'pe': page_obj, 'count': count})
 
 def create_test(request, pk):
     if request.method=="POST":
@@ -839,27 +903,64 @@ def schedule(request, pk):
                     flag=True
                     f=True
                 if(flag==False):
+                    testinfo=TestInfo.objects.get(testinfoid=request.POST['testinfoid'])
+                    tuser=TestUser.objects.filter(user_id=applics.user_id, test_id=testinfo.test_id.test_id)
+                    if(len(tuser)>0):
+                        break
                     applics.status=3
-                    applics.save()
                     request.session['shower']=applics.job_id.jobid
                     testuser=TestUser()
                     testuser.user_id=applics.user_id
-                    testinfo=TestInfo.objects.get(testinfoid=request.POST['testinfoid'])
                     testuser.test_id=testinfo.test_id
+                    applics.test=testinfo
+                    applics.save()
                     testuser.save()
+                    notif=Notifications()
+                    notif.notif_type="T"
+                    notif.send_id=Login.objects.get(email=request.session['email'])
+                    notif.rece_id=applics.user_id.log_id
+                    notif.save()
             return JsonResponse({'message': 'scheduled'})
         applics=Application.objects.get(apply_id=request.POST['id'])
         if applics.status==3:
             return JsonResponse({'message': 'X'})
+        testinfo=TestInfo.objects.get(testinfoid=request.POST['testinfoid'])
+        tuser=TestUser.objects.filter(user_id=applics.user_id, test_id=testinfo.test_id.test_id)
+        if(len(tuser)>0):
+            return JsonResponse({'message': 'X'})
         applics.status=3
-        applics.save()
         request.session['shower']=applics.job_id.jobid
         testuser=TestUser()
         testuser.user_id=applics.user_id
-        testinfo=TestInfo.objects.get(testinfoid=request.POST['testinfoid'])
         testuser.test_id=testinfo.test_id
+        applics.test=testinfo
+        applics.save()
         testuser.save()
+        notif=Notifications()
+        notif.notif_type="T"
+        notif.send_id=Login.objects.get(email=request.session['email'])
+        notif.rece_id=applics.user_id.log_id
+        notif.save()
     return JsonResponse({'message': 'scheduled'})
+
+def test_info(request, pk):
+    testinfo=TestInfo.objects.filter(testinfoid=request.GET['testinfoid'])
+    testdate=str(testinfo[0].test_id.created_date)
+    testquest=TestQues.objects.filter(testinfoid=testinfo[0].testinfoid)
+    testdate=testdate[0:11]
+    return JsonResponse({'message': 'x', 'test': dumps(list(testinfo.values()), default=str), 'date': dumps(testdate, default=str), 'ques': dumps(list(testquest.values()))})
+
+def get_results(request, pk):
+    testuser=TestUser.objects.get(testuser_id=request.GET['id'])
+    testinfo=TestInfo.objects.get(test_id=testuser.test_id.test_id)
+    data={}
+    data['user_name']=testuser.user_id.name
+    data['name']=testinfo.test_name
+    data['num']=testuser.total_ques
+    data['correct']=testuser.correct_answers
+    data['date']=testuser.date
+    data['percent']=(data['correct']/data['num'])*100
+    return JsonResponse({'data': dumps(data, default=str)})
 
 def logout(request, pk):
     employer=Login.objects.get(log_id=Employer.objects.get(eid=pk).log_id.log_id)

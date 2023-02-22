@@ -49,7 +49,7 @@
                     <li id="ccan"><a href="{% url 'employer:candidates' pk=pk %}"><span class="fa fa-user-circle-o"></span>Candidates</a></li>
                     <li id="csub"><a href="{% url 'employer:subscriptions' pk=pk %}"><span class="fa fa-credit-card"></span>Subscriptions</a></li>
                     <li id="ccha"><a href="{% url 'employer:change_pass' pk=pk %}"><span class="fa fa-lock"></span>Change Password</a></li>
-                    <li id="qui"><a href="{% url 'employer:test' pk=pk %}"><span class="fa fa-question"></span>Create Test</a></li>
+                    <li id="qui"><a href="{% url 'employer:show_tests' pk=pk %}"><span class="fa fa-question"></span>Create Test</a></li>
                 </ul>
                 <div class="pxp-dashboard-side-label mt-3 mt-lg-4">Insights</div>
                 <ul class="list-unstyled">
@@ -130,7 +130,7 @@
                                     <li class="nav-item"><a href="{% url 'employer:candidates' pk=pk %}"><span class="fa fa-user-circle-o"></span>Candidates</a></li>
                                     <li class="nav-item"><a href="{% url 'employer:subscriptions' pk=pk %}"><span class="fa fa-credit-card"></span>Subscriptions</a></li>
                                     <li class="nav-item"><a href="{% url 'employer:change_pass' pk=pk %}"><span class="fa fa-lock"></span>Change Password</a></li>
-                                    <li class="nav-item"><a href="{% url 'employer:test' pk=pk %}"><span class="fa fa-question"></span>Create Test</a></li>
+                                    <li class="nav-item"><a href="{% url 'employer:show_tests' pk=pk %}"><span class="fa fa-question"></span>Create Test</a></li>
                                     <li class="pxp-dropdown-header mt-4">Insights</li>
                                     <li class="nav-item">
                                         <a href="{% url 'employer:cinbox' pk=pk %}" class="d-flex justify-content-between align-items-center">
@@ -178,6 +178,8 @@
                                 <li><a class="dropdown-item" href="#" onclick="messageclick({{i.log_id}})"><strong>{{ i.name }}</strong> sent you a message. <span class="pxp-is-time">{{ i.datetime|naturaltime }}</span></a></li>
                                 {% elif i.notif_type == "V" %}
                                 <li><a class="dropdown-item" href="#" data-bs-target="#pxp-candidate-modal" data-bs-toggle="modal" onclick="candidatemodal('{{i.user_id}}')"><strong>{{ i.name }}</strong> viewed your profile. <span class="pxp-is-time">{{ i.datetime|naturaltime }}</span></a></li>
+                                {% elif i.notif_type == "T" %}
+                                <li><a class="dropdown-item" href="#" data-bs-target="#pxp-results-modal" data-bs-toggle="modal" onclick="resultsmodal('{{i.test_id}}')"><strong>{{ i.name }}</strong> had attempted {{i.test_name}} test. <span class="pxp-is-time">{{ i.datetime|naturaltime }}</span></a></li>
                                 {% else %}
                                 <li><a class="dropdown-item" href="{% url 'employer:under_development' pk=pk %}"><strong>{{ i.name }}</strong> applied for <strong>{{ i.title }}</strong>. <span class="pxp-is-time">{{ i.datetime|naturaltime }}</span></a></li>
                                 {% endif %}
@@ -394,6 +396,31 @@
             </div>
         </div>
 
+
+        <div class="modal fade pxp-user-modal" id="pxp-results-modal" aria-hidden="true" aria-labelledby="resultsModal" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered widthadjuster" style="justify-content: center">
+                <div class="modal-content" style="width: 35rem">
+                    <div class="modal-header" style="padding: 10px">
+                        <h3 id="user_name"></h3>
+                    </div>
+                    <hr style="margin: 0px" />
+                    <div class="modal-body" style="padding: 1rem !important">
+                        <div class="pxp-company-dashboard-jobs-bulk-actions" style="margin-left: auto; flex-direction: column">
+                            <div id="test_name">
+                            </div>
+                            <div id="date">
+                            </div>
+                            <div id="num">
+                            </div>
+                            <div id="correct">
+                            </div>
+                            <div id="percent">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
 
 
@@ -703,6 +730,28 @@
                         window.location="{% url 'employer:cinbox' pk %}";
                     },
                 })
+        }
+
+        function resultsmodal(id)
+        {
+            $.ajax(
+                {
+                    type:"GET",
+                    url: "{% url 'employer:get_results' pk %}",
+                    data:{
+                        id: id
+                    },
+                    success: function( data ) 
+                    {
+                        let datainfo=JSON.parse(data['data']);
+                        $('#user_name').text(datainfo.user_name);
+                        $('#test_name').text("Test name: "+datainfo.name);
+                        $('#date').text("Attempted on: "+datainfo.date.slice(0, 19));
+                        $('#num').text("Total questions: "+datainfo.num);
+                        $('#correct').text("Correct answers: "+datainfo.correct);
+                        $('#percent').text("Percentage score: "+datainfo.percent+" %");
+                    },
+            })
         }
             {% block script %}
             {% endblock script %}

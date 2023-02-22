@@ -117,6 +117,16 @@
                     </div>
                     <div class="pxp-candidate-dashboard-notifications-item-right">{{ i.datetime|naturaltime }}</div>
                 </div>
+                {% elif i.notif_type == "T" %}
+                <div class="pxp-candidate-dashboard-notifications-item mb-3">
+                    <div class="pxp-candidate-dashboard-notifications-item-left">
+                        <div class="pxp-candidate-dashboard-notifications-item-type"><span class="fa fa-book"></span></div>
+                        <div class="pxp-candidate-dashboard-notifications-item-message">
+                            <a href="{% url 'candidate:tests' pk %}">{{ i.ename }}</a> scheduled a test.
+                        </div>
+                    </div>
+                    <div class="pxp-candidate-dashboard-notifications-item-right">{{ i.datetime|naturaltime }}</div>
+                </div>
                 {% else %}
                 <div class="pxp-candidate-dashboard-notifications-item mb-3">
                     <div class="pxp-candidate-dashboard-notifications-item-left">
