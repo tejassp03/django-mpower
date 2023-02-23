@@ -34,6 +34,8 @@ from itertools import chain
 from django.db.models import Q
 from django.db.models import Max, Min
 
+from json import dumps
+
 
 @csrf_exempt
 def index(request):
@@ -83,7 +85,10 @@ def index(request):
 	jobs=Jobs.objects.all()
 	locations=jobs.order_by().values('location').distinct()
 	titles=jobs.order_by().values('title').distinct()
-	return render(request, 'index.html', {'locations': locations, 'titles': titles})
+	title=[]
+	for i in titles:
+		title.append(i['title'])
+	return render(request, 'index.html', {'locations': locations, 'titles': titles, 'title': dumps(title)})
 
 def view_function(request):
     messages.add_message(request, messages.INFO, 'This is an info message')

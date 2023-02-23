@@ -1,5 +1,86 @@
 {% extends 'base.html' %}
 {% load static %}
+
+{% block style %}
+input::-webkit-calendar-picker-indicator {
+    display: none !important;
+  }
+  ::selection{
+    color: #fff;
+    background: #664AFF;
+  }
+  
+  .container{
+    max-width: 450px;
+  }
+  
+  .container .searchInput{
+    background: #fff;
+    width: 100%;
+    border-radius: 5px;
+    {% comment %} position: relative; {% endcomment %}
+  }
+  
+  .searchInput input{
+    height: 55px;
+    width: 100%;
+    outline: none;
+    border: none;
+    border-radius: 5px;
+    padding: 0px !important;
+    {% comment %} padding: 0 60px 0 20px; {% endcomment %}
+    font-size: 18px;
+  }
+  
+  .searchInput.active input{
+    border-radius: 5px 5px 0 0;
+  }
+  
+  .searchInput .resultBox{
+    padding: 0;
+    opacity: 0;
+    pointer-events: none;
+    max-height: 280px;
+    overflow-y: auto;
+  }
+  
+  .searchInput.active .resultBox{
+    padding: 10px 8px;
+    opacity: 1;
+    pointer-events: auto;
+    position: fixed;
+    background: white;
+  }
+  
+  .resultBox li{
+    list-style: none;
+    padding: 8px 12px;
+    display: none;
+    width: 100%;
+    cursor: default;
+    border-radius: 3px;
+  }
+  
+  .searchInput.active .resultBox li{
+    display: block;
+  }
+  .resultBox li:hover{
+    background: #efefef;
+  }
+  
+  .searchInput .icon{
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    height: 55px;
+    width: 55px;
+    text-align: center;
+    line-height: 55px;
+    font-size: 20px;
+    color: #644bff;
+    cursor: pointer;
+  }
+{% endblock %}
 {% block content %}
 
 <section class="pxp-hero vh-100" style="background-color: var(--pxpMainColorLight);">
@@ -15,7 +96,21 @@
                             <input type="text" name="category" value="all" style="display: none">
                             <div class="col-12 col-sm">
                                 <div class="mb-3 mb-sm-0">
-                                    <select id="select-titles" placeholder="Job titles" class="form-select" name="title">
+                                    <div class="container">
+                                    <div class="searchInput">
+                                        <input type="text" placeholder="Job title" class="form-select" name="title" style="background-image: none">
+                                        <div class="resultBox">
+                                          <!-- here list are inserted from javascript -->
+                                        </div>
+                                      </div>
+                                    </div>
+                                    {% comment %} <input type="text" class="form-select" list="select-titles" placeholder="Job title" name="title" style="background-image: none"/>
+                                    <datalist id="select-titles">
+                                        {% for i in titles %}
+                                        <option value='{{ i.title }}'>{{ i.title }}</option>
+                                        {% endfor %}
+                                    </datalist> {% endcomment %}
+                                    {% comment %} <select id="select-titles" placeholder="Job titles" class="form-select" name="title">
                                         <option value="all" selected>Job title</option>
                                         {% for i in titles %}
                                             {% if i.title == context.t %}
@@ -24,12 +119,12 @@
                                             <option value='{{ i.title }}'>{{ i.title }}</option>
                                             {% endif %}
                                         {% endfor %}
-                                    </select>
+                                    </select> {% endcomment %}
                                 </div>
                             </div>
                             <div class="col-12 col-sm pxp-has-left-border">
                                 <div class="mb-3 mb-sm-0">
-                                    <select id="select-locations" placeholder="Pick a Category..." class="form-select"  name="location">
+                                    <select id="select-locations" placeholder="Pick a Category..." class="form-select"  name="location" style="background-image: none">
                                         <option value="all">All locations</option>
                                         {% for i in locations %}
                                             {% if i.location == context.l %}
@@ -580,4 +675,76 @@
 
 {% include "footer.html" %}
 {% endblock %}
+
+{% block script %}
+let suggestions={{ title|safe }};
+const searchInput = document.querySelector(".searchInput");
+const input = searchInput.querySelector("input");
+const resultBox = searchInput.querySelector(".resultBox");
+const icon = searchInput.querySelector(".icon");
+let linkTag = searchInput.querySelector("a");
+let webLink;
+
+// if user press any key and release
+input.onkeyup = (e)=>{
+    let userData = e.target.value; //user enetered data
+    let emptyArray = [];
+    if(userData){
+        emptyArray = suggestions.filter((data)=>{
+            //filtering array value and user characters to lowercase and return only those words which are start with user enetered chars
+            return data.toLocaleLowerCase().startsWith(userData.toLocaleLowerCase()); 
+        });
+        emptyArray = emptyArray.map((data)=>{
+            // passing return data inside li tag
+            return data = '<li>'+ data +'</li>';
+        });
+        searchInput.classList.add("active"); //show autocomplete box
+        showSuggestions(emptyArray);
+        let allList = resultBox.querySelectorAll("li");
+        for (let i = 0; i < allList.length; i++) {
+            //adding onclick attribute in all li tag
+            allList[i].setAttribute("onclick", "select(this)");
+        }
+    }else{
+        searchInput.classList.remove("active"); //hide autocomplete box
+    }
+}
+
+function select(ele)
+{
+    input.value=ele.innerHTML;
+    let userData = ele.innerHTML;
+    let emptyArray = [];
+    if(userData){
+        emptyArray = suggestions.filter((data)=>{
+            //filtering array value and user characters to lowercase and return only those words which are start with user enetered chars
+            return data.toLocaleLowerCase().startsWith(userData.toLocaleLowerCase()); 
+        });
+        emptyArray = emptyArray.map((data)=>{
+            // passing return data inside li tag
+            return data = '<li>'+ data +'</li>';
+        });
+        searchInput.classList.add("active"); //show autocomplete box
+        showSuggestions(emptyArray);
+        let allList = resultBox.querySelectorAll("li");
+        for (let i = 0; i < allList.length; i++) {
+            //adding onclick attribute in all li tag
+            allList[i].setAttribute("onclick", "select(this)");
+        }
+    }else{
+        searchInput.classList.remove("active"); //hide autocomplete box
+    }
+}
+
+function showSuggestions(list){
+    let listData;
+    if(!list.length){
+        userValue = input.value;
+        listData = '<li>'+ userValue +'</li>';
+    }else{
+        listData = list.join('');
+    }
+    resultBox.innerHTML = listData;
+}
+{% endblock script %}
 
