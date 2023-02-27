@@ -954,13 +954,74 @@ def get_results(request, pk):
     testuser=TestUser.objects.get(testuser_id=request.GET['id'])
     testinfo=TestInfo.objects.get(test_id=testuser.test_id.test_id)
     data={}
+    data['user_id']=testuser.user_id.user_id
+    inters=Interview.objects.filter(user_id=testuser.user_id.user_id, eid=pk)
     data['user_name']=testuser.user_id.name
     data['name']=testinfo.test_name
     data['num']=testuser.total_ques
     data['correct']=testuser.correct_answers
     data['date']=testuser.date
+    if(len(inters)>0):
+        data['int_link']=inters[0].int_link
+    else:
+        data['int_link']=""
     data['percent']=(data['correct']/data['num'])*100
     return JsonResponse({'data': dumps(data, default=str)})
+
+def schedule_interview(request, pk):
+    if request.method=="POST":
+        check=Interview.objects.filter(user_id=request.POST['user_id'], eid=pk)
+        if(len(check)!=0):
+            check[0].int_link=request.POST['int_link']
+            check[0].save()
+            return JsonResponse({'m': 'A'})
+        intval=Interview()
+        intval.eid=Employer.objects.get(eid=pk)
+        intval.user_id=JobSeeker.objects.get(user_id=request.POST['user_id'])
+        intval.int_link=request.POST['int_link']
+        intval.save()
+        notif=Notifications()
+        notif.notif_type="I"
+        notif.send_id=intval.eid.log_id
+        notif.rece_id=intval.user_id.log_id
+        notif.save()
+        return JsonResponse({'m': 'Y'})
+    return JsonResponse({'m': 'X'})
+
+def all_interviews(request, pk):
+    if request.method=="POST":
+        if 'act' in request.POST:
+            for i in request.POST.getlist('ids[]'):
+                Interview.objects.get(int_id=i).delete()
+            return redirect('employer:all_interviews', pk=pk)
+        Interview.objects.get(int_id=request.POST['int_id']).delete()
+        return redirect('employer:all_interviews', pk=pk)
+    all_ints=Interview.objects.filter(eid=pk).order_by('schedule_date')
+    final_ints=[]
+    for i in all_ints:
+        single_int={}
+        single_int['int_id']=i.int_id
+        single_int['user_id']=i.user_id.user_id
+        single_int['name']=i.user_id.name
+        single_int['location']=i.user_id.location
+        single_int['date']=i.schedule_date
+        single_int['link']=i.int_link
+        final_ints.append(single_int)
+    GET_params = request.GET.copy()
+    count=len(final_ints)
+    if('page' in GET_params):
+        last=GET_params['page'][-1]
+        GET_params['page']=last[0]
+    p=Paginator(final_ints, 10)
+    page_number = request.GET.get('page')
+    try:
+        page_obj = p.get_page(page_number)
+    except PageNotAnInteger:
+        page_obj = p.page(1)
+    except EmptyPage:
+        page_obj = p.page(p.num_pages)
+    return render(request, 'interviews-employer.html', {'pk': pk, 'pe': page_obj, 'count': count})
+
 
 def logout(request, pk):
     employer=Login.objects.get(log_id=Employer.objects.get(eid=pk).log_id.log_id)

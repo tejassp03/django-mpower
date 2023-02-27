@@ -277,30 +277,11 @@ def profile_completion(request, pk):
 		jobseeker.other_qual=request.POST['other']
 		skills = request.POST.getlist('skills')
 		all_skills=""
-		if(len(skills)==1):
-			all_skills=skills[0]
-		elif(len(skills)>1):
-			for i in range(0, len(skills)):
-				if i==len(skills)-1:
-					if(skills[i]!=""):
-						all_skills=all_skills+","+skills[i]
-					break
-				if(skills[i]!=""):
-					all_skills=all_skills+skills[i]
-		experiences = request.POST.getlist('experience')
-		all_experiences=""
-		if(len(experiences)==1):
-			all_experiences=experiences[0]
-		elif(len(experiences)>1):
-			for i in range(0, len(experiences)):
-				if i==len(experiences)-1:
-					if(experiences[i]!=""):
-						all_experiences=all_experiences+"."+experiences[i]
-					break
-				if(experiences[i]!=""):
-					all_experiences=all_experiences+experiences[i]
+		for i in skills:
+			all_skills=all_skills+i+","
+		experiences = request.POST.get('experience')
 		jobseeker.skills=all_skills
-		jobseeker.experience=all_experiences
+		jobseeker.experience=experiences
 		filev=None
 		try:
 			filev=request.FILES['resume']

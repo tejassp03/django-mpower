@@ -119,16 +119,16 @@
                   <h6>A secret code is sent to your phone. <br>Please enter it here.</h6> 
                 </div>
                 <div class="code_group"> 
-                  <input type="text" class="form-control" placeholder="0" name="digit" id="otp_val1">
-                  <input type="text" class="form-control" placeholder="0" name="digit" id="otp_val2">
-                  <input type="text" class="form-control" placeholder="0" name="digit" id="otp_val3">
-                  <input type="text" class="form-control" placeholder="0" name="digit" id="otp_val4">
-                  <input type="text" class="form-control" placeholder="0" name="digit" id="otp_val5">
-                  <input type="text" class="form-control" placeholder="0" name="digit" id="otp_val6">
+                  <input type="text" class="form-control" placeholder="0" name="digit" id="otp_val1" maxlength=1 onkeyup="onKeyUpEvent(1, event)" onfocus="onFocusEvent(1)">
+                  <input type="text" class="form-control" placeholder="0" name="digit" id="otp_val2" maxlength=1 onkeyup="onKeyUpEvent(2, event)" onfocus="onFocusEvent(2)">
+                  <input type="text" class="form-control" placeholder="0" name="digit" id="otp_val3" maxlength=1 onkeyup="onKeyUpEvent(3, event)" onfocus="onFocusEvent(3)">
+                  <input type="text" class="form-control" placeholder="0" name="digit" id="otp_val4" maxlength=1 onkeyup="onKeyUpEvent(4, event)" onfocus="onFocusEvent(4)">
+                  <input type="text" class="form-control" placeholder="0" name="digit" id="otp_val5" maxlength=1 onkeyup="onKeyUpEvent(5, event)" onfocus="onFocusEvent(5)">
+                  <input type="text" class="form-control" placeholder="0" name="digit" id="otp_val6" maxlength=1 onkeyup="onKeyUpEvent(6, event)" onfocus="onFocusEvent(6)">
                 </div>
-                <button type="button" class="action-but2">Verify</button>
+                <button type="button" class="action-but2" style="color: green; background: white; border: 1px solid green">Verify</button>
             </div>
-                <button type="button" class="next action-button">Continue</button>  
+            <button type="button" class="next action-button" style="display: none" id="verifier">Continue</button>
               </fieldset>
 
               <fieldset>
@@ -296,7 +296,7 @@
                 function phoneNoselect(){
                     if ( $('#msform').length ){   
                         $("#phone").intlTelInput(); 
-                        $("#phone").intlTelInput("setNumber", "+880"); 
+                        $("#phone").intlTelInput("setNumber", "+91"); 
                     };
                 }; 
                 //* Select js
@@ -518,7 +518,8 @@
                     url: "post_otp/",
                     data:{
                         'phone': text2,
-                        'OTP': res1
+                        'OTP': res1,
+                        csrfmiddlewaretoken: '{{csrf_token}}'
                     },
                     success: function( data ) 
                     {
@@ -530,10 +531,35 @@
                         {
                             alert('Phone number verified');
                             $('.action-but2').css('display', 'none');
+                            $('#verifier').click();
                         }
                     }
                     })
                 })
+
+                function getCodeBoxElement(index) {
+                    return document.getElementById('otp_val' + index);
+                  }
+                  function onKeyUpEvent(index, event) {
+                    const eventCode = event.which || event.keyCode;
+                    if (getCodeBoxElement(index).value.length === 1) {
+                      if (index !== 6) {
+                        getCodeBoxElement(index+ 1).focus();
+                      }
+                    }
+                    if (eventCode === 8 && index !== 1) {
+                      getCodeBoxElement(index - 1).focus();
+                    }
+                  }
+                  function onFocusEvent(index) {
+                    for (item = 1; item < index; item++) {
+                      const currentElement = getCodeBoxElement(item);
+                      if (!currentElement.value) {
+                          currentElement.focus();
+                          break;
+                      }
+                    }
+                  }
 
         </script>
     </body>

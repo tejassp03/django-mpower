@@ -229,3 +229,12 @@ class Notifications(models.Model):
     testuser_id = models.ForeignKey(TestUser, on_delete=models.CASCADE, blank=True, null=True)
     class Meta:
         db_table = "notifications"
+
+class Interview(models.Model):
+    int_id = models.AutoField(primary_key=True)
+    user_id = models.ForeignKey(JobSeeker, on_delete=models.CASCADE, blank=True, null=True)
+    eid = models.ForeignKey(Employer, on_delete=models.CASCADE, blank=True, null=True)
+    int_link = models.CharField(max_length=300, default=None, blank=True, null=True)
+    schedule_date = models.DateTimeField(default=timezone.now)
+    class Meta:
+        db_table = "interview"

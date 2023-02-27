@@ -11,6 +11,7 @@
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600;700&display=swap" rel="stylesheet">
         <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.3.0/css/datepicker.css" rel="stylesheet" type="text/css" />
 
         <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
         <link rel="stylesheet" href="{% static 'css/font-awesome.min.css' %}">
@@ -18,6 +19,9 @@
         <link rel="stylesheet" href="{% static 'css/owl.theme.default.min.css' %}">
         <link rel="stylesheet" href="{% static 'css/animate.css' %}">
         <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+        {% block header %}
+        {% endblock header %}
 
 
         {% block title %}
@@ -50,6 +54,7 @@
                     <li id="csub"><a href="{% url 'employer:subscriptions' pk=pk %}"><span class="fa fa-credit-card"></span>Subscriptions</a></li>
                     <li id="ccha"><a href="{% url 'employer:change_pass' pk=pk %}"><span class="fa fa-lock"></span>Change Password</a></li>
                     <li id="qui"><a href="{% url 'employer:show_tests' pk=pk %}"><span class="fa fa-question"></span>Create Test</a></li>
+                    <li id="inr"><a href="{% url 'employer:all_interviews' pk=pk %}"><span class="fa fa-user"></span>Interviews</a></li>
                 </ul>
                 <div class="pxp-dashboard-side-label mt-3 mt-lg-4">Insights</div>
                 <ul class="list-unstyled">
@@ -131,6 +136,7 @@
                                     <li class="nav-item"><a href="{% url 'employer:subscriptions' pk=pk %}"><span class="fa fa-credit-card"></span>Subscriptions</a></li>
                                     <li class="nav-item"><a href="{% url 'employer:change_pass' pk=pk %}"><span class="fa fa-lock"></span>Change Password</a></li>
                                     <li class="nav-item"><a href="{% url 'employer:show_tests' pk=pk %}"><span class="fa fa-question"></span>Create Test</a></li>
+                                    <li class="nav-item"><a href="{% url 'employer:all_interviews' pk=pk %}"><span class="fa fa-user"></span>Interviews</a></li>
                                     <li class="pxp-dropdown-header mt-4">Insights</li>
                                     <li class="nav-item">
                                         <a href="{% url 'employer:cinbox' pk=pk %}" class="d-flex justify-content-between align-items-center">
@@ -418,6 +424,14 @@
                             </div>
                         </div>
                     </div>
+                    <hr style="margin: 0px" />
+                    <div class="modal-header" style="padding: 10px">
+                        <input type="text" style="display: none" name="user_id_val" />
+                        <input type="text" class="form-control" placeholder="Paste interview link" name="intlink" />
+                        <a class="btn rounded-pill pxp-nav-btn" onclick="sched()">Schedule</a>
+                    </div>
+                    <div class="modal-header" id="spanadder">
+                    </div>
                 </div>
             </div>
         </div>
@@ -432,6 +446,7 @@
         <script src="{% static 'js/nav.js' %}"></script>
         <script src="{% static 'js/Chart.min.js' %}"></script>
         <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.17.1/moment.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.3.0/js/bootstrap-datepicker.js"></script>
 
         <script>
             $(document).ready(function () {
@@ -744,12 +759,82 @@
                     success: function( data ) 
                     {
                         let datainfo=JSON.parse(data['data']);
+                        $('[name=user_id_val]').val(datainfo.user_id);
                         $('#user_name').text(datainfo.user_name);
                         $('#test_name').text("Test name: "+datainfo.name);
                         $('#date').text("Attempted on: "+datainfo.date.slice(0, 19));
                         $('#num').text("Total questions: "+datainfo.num);
                         $('#correct').text("Correct answers: "+datainfo.correct);
                         $('#percent').text("Percentage score: "+datainfo.percent+" %");
+                        let span=document.getElementById('spanadder');
+                        let span2;
+                        let remover=document.getElementById('smallspan');
+                        if(remover)
+                        {
+                            remover.remove();
+                        }
+                        if(datainfo.int_link!="")
+                        {
+                            span2=document.createElement('span');
+                            span2.innerHTML="Scheduled";
+                            span2.setAttribute('id', 'smallspan');
+                            span.setAttribute('style', 'padding: 10px; background: green; color: white; border-radius: 0rem 0rem 1rem 1rem;');
+                            $('[name=intlink]').val(datainfo.int_link);
+                            span.append(span2);
+                        }
+                    },
+            })
+        }
+
+        function sched()
+        {
+            let link=$('[name=intlink]').val();
+            let user=$('[name=user_id_val]').val();
+            if(link=="")
+            {
+                alert("Please enter a link");
+                return;
+            }
+            $.ajax(
+                {
+                    type:"POST",
+                    url: "{% url 'employer:schedule_interview' pk %}",
+                    data:{
+                        user_id: user,
+                        int_link: link,
+                        csrfmiddlewaretoken: '{{ csrf_token }}'
+                    },
+                    success: function( data ) 
+                    {
+                        let span=document.getElementById('spanadder');
+                        let span2;
+                        let remover=document.getElementById('smallspan');
+                        if(remover)
+                        {
+                            remover.remove();
+                        }
+                        if(data['m']=="Y")
+                        {
+                            span2=document.createElement('span');
+                            span2.innerHTML="Scheduled";
+                            span2.setAttribute('id', 'smallspan');
+                            span.setAttribute('style', 'padding: 10px; background: green; color: white; border-radius: 0rem 0rem 1rem 1rem;');
+                        }
+                        else if(data['m']=="A")
+                        {
+                            span2=document.createElement('span');
+                            span2.innerHTML="Rescheduled successfully";
+                            span2.setAttribute('id', 'smallspan');
+                            span.setAttribute('style', 'padding: 10px; background: yellow; color: black; border-radius: 0rem 0rem 1rem 1rem;');
+                        }
+                        else
+                        {
+                            span2=document.createElement('span');
+                            span2.innerHTML="Internal server error";
+                            span2.setAttribute('id', 'smallspan');
+                            span.setAttribute('style', 'padding: 10px; background: red; color: white; border-radius: 0rem 0rem 1rem 1rem;');
+                        }
+                        span.append(span2);
                     },
             })
         }

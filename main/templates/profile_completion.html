@@ -11,6 +11,16 @@
         <link rel='stylesheet' href='https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css'>
         <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/jquery-nice-select/1.1.0/css/nice-select.min.css'>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.css"></link>
+
+  
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <!-- select2 -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
+
+  <!-- select2-bootstrap4-theme -->
+  <link href="https://raw.githack.com/ttskch/select2-bootstrap4-theme/master/dist/select2-bootstrap4.css" rel="stylesheet"> <!-- for live demo page -->
+  <link href="select2-bootstrap4.css" rel="stylesheet"> 
+  
      
         <link rel="shortcut icon" href="{% static 'images/favicon.png' %}" type="image/x-icon">
         <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -52,6 +62,29 @@
                 align-items: center;
                 margin: 10px 10px;
             }
+
+              
+              h3 {
+                color: #000000;
+                margin: 40px 0;
+                padding: 0;
+                font-size: 28px;
+                text-align: center;
+              }
+              
+              select {
+                width: 100%;
+                min-height: 100px;
+                border-radius: 3px;
+                border: 1px solid #444;
+                padding: 10px;
+                color: #444444;
+                font-size: 14px;
+              }
+              .select2-search__field
+              {
+                width: 100% !important;
+              }
         </style>
     </head>
    
@@ -138,28 +171,37 @@
 
               <fieldset>
                 <h3>Please enter details</h3>
-                <select multiple data-placeholder="Select Skills" name="skills">
+                {% comment %} <select multiple data-placeholder="Select Skills" name="skills">
                     <option>Python</option>
                     <option>JavaScript</option>
                     <option>C/C++</option>
                     <option>Java</option>
                     <option>Kotlin</option>
-                </select>
+                </select> {% endcomment %}
+                <div class="wrapper">
+                    <div class="container">
+                        <div class="form-group">
+                          <select multiple placeholder="Choose skills" name="skills" class="notnormal">
+                            <option>HTML</option>
+                            <option>CSS</option>
+                            <option>JavaScript</option>
+                            <option>PHP</option>
+                            <option>MySQL</option>
+                          </select>
+                        </div>
+                    </div>
+                </div>
                 <hr>
                 <div class="form-group fg_2">
-                    <input style="border: none; display: none;" id="QuestionCounta" name="question_counta" value=1>
-                    <input style="border: none; display: none;" id="radioCounta" name="radio_counta" value=2>
-                    <input style="border: none; display: none;" id="rdca" name="rdca">
-                    <section class="questionInputa" class="container">
-                        <div id="questioneera" class="row">
-                            <div id="eq1" class="single_question1a Ques" style="padding: 0px 0px">
-                                <div class="individualQuestiona" style="margin: 0px 0px">
-                                    <input class="form-control specialInputQuestionsa" type="text" placeholder="Experience (Role, company, timespan)" name="experience" id="question1a">
-                                </div>
-                            </div>
-                        </div>
-                        <button type="button" id="addQuestionsa" class="btn btn-primary" onclick="addQuestion('experience')" style="margin: 20px 20px">+</button>
-                    </section>
+                    <select class="form-group" name="experience" style="min-height: 3rem !important">
+                        <option value="0">Fresher</option>
+                        <option value="1">&#10092; 1 year</option>
+                        <option value="2">1 year</option>
+                        <option value="3">2 years</option>
+                        <option value="4">3 years</option>
+                        <option value="5">4 years</option>
+                        <option value="6">&#10093; 5 yeras</option>
+                    </select>
                 </div>
                 <button type="button" class="action-button previous previous_button" style="margin-bottom: 30px">Back</button> 
                 <button type="button" class="next action-button" style="margin-bottom: 30px">Continue</button>   
@@ -200,6 +242,9 @@
         <script src='https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/12.1.2/js/intlTelInput.js'></script>
         <script src='https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js'></script>
         <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery-nice-select/1.1.0/js/jquery.nice-select.min.js'></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
         <script src="{% static 'js/main.js' %}"></script>
         <script>
             (function($) {
@@ -428,104 +473,17 @@
                     $('#gifshower').css({'display': 'none'})
                   })
 
-                  $(document).ready(function () {
-                      var select = $('select[multiple]');
-                      var options = select.find('option');
-                     
-                      var div = $('<div />').addClass('selectMultiple');
-                      var active = $('<div />');
-                      var list = $('<ul />');
-                      var placeholder = select.data('placeholder');
-                     
-                      var span = $('<span />').text(placeholder).appendTo(active);
-                     
-                      options.each(function () {
-                        var text = $(this).text();
-                        if ($(this).is(':selected')) {
-                          active.append($('<a />').html('<em>' + text +'</em><i></i>'));
-                          span.addClass('hide');
-                        }else {
-                          list.append($('<li />').html(text));
-                        }
-                      });
-                     
-                      active.append($('<div />').addClass('arrow'));
-                      div.append(active).append(list);
-                     
-                      select.wrap(div);
-                     
-                      $(document).on('click','.selectMultiple ul li',function (e) {
-                        var select = $(this).parent().parent();
-                        var li = $(this);
-                        if (!select.hasClass('clicked')) {
-                          select.addClass('clicked');
-                          li.prev().addClass('beforeRemove');
-                          li.next().addClass('afterRemove');
-                          li.addClass('remove');
-                          var a = $('<a />').addClass('notShown').html('<em>' + li.text() +'</em><i></i>').hide().appendTo(select.children('div'));
-                          a.slideDown(400,function () {
-                            setTimeout(function () {
-                              a.addClass('shown');
-                              select.children('div').children('span').addClass('hide');
-                              select.find('option:contains(' + li.text() +')').prop('selected',true);
-                            }, 500);
+                  
+                    $(function () {
+                        $('.notnormal').each(function () {
+                          $(this).select2({
+                            theme: 'bootstrap4',
+                            width: 'style',
+                            placeholder: $(this).attr('placeholder'),
+                            allowClear: Boolean($(this).data('allow-clear')),
                           });
-                          setTimeout(function () {
-                            if (li.prev().is(':last-child')) {
-                              li.prev().removeClass('beforeRemove');
-                            }
-                            if (li.next().is(':first-child')) {
-                              li.next().removeClass('afterRemove');
-                            }
-                            setTimeout(function () {
-                              li.prev().removeClass('beforeRemove');
-                              li.next().removeClass('afterRemove');
-                            }, 200);
-                     
-                            li.slideUp(400,function () {
-                              li.remove();
-                              select.removeClass('clicked');
-                            });
-                          }, 600);
-                        }
+                        });
                       });
-                     
-                      $(document).on('click','.selectMultiple > div a',function (e) {
-                        var select = $(this).parent().parent();
-                        var self = $(this);
-                        self.removeClass().addClass('remove');
-                        select.addClass('open');
-                        setTimeout(function () {
-                          self.addClass('disappear');
-                          setTimeout(function () {
-                            self.animate({
-                              width: 0,
-                              height: 0,
-                              padding: 0,
-                              margin: 0
-                            }, 300,function () {
-                              var li = $('<li />').text(self.children('em').text()).addClass('notShown').appendTo(select.find('ul'));
-                              li.slideDown(400,function () {
-                                li.addClass('show');
-                                setTimeout(function () {
-                                  select.find('option:contains(' + self.children('em').text() +')').prop('selected',false);
-                                  if (!select.find('option:selected').length) {
-                                    select.children('div').children('span').removeClass('hide');
-                                  }
-                                  li.removeClass();
-                                }, 400);
-                              });
-                              self.remove();
-                            })
-                          }, 300);
-                        }, 400);
-                      });
-                     
-                      $(document).on('click','.selectMultiple > div .arrow, .selectMultiple > div span',function (e) {
-                        $(this).parent().parent().toggleClass('open');
-                      });
-                     
-                    });
 
 
                     var count = 1;
