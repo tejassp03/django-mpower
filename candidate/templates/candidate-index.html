@@ -40,6 +40,7 @@
                     <li id="fav"><a href="{% url 'candidate:favjobs' pk=pk %}"><span class="fa fa-heart-o"></span>Favourite Jobs</a></li>
                     <li id="cha" ><a href="{% url 'candidate:change' pk=pk %}"><span class="fa fa-lock"></span>Change Password</a></li>
                     <li id="tes" ><a href="{% url 'candidate:tests' pk=pk %}"><span class="fa fa-question"></span>Tests</a></li>
+                    <li id="ins" ><a href="{% url 'candidate:interviews' pk=pk %}"><span class="fa fa-user"></span>Interviews</a></li>
                     {% comment %} <li><a href="candidate-dashboard-applications.html"><span class="fa fa-file-text-o"></span>Apllications</a></li>
                     <li><a href="candidate-dashboard-fav-jobs.html"><span class="fa fa-heart-o"></span>Favourite Jobs</a></li>
                     <li><a href="candidate-dashboard-password.html"><span class="fa fa-lock"></span>Change Password</a></li> {% endcomment %}
@@ -135,6 +136,7 @@
                                     <li class="nav-item"><a href="{% url 'candidate:favjobs' pk=pk %}"><span class="fa fa-heart-o"></span>Favourite Jobs</a></li>
                                     <li class="nav-item"><a href="{% url 'candidate:change' pk=pk %}"><span class="fa fa-lock"></span>Change Password</a></li>
                                     <li class="nav-item"><a href="{% url 'candidate:tests' pk=pk %}"><span class="fa fa-question"></span>Tests</a></li>
+                                    <li class="nav-item"><a href="{% url 'candidate:interviews' pk=pk %}"><span class="fa fa-user"></span>Interviews</a></li>
                                     {% comment %} <li class="nav-item"><a href="candidate-dashboard-applications.html"><span class="fa fa-file-text-o"></span>Apllications</a></li>
                                     <li class="nav-item"><a href="candidate-dashboard-fav-jobs.html"><span class="fa fa-heart-o"></span>Favourite Jobs</a></li>
                                     <li class="nav-item"><a href="candidate-dashboard-password.html"><span class="fa fa-lock"></span>Change Password</a></li> {% endcomment %}
@@ -199,6 +201,8 @@
                                 <li><a class="dropdown-item" href="#" onclick="messageclick({{i.log_id}})"><strong>{{ i.ename }}</strong> sent you a message. <span class="pxp-is-time">{{ i.datetime|naturaltime }}</span></a></li>
                                 {% elif i.notif_type == "T" %}
                                 <li><a class="dropdown-item" href="{% url 'candidate:tests' pk %}"><strong>{{ i.ename }}</strong> scheduled a test. <span class="pxp-is-time">{{ i.datetime|naturaltime }}</span></a></li>
+                                {% elif i.notif_type == "I" %}
+                                <li><a class="dropdown-item" href="#" onclick="interviewload({{i.eid}})" data-bs-target="#pxp-interview-modal" data-bs-toggle="modal"><strong>{{ i.ename }}</strong> scheduled a interview. <span class="pxp-is-time">{{ i.datetime|naturaltime }}</span></a></li>
                                 {% else %}
                                 <li><a class="dropdown-item" href="#" onclick="companyload({{i.eid}})" data-bs-target="#pxp-company-modal" data-bs-toggle="modal"><strong>{{ i.ename }}</strong> viewed your profile. <span class="pxp-is-time">{{ i.datetime|naturaltime }}</span></a></li>
                                 {% endif %}
@@ -475,6 +479,26 @@
                                     </div>
                                 </div>
                             </section>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade pxp-interview-modal" id="pxp-interview-modal" aria-hidden="true" aria-labelledby="interviewModal" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered widthadjuster" style="justify-content: center">
+                    <div class="modal-content" style="width: 35rem">
+                        <div class="modal-header" style="padding: 10px">
+                            <h3 id="employer_name"></h3>
+                        </div>
+                        <hr style="margin: 0px" />
+                        <div class="modal-body" style="padding: 1rem !important">
+                            <div class="pxp-company-dashboard-jobs-bulk-actions" style="margin-left: auto; flex-direction: column">
+                                <div id="link_int">
+                                </div>
+                            </div>
+                        </div>
+                        <hr style="margin: 0px" />
+                        <div class="modal-header" style="padding: 10px" id="dateadder">
                         </div>
                     </div>
                 </div>
@@ -782,6 +806,25 @@
                         }
                     },
             })
+        }
+
+        function interviewload(id)
+        {
+            $.ajax(
+                {
+                    type:"GET",
+                    url: "{% url 'candidate:get_interview' pk %}",
+                    data:{
+                        eid: id
+                    },
+                    success: function( data ) 
+                    {
+                        let info=JSON.parse(data['info']);
+                        $('#employer_name').text(info['ename']);
+                        $('#link_int').text(info['link']);
+                        $('#dateadder').text("Date: "+moment(info['date'].slice(0, 19)).format("MMM. D, YYYY, h:mm a"));
+                    },
+                })
         }
             {% block script %}
             {% endblock script %}

@@ -787,6 +787,45 @@ def submit(request, pk):
         notif.save()
     return JsonResponse({'message': "submitted"})
 
+def interviews(request, pk):
+    inter=Interview.objects.filter(user_id=pk).order_by('schedule_date')
+    all_inters=[]
+    for i in inter:
+        single_inter={}
+        single_inter['int_id']=i.int_id
+        single_inter['eid']=i.eid.eid
+        single_inter['ename']=i.eid.ename
+        single_inter['date']=i.schedule_date
+        single_inter['link']=i.int_link
+        single_inter['location']=i.eid.location
+        if(i.eid.logo):
+            single_inter['logo']=i.eid.logo
+        else:
+            single_inter['logo']=""
+        all_inters.append(single_inter)
+    count=len(all_inters)
+    GET_params = request.GET.copy()
+    if('page' in GET_params):
+        last=GET_params['page'][-1]
+        GET_params['page']=last[0]
+    p=Paginator(all_inters, 5)
+    page_number = request.GET.get('page')
+    try:
+        page_obj = p.get_page(page_number)
+    except PageNotAnInteger:
+        page_obj = p.page(1)
+    except EmptyPage:
+        page_obj = p.page(p.num_pages)
+    return render(request, 'interviews-candidate.html', {'pk': pk, 'pe': page_obj, 'count': count})
+
+def get_interview(request, pk):
+    inter=Interview.objects.get(eid=request.GET['eid'], user_id=pk)
+    data={}
+    data['date']=inter.schedule_date
+    data['link']=inter.int_link
+    data['ename']=inter.eid.ename
+    return JsonResponse({'info': dumps(data, default=str)})
+
 def logout(request, pk):
     user=Login.objects.get(log_id=JobSeeker.objects.get(user_id=pk).log_id.log_id)
     user.status=0
