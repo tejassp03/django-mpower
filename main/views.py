@@ -553,5 +553,14 @@ def singlejob(request, pk2):
 	companydet=Employer.objects.get(eid=jobdet.eid.eid)
 	liked=LikedJobs.objects.filter(job_id=pk2)
 	loger=Login.objects.get(log_id=companydet.log_id.log_id)
-	return render(request, 'singlejob.html', {'job_details': jobdet, 'company_details': companydet, 'liked': liked, 'loger': loger})
+	skills=[]
+	for i in jobdet.skills.split("\n"):
+		skills.append(i)
+	requirements=[]
+	for i in jobdet.requirements.split("\n"):
+		requirements.append(i)
+	responsibilities=[]
+	for i in jobdet.responsibilities.split("\n"):
+		responsibilities.append(i)
+	return render(request, 'singlejob.html', {'job_details': jobdet, 'company_details': companydet, 'liked': liked, 'loger': loger, 'skills': skills, 'requirements': requirements, 'responsibilities': responsibilities})
 
