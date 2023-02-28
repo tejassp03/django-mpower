@@ -25,6 +25,15 @@ def dashboard(request, pk):
     threads = Threads.objects.filter(receiver=userobj.log_id)
     countunmess=0
     recent_mess=[]
+    testuser=TestUser.objects.filter(user_id=pk)
+    popupmess=[]
+    for i in testuser:
+        if i.answers:
+            continue
+        else:
+            testinfo=TestInfo.objects.get(test_id=i.test_id.test_id)
+            ans="You have a pending test scheduled by "+testinfo.eid.ename+" (test name "+testinfo.test_name+")"
+            popupmess.append(ans)
     for i in threads:
         mess=Messages.objects.filter(msg_id=i.msg_id, receiver_user=userobj.log_id.log_id).order_by("-date")
         if(len(mess)>0):
@@ -169,7 +178,7 @@ def dashboard(request, pk):
     charts_context['vpastyea']=dumps([item[1] for item in visits_365])
     charts_context['vdates365']=dumps([item[0] for item in visits_365], default=str)
     charts_context['vcount_365']=dumps(countsv[4])
-    return render(request, 'dashboard-candidate.html', {'user': context, 'applications': all_applics, 'pk': pk, 'profile': profile, 'notifics': all_notis, 'messcount': countunmess, 'charts': charts_context, 'recent': recent_mess_temp})
+    return render(request, 'dashboard-candidate.html', {'user': context, 'applications': all_applics, 'pk': pk, 'profile': profile, 'notifics': all_notis, 'messcount': countunmess, 'charts': charts_context, 'recent': recent_mess_temp, 'pending': popupmess})
 
 
 def jobapp(request, pk):

@@ -37,6 +37,7 @@ from django.db.models import Max, Min
 from json import dumps
 
 
+
 @csrf_exempt
 def index(request):
 	if request.method == 'POST':

@@ -15,6 +15,9 @@ import string
 import pandas as pd
 import matplotlib.pyplot as plt
 
+
+from main.utils import send_emails
+
 # Create your views here.
 def dashboard(request, pk):
     context = Employer.objects.get(eid=pk)
@@ -303,6 +306,10 @@ def candidates(request, pk):
             request.session['shower']=apps.job_id.jobid
             apps.status=1
             apps.save()
+            subject="Congratulations "+apps.user_id.name+" you are selected!"
+            message="Company: "+apps.job_id.eid.ename+"\nJob: "+apps.job_id.title
+            receipt=[apps.user_id.log_id.email]
+            send_emails(subject, message, receipt)
             return redirect('employer:candidates', pk=pk)
         if 'reject' in request.POST:
             apps=Application.objects.get(apply_id=request.POST['apply_id'])
@@ -321,6 +328,10 @@ def candidates(request, pk):
                     apps=Application.objects.get(apply_id=i)
                     apps.status=1
                     apps.save()
+                    subject="Congratulations "+apps.user_id.name+" you are selected!"
+                    message="Company: "+apps.job_id.eid.ename+"\nJob: "+apps.job_id.title
+                    receipt=[apps.user_id.log_id.email]
+                    send_emails(subject, message, receipt)
                     request.session['shower']=apps.job_id.jobid
             if(request.POST['act']=="rejall"):
                 for i in request.POST.getlist('ids[]'):
@@ -920,6 +931,10 @@ def schedule(request, pk):
                     notif.send_id=Login.objects.get(email=request.session['email'])
                     notif.rece_id=applics.user_id.log_id
                     notif.save()
+                    subject="Test scheduled by "+applics.job_id.eid.ename
+                    message="Test Name: "+testinfo.test_name+"\nDuration: "+str(testinfo.time_limit)
+                    receipt=[applics.user_id.log_id.email]
+                    send_emails(subject, message, receipt)
             return JsonResponse({'message': 'scheduled'})
         applics=Application.objects.get(apply_id=request.POST['id'])
         if applics.status==3:
@@ -941,6 +956,10 @@ def schedule(request, pk):
         notif.send_id=Login.objects.get(email=request.session['email'])
         notif.rece_id=applics.user_id.log_id
         notif.save()
+        subject="Test scheduled by "+applics.job_id.eid.ename
+        message="Test Name: "+testinfo.test_name+"\nDuration: "+str(testinfo.time_limit)
+        receipt=[applics.user_id.log_id.email]
+        send_emails(subject, message, receipt)
     return JsonResponse({'message': 'scheduled'})
 
 def test_info(request, pk):
@@ -985,6 +1004,10 @@ def schedule_interview(request, pk):
         notif.send_id=intval.eid.log_id
         notif.rece_id=intval.user_id.log_id
         notif.save()
+        subject="Interview scheduled by "+intval.eid.ename
+        message="Interview link: "+intval.int_link+"\nDate: "+str(intval.schedule_date)
+        receipt=[intval.user_id.log_id.email]
+        send_emails(subject, message, receipt)
         return JsonResponse({'m': 'Y'})
     return JsonResponse({'m': 'X'})
 
