@@ -250,6 +250,33 @@
                 </div>
             </div>
         </div>
+
+
+        <div class="modal fade pxp-applic-modal" id="pxp-applic-modal" aria-hidden="true" aria-labelledby="applicModal" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered widthadjuster" style="justify-content: center">
+                <div class="modal-content" style="width: 35rem">
+                    <div class="modal-header" style="padding: 10px">
+                        <h3 id="applyjob"></h3>
+                    </div>
+                    <hr style="margin: 0px" />
+                    <div class="modal-body" style="padding: 1rem !important">
+                        <div class="pxp-company-dashboard-jobs-bulk-actions">
+                            <div id="whyhire">
+                                <input name="jobidval" style="display: none" />
+                                <label for="pxp-company-job-description" class="form-label">Why should we hire you?</label>
+                                <textarea class="form-control" rows=10 cols=70 id="pxp-company-job-description" placeholder="Mention about your skills, experiences, etc" name="whyhire" minlength=50></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <hr style="margin: 0px" />
+                    <div class="modal-header" style="padding: 10px">
+                        <a class="btn rounded-pill pxp-nav-btn" onclick="applics()">Apply</a>
+                    </div>
+                    <div class="modal-header" id="spanadder">
+                    </div>
+                </div>
+            </div>
+        </div>
     
 
         <script src="{% static 'js/jquery-3.4.1.min.js' %}"></script>
@@ -415,6 +442,48 @@
               $('#pxp-signin-modal .show .signinbut').click();
             }
           });
+
+        function applicmodal(id)
+        {
+            $.ajax(
+                {
+                    type:"GET",
+                    url: "{% url 'main:get_job' %}",
+                    data:{
+                            id: id,
+                    },
+                    success: function( data ) 
+                    {
+                        $('#applyjob').text(data['name']);
+                        $('[name=jobidval]').val(data['id']);
+                    }
+                })
+        }
+
+        function applics()
+        {
+            if($('[name=whyhire]').val()=="")
+            {
+                alert("Please answer the question");
+                return;
+            }
+            $.ajax(
+                {
+                    type:"POST",
+                    url: "{% url 'main:get_job' %}",
+                    data:{
+                            id: $('[name=jobidval]').val(),
+                            whyhire: $('[name=whyhire]').val(),
+                            csrfmiddlewaretoken: '{{ csrf_token }}'
+                    },
+                    success: function( data ) 
+                    {
+                        alert("Applied successfully track status from the dashboard!!");
+                        location.reload();
+                    }
+                })
+        }
+
         {% block script %}
         {% endblock script %}
         </script>

@@ -14,6 +14,7 @@ urlpatterns = [
 	path('companies/', views.companies, name ='companies'),
 	path('candidates/', views.candidates, name ='candidates'),
 	path('postjob/', views.postjob, name ='postjob'),
+    path('get_job/', views.get_job, name='get_job'),
 	path('profile_completion/<int:pk>/', views.profile_completion, name="profilecompletion"),
 	path('emp_completion/<int:pk>/', views.emp_completion, name="eprofile"),
 	path('profile_completion/<int:pk>/get_otp/', views.get_otp, name='get_otp'),

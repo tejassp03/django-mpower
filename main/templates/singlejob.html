@@ -85,7 +85,13 @@
                                         {% endif %}
                                     </ul>
                                 </div>
-                                <button class="btn ms-2 pxp-single-job-apply-btn rounded-pill">Apply Now</button>
+                                {% if request.session.name %}
+                                {% if date %}
+                                <button class="btn ms-2 pxp-single-job-apply-btn rounded-pill" style="height: 60px">Applied on <br>{{ date }}</button>
+                                {% else %}
+                                <button class="btn ms-2 pxp-single-job-apply-btn rounded-pill" data-bs-target="#pxp-applic-modal" data-bs-toggle="modal" onclick="applicmodal('{{job_details.jobid}}')">Apply Now</button>
+                                {% endif %}
+                                {% endif %}
                             </div>
                         </div>
                     </div>
@@ -130,9 +136,17 @@
                             </ul>
                         </div>
 
+                        {% if request.session.name %}
+                        {% if date %}
                         <div class="mt-4 mt-lg-5">
-                            <a href="#" class="btn rounded-pill pxp-section-cta">Apply Now</a>
+                            <a class="btn rounded-pill pxp-section-cta">Applied on <br>{{ date }}</a>
                         </div>
+                        {% else %}
+                        <div class="mt-4 mt-lg-5">
+                            <a href="" data-bs-target="#pxp-applic-modal" data-bs-toggle="modal" onclick="applicmodal('{{job_details.jobid}}')" class="btn rounded-pill pxp-section-cta">Apply Now</a>
+                        </div>
+                        {% endif %}
+                        {% endif %}
                     </div>
                 </div>
                 <div class="col-lg-5 col-xl-4 col-xxl-3">

@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate,login
 from django.contrib import messages
-from .models import JobSeeker, Login, Employer, ResumeAnalysis, Jobs, LikedJobs
+from .models import JobSeeker, Login, Employer, ResumeAnalysis, Jobs, LikedJobs, Application
 import random
 import re
 from django.contrib.auth.hashers import make_password, check_password
@@ -551,8 +551,16 @@ def singlejob(request, pk2):
 		like.save()
 		return redirect('main:singlejob', pk2=pk2)
 	jobdet=Jobs.objects.get(jobid=pk2)
+	lik=False
+	app_date=None
 	companydet=Employer.objects.get(eid=jobdet.eid.eid)
-	liked=LikedJobs.objects.filter(job_id=pk2)
+	if 'pk' in request.session:
+		liked=LikedJobs.objects.filter(job_id=pk2, user_id=request.session['pk'])
+		if liked:
+			lik=True
+		applics=Application.objects.filter(job_id=pk2, user_id=request.session['pk'])
+		if applics:
+			app_date=applics[0].date_applied
 	loger=Login.objects.get(log_id=companydet.log_id.log_id)
 	skills=[]
 	for i in jobdet.skills.split("\n"):
@@ -563,5 +571,18 @@ def singlejob(request, pk2):
 	responsibilities=[]
 	for i in jobdet.responsibilities.split("\n"):
 		responsibilities.append(i)
-	return render(request, 'singlejob.html', {'job_details': jobdet, 'company_details': companydet, 'liked': liked, 'loger': loger, 'skills': skills, 'requirements': requirements, 'responsibilities': responsibilities})
+	return render(request, 'singlejob.html', {'job_details': jobdet, 'company_details': companydet, 'liked': lik, 'loger': loger, 'skills': skills, 'requirements': requirements, 'responsibilities': responsibilities, 'date': app_date})
 
+def get_job(request):
+	if(request.method=="GET"):
+		job=Jobs.objects.get(jobid=request.GET['id'])
+		return JsonResponse({'name': job.title, 'id': job.jobid})
+	if(request.method=="POST"):
+		applic=Application()
+		applic.user_id=JobSeeker.objects.get(user_id=request.session['pk'])
+		applic.status=0
+		applic.job_id=Jobs.objects.get(jobid=request.POST['id'])
+		applic.eid=applic.job_id.eid
+		applic.why_desc=request.POST['whyhire']
+		applic.save()
+		return JsonResponse({'message': 'Y'})

@@ -214,6 +214,7 @@ class Application(models.Model):
     status = models.IntegerField(default=None, null=True)
     date_applied = models.DateTimeField(default=timezone.now)
     test = models.ForeignKey(TestInfo, default=None, blank=True, null=True, on_delete=models.CASCADE)
+    why_desc = models.CharField(max_length=700, default=None, blank=True, null=True)
     class Meta:
         db_table = "application"
 
