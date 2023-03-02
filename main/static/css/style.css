@@ -5243,6 +5243,7 @@ ol.pxp-comments-list {
 }
 .pxp-contact-card-1:hover {
     background-color: var(--pxpMainColorDark);
+    color: white;
 }
 .pxp-contact-card-1-icon {
     background-color: #fff;

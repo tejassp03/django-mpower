@@ -82,7 +82,7 @@
                                     <a role="button" class="nav-link" href="{% url 'main:jobs' %}">Find Jobs</a>
                                     
                                 </li>
-                                <li class="nav-item dropdown">
+                                {% comment %} <li class="nav-item dropdown">
                                     <a role="button" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Companies</a>
                                     <ul class="dropdown-menu">
                                         <li class="nav-item dropdown">
@@ -103,7 +103,7 @@
                                         </li>
                                         <li class="nav-item"><a href="company-dashboard.html">Company Dashboard</a></li>
                                     </ul>
-                                </li>
+                                </li> {% endcomment %}
                                 {% comment %} <li class="nav-item dropdown">
                                     <a role="button" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Candidates</a>
 
@@ -128,7 +128,7 @@
                                     {% comment %} <a id="signin" role="button" class="btn rounded-pill pxp-user-nav-trigger pxp-on-light" data-bs-target="#pxp-signin-modal" data-bs-toggle="modal">Sign in</a> {% endcomment %}
                                     {% comment %} {% endif %} {% endcomment %}
                                 {% comment %} </li> {% endcomment %}
-                                <li class="nav-item dropdown">
+                                {% comment %} <li class="nav-item dropdown">
                                     <a role="button" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Blog</a>
                                     <ul class="dropdown-menu">
                                         <li class="nav-item"><a href="blog-list-1.html">Articles Cards</a></li>
@@ -148,7 +148,7 @@
                                         <li class="nav-item"><a href="sign-up.html">Sign Up</a></li>
                                         <li class="nav-item"><a href="404.html">404 Page</a></li>
                                     </ul>
-                                </li>
+                                </li> {% endcomment %}
                             </ul>
                         </nav>
                     </div>
@@ -166,7 +166,7 @@
                         <a href="{% url 'main:jobs' %}" class="dropdown-toggle" >Find Jobs</a>
                         
                     </li>
-                    <li class="dropdown">
+                    {% comment %} <li class="dropdown">
                         <a href="{% url 'main:companies' %}" class="dropdown-toggle" >Companies</a>
                         
                     </li>
@@ -177,7 +177,7 @@
                     <li class="dropdown">
                         <a href="{% url 'main:blog' %}" class="dropdown-toggle" >Blog</a>
                        
-                    </li>
+                    </li> {% endcomment %}
                     
                 </ul>
             </nav>

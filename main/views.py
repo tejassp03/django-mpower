@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate,login
 from django.contrib import messages
-from .models import JobSeeker, Login, Employer, ResumeAnalysis, Jobs, LikedJobs, Application
+from .models import JobSeeker, Login, Employer, ResumeAnalysis, Jobs, LikedJobs, Application, Interview, Feedback
 import random
 import re
 from django.contrib.auth.hashers import make_password, check_password
@@ -586,3 +586,38 @@ def get_job(request):
 		applic.why_desc=request.POST['whyhire']
 		applic.save()
 		return JsonResponse({'message': 'Y'})
+
+def give_feedback(request, pk):
+	if request.method=="POST":
+		int_val=Interview.objects.get(int_id=pk)
+		int_val.is_feedgiven=1
+		int_val.save()
+		feedback=Feedback()
+		feedback.int_id=int_val
+		feedback.emp_feedback=request.POST['feedback']
+		feedback.name=request.POST['name']
+		feedback.save()
+		messages.error(request, "Feedback successfully recorded!")
+		return redirect('main:give_feedback', pk=pk)
+	int_val=Interview.objects.get(int_id=pk)
+	data={}
+	data['name']=int_val.user_id.name
+	data['location']=int_val.user_id.location
+	data['title']=int_val.user_id.title
+	if int_val.user_id.photo:
+		data['photo']=int_val.user_id.photo
+	return render(request, 'give_feedback.html', {'data': data})
+
+def give_feed(request, pk):
+	if request.method=="POST":
+		int_val=Interview.objects.get(int_id=pk)
+		int_val.cand_feedback=request.POST['feedback']
+		int_val.save()
+		return redirect("main:index")
+	int_val=Interview.objects.get(int_id=pk)
+	data={}
+	data['ename']=int_val.eid.ename
+	data['location']=int_val.eid.location
+	if int_val.eid.logo:
+		data['logo']=int_val.eid.logo.url
+	return render(request, 'give_feed.html', {'data': data})

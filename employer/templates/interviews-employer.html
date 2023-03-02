@@ -25,6 +25,7 @@
                     <select class="form-select" name="act">
                         <option value="a">Bulk actions</option>
                         {% comment %} <option>Edit</option> {% endcomment %}
+                        <option value="c">Done</option>
                         <option value="b">Delete</option>
                     </select>
                     <button class="btn ms-2" onclick="multiple()">Apply</button>
@@ -50,6 +51,7 @@
                         <th style="width: 15%;">Name</th>
                         <th style="width: 15%;">Date<span class="fa fa-angle-up ms-3"></span></th>
                         <th style="width: 15%;">Link</th>
+                        <th style="width: 15%;">Status</th>
                         <th style="width: 15%;">&nbsp;</th>
                     </tr>
                 </thead>
@@ -64,9 +66,16 @@
                         </td>
                         <td><div class="pxp-company-dashboard-job-date mt-1">{{ i.date }}</div></td>
                         <td><a href={{i.link}} target="_blank" class="pxp-company-dashboard-job-date mt-1">{{ i.link }}</div></td>
+                        {% if i.isdone == 1 %}
+                        <td><div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-success">Done</span></div></td>
+                        {% else %}
+                        <td><div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-secondary">Pending</span></div></td>
+                        {% endif %}
                         <td>
                             <div class="pxp-dashboard-table-options">
                                 <ul class="list-unstyled">
+                                    <li><button title="Feedback Info" onclick="feedb({{i.int_id}})" href="#" data-bs-target="#pxp-feedback-modal" data-bs-toggle="modal"><span class="fa fa-eye"></span></button></li>
+                                    <li><button title="Done" onclick="done({{i.int_id}})"><span class="fa fa-check"></span></button></li>
                                     <input style="display: none" value={{i.int_id}}>
                                     <li><button title="Delete" onclick="delint({{i.int_id}})"><span class="fa fa-trash-o"></span></button></li>
                                 </ul>
@@ -180,6 +189,30 @@
     </div>
 </div>
 
+
+<div class="modal fade pxp-user-modal" id="pxp-feedback-modal" aria-hidden="true" aria-labelledby="feedbackModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered widthadjuster" style="justify-content: center">
+        <div class="modal-content" style="width: 35rem">
+            <div class="modal-header" style="padding: 10px">
+                <h3 id="user_name2"></h3>
+            </div>
+            <hr style="margin: 0px" />
+            <div class="modal-body" style="padding: 1rem !important">
+                <div class="pxp-company-dashboard-jobs-bulk-actions" style="margin-left: auto; flex-direction: column">
+                    <div id="feedback_link">
+                    </div>
+                </div>
+            </div>
+            <hr style="margin: 0px" />
+            <div class="modal-header" style="padding: 10px">
+                <p id="descri"></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
 {% endblock %}
 
 {% block script %}
@@ -268,17 +301,32 @@ function multiple()
     })
     if(ids.length==0)
     {
-        alert("Please select at least one of the records to apply delete operation")
+        if(action=="b")
+        {
+            alert("Please select at least one of the records to apply delete operation")
+        }
+        else if(action=="c")
+        {
+            alert("Please select at least one of the records to apply done operation")
+        }
         return;
     }
-    console.log(ids);
+    let act_val="";
+    if(action=="b")
+    {
+        act_val="delall";
+    }
+    else if(action=="c")
+    {
+        act_val="donall";
+    }
     $.ajax(
         {
             type:"POST",
             url: "",
             data:{
                     'ids': ids,
-                    'act': "delall",
+                    'act': act_val,
                     csrfmiddlewaretoken: '{{ csrf_token }}'
             },
             success: function( data ) 
@@ -288,5 +336,47 @@ function multiple()
     })
 }
 
+function done(id)
+{
+    $.ajax(
+        {
+            type:"POST",
+            url: "{% url 'employer:done' pk %}",
+            data:{
+                    'id': id,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function( data ) 
+            {
+                location.reload();
+            }
+    })
+}
+
+function feedb(id)
+{
+    $.ajax(
+        {
+            type:"GET",
+            url: "{% url "employer:get_link" pk %}",
+            data:{
+                    'int_id': id
+            },
+            success: function( data ) 
+            {
+                if(data['message']=="X")
+                {
+                    $('#user_name2').text(data['name']);
+                    $('#feedback_link').text("Interview must be completed before giving feedback!");
+                }
+                else
+                {
+                    $('#user_name2').text(data['name']);
+                    $('#feedback_link').text("Link: "+data['url']);
+                    $('#descri').text("Please share this link with other panel members of the interview for feedback");
+                }
+            }
+    })
+}
 
 {% endblock %}

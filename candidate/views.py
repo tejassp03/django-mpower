@@ -34,6 +34,13 @@ def dashboard(request, pk):
             testinfo=TestInfo.objects.get(test_id=i.test_id.test_id)
             ans="You have a pending test scheduled by "+testinfo.eid.ename+" (test name "+testinfo.test_name+")"
             popupmess.append(ans)
+    int_vals=Interview.objects.filter(user_id=pk, is_done=1)
+    for i in int_vals:
+        if i.cand_feedback:
+            continue
+        else:
+            ans="Please provide your feedback for the interview with "+i.eid.ename+"\n Link: http://localhost:8000/give_feed/"+str(i.int_id)
+            popupmess.append(ans)
     for i in threads:
         mess=Messages.objects.filter(msg_id=i.msg_id, receiver_user=userobj.log_id.log_id).order_by("-date")
         if(len(mess)>0):

@@ -998,6 +998,8 @@ def schedule_interview(request, pk):
         intval.eid=Employer.objects.get(eid=pk)
         intval.user_id=JobSeeker.objects.get(user_id=request.POST['user_id'])
         intval.int_link=request.POST['int_link']
+        intval.is_done=False
+        intval.is_feedgiven=False
         intval.save()
         notif=Notifications()
         notif.notif_type="I"
@@ -1014,12 +1016,18 @@ def schedule_interview(request, pk):
 def all_interviews(request, pk):
     if request.method=="POST":
         if 'act' in request.POST:
+            if request.POST['act']=="donall":
+                for i in request.POST.getlist('ids[]'):
+                    single_int=Interview.objects.get(int_id=i)
+                    single_int.is_done=1
+                    single_int.save()
+                return redirect('employer:all_interviews', pk=pk)
             for i in request.POST.getlist('ids[]'):
                 Interview.objects.get(int_id=i).delete()
             return redirect('employer:all_interviews', pk=pk)
         Interview.objects.get(int_id=request.POST['int_id']).delete()
         return redirect('employer:all_interviews', pk=pk)
-    all_ints=Interview.objects.filter(eid=pk).order_by('schedule_date')
+    all_ints=Interview.objects.filter(eid=pk).order_by('-schedule_date')
     final_ints=[]
     for i in all_ints:
         single_int={}
@@ -1029,6 +1037,7 @@ def all_interviews(request, pk):
         single_int['location']=i.user_id.location
         single_int['date']=i.schedule_date
         single_int['link']=i.int_link
+        single_int['isdone']=i.is_done
         final_ints.append(single_int)
     GET_params = request.GET.copy()
     count=len(final_ints)
@@ -1045,6 +1054,20 @@ def all_interviews(request, pk):
         page_obj = p.page(p.num_pages)
     return render(request, 'interviews-employer.html', {'pk': pk, 'pe': page_obj, 'count': count})
 
+def done(request, pk):
+    if request.method=="POST":
+        int_val = Interview.objects.get(int_id=request.POST['id'])
+        int_val.is_done=1
+        int_val.save()
+        return JsonResponse({'message': 'Y'})
+
+def get_link(request, pk):
+    int_val=Interview.objects.get(int_id=request.GET['int_id'])
+    name=int_val.user_id.name
+    if int_val.is_done==0:
+        return JsonResponse({'message': 'X', 'name': name})
+    url="http://localhost:8000/give_feedback/"+str(int_val.int_id)+"/"
+    return JsonResponse({'message': 'Y', 'url': url, 'name': name})
 
 def logout(request, pk):
     employer=Login.objects.get(log_id=Employer.objects.get(eid=pk).log_id.log_id)
