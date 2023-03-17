@@ -12,6 +12,7 @@ import pyotp
 import base64
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
+from django.db.models import Count
 
 
 import pandas as pd
@@ -84,12 +85,57 @@ def index(request):
 			else:
 				return JsonResponse({'message': 'X'})
 	jobs=Jobs.objects.all()
+	typ=jobs.values('fnarea').annotate(Count('fnarea')).order_by('-fnarea__count')
+	applics=Application.objects.values('job_id').annotate(Count('job_id')).order_by('-job_id__count')
+	coms=jobs.values('eid').annotate(Count('eid')).order_by('-eid__count')
+	vals=[]
+	co=0
+	for i in typ:
+		if(co>5):
+			break
+		single_val={}
+		single_val['fnarea']=i['fnarea']
+		single_val['count']=i['fnarea__count']
+		vals.append(single_val)
+		co=co+1
 	locations=jobs.order_by().values('location').distinct()
 	titles=jobs.order_by().values('title').distinct()
 	title=[]
+	jobs_info=[]
+	co=0
+	for i in applics:
+		if(co>7):
+			break
+		single_j={}
+		sin=Jobs.objects.get(jobid=i['job_id'])
+		single_j['fnarea']=sin.fnarea
+		single_j['title']=sin.title
+		single_j['location']=sin.location
+		single_j['type']=sin.jobtype
+		single_j['date']=sin.postdate
+		single_j['name']=sin.eid.ename
+		if(sin.eid.logo):
+			single_j['logo']=sin.eid.logo
+		else:
+			single_j['logo']=None
+		single_j['eid']=sin.eid.eid
+		jobs_info.append(single_j)
+		co=co+1
+	coms_info=[]
+	for i in coms:
+		single_com={}
+		emp=Employer.objects.get(eid=i['eid'])
+		single_com['name']=emp.ename
+		if(emp.logo):
+			single_com['logo']=emp.logo
+		else:
+			single_com['logo']=None
+		single_com['info']=emp.profile
+		single_com['count']=i['eid__count']
+		coms_info.append(single_com)
 	for i in titles:
 		title.append(i['title'])
-	return render(request, 'index.html', {'locations': locations, 'titles': titles, 'title': dumps(title)})
+	return render(request, 'index.html', {'locations': locations, 'titles': titles, 'title': dumps(title), 'vals': vals, 'jobs': jobs_info, 'coms': coms_info})
 
 def view_function(request):
     messages.add_message(request, messages.INFO, 'This is an info message')

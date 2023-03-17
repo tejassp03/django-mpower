@@ -76,7 +76,7 @@ class Jobs(models.Model):
     ugqual = models.CharField(max_length=100, default=None, null=True)
     pgqual = models.CharField(max_length=100, default=None, null=True)
     profile = models.CharField(max_length=700, default=None, null=True)
-    postdate = models.DateField(default=timezone.now)
+    postdate = models.DateTimeField(default=timezone.now)
     jobtype = models.CharField(max_length=50, default="Full Time")
     skills = models.CharField(max_length=700, default=None, null=True)
     careerlevel = models.CharField(max_length=40, default="No experience", null=True)
