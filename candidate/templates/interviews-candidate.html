@@ -80,6 +80,9 @@
                             <div class="pxp-dashboard-table-options">
                                 <ul class="list-unstyled" style="justify-content: center">
                                     <li><button title="Preview" onclick="interviewload({{i.eid}})" data-bs-target="#pxp-interview-modal" data-bs-toggle="modal"><span class="fa fa-eye"></span></button></li>
+                                    {% if i.isdone %}
+                                    <li><button title="Feedback info" onclick="feedbackload({{i.eid}})" data-bs-target="#pxp-popup-modal" data-bs-toggle="modal"><span class="fa fa-comment"></span></button></li>
+                                    {% endif %}
                                 </ul>
                             </div>
                         </td>
@@ -145,6 +148,22 @@
     </div>
 </div>
 
+<div class="modal fade pxp-user-modal" id="pxp-popup-modal" aria-hidden="true" aria-labelledby="popupModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h5 class="modal-title text-center mt-4" id="c_na_me"></h5>
+            </div>
+            <hr>
+            <div id="popups2">
+            </div>
+            <hr>
+            <div id="int_reci" style="display: flex; justify-content: center; flex-wrap: wrap">
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock content %}
 
 {% block script %}
@@ -162,6 +181,51 @@ $(document).ready(function () {
     $('#tes').removeClass('pxp-active');
     $('#ins').addClass('pxp-active');
 })
+
+function feedbackload(id)
+{
+    $.ajax(
+        {
+            type:"GET",
+            url: "{% url 'candidate:feed_get' pk=pk %}",
+            data:{
+                    'eid': id,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function( data ) 
+            {
+                $('#c_na_me').text(data['info'].comname);
+                let mainsec=document.getElementById('popups2');
+                $('#popups2').empty();
+                let p=document.createElement('p');
+                if(data['info'].is_cand_done)
+                {
+                    p.innerHTML="Your feedback: "+data['info'].feed_cand
+                }
+                else
+                {
+                    p.innerHTML="Feedback link: "+data['info'].feed_cand;
+                }
+                mainsec.append(p);
+                let main2=document.getElementById('int_reci');
+                $('#int_reci').empty();
+                let h6=document.createElement('h6');
+                h6.innerHTML="Feedbacks Received";
+                let hr=document.createElement('hr');
+                main2.append(h6);
+                main2.append(hr);
+                let ul=document.createElement('ul');
+                let lis=data['info'].feed_received;
+                for(let i=0;i<lis.length;i++)
+                {
+                    let li=document.createElement('li');
+                    li.innerHTML=lis[i];
+                    ul.append(li);
+                }
+                main2.append(ul);
+            }
+    })
+}
 
 var $rows = $('#table tbody tr');
 $('#search').keyup(function() {

@@ -1093,7 +1093,18 @@ def get_link(request, pk):
     if int_val.is_done==0:
         return JsonResponse({'message': 'X', 'name': name})
     url="http://localhost:8000/give_feedback/"+str(int_val.int_id)+"/"
-    return JsonResponse({'message': 'Y', 'url': url, 'name': name})
+    data=[]
+    if int_val.cand_feedback:
+        data.append(int_val.cand_feedback)
+    else:
+        data.append(False)
+    all_feeds=Feedback.objects.filter(int_id=request.GET['int_id'])
+    if all_feeds:
+        for i in all_feeds:
+            data.append([i.name, i.emp_feedback])
+    else:
+        data.append(False)
+    return JsonResponse({'message': 'Y', 'url': url, 'name': name, 'info': data})
 
 def logout(request, pk):
     employer=Login.objects.get(log_id=Employer.objects.get(eid=pk).log_id.log_id)

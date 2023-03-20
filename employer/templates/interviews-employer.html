@@ -207,6 +207,9 @@
             <div class="modal-header" style="padding: 10px">
                 <p id="descri"></p>
             </div>
+            <hr style="margin: 0px" />
+            <div class="modal-header" style="padding: 10px" id="already_feedback">
+            </div>
         </div>
     </div>
 </div>
@@ -374,6 +377,37 @@ function feedb(id)
                     $('#user_name2').text(data['name']);
                     $('#feedback_link').text("Link: "+data['url']);
                     $('#descri').text("Please share this link with other panel members of the interview for feedback");
+                    $('already_feedback').empty();
+                    let mainsec=document.getElementById('already_feedback');
+                    let ul=document.createElement('ul');
+                    let info=data['info'];
+                    if(info[0]==false)
+                    {
+                        if(info[1]==false)
+                        {
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        let li=document.createElement('li');
+                        li.innerHTML="Feedback by candidate: "+info[0];
+                        ul.append(li);
+                        if(info[1]==false)
+                        {
+                            return;
+                        }
+                    }
+                    let li2=document.createElement('li');
+                    li2.innerHTML="Feedback given by panel members: "
+                    ul.append(li2);
+                    for(let i=1;i<info.length;i++)
+                    {
+                        li2=document.createElement('li');
+                        li2.innerHTML=info[i][0]+" : "+info[i][1];
+                        ul.append(li2);
+                    }
+                    mainsec.append(ul);
                 }
             }
     })

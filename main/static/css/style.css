@@ -170,7 +170,7 @@ a:hover {
   
   /* Handle on hover */
   ::-webkit-scrollbar-thumb:hover {
-    background: var(--pxpMainColor); 
+    background: var(--pxpDarkGrayColor); 
   }
 
 .pxp-section-cta,

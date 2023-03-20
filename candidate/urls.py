@@ -45,6 +45,7 @@ urlpatterns = [
 	path('submit/', views.submit, name='submit'),
     path('interviews/', views.interviews, name='interviews'),
     path('get_interview/', views.get_interview, name='get_interview'),
+    path('feed_get/', views.feed_get, name='feed_get'),
 	path('logout/', views.logout, name='logout')
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

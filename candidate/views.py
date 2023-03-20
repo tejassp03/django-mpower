@@ -854,6 +854,7 @@ def interviews(request, pk):
         single_inter['date']=i.schedule_date
         single_inter['link']=i.int_link
         single_inter['location']=i.eid.location
+        single_inter['isdone']=i.is_done
         if(i.eid.logo):
             single_inter['logo']=i.eid.logo
         else:
@@ -881,6 +882,23 @@ def get_interview(request, pk):
     data['link']=inter.int_link
     data['ename']=inter.eid.ename
     return JsonResponse({'info': dumps(data, default=str)})
+
+def feed_get(request, pk):
+    inter=Interview.objects.get(eid=request.GET['eid'], user_id=pk)
+    data={}
+    data['comname']=inter.eid.ename
+    data['is_cand_done']=False
+    if inter.cand_feedback:
+        data['is_cand_done']=True
+        data['feed_cand']=inter.cand_feedback
+    else:
+        ans="Please provide your feedback for the interview with "+inter.eid.ename+"\n Link: http://localhost:8000/give_feed/"+str(inter.int_id)
+        data['feed_cand']=ans
+    data['feed_received']=[]
+    feeds=Feedback.objects.filter(int_id=inter.int_id)
+    for i in feeds:
+        data['feed_received'].append(i.emp_feedback)
+    return JsonResponse({'info': data})
 
 def logout(request, pk):
     user=Login.objects.get(log_id=JobSeeker.objects.get(user_id=pk).log_id.log_id)
