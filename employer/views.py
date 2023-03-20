@@ -14,7 +14,8 @@ import textract
 import string
 import pandas as pd
 import matplotlib.pyplot as plt
-
+import pyotp
+import base64
 
 from main.utils import send_emails
 
@@ -219,7 +220,7 @@ def edit(request, pk):
         loger.email = request.POST['email']
         request.session['name'] = request.POST['ename']
         request.session['email'] = request.POST['email']
-        context.phone = request.POST['phone']
+        # context.phone = request.POST['phone']
         context.website = request.POST['website']
         context.profile = request.POST['profile']
         context.industry = request.POST['industry']
@@ -257,6 +258,31 @@ def edit(request, pk):
     if 'shower' in request.session:
         del request.session['shower']
     return render(request, 'profile-employer.html', {'pk': pk, 'context': context})
+
+def returnvalue(phone):
+	return str(phone) + str(datetime.date(datetime.now())) + "12345"
+
+def get_ot(request, pk):
+	if request.method == "GET":
+		key = base64.b32encode(returnvalue(request.GET['phone']).encode())
+		OTP = pyotp.TOTP(key,interval = 30)
+		return JsonResponse({'OTP': OTP.now()})
+	return JsonResponse({'OTP': 'X'})
+
+def post_ot(request, pk):
+	if(request.method=='POST'):
+		key = base64.b32encode(returnvalue(request.POST['phone'][3:]).encode())
+		OTP = pyotp.TOTP(key,interval = 30)
+		if OTP.verify(int(request.POST['OTP'])):
+			return JsonResponse({'message': 'Phone number verified'})
+	return JsonResponse({'message': 'Please enter correct OTP'})
+
+def cupd_phone(request, pk):
+    if request.method=="POST":
+        employ=Employer.objects.get(eid=pk)
+        employ.phone=request.POST['phone']
+        employ.save()
+        return JsonResponse({'message': 'x'})
 
 def manage(request, pk):
     if request.method=="POST":

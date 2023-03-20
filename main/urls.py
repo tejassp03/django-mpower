@@ -10,6 +10,7 @@ urlpatterns = [
 	path('blog/', views.blog, name ='blog'),
 	path('user_login/', views.user_login, name ='user_login'),
 	path('register/', views.register, name ='register'),
+    path('subscribe/', views.subscribe, name='subscribe'),
 	path('jobs/', views.findjobs, name ='jobs'),
 	path('companies/', views.companies, name ='companies'),
 	path('candidates/', views.candidates, name ='candidates'),
@@ -24,6 +25,7 @@ urlpatterns = [
 	path('emp_completion/<int:pk>/get_otp/', views.get_otp, name='eget_otp'),
 	path('emp_completion/<int:pk>/post_otp/', views.verify_otp, name='everify_otp'),
 	path('singlejob/<int:pk2>/', views.singlejob, name='singlejob'),
+    path('singlecompany/<int:pk2>/', views.singlecompany, name='singlecompany'),
 	path('candidate/<int:pk>/', include('candidate.urls', namespace = 'candidate')),
 	path('employer/<int:pk>/', include('employer.urls', namespace = 'employer')),
 ]

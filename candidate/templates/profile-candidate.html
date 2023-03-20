@@ -55,6 +55,7 @@
                         <div class="mb-3">
                             <label for="pxp-candidate-phone" class="form-label">Phone</label>
                             <input type="tel" id="pxp-candidate-phone" class="form-control" placeholder="(+12) 345 6789" name="phone" value="{{ user.phone }}">
+                            <a class="btn rounded-pill pxp-subsection-cta action-but3">Get OTP</a>
                         </div>
                     </div>
                 </div>
@@ -68,8 +69,8 @@
                     {% else %}
                         <label for="pxp-candidate-cover-choose-file" class="pxp-cover"><span>Upload Photo</span></label>
                     {% endif %}
-                {% comment %} </div>
-                <div class="pxp-candidate-photo mb-3">
+                </div>
+                {% comment %} <div class="pxp-candidate-photo mb-3">
                     <input type="file" id="pxp-candidate-photo-choose-file" accept="image/*">
                     <label for="pxp-candidate-photo-choose-file" class="pxp-cover"><span>Upload<br>Photo</span></label>
                 </div> {% endcomment %}
@@ -289,9 +290,25 @@
     </div>
 </div>
 
+<div class="modal fade pxp-otp-modal" id="pxp-otp-modal" aria-hidden="true" aria-labelledby="otpModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h5 class="modal-title text-center mt-4">Verify OTP</h5>
+            </div>
+            <hr>
+            <div style="margin-right: auto; margin-left: auto; margin-bottom: 20px" id="messagesshow">
+                <input class="form-group" placeholder="Enter opt" type="text" name="otpval" id="pxp-candidate-otp" />
+                <button class="btn rounded-pill pxp-subsection-cta action-but4">Verify</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock content %}
 
 {% block script %}
+let ab=0;
 $('.skilladder').click(function(e){
     e.preventDefault()
     $.ajax(
@@ -501,4 +518,83 @@ $(document).ready(function () {
     $('#tes').removeClass('pxp-active');
     $('#ins').removeClass('pxp-active');
 })
+
+
+$('.action-but3').click(function(){
+    if(document.getElementById('pxp-candidate-phone').value=="")
+    {
+        alert("Please enter a valid phone number");
+        $('#pxp-candidate-phone').val('{{ user.phone }}');
+        return;
+    }
+    let text1 = document.getElementById('pxp-candidate-phone').value;
+    if(text1=='{{user.phone}}')
+    {
+        alert("Please enter a different phone number");
+        return;
+    }
+    $.ajax(
+    {
+        type:"GET",
+        url: "{% url 'candidate:get_o' pk=pk %}",
+        data:{
+            'phone': text1,
+            csrfmiddlewaretoken: '{{ csrf_token }}'
+        },
+        success: function( data ) 
+        {
+            alert(`OTP is ${data.OTP}`);
+            $('#pxp-otp-modal').modal('show');
+        }
+     })
+    })
+
+$('.action-but4').click(function(){
+    let text1 = document.getElementById('pxp-candidate-phone').value;
+    let text2 = document.getElementById('pxp-candidate-otp').value;
+    if(text2=="")
+    {
+        alert("Please enter OTP to verify");
+        return;
+    }
+    $.ajax(
+    {
+        type:"POST",
+        url: "{% url 'candidate:post_o' pk=pk %}",
+        data:{
+            'phone': text1,
+            'OTP': text2,
+            csrfmiddlewaretoken: '{{ csrf_token }}'
+        },
+        success: function( data ) 
+        {
+            if(data.message=='Please enter correct OTP')
+            {
+                alert('Please enter correct OTP or Generate a new one');
+                ab=ab+1;
+                if(ab>2)
+                {
+                    location.reload();
+                }
+            }
+            else
+            {
+                alert('Phone number verified');
+                $.ajax(
+                {
+                    type:"POST",
+                    url: "{% url 'candidate:upd_phone' pk=pk %}",
+                    data:{
+                        'phone': text1,
+                        csrfmiddlewaretoken: '{{ csrf_token }}'
+                    },
+                    success: function( data ) 
+                    {
+                    }
+                })
+                location.reload();
+            }
+        }
+        })
+    })
 {% endblock %}

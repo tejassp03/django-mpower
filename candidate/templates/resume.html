@@ -11,6 +11,14 @@
     <h1>Resume Strength</h1>
     <p class="pxp-text-light">Your strengths and weaknesses according to your resume</p>
     <div class="mt-4 mt-lg-5">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            Upload Resume: <input type="file" name="resume" accept="application/pdf" required />
+            <a class="btn rounded-pill pxp-subsection-cta addedu" target="_blank" href="{{url}}">View Resume</a>
+            <button class="btn rounded-pill pxp-section-cta">Submit Resume</button>
+        </form>
+    </div>
+    <div class="mt-4 mt-lg-5">
         <div class="table-responsive">
             <h4 class="text-center">Resume Score</h4>
             <div class="progressa">

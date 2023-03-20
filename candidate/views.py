@@ -13,6 +13,8 @@ from django.template import RequestContext
 from datetime import date, timedelta, datetime
 import heapq
 
+import pyotp
+import base64
 
 # Create your views here.
 def dashboard(request, pk):
@@ -212,7 +214,7 @@ def edit_profile(request, pk):
         jobseeker.name=request.POST['name']
         jobseeker.title=request.POST['title']
         jobseeker.location=request.POST['location']
-        jobseeker.phone=request.POST['phone']
+        # jobseeker.phone=request.POST['phone']
         jobseeker.about=request.POST['about']
         filev=None
         try:
@@ -235,6 +237,31 @@ def edit_profile(request, pk):
             request.session['photo']=ss_info.photo.url
         return redirect('candidate:edit', pk=pk)
     return render(request, 'profile-candidate.html', {'user': context, 'pk': pk, 'log': request.session['email'], 'skills': skills, 'experience': experience, 'education': education})
+
+def returnvalue(phone):
+	return str(phone) + str(datetime.date(datetime.now())) + "12345"
+
+def get_o(request, pk):
+	if request.method == "GET":
+		key = base64.b32encode(returnvalue(request.GET['phone']).encode())
+		OTP = pyotp.TOTP(key,interval = 30)
+		return JsonResponse({'OTP': OTP.now()})
+	return JsonResponse({'OTP': 'X'})
+
+def post_o(request, pk):
+	if(request.method=='POST'):
+		key = base64.b32encode(returnvalue(request.POST['phone'][3:]).encode())
+		OTP = pyotp.TOTP(key,interval = 30)
+		if OTP.verify(int(request.POST['OTP'])):
+			return JsonResponse({'message': 'Phone number verified'})
+	return JsonResponse({'message': 'Please enter correct OTP'})
+
+def upd_phone(request, pk):
+    if request.method=="POST":
+        jobseek=JobSeeker.objects.get(user_id=pk)
+        jobseek.phone=request.POST['phone']
+        jobseek.save()
+        return JsonResponse({'message': 'x'})
 
 def add_skill(request, pk):
     if(request.method=="POST"):
@@ -507,6 +534,19 @@ def seenmes(request, pk):
 
 def resume(request, pk):
     data={}
+    jobseek=JobSeeker.objects.filter(user_id=pk)
+    urlval=None
+    if jobseek:
+        urlval=jobseek[0].Resume.url
+    if request.method=="POST":
+        print(request.FILES)
+        jobseek[0].Resume.delete()
+        filev=request.FILES['resume']
+        lst=filev._name.split(".")
+        filev._name=str(pk)+"_"+jobseek[0].name+"_Resume_"+filev._name
+        jobseek[0].Resume = filev
+        jobseek[0].save()
+        return redirect('candidate:resume', pk=pk)
     try:
         context=ResumeAnalysis.objects.get(jobseeker_id=pk)
         data['score']=context.resume_score
@@ -528,7 +568,7 @@ def resume(request, pk):
         data['reco_courses']=""
         data['recommendations']=""
         data['upload']="N"
-    return render(request, 'resume.html', {'pk': pk, 'context': data})
+    return render(request, 'resume.html', {'pk': pk, 'context': data, 'url': urlval})
 
 def count_inbox(request, pk):
     # user=JobSeeker.objects.get(user_id=pk)

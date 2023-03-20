@@ -82,6 +82,7 @@ class Jobs(models.Model):
     careerlevel = models.CharField(max_length=40, default="No experience", null=True)
     responsibilities = models.CharField(max_length=700, default=None, null=True)
     requirements = models.CharField(max_length=700, default=None, null=True)
+    num_of_visits = models.IntegerField(default=0)
     class Meta:
         db_table = "jobs"
 
@@ -250,3 +251,9 @@ class Feedback(models.Model):
     name = models.CharField(max_length=100, default=None, blank=True, null=True)
     class Meta:
         db_table = "feedback"
+
+class Newsletter(models.Model):
+    news_id = models.AutoField(primary_key=True)
+    email = models.CharField(max_length=300)
+    class Meta:
+        db_table = "newsletter"

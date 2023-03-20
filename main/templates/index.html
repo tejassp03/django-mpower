@@ -6,10 +6,10 @@
 input::-webkit-calendar-picker-indicator {
     display: none !important;
   }
-  ::selection{
+  {% comment %} ::selection{
     color: #fff;
     background: #664AFF;
-  }
+  } {% endcomment %}
   
   .container{
     max-width: 450px;
@@ -81,20 +81,93 @@ input::-webkit-calendar-picker-indicator {
     color: #644bff;
     cursor: pointer;
   }
+
+  .container .searchInput2{
+    background: #fff;
+    width: 100%;
+    border-radius: 5px;
+    {% comment %} position: relative; {% endcomment %}
+  }
+  
+  .searchInput2 input{
+    height: 55px;
+    width: 100%;
+    outline: none;
+    border: none;
+    border-radius: 5px;
+    padding: 0px !important;
+    {% comment %} padding: 0 60px 0 20px; {% endcomment %}
+    font-size: 18px;
+  }
+  
+  .searchInput2.active input{
+    border-radius: 5px 5px 0 0;
+  }
+  
+  .searchInput2 .resultBox2{
+    padding: 0;
+    opacity: 0;
+    pointer-events: none;
+    max-height: 280px;
+    overflow-y: auto;
+  }
+  
+  .searchInput2.active .resultBox2{
+    padding: 10px 8px;
+    opacity: 1;
+    pointer-events: auto;
+    position: fixed;
+    background: white;
+  }
+  
+  .resultBox2 li{
+    list-style: none;
+    padding: 8px 12px;
+    display: none;
+    width: 100%;
+    cursor: default;
+    border-radius: 3px;
+  }
+  
+  .searchInput2.active .resultBox2 li{
+    display: block;
+  }
+  .resultBox2 li:hover{
+    background: #efefef;
+  }
+  
+  .searchInput2 .icon{
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    height: 55px;
+    width: 55px;
+    text-align: center;
+    line-height: 55px;
+    font-size: 20px;
+    color: #644bff;
+    cursor: pointer;
+  }
 {% endblock %}
 {% block content %}
-
+{% if messages %}
+    {% for message in messages %}
+        {% if message.tags %}  
+        <script>alert('{{ message }}')</script>
+        {% endif %}
+    {% endfor %}
+{% endif %}
 <section class="pxp-hero vh-100" style="background-color: var(--pxpMainColorLight);">
     <div class="pxp-hero-caption">
         <div class="pxp-container">
             <div class="row pxp-pl-80 align-items-center justify-content-between">
                 <div class="col-12 col-xl-6 col-xxl-5">
                     <h1>Find the perfect<br><span style="color: var(--pxpMainColor);">job</span> for you</h1>
-                    <div class="pxp-hero-subtitle mt-3 mt-lg-4">Search your career opportunity through <strong>12,800</strong> jobs</div>
+                    <div class="pxp-hero-subtitle mt-3 mt-lg-4">Search your career opportunity through <strong>{{ total }}</strong> jobs</div>
 
                     <div class="pxp-hero-form pxp-hero-form-round mt-3 mt-lg-4">
                         <form class="row gx-3 align-items-center" method="GET" action = "{% url 'main:jobs' %}">
-                            <input type="text" name="category" value="all" style="display: none">
+                            {% comment %} <input type="text" name="category" value="all" style="display: none"> {% endcomment %}
                             <div class="col-12 col-sm">
                                 <div class="mb-3 mb-sm-0">
                                     <div class="container">
@@ -123,7 +196,36 @@ input::-webkit-calendar-picker-indicator {
                                     </select> {% endcomment %}
                                 </div>
                             </div>
+                            {% comment %} <input type="text" name="category" value="all" style="display: none"> {% endcomment %}
                             <div class="col-12 col-sm pxp-has-left-border">
+                                <div class="mb-3 mb-sm-0">
+                                    <div class="container">
+                                    <div class="searchInput2">
+                                        <input type="text" placeholder="Location" class="form-select" name="location" style="background-image: none">
+                                        <div class="resultBox2">
+                                          <!-- here list are inserted from javascript -->
+                                        </div>
+                                      </div>
+                                    </div>
+                                    {% comment %} <input type="text" class="form-select" list="select-titles" placeholder="Job title" name="title" style="background-image: none"/>
+                                    <datalist id="select-titles">
+                                        {% for i in titles %}
+                                        <option value='{{ i.title }}'>{{ i.title }}</option>
+                                        {% endfor %}
+                                    </datalist> {% endcomment %}
+                                    {% comment %} <select id="select-titles" placeholder="Job titles" class="form-select" name="title">
+                                        <option value="all" selected>Job title</option>
+                                        {% for i in titles %}
+                                            {% if i.title == context.t %}
+                                            <option value='{{ i.title }}' selected>{{ i.title }}</option>
+                                            {% else %}
+                                            <option value='{{ i.title }}'>{{ i.title }}</option>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </select> {% endcomment %}
+                                </div>
+                            </div>
+                            {% comment %} <div class="col-12 col-sm pxp-has-left-border">
                                 <div class="mb-3 mb-sm-0">
                                     <select id="select-locations" placeholder="Pick a Category..." class="form-select"  name="location" style="background-image: none">
                                         <option value="all">All locations</option>
@@ -136,7 +238,7 @@ input::-webkit-calendar-picker-indicator {
                                         {% endfor %}
                                     </select>
                                 </div>
-                            </div>
+                            </div> {% endcomment %}
                             <div class="col-12 col-sm-auto">
                                 <button><span class="fa fa-search"></span></button>
                             </div>
@@ -322,7 +424,7 @@ input::-webkit-calendar-picker-indicator {
 <section class="mt-100 pt-100 pb-100" style="background-color: var(--pxpSecondaryColorLight);">
     <div class="pxp-container">
         <h2 class="pxp-section-h2 text-center">Featured Job Offers</h2>
-        <p class="pxp-text-light text-center">Search your career opportunity through 12,800 jobs</p>
+        <p class="pxp-text-light text-center">Search your career opportunity through {{ total }} jobs</p>
 
         <div class="row mt-4 mt-md-5 pxp-animate-in pxp-animate-in-top" style="justify-content: center">
             {% for i in jobs %}
@@ -344,7 +446,7 @@ input::-webkit-calendar-picker-indicator {
                     <div class="pxp-jobs-card-1-bottom">
                         <div class="pxp-jobs-card-1-bottom-left">
                             <div class="pxp-jobs-card-1-date pxp-text-light">{{ i.date|naturaltime }}</div>
-                            <a href="#" class="pxp-jobs-card-1-company">{{ i.name }}</a>
+                            <a href="{% url 'main:singlecompany' pk2=i.eid %}" class="pxp-jobs-card-1-company">{{ i.name }}</a>
                         </div>
                         {% if i.logo %}
                         <a href="#" class="pxp-jobs-card-1-company-logo" style="background-image: url({{i.logo.url}});"></a>
@@ -570,7 +672,7 @@ input::-webkit-calendar-picker-indicator {
                         {% else %}
                         <a href="#" class="pxp-companies-card-1-company-logo" style="background-image: url(/static/images/company-logo-1.png);"></a>
                         {% endif %}
-                        <a href="#" class="pxp-companies-card-1-company-name">{{ i.name }}</a>
+                        <a href=""{% url 'main:singlecompany' pk2=i.eid %}"" class="pxp-companies-card-1-company-name">{{ i.name }}</a>
                         {% if i.info %}
                         <div class="pxp-companies-card-1-company-description pxp-text-light">{{ i.info }}</div>
                         {% else %}
@@ -732,11 +834,12 @@ input::-webkit-calendar-picker-indicator {
                         <img src="{% static 'images/subscribe.png' %}" alt="Stay Up to Date">
                     </div>
                     <div class="pxp-subscribe-1-form">
-                        <form>
+                        <form method="post" action="{% url 'main:subscribe' %}">
+                            {% csrf_token %}
                             <div class="input-group">
-                                <input type="text" class="form-control" placeholder="Enter your email...">
-                                <button class="btn btn-primary" type="button">Subscribe<span class="fa fa-angle-right"></span></button>
-                                </div>
+                                <input type="text" class="form-control" placeholder="Enter your email..." name="news_email" required>
+                                <button type="submit" class="btn btn-primary" type="button">Subscribe<span class="fa fa-angle-right"></span></button>
+                            </div>
                         </form>
                     </div>
                 </div>
@@ -817,6 +920,78 @@ function showSuggestions(list){
         listData = list.join('');
     }
     resultBox.innerHTML = listData;
+}
+
+
+
+let suggestions2={{ loc|safe }};
+const searchInput2 = document.querySelector(".searchInput2");
+const input2 = searchInput2.querySelector("input");
+const resultBox2 = searchInput2.querySelector(".resultBox2");
+const icon2 = searchInput2.querySelector(".icon");
+let linkTag2 = searchInput2.querySelector("a");
+let webLink2;
+
+// if user press any key and release
+input2.onkeyup = (e)=>{
+    let userData = e.target.value; //user enetered data
+    let emptyArray = [];
+    if(userData){
+        emptyArray = suggestions2.filter((data)=>{
+            //filtering array value and user characters to lowercase and return only those words which are start with user enetered chars
+            return data.toLocaleLowerCase().startsWith(userData.toLocaleLowerCase()); 
+        });
+        emptyArray = emptyArray.map((data)=>{
+            // passing return data inside li tag
+            return data = '<li>'+ data +'</li>';
+        });
+        searchInput2.classList.add("active");//show autocomplete box
+        showSuggestions2(emptyArray);
+        let allList = resultBox2.querySelectorAll("li");
+        for (let i = 0; i < allList.length; i++) {
+            //adding onclick attribute in all li tag
+            allList[i].setAttribute("onclick", "select2(this)");
+        }
+    }else{
+        searchInput2.classList.remove("active"); //hide autocomplete box
+    }
+}
+
+function select2(ele)
+{
+    input2.value=ele.innerHTML;
+    let userData = ele.innerHTML;
+    let emptyArray = [];
+    if(userData){
+        emptyArray = suggestions2.filter((data)=>{
+            //filtering array value and user characters to lowercase and return only those words which are start with user enetered chars
+            return data.toLocaleLowerCase().startsWith(userData.toLocaleLowerCase()); 
+        });
+        emptyArray = emptyArray.map((data)=>{
+            // passing return data inside li tag
+            return data = '<li>'+ data +'</li>';
+        });
+        searchInput2.classList.add("active"); //show autocomplete box
+        showSuggestions2(emptyArray);
+        let allList = resultBox2.querySelectorAll("li");
+        for (let i = 0; i < allList.length; i++) {
+            //adding onclick attribute in all li tag
+            allList[i].setAttribute("onclick", "select(this)");
+        }
+    }else{
+        searchInput2.classList.remove("active"); //hide autocomplete box
+    }
+}
+
+function showSuggestions2(list){
+    let listData;
+    if(!list.length){
+        userValue = input2.value;
+        listData = '<li>'+ userValue +'</li>';
+    }else{
+        listData = list.join('');
+    }
+    resultBox2.innerHTML = listData;
 }
 {% endblock script %}
 

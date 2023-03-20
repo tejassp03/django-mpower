@@ -30,6 +30,7 @@
                         <div class="mb-3">
                             <label for="pxp-company-phone" class="form-label">Phone</label>
                             <input type="tel" id="pxp-company-phone" class="form-control" placeholder="(+12) 345 6789" name="phone" value="{{ context.phone }}">
+                            <a class="btn rounded-pill pxp-subsection-cta action-but3">Get OTP</a>
                         </div>
                     </div>
                 </div>
@@ -195,10 +196,26 @@
     </form>
 </div>
 
+<div class="modal fade pxp-otp-modal" id="pxp-otp-modal" aria-hidden="true" aria-labelledby="otpModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h5 class="modal-title text-center mt-4">Verify OTP</h5>
+            </div>
+            <hr>
+            <div style="margin-right: auto; margin-left: auto; margin-bottom: 20px" id="messagesshow">
+                <input class="form-group" placeholder="Enter opt" type="text" name="otpval" id="pxp-company-otp" />
+                <button class="btn rounded-pill pxp-subsection-cta action-but4">Verify</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock content%}
 
 
 {% block script %}
+let ab=0;
 $(document).ready(function () {
     $('#cdas').removeClass('pxp-active');
     $('#cedi').addClass('pxp-active');
@@ -220,5 +237,87 @@ $(document).ready(function () {
         }
     }
 })
+
+
+
+
+$('.action-but3').click(function(){
+    if(document.getElementById('pxp-company-phone').value=="")
+    {
+        alert("Please enter a valid phone number");
+        $('#pxp-company-phone').val('{{ context.phone }}');
+        return;
+    }
+    let text1 = document.getElementById('pxp-company-phone').value;
+    if(text1=='{{ context.phone }}')
+    {
+        alert("Please enter a different phone number");
+        return;
+    }
+    $.ajax(
+    {
+        type:"GET",
+        url: "{% url 'employer:get_ot' pk=pk %}",
+        data:{
+            'phone': text1,
+            csrfmiddlewaretoken: '{{ csrf_token }}'
+        },
+        success: function( data ) 
+        {
+            alert(`OTP is ${data.OTP}`);
+            $('#pxp-otp-modal').modal('show');
+        }
+     })
+    })
+
+$('.action-but4').click(function(){
+    let text1 = document.getElementById('pxp-company-phone').value;
+    let text2 = document.getElementById('pxp-company-otp').value;
+    if(text2=="")
+    {
+        alert("Please enter OTP to verify");
+        return;
+    }
+    $.ajax(
+    {
+        type:"POST",
+        url: "{% url 'employer:post_ot' pk=pk %}",
+        data:{
+            'phone': text1,
+            'OTP': text2,
+            csrfmiddlewaretoken: '{{ csrf_token }}'
+        },
+        success: function( data ) 
+        {
+            if(data.message=='Please enter correct OTP')
+            {
+                alert('Please enter correct OTP or Generate a new one');
+                ab=ab+1;
+                if(ab>2)
+                {
+                    location.reload();
+                }
+            }
+            else
+            {
+                alert('Phone number verified');
+                $.ajax(
+                {
+                    type:"POST",
+                    url: "{% url 'employer:cupd_phone' pk=pk %}",
+                    data:{
+                        'phone': text1,
+                        csrfmiddlewaretoken: '{{ csrf_token }}'
+                    },
+                    success: function( data ) 
+                    {
+                    }
+                })
+                location.reload();
+            }
+        }
+        })
+    })
+
 
 {% endblock %}

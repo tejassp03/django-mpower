@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate,login
 from django.contrib import messages
-from .models import JobSeeker, Login, Employer, ResumeAnalysis, Jobs, LikedJobs, Application, Interview, Feedback
+from .models import JobSeeker, Login, Employer, ResumeAnalysis, Jobs, LikedJobs, Application, Interview, Feedback, Newsletter
 import random
 import re
 from django.contrib.auth.hashers import make_password, check_password
@@ -101,6 +101,7 @@ def index(request):
 	locations=jobs.order_by().values('location').distinct()
 	titles=jobs.order_by().values('title').distinct()
 	title=[]
+	locate=[]
 	jobs_info=[]
 	co=0
 	for i in applics:
@@ -126,6 +127,7 @@ def index(request):
 		single_com={}
 		emp=Employer.objects.get(eid=i['eid'])
 		single_com['name']=emp.ename
+		single_com['eid']=emp.eid
 		if(emp.logo):
 			single_com['logo']=emp.logo
 		else:
@@ -135,12 +137,26 @@ def index(request):
 		coms_info.append(single_com)
 	for i in titles:
 		title.append(i['title'])
-	return render(request, 'index.html', {'locations': locations, 'titles': titles, 'title': dumps(title), 'vals': vals, 'jobs': jobs_info, 'coms': coms_info})
+	for i in locations:
+		locate.append(i['location'])
+	return render(request, 'index.html', {'locations': locations, 'titles': titles, 'title': dumps(title), 'vals': vals, 'jobs': jobs_info, 'coms': coms_info, 'loc': locate, 'total': len(jobs)})
 
 def view_function(request):
     messages.add_message(request, messages.INFO, 'This is an info message')
     messages.add_message(request, messages.ERROR, 'This is an error message')
     return redirect('main:index')
+
+def subscribe(request):
+	if request.method=="POST":
+		temp=Newsletter.objects.filter(email=request.POST['news_email'])
+		if(len(temp)>0):
+			messages.error(request, 'Email already exists')
+			return redirect('main:index')
+		news=Newsletter()
+		news.email=request.POST['news_email']
+		news.save()
+		messages.error(request, 'Subscription added')
+		return redirect('main:index')
 
 def user_login(request):
 		if request.method == 'POST':
@@ -597,6 +613,8 @@ def singlejob(request, pk2):
 		like.save()
 		return redirect('main:singlejob', pk2=pk2)
 	jobdet=Jobs.objects.get(jobid=pk2)
+	jobdet.num_of_visits=jobdet.num_of_visits+1
+	jobdet.save()
 	lik=False
 	app_date=None
 	companydet=Employer.objects.get(eid=jobdet.eid.eid)
@@ -618,6 +636,11 @@ def singlejob(request, pk2):
 	for i in jobdet.responsibilities.split("\n"):
 		responsibilities.append(i)
 	return render(request, 'singlejob.html', {'job_details': jobdet, 'company_details': companydet, 'liked': lik, 'loger': loger, 'skills': skills, 'requirements': requirements, 'responsibilities': responsibilities, 'date': app_date})
+
+def singlecompany(request, pk2):
+	cominfo=Employer.objects.get(eid=pk2)
+	jobs=Jobs.objects.filter(eid=cominfo.eid).order_by('-postdate')
+	return render(request, 'singlecompany.html', {'cominfo': cominfo, 'jobs': jobs})
 
 def get_job(request):
 	if(request.method=="GET"):
