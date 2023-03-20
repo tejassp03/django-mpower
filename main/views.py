@@ -104,17 +104,19 @@ def index(request):
 	locate=[]
 	jobs_info=[]
 	co=0
-	for i in applics:
+	feature_jobs=jobs.order_by('-num_of_visits')
+	for i in feature_jobs:
 		if(co>7):
 			break
 		single_j={}
-		sin=Jobs.objects.get(jobid=i['job_id'])
+		sin=i
 		single_j['fnarea']=sin.fnarea
 		single_j['title']=sin.title
 		single_j['location']=sin.location
 		single_j['type']=sin.jobtype
 		single_j['date']=sin.postdate
 		single_j['name']=sin.eid.ename
+		single_j['jobid']=sin.jobid
 		if(sin.eid.logo):
 			single_j['logo']=sin.eid.logo
 		else:

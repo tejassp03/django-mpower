@@ -435,7 +435,7 @@ input::-webkit-calendar-picker-indicator {
                             <div class="pxp-jobs-card-1-category-icon"><span class="fa fa-bullhorn"></span></div>
                             <div class="pxp-jobs-card-1-category-label">{{ i.fnarea }}</div>
                         </a>
-                        <a href="#" class="pxp-jobs-card-1-title">{{ i.title }}</a>
+                        <a href="{% url 'main:singlejob' pk2=i.jobid %}" class="pxp-jobs-card-1-title">{{ i.title }}</a>
                         <div class="pxp-jobs-card-1-details">
                             <a href="#" class="pxp-jobs-card-1-location">
                                 <span class="fa fa-globe"></span>{{ i.location }}
@@ -652,7 +652,7 @@ input::-webkit-calendar-picker-indicator {
         </div>
 
         <div class="mt-4 mt-md-5 text-center pxp-animate-in pxp-animate-in-top">
-            <a href="#" class="btn rounded-pill pxp-section-cta">All Job Offers<span class="fa fa-angle-right"></span></a>
+            <a href="{% url 'main:jobs' %}" class="btn rounded-pill pxp-section-cta">All Job Offers<span class="fa fa-angle-right"></span></a>
         </div>
     </div>
 </section>
@@ -672,7 +672,7 @@ input::-webkit-calendar-picker-indicator {
                         {% else %}
                         <a href="#" class="pxp-companies-card-1-company-logo" style="background-image: url(/static/images/company-logo-1.png);"></a>
                         {% endif %}
-                        <a href=""{% url 'main:singlecompany' pk2=i.eid %}"" class="pxp-companies-card-1-company-name">{{ i.name }}</a>
+                        <a href="{% url 'main:singlecompany' pk2=i.eid %}" class="pxp-companies-card-1-company-name">{{ i.name }}</a>
                         {% if i.info %}
                         <div class="pxp-companies-card-1-company-description pxp-text-light">{{ i.info }}</div>
                         {% else %}

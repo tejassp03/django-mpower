@@ -246,26 +246,26 @@
                             <div class="row align-items-center justify-content-between">
                                 <div class="col-sm-3 col-md-2 col-lg-3 col-xl-2 col-xxl-auto">
                                     {% if i.logo %}
-                                    <a href="single-company-1.html" class="pxp-jobs-card-3-company-logo" style="background-image: url({{i.logo.url}});"></a>
+                                    <a href="#" class="pxp-jobs-card-3-company-logo" style="background-image: url({{i.logo.url}});"></a>
                                     {% else %}
-                                    <a href="single-company-1.html" class="pxp-jobs-card-3-company-logo" style="background-image: url();"></a>
+                                    <a href="#" class="pxp-jobs-card-3-company-logo" style="background-image: url();"></a>
                                     {% endif %}
                                 </div>
                                 <div class="col-sm-9 col-md-10 col-lg-9 col-xl-10 col-xxl-4">
-                                    <a href="single-job-1.html" class="pxp-jobs-card-3-title mt-3 mt-sm-0">{{ i.title }}</a>
+                                    <a href="{% url 'main:singlejob' pk2=i.jobid %}" class="pxp-jobs-card-3-title mt-3 mt-sm-0">{{ i.title }}</a>
                                     <div class="pxp-jobs-card-3-details">
-                                        <a href="jobs-list-1.html" class="pxp-jobs-card-3-location">
+                                        <a href="#" class="pxp-jobs-card-3-location">
                                             <span class="fa fa-globe"></span>{{ i.location }}
                                         </a>
                                         <div class="pxp-jobs-card-3-type">{{ i.experience }}</div>
                                     </div>
                                 </div>
                                 <div class="col-sm-8 col-xl-6 col-xxl-4 mt-3 mt-xxl-0">
-                                    <a href="jobs-list-1.html" class="pxp-jobs-card-3-category">
+                                    <a href="#" class="pxp-jobs-card-3-category">
                                         <div class="pxp-jobs-card-3-category-label">{{ i.fnarea }}</div>
                                     </a>
                                     <div class="pxp-jobs-card-3-date-company">
-                                        <span class="pxp-jobs-card-3-date pxp-text-light">{{ i.postdate }}</span> <a href="#" class="pxp-jobs-card-3-company">{{ i.ename }}</a>
+                                        <span class="pxp-jobs-card-3-date pxp-text-light">{{ i.postdate }}</span> <a href="{% url 'main:singlecompany' pk2=i.eid %}" class="pxp-jobs-card-3-company">{{ i.ename }}</a>
                                     </div>
                                 </div>
                                 <div class="col-sm-4 col-xl-2 col-xxl-auto mt-3 mt-xxl-0 pxp-text-right" style="display: none">
