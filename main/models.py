@@ -241,6 +241,7 @@ class Interview(models.Model):
     is_done = models.BooleanField(default=False)
     is_feedgiven = models.BooleanField(default=False)
     cand_feedback = models.CharField(max_length=500, default=None, blank=True, null=True)
+    testuser_id = models.ForeignKey(TestUser, on_delete=models.CASCADE, blank=True, null=True)
     class Meta:
         db_table = "interview"
     

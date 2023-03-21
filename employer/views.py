@@ -736,8 +736,11 @@ def cand_suggest(request, pk):
         jobs=JobSeeker.objects.all()
         for i in jobs:
             if i.Resume:
-                pdfFileObj = open("media/"+str(i.Resume),'rb')  
-                pdfReader = PyPDF2.PdfFileReader(pdfFileObj)
+                try: 
+                    pdfFileObj = open("media/"+str(i.Resume),'rb')  
+                    pdfReader = PyPDF2.PdfFileReader(pdfFileObj)
+                except:
+                    continue
                 num_pages = pdfReader.numPages
                 count = 0
                 text = ""
