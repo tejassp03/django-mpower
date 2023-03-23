@@ -167,7 +167,7 @@ input::-webkit-calendar-picker-indicator {
 
                     <div class="pxp-hero-form pxp-hero-form-round mt-3 mt-lg-4">
                         <form class="row gx-3 align-items-center" method="GET" action = "{% url 'main:jobs' %}">
-                            {% comment %} <input type="text" name="category" value="all" style="display: none"> {% endcomment %}
+                            <input type="text" name="category" value="all" style="display: none">
                             <div class="col-12 col-sm">
                                 <div class="mb-3 mb-sm-0">
                                     <div class="container">
@@ -196,7 +196,7 @@ input::-webkit-calendar-picker-indicator {
                                     </select> {% endcomment %}
                                 </div>
                             </div>
-                            {% comment %} <input type="text" name="category" value="all" style="display: none"> {% endcomment %}
+                            <input type="text" name="category" value="all" style="display: none">
                             <div class="col-12 col-sm pxp-has-left-border">
                                 <div class="mb-3 mb-sm-0">
                                     <div class="container">
@@ -906,6 +906,7 @@ function select(ele)
             //adding onclick attribute in all li tag
             allList[i].setAttribute("onclick", "select(this)");
         }
+        $('.resultBox').empty();
     }else{
         searchInput.classList.remove("active"); //hide autocomplete box
     }
@@ -978,6 +979,7 @@ function select2(ele)
             //adding onclick attribute in all li tag
             allList[i].setAttribute("onclick", "select(this)");
         }
+        $('.resultBox2').empty();
     }else{
         searchInput2.classList.remove("active"); //hide autocomplete box
     }

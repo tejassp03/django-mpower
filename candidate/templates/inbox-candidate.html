@@ -14,7 +14,7 @@
         <div class="col-xxl-4">
             <div class="pxp-dashboard-inbox-search-form">
                 <div class="input-group">
-                    <span class="input-group-text"><span class="fa fa-search"></span></span>
+                    <span class="input-group-text" style="background: white"><span class="fa fa-search"></span></span>
                     <input type="text" class="form-control" placeholder="Search messages..." id="search">
                 </div>
             </div>
@@ -68,7 +68,7 @@
                 {% elif shower != "" %}
                 <input style="display: none" class="sho" id={{shower}} value={{shower}} />
                 {% else %}
-                <div class="pxp-dashboard-inbox-messages-header">
+                <div class="pxp-dashboard-inbox-messages-header" style="background: var(--pxpSecondaryColorLight)">
                     <div class="pxp-dashboard-inbox-list-item-left">
                         {% if first.logo %}
                         <div class="pxp-dashboard-inbox-list-item-avatar pxp-cover" style="background-image: url({{first.logo.url}});"></div>
@@ -128,9 +128,9 @@
                     {% endif %}
                     {% endfor %}
                     </div>
-                    <div class="pxp-dashboard-inbox-messages-footer">
+                    <div class="pxp-dashboard-inbox-messages-footer" style="background: var(--pxpSecondaryColorLight)">
                         <div class="pxp-dashboard-inbox-messages-footer-field">
-                            <input type="text" class="form-control" placeholder="Type your message here..." name="message">
+                            <input type="text" class="form-control" placeholder="Type your message here..." name="message" style="background: var(--pxpSecondaryColorLight)">
                             <input type="text" class="form-control" placeholder="Type your message here..." name="employer" style="display: none" value={{ threads.0.msg_id }}>
                         </div>
                         <div class="pxp-dashboard-inbox-messages-footer-btn">
@@ -436,6 +436,7 @@ hiderdiv.innerHTML="Chatting with - "+JSON.parse(company)[0].executive
 
 let headerdiv=document.createElement('div');
 headerdiv.setAttribute('class', 'pxp-dashboard-inbox-messages-header');
+headerdiv.setAttribute('style', 'background: var(--pxpSecondaryColorLight)');
 let photodiv=document.createElement('div');
 photodiv.setAttribute('class', 'pxp-dashboard-inbox-list-item-left');
 let avatardiv=document.createElement('div');
@@ -574,6 +575,7 @@ let form=document.createElement('form');
 form.setAttribute('method', 'POST');
 let footer=document.createElement('div');
 footer.setAttribute('class', 'pxp-dashboard-inbox-messages-footer');
+footer.setAttribute('style', 'background: var(--pxpSecondaryColorLight)');
 let field=document.createElement('div');
 field.setAttribute('class', 'pxp-dashboard-inbox-messages-footer-field');
 let inp1=document.createElement('input');
@@ -581,6 +583,7 @@ inp1.setAttribute('type', 'text');
 inp1.setAttribute('class', 'form-control');
 inp1.setAttribute('placeholder', 'Type your message here....');
 inp1.setAttribute('name', 'message');
+inp1.setAttribute('style', 'background: var(--pxpSecondaryColorLight)');
 let inp2=document.createElement('input');
 inp2.setAttribute('type', 'text');
 inp2.setAttribute('class', 'form-control');

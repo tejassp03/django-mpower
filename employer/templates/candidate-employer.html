@@ -15,7 +15,7 @@
         <div class="col-xxl-4">
             <div class="pxp-dashboard-inbox-search-form">
                 <div class="input-group">
-                    <span class="input-group-text"><span class="fa fa-search"></span></span>
+                    <span class="input-group-text" style="background: white"><span class="fa fa-search"></span></span>
                     <input type="text" class="form-control" placeholder="Search jobs..." id="search">
                 </div>
             </div>
@@ -45,7 +45,7 @@
         <div class="col-xxl-8" id="messages-shower">
             <div class="pxp-dashboard-inbox-messages-container">
                 {% if single|length == 0 %}
-                <div class="pxp-dashboard-inbox-messages-header">
+                <div class="pxp-dashboard-inbox-messages-header" style="background: var(--pxpMainColorLight)">
                     <div>
                         No candidates
                     </div>
@@ -65,7 +65,7 @@
                                     <th colspan="2" style="width: 25%;">Name</th>
                                     <th style="width: 15%;">Status</th>
                                     <th>Date<span class="fa fa-angle-up ms-3"></span></th>
-                                    <th>&nbsp;</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="childrem">
@@ -73,10 +73,10 @@
                         </table>
                     <img src="{% static 'images/nothing.jpg' %}" />
                 </div>
-                <div class="pxp-dashboard-inbox-messages-header">
+                <div class="pxp-dashboard-inbox-messages-header" style="background: var(--pxpMainColorLight)">
                     <div class="pxp-dashboard-inbox-search-form">
                         <div class="input-group">
-                            <span class="input-group-text"><span class="fa fa-search"></span></span>
+                            <span class="input-group-text" style="background: white"><span class="fa fa-search"></span></span>
                             <input type="text" class="form-control" placeholder="Search candidates..." id="search2" onkeyup="sea()">
                         </div>
                     </div>
@@ -109,7 +109,7 @@
                                 <th colspan="2" style="width: 25%;">Name</th>
                                 <th style="width: 15%;">Status</th>
                                 <th>Date<span class="fa fa-angle-up ms-3"></span></th>
-                                <th>&nbsp;</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody id="childrem">
@@ -119,10 +119,10 @@
             </div>
 
                 {% else %}
-                <div class="pxp-dashboard-inbox-messages-header">
+                <div class="pxp-dashboard-inbox-messages-header" style="background: var(--pxpMainColorLight)">
                     <div class="pxp-dashboard-inbox-search-form">
                         <div class="input-group">
-                            <span class="input-group-text"><span class="fa fa-search"></span></span>
+                            <span class="input-group-text" style="background: white"><span class="fa fa-search"></span></span>
                             <input type="text" class="form-control" placeholder="Search candidates..." id="search2" onkeyup="sea()">
                         </div>
                     </div>
@@ -155,7 +155,7 @@
                                 <th colspan="2" style="width: 25%;">Name</th>
                                 <th style="width: 15%;">Status</th>
                                 <th>Date<span class="fa fa-angle-up ms-3"></span></th>
-                                <th>&nbsp;</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody id="childrem">
@@ -194,14 +194,25 @@
                                     <div class="pxp-company-dashboard-job-date">{{ i.date_applied }}</div>
                                 </td>
                                 <td>
+                                    <div class="pxp-company-dashboard-jobs-bulk-actions" style="margin-left: auto">
+                                        <select class="form-select" name="action_but_option">
+                                            <option value="a">Select Action</option>
+                                            <option value="b">View profile</option>
+                                            <option value="c">Schedule Test</option>
+                                            <option value="d">Send Message</option>
+                                            <option value="e">Approve</option>
+                                            <option value="f">Reject</option>
+                                            <option value="g">Delete</option>
+                                        </select>
+                                    </div>
                                     <div class="pxp-dashboard-table-options">
                                         <ul class="list-unstyled">
-                                            <li><button title="View profile" id="pxp-candidate-modal-button" data-bs-target="#pxp-candidate-modal" data-bs-toggle="modal" onclick="candidatemodal('{{i.user_id}}')"><span class="fa fa-eye"></span></button></li>
-                                            <li><button title="Schedule Test" id="pxp-schedule-modal-button" data-bs-target="#pxp-schedule-modal" data-bs-toggle="modal" onclick="setter('{{i.apply_id}}')"><span class="fa fa-question"></span></button></li>
-                                            <li><button title="Send message" onclick="messageclick({{i.log_id}})"><span class="fa fa-envelope-o"></span></button></li>
-                                            <li><button title="Approve" onclick="approve({{i.apply_id}})"><span class="fa fa-check"></span></button></li>
-                                            <li><button title="Reject" onclick="reject({{i.apply_id}})"><span class="fa fa-ban"></span></button></li>
-                                            <li><button title="Delete" onclick="delcan({{i.apply_id}})"><span class="fa fa-trash-o"></span></button></li>
+                                            <li><button title="View profile" id="pxp-candidate-modal-button" data-bs-target="#pxp-candidate-modal" data-bs-toggle="modal" onclick="candidatemodal('{{i.user_id}}')" style="display: none"><span class="fa fa-eye"></span></button></li>
+                                            <li><button title="Schedule Test" id="pxp-schedule-modal-button" data-bs-target="#pxp-schedule-modal" data-bs-toggle="modal" onclick="setter('{{i.apply_id}}')" style="display: none"><span class="fa fa-question"></span></button></li>
+                                            <li><button title="Send message" id="pxp-send-message-button" onclick="messageclick({{i.log_id}})" style="display: none"><span class="fa fa-envelope-o"></span></button></li>
+                                            <li><button title="Approve" id="pxp-approve-button" onclick="approve({{i.apply_id}})" style="display: none"><span class="fa fa-check"></span></button></li>
+                                            <li><button title="Reject" id="pxp-reject-button" onclick="reject({{i.apply_id}})" style="display: none"><span class="fa fa-ban"></span></button></li>
+                                            <li><button title="Delete" id="pxp-delete-button" onclick="delcan({{i.apply_id}})" style="display: none"><span class="fa fa-trash-o"></span></button></li>
                                         </ul>
                                     </div>
                                 </td>
@@ -445,6 +456,7 @@ function candifetch(id)
                     let li2=document.createElement('li');
                     let but2=document.createElement('button');
                     but2.setAttribute('title', 'Send message');
+                    but2.setAttribute('id', 'pxp-send-message-button');
                     let but2ans='messageclick('+datainfo[i].log_id+')';
                     but2.setAttribute('onclick', but2ans);
                     let but2span=document.createElement('span');
@@ -455,6 +467,7 @@ function candifetch(id)
                     let li3=document.createElement('li');
                     let but3=document.createElement('button');
                     but3.setAttribute('title', 'Approve');
+                    but3.setAttribute('id', 'pxp-approve-button');
                     let but3ans='approve('+datainfo[i].apply_id+')';
                     but3.setAttribute('onclick', but3ans);
                     let but3span=document.createElement('span');
@@ -465,6 +478,7 @@ function candifetch(id)
                     let li4=document.createElement('li');
                     let but4=document.createElement('button');
                     but4.setAttribute('title', 'Reject');
+                    but4.setAttribute('id', 'pxp-reject-button');
                     let but4ans='reject('+datainfo[i].apply_id+')';
                     but4.setAttribute('onclick', but4ans);
                     let but4span=document.createElement('span');
@@ -475,6 +489,7 @@ function candifetch(id)
                     let li5=document.createElement('li');
                     let but5=document.createElement('button');
                     but5.setAttribute('title', 'Delete');
+                    but5.setAttribute('id', 'pxp-delete-button');
                     let but5ans='delcan('+datainfo[i].apply_id+')';
                     but5.setAttribute('onclick', but5ans);
                     let but5span=document.createElement('span');
@@ -484,12 +499,51 @@ function candifetch(id)
                     ul.append(li5);
                     td5div.append(ul);
                     td5.append(td5div);
+                    let seloptdiv=document.createElement('div');
+                    seloptdiv.setAttribute('class', 'pxp-company-dashboard-jobs-bulk-actions');
+                    seloptdiv.setAttribute('style', 'margin-left: auto');
+                    let selectorsopt=document.createElement('select');
+                    selectorsopt.setAttribute('class', 'form-select');
+                    selectorsopt.setAttribute('name', 'action_but_option');
+                    selectorsopt.setAttribute('onchange', 'tme2()');
+                    let opt1=document.createElement('option');
+                    opt1.setAttribute('value', 'a');
+                    opt1.innerHTML="Select Action";
+                    selectorsopt.append(opt1);
+                    let opt2=document.createElement('option');
+                    opt2.setAttribute('value', 'b');
+                    opt2.innerHTML="View profile";
+                    selectorsopt.append(opt2);
+                    let opt3=document.createElement('option');
+                    opt3.setAttribute('value', 'c');
+                    opt3.innerHTML="Schedule Test";
+                    selectorsopt.append(opt3);
+                    let opt4=document.createElement('option');
+                    opt4.setAttribute('value', 'd');
+                    opt4.innerHTML="Send Message";
+                    selectorsopt.append(opt4);
+                    let opt5=document.createElement('option');
+                    opt5.setAttribute('value', 'e');
+                    opt5.innerHTML="Approve";
+                    selectorsopt.append(opt5);
+                    let opt6=document.createElement('option');
+                    opt6.setAttribute('value', 'f');
+                    opt6.innerHTML="Reject";
+                    selectorsopt.append(opt6);
+                    let opt7=document.createElement('option');
+                    opt7.setAttribute('value', 'g');
+                    opt7.innerHTML="Delete";
+                    selectorsopt.append(opt7);
+                    seloptdiv.append(selectorsopt);
+                    td5.append(seloptdiv);
                     tr.append(td5);
                     finalinsert.append(tr);
                 }
             }
     })
 }
+
+
 
 function approve(id)
 {
@@ -620,6 +674,34 @@ $('#search2').keyup(function() {
     }).hide();
 });
 
+$("[name='action_but_option']").change(function(){
+    let val_option=$("[name='action_but_option']").val();
+    if(val_option == "b")
+    {
+        $('#pxp-candidate-modal-button').click();
+    }
+    else if(val_option == "c")
+    {
+        $('#pxp-schedule-modal-button').click();
+    }
+    else if(val_option == "d")
+    {
+        $('#pxp-send-message-button').click();
+    }
+    else if(val_option == "e")
+    {
+        $('#pxp-approve-button').click();
+    }
+    else if(val_option == "f")
+    {
+        $('#pxp-reject-button').click();
+    }
+    else if(val_option == "g")
+    {
+        $('#pxp-delete-button').click();
+    }
+})
+
 $("[name='chek']").change(function(){
     let a=0;
     checkboxes = document.getElementsByName('chek');
@@ -710,6 +792,38 @@ function scheduletest()
             location.reload();
         }
     })
+}
+
+function tme2()
+{
+    $("[name='action_but_option']").change(function(){
+        let val_option=$("[name='action_but_option']").val();
+        if(val_option == "b")
+        {
+            $('#pxp-candidate-modal-button').click();
+        }
+        else if(val_option == "c")
+        {
+            $('#pxp-schedule-modal-button').click();
+        }
+        else if(val_option == "d")
+        {
+            $('#pxp-send-message-button').click();
+        }
+        else if(val_option == "e")
+        {
+            $('#pxp-approve-button').click();
+        }
+        else if(val_option == "f")
+        {
+            $('#pxp-reject-button').click();
+        }
+        else if(val_option == "g")
+        {
+            $('#pxp-delete-button').click();
+        }
+    })
+    
 }
 
 
