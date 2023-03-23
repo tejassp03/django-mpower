@@ -1109,6 +1109,48 @@ def get_link(request, pk):
         data.append(False)
     return JsonResponse({'message': 'Y', 'url': url, 'name': name, 'info': data})
 
+def pending_actions(request, pk):
+    applics=Application.objects.filter(eid=pk)
+    GET_params = request.GET.copy()
+    all_applics=[]
+    for i in applics:
+        if i.status==0 or i.status==4:
+            single_applic={}
+            single_applic['apply_id']=i.apply_id
+            single_applic['user_id']=i.user_id.user_id
+            single_applic['name']=i.user_id.name
+            single_applic['photo']=""
+            if(i.user_id.photo):
+                single_applic['photo']=i.user_id.photo.url
+            single_applic['location']=i.user_id.location
+            single_applic['title']=i.job_id.title
+            single_applic['job_location']=i.job_id.location
+            single_applic['apply_date']=i.date_applied
+            single_applic['status']=i.status
+            single_applic['jobid']=i.job_id.jobid
+            if i.status == 4:
+                testinfo1=TestInfo.objects.get(testinfoid=i.test.testinfoid)
+                testuser1=TestUser.objects.get(test_id=testinfo1.test_id.test_id, user_id=i.user_id.user_id)
+                single_applic['test_id']=testuser1.testuser_id
+                single_applic['results']=(int(testuser1.correct_answers)/int(testuser1.total_ques))*100
+            else:
+                single_applic['results']=0
+            all_applics.append(single_applic)
+    testinfo=TestInfo.objects.filter(eid=pk)
+    count=len(applics)
+    if('page' in GET_params):
+        last=GET_params['page'][-1]
+        GET_params['page']=last[0]
+    p=Paginator(all_applics, 10)
+    page_number = request.GET.get('page')
+    try:
+        page_obj = p.get_page(page_number)
+    except PageNotAnInteger:
+        page_obj = p.page(1)
+    except EmptyPage:
+        page_obj = p.page(p.num_pages)
+    return render(request, 'actions-employer.html', {'pk': pk, 'count': count, 'pe': page_obj, 'test': testinfo})
+
 def logout(request, pk):
     employer=Login.objects.get(log_id=Employer.objects.get(eid=pk).log_id.log_id)
     employer.status=0
