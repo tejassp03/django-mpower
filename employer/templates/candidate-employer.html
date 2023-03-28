@@ -197,22 +197,27 @@
                                     <div class="pxp-company-dashboard-jobs-bulk-actions" style="margin-left: auto">
                                         <select class="form-select" name="action_but_option">
                                             <option value="a">Select Action</option>
-                                            <option value="b">View profile</option>
-                                            <option value="c">Schedule Test</option>
-                                            <option value="d">Send Message</option>
-                                            <option value="e">Approve</option>
-                                            <option value="f">Reject</option>
-                                            <option value="g">Delete</option>
+                                            <option value="b_{{i.user_id}}">View profile</option>
+                                            {% if i.status == 0 %}
+                                            <option value="c_{{i.user_id}}_{{i.apply_id}}">Schedule Test</option>
+                                            {% elif i.status == 4 %}
+                                            <option value="h_{{i.user_id}}_{{i.test_id}}">Schedule Interview</option>
+                                            {% endif %}
+                                            <option value="d_{{i.user_id}}_{{i.log_id}}">Send Message</option>
+                                            <option value="e_{{i.user_id}}_{{i.apply_id}}">Approve</option>
+                                            <option value="f_{{i.user_id}}_{{i.apply_id}}">Reject</option>
+                                            <option value="g_{{i.user_id}}_{{i.apply_id}}">Delete</option>
                                         </select>
                                     </div>
                                     <div class="pxp-dashboard-table-options">
                                         <ul class="list-unstyled">
-                                            <li><button title="View profile" id="pxp-candidate-modal-button" data-bs-target="#pxp-candidate-modal" data-bs-toggle="modal" onclick="candidatemodal('{{i.user_id}}')" style="display: none"><span class="fa fa-eye"></span></button></li>
-                                            <li><button title="Schedule Test" id="pxp-schedule-modal-button" data-bs-target="#pxp-schedule-modal" data-bs-toggle="modal" onclick="setter('{{i.apply_id}}')" style="display: none"><span class="fa fa-question"></span></button></li>
-                                            <li><button title="Send message" id="pxp-send-message-button" onclick="messageclick({{i.log_id}})" style="display: none"><span class="fa fa-envelope-o"></span></button></li>
-                                            <li><button title="Approve" id="pxp-approve-button" onclick="approve({{i.apply_id}})" style="display: none"><span class="fa fa-check"></span></button></li>
-                                            <li><button title="Reject" id="pxp-reject-button" onclick="reject({{i.apply_id}})" style="display: none"><span class="fa fa-ban"></span></button></li>
-                                            <li><button title="Delete" id="pxp-delete-button" onclick="delcan({{i.apply_id}})" style="display: none"><span class="fa fa-trash-o"></span></button></li>
+                                            <li><button title="Schedule Interview" id="pxp-interview-modal-button-{{i.user_id}}-{{i.test_id}}" data-bs-target="#pxp-results-modal" data-bs-toggle="modal" onclick="resultsmodal('{{i.test_id}}')" style="display: none"></button></li>
+                                            <li><button title="View profile" id="pxp-candidate-modal-button-{{i.user_id}}" data-bs-target="#pxp-candidate-modal" data-bs-toggle="modal" onclick="candidatemodal('{{i.user_id}}')" style="display: none"><span class="fa fa-eye"></span></button></li>
+                                            <li><button title="Schedule Test" id="pxp-schedule-modal-button-{{i.user_id}}-{{i.apply_id}}" data-bs-target="#pxp-schedule-modal" data-bs-toggle="modal" onclick="setter('{{i.apply_id}}')" style="display: none"><span class="fa fa-question"></span></button></li>
+                                            <li><button title="Send message" id="pxp-send-message-button-{{i.user_id}}-{{i.log_id}}" onclick="messageclick({{i.log_id}})" style="display: none"><span class="fa fa-envelope-o"></span></button></li>
+                                            <li><button title="Approve" id="pxp-approve-button-{{i.user_id}}-{{i.apply_id}}" onclick="approve({{i.apply_id}})" style="display: none"><span class="fa fa-check"></span></button></li>
+                                            <li><button title="Reject" id="pxp-reject-button-{{i.user_id}}-{{i.apply_id}}" onclick="reject({{i.apply_id}})" style="display: none"><span class="fa fa-ban"></span></button></li>
+                                            <li><button title="Delete" id="pxp-delete-button-{{i.user_id}}-{{i.apply_id}}" onclick="delcan({{i.apply_id}})" style="display: none"><span class="fa fa-trash-o"></span></button></li>
                                         </ul>
                                     </div>
                                 </td>
@@ -316,6 +321,7 @@ function candifetch(id)
             success: function( data ) 
             {
                 let datainfo=JSON.parse(data['info']);
+                let idval;
                 $('#childrem tr').remove();
                 if(datainfo.length>0)
                 {
@@ -425,50 +431,86 @@ function candifetch(id)
                     tr.append(td4);
                     let td5=document.createElement('td');
                     let td5div=document.createElement('div');
-                    td5div.setAttribute('class', 'pxp-dashboard-table-options');
+                    td5div.setAttribute('class', 'pxp-dashboard-table-options');                 
                     let ul=document.createElement('ul');
                     ul.setAttribute('class', 'list-unstyled');
+                    
+
+                    
+                    
+                    if(datainfo[i].status==4)
+                    {
+                        let interviewli=document.createElement('li');
+                        let interviewbut=document.createElement('button');
+                        interviewbut.setAttribute('title', 'Schedule Interview');
+                        idval='pxp-interview-modal-button-'+datainfo[i].user_id+'-'+datainfo[0].test_id;
+                        interviewbut.setAttribute('id', idval);
+                        interviewbut.setAttribute('data-bs-target', '#pxp-results-modal');
+                        interviewbut.setAttribute('data-bs-toggle', 'modal');
+                        let interviewans='resultsmodal('+datainfo[i].test_id+')';
+                        interviewbut.setAttribute('onclick', interviewans);
+                        interviewbut.setAttribute('style', 'display: none');
+                        interviewli.append(interviewbut);
+                        ul.append(interviewli);
+                    }
+                    
                     let li1=document.createElement('li');
                     let but1=document.createElement('button');
                     but1.setAttribute('title', 'View profile');
-                    but1.setAttribute('id', 'pxp-candidate-modal-button');
+                    idval='pxp-candidate-modal-button-'+datainfo[i].user_id;
+                    but1.setAttribute('id', idval);
                     but1.setAttribute('data-bs-target', '#pxp-candidate-modal');
                     but1.setAttribute('data-bs-toggle', 'modal');
                     let but1ans='candidatemodal('+datainfo[i].user_id+')';
                     but1.setAttribute('onclick', but1ans);
+                    but1.setAttribute('style', 'display: none');
                     let but1span=document.createElement('span');
                     but1span.setAttribute('class', 'fa fa-eye');
                     but1.append(but1span);
                     li1.append(but1);
                     ul.append(li1);
+
+                    if(datainfo[i].status==0)
+                    {
                     let li6=document.createElement('li');
                     let but6=document.createElement('button');
                     but6.setAttribute('title', 'Schedule Test');
-                    but6.setAttribute('id', 'pxp-schedule-modal-button');
+                    idval='pxp-schedule-modal-button-'+datainfo[i].user_id+'-'+datainfo[0].apply_id;
+                    but6.setAttribute('id', idval);
                     but6.setAttribute('data-bs-target', '#pxp-schedule-modal');
                     but6.setAttribute('data-bs-toggle', 'modal');
                     let but6ans='setter('+datainfo[i].apply_id+')';
                     but6.setAttribute('onclick', but6ans);
+                    but6.setAttribute('style', 'display: none');
                     let but6span=document.createElement('span');
                     but6span.setAttribute('class', 'fa fa-question');
                     but6.append(but6span);
                     li6.append(but6);
                     ul.append(li6);
+                    }
+
+
                     let li2=document.createElement('li');
                     let but2=document.createElement('button');
                     but2.setAttribute('title', 'Send message');
-                    but2.setAttribute('id', 'pxp-send-message-button');
+                    idval='pxp-send-message-button-'+datainfo[i].user_id+'-'+datainfo[0].log_id;
+                    but2.setAttribute('id', idval);
                     let but2ans='messageclick('+datainfo[i].log_id+')';
                     but2.setAttribute('onclick', but2ans);
+                    but2.setAttribute('style', 'display: none');
                     let but2span=document.createElement('span');
                     but2span.setAttribute('class', 'fa fa-envelope-o');
                     but2.append(but2span);
                     li2.append(but2);
                     ul.append(li2);
+
+
                     let li3=document.createElement('li');
                     let but3=document.createElement('button');
                     but3.setAttribute('title', 'Approve');
-                    but3.setAttribute('id', 'pxp-approve-button');
+                    idval='pxp-approve-button-'+datainfo[i].user_id+'-'+datainfo[0].apply_id;
+                    but3.setAttribute('id', idval);
+                    but3.setAttribute('style', 'display: none');
                     let but3ans='approve('+datainfo[i].apply_id+')';
                     but3.setAttribute('onclick', but3ans);
                     let but3span=document.createElement('span');
@@ -476,10 +518,14 @@ function candifetch(id)
                     but3.append(but3span);
                     li3.append(but3);
                     ul.append(li3);
+
+                    
                     let li4=document.createElement('li');
                     let but4=document.createElement('button');
                     but4.setAttribute('title', 'Reject');
-                    but4.setAttribute('id', 'pxp-reject-button');
+                    idval='pxp-reject-button-'+datainfo[i].user_id+'-'+datainfo[0].apply_id;
+                    but4.setAttribute('id', idval);
+                    but4.setAttribute('style', 'display: none');
                     let but4ans='reject('+datainfo[i].apply_id+')';
                     but4.setAttribute('onclick', but4ans);
                     let but4span=document.createElement('span');
@@ -487,10 +533,13 @@ function candifetch(id)
                     but4.append(but4span);
                     li4.append(but4);
                     ul.append(li4);
+
                     let li5=document.createElement('li');
                     let but5=document.createElement('button');
                     but5.setAttribute('title', 'Delete');
-                    but5.setAttribute('id', 'pxp-delete-button');
+                    idval='pxp-delete-button-'+datainfo[i].user_id+'-'+datainfo[0].apply_id;
+                    but5.setAttribute('id', idval);
+                    but5.setAttribute('style', 'display: none');
                     let but5ans='delcan('+datainfo[i].apply_id+')';
                     but5.setAttribute('onclick', but5ans);
                     let but5span=document.createElement('span');
@@ -498,6 +547,8 @@ function candifetch(id)
                     but5.append(but5span);
                     li5.append(but5);
                     ul.append(li5);
+
+
                     td5div.append(ul);
                     td5.append(td5div);
                     let seloptdiv=document.createElement('div');
@@ -508,31 +559,50 @@ function candifetch(id)
                     selectorsopt.setAttribute('name', 'action_but_option');
                     selectorsopt.setAttribute('onchange', 'tme2()');
                     let opt1=document.createElement('option');
+
                     opt1.setAttribute('value', 'a');
                     opt1.innerHTML="Select Action";
                     selectorsopt.append(opt1);
                     let opt2=document.createElement('option');
-                    opt2.setAttribute('value', 'b');
+                    idval="b_"+datainfo[i].user_id;
+                    opt2.setAttribute('value', idval);
                     opt2.innerHTML="View profile";
                     selectorsopt.append(opt2);
+                    if(datainfo[i].status==0)
+                    {
                     let opt3=document.createElement('option');
-                    opt3.setAttribute('value', 'c');
+                    idval="c_"+datainfo[i].user_id+"_"+datainfo[i].apply_id;
+                    opt3.setAttribute('value', idval);
                     opt3.innerHTML="Schedule Test";
                     selectorsopt.append(opt3);
+                    }
+                    else if(datainfo[i].status==4)
+                    {
+                        let opt9=document.createElement('option');
+                        idval="h_"+datainfo[i].user_id+"_"+datainfo[i].test_id;
+                        opt9.setAttribute('value', idval);
+                        opt9.innerHTML="Schedule Interview";
+                        selectorsopt.append(opt9);
+                    }
+
                     let opt4=document.createElement('option');
-                    opt4.setAttribute('value', 'd');
+                    idval="d_"+datainfo[i].user_id+"_"+datainfo[i].log_id;
+                    opt4.setAttribute('value', idval);
                     opt4.innerHTML="Send Message";
                     selectorsopt.append(opt4);
                     let opt5=document.createElement('option');
-                    opt5.setAttribute('value', 'e');
+                    idval="e_"+datainfo[i].user_id+"_"+datainfo[i].apply_id;
+                    opt5.setAttribute('value', idval);
                     opt5.innerHTML="Approve";
                     selectorsopt.append(opt5);
                     let opt6=document.createElement('option');
-                    opt6.setAttribute('value', 'f');
+                    idval="f_"+datainfo[i].user_id+"_"+datainfo[i].apply_id;
+                    opt6.setAttribute('value', idval);
                     opt6.innerHTML="Reject";
                     selectorsopt.append(opt6);
                     let opt7=document.createElement('option');
-                    opt7.setAttribute('value', 'g');
+                    idval="g_"+datainfo[i].user_id+"_"+datainfo[i].apply_id;
+                    opt7.setAttribute('value', idval);
                     opt7.innerHTML="Delete";
                     selectorsopt.append(opt7);
                     seloptdiv.append(selectorsopt);
@@ -677,29 +747,41 @@ $('#search2').keyup(function() {
 
 $("[name='action_but_option']").change(function(){
     let val_option=$("[name='action_but_option']").val();
-    if(val_option == "b")
+    val_option=val_option.split("_");
+    if(val_option[0] == "b")
     {
-        $('#pxp-candidate-modal-button').click();
+        let temp="#pxp-candidate-modal-button-"+val_option[1];
+        $(temp).click();
     }
-    else if(val_option == "c")
+    else if(val_option[0] == "c")
     {
-        $('#pxp-schedule-modal-button').click();
+        let temp="#pxp-schedule-modal-button-"+val_option[1]+"-"+val_option[2];
+        $(temp).click();
     }
-    else if(val_option == "d")
+    else if(val_option[0] == "d")
     {
-        $('#pxp-send-message-button').click();
+        let temp="#pxp-send-message-button-"+val_option[1]+"-"+val_option[2];
+        $(temp).click();
     }
-    else if(val_option == "e")
+    else if(val_option[0] == "e")
     {
-        $('#pxp-approve-button').click();
+        let temp="#pxp-approve-button-"+val_option[1]+"-"+val_option[2];
+        $(temp).click();
     }
-    else if(val_option == "f")
+    else if(val_option[0] == "f")
     {
-        $('#pxp-reject-button').click();
+        let temp="#pxp-reject-button-"+val_option[1]+"-"+val_option[2];
+        $(temp).click();
     }
-    else if(val_option == "g")
+    else if(val_option[0] == "g")
     {
-        $('#pxp-delete-button').click();
+        let temp="#pxp-delete-button-"+val_option[1]+"-"+val_option[2];
+        $(temp).click();
+    }
+    else if(val_option[0] == "h")
+    {
+        let temp="#pxp-interview-modal-button-"+val_option[1]+"-"+val_option[2];
+        $(temp).click();
     }
 })
 
@@ -797,34 +879,43 @@ function scheduletest()
 
 function tme2()
 {
-    $("[name='action_but_option']").change(function(){
-        let val_option=$("[name='action_but_option']").val();
-        if(val_option == "b")
-        {
-            $('#pxp-candidate-modal-button').click();
-        }
-        else if(val_option == "c")
-        {
-            $('#pxp-schedule-modal-button').click();
-        }
-        else if(val_option == "d")
-        {
-            $('#pxp-send-message-button').click();
-        }
-        else if(val_option == "e")
-        {
-            $('#pxp-approve-button').click();
-        }
-        else if(val_option == "f")
-        {
-            $('#pxp-reject-button').click();
-        }
-        else if(val_option == "g")
-        {
-            $('#pxp-delete-button').click();
-        }
-    })
-    
+    let val_option=$("[name='action_but_option']").val();
+    val_option=val_option.split("_");
+    if(val_option[0] == "b")
+    {
+        let temp="#pxp-candidate-modal-button-"+val_option[1];
+        $(temp).click();
+    }
+    else if(val_option[0] == "c")
+    {
+        let temp="#pxp-schedule-modal-button-"+val_option[1]+"-"+val_option[2];
+        $(temp).click();
+    }
+    else if(val_option[0] == "d")
+    {
+        let temp="#pxp-send-message-button-"+val_option[1]+"-"+val_option[2];
+        $(temp).click();
+    }
+    else if(val_option[0] == "e")
+    {
+        let temp="#pxp-approve-button-"+val_option[1]+"-"+val_option[2];
+        $(temp).click();
+    }
+    else if(val_option[0] == "f")
+    {
+        let temp="#pxp-reject-button-"+val_option[1]+"-"+val_option[2];
+        $(temp).click();
+    }
+    else if(val_option[0] == "g")
+    {
+        let temp="#pxp-delete-button-"+val_option[1]+"-"+val_option[2];
+        $(temp).click();
+    }
+    else if(val_option[0] == "h")
+    {
+        let temp="#pxp-interview-modal-button-"+val_option[1]+"-"+val_option[2];
+        $(temp).click();
+    }   
 }
 
 

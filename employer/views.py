@@ -397,7 +397,7 @@ def candidates(request, pk):
                 testinfo1=TestInfo.objects.get(testinfoid=i.test.testinfoid)
                 testuser1=TestUser.objects.get(test_id=testinfo1.test_id.test_id, user_id=user.user_id)
                 single_can['results']=(int(testuser1.correct_answers)/int(testuser1.total_ques))*100
-                print(single_can['results'])
+                single_can['test_id']=testuser1.testuser_id
             else:
                 single_can['results']=0
             single_apps.append(single_can)
@@ -419,6 +419,7 @@ def candidates(request, pk):
         if i.status == 4:
             testinfo1=TestInfo.objects.get(testinfoid=i.test.testinfoid)
             testuser1=TestUser.objects.get(test_id=testinfo1.test_id.test_id, user_id=user.user_id)
+            single_can['test_id']=testuser1.testuser_id
             single_can['results']=(int(testuser1.correct_answers)/int(testuser1.total_ques))*100
         else:
             single_can['results']=0
@@ -827,6 +828,7 @@ def get_cands(request, pk):
             testinfo1=TestInfo.objects.get(testinfoid=i.test.testinfoid)
             testuser1=TestUser.objects.get(test_id=testinfo1.test_id.test_id, user_id=user.user_id)
             single_can['results']=(int(testuser1.correct_answers)/int(testuser1.total_ques))*100
+            single_can['test_id']=testuser1.testuser_id
         else:
             single_can['results']=0
         single_can['date_applied']=i.date_applied

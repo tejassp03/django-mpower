@@ -258,3 +258,23 @@ class Newsletter(models.Model):
     email = models.CharField(max_length=300)
     class Meta:
         db_table = "newsletter"
+
+class AllSkills(models.Model):
+    id = models.AutoField(primary_key=True)
+    skill = models.CharField(max_length=750)
+    class Meta:
+        db_table = "allskills"
+
+class RoleDetails(models.Model):
+    id = models.AutoField(primary_key=True)
+    role = models.CharField(max_length=750)
+    class Meta:
+        db_table = "roledetails"
+
+class Course(models.Model):
+    id = models.AutoField(primary_key=True)
+    course = models.CharField(max_length=512)
+    description = models.CharField(max_length=512)
+    institution_type = models.CharField(max_length=512)
+    class Meta:
+        db_table = "course"
