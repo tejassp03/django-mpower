@@ -156,13 +156,43 @@
                   <input class="form-control textbox-n" placeholder="Date of birth" name="dob" type="text" onfocus="(this.type='date')" id="date">
                 </div>
                   <div class="form-group fg_2">
-                    <input type="text" class="form-control" placeholder="Basic Education" name="basic">
+                    <div class="wrapper">
+                        <div class="container">
+                            <div class="form-group">
+                                Basic Education: <select placeholder="Basic Education" name="basic" class="notnormal">
+                                {% for i in educat %}
+                                <option>{{ i.course }} - {{ i.description }} - {{ i.institution_type }}</option>
+                                {% endfor %}
+                              </select>
+                            </div>
+                        </div>
+                    </div>
                   </div> 
                   <div class="form-group fg_2"> 
-                    <input type="text" class="form-control" placeholder="Master Education" name="master">
+                    <div class="wrapper">
+                        <div class="container">
+                            <div class="form-group">
+                                Master Education: <select placeholder="Master Education" name="master" class="notnormal">
+                                {% for i in educat %}
+                                <option>{{ i.course }} - {{ i.description }} - {{ i.institution_type }}</option>
+                                {% endfor %}
+                              </select>
+                            </div>
+                        </div>
+                    </div>
                   </div> 
                   <div class="form-group fg_2"> 
-                    <input type="text" class="form-control" placeholder="Other Qualifications" name="other">
+                    <div class="wrapper">
+                        <div class="container">
+                            <div class="form-group">
+                                Other Qualifications: <select placeholder="Other Qualifications" name="other" class="notnormal">
+                                {% for i in educat %}
+                                <option>{{ i.course }} - {{ i.description }} - {{ i.institution_type }}</option>
+                                {% endfor %}
+                              </select>
+                            </div>
+                        </div>
+                    </div>
                   </div> 
                 <button type="button" class="action-button previous previous_button" style="margin-bottom: 30px">Back</button> 
                 <button type="button" class="next action-button" style="margin-bottom: 30px">Continue</button>   
@@ -182,11 +212,9 @@
                     <div class="container">
                         <div class="form-group">
                           <select multiple placeholder="Choose skills" name="skills" class="notnormal">
-                            <option>HTML</option>
-                            <option>CSS</option>
-                            <option>JavaScript</option>
-                            <option>PHP</option>
-                            <option>MySQL</option>
+                            {% for i in allskil %}
+                            <option>{{ i.skill }}</option>
+                            {% endfor %}
                           </select>
                         </div>
                     </div>

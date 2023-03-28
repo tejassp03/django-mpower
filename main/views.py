@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate,login
 from django.contrib import messages
-from .models import JobSeeker, Login, Employer, ResumeAnalysis, Jobs, LikedJobs, Application, Interview, Feedback, Newsletter
+from .models import JobSeeker, Login, Employer, ResumeAnalysis, Jobs, LikedJobs, Application, Interview, Feedback, Newsletter, Course, AllSkills, RoleDetails
 import random
 import re
 from django.contrib.auth.hashers import make_password, check_password
@@ -517,7 +517,9 @@ def profile_completion(request, pk):
 		return redirect("candidate:dashboard", pk=jobseeker.user_id)
 	if(len(Login.objects.filter(log_id=pk, user_type="candidate"))==0):
 		return redirect('main:index')
-	return render(request, 'profile_completion.html')
+	educat=Course.objects.all()
+	allskil=AllSkills.objects.all()
+	return render(request, 'profile_completion.html', {'educat': educat, 'allskil': allskil})
 
 def pdf_reader(file):
     resource_manager = PDFResourceManager()
