@@ -279,6 +279,9 @@
                                                         <div class="pxp-single-job-date pxp-text-light" id="datesh"></div>
                                                     </div>
                                                 </div>
+                                                <div class="pxp-single-job-content-details mt-4 mt-lg-5">
+                                                    <p id="qualityshower"></p>
+                                                </div>
                     
                                                 <div class="pxp-single-job-content-details mt-4 mt-lg-5">
                                                     <h4>Overview</h4>
@@ -567,6 +570,16 @@
                     $('#exp').text(JSON.parse(data['info'])[0].experience);
                     $('#lev').text(JSON.parse(data['info'])[0].careerlevel);
                     $('#jobtype').text(JSON.parse(data['info'])[0].jobtype);
+                    let finaltext;
+                    if(data['score']=="Please submit resume to check eligibility")
+                    {
+                        finaltext="Your eligibility : "+data['score'];
+                    }
+                    else
+                    {
+                        finaltext="Your eligibility : "+data['score']+" %";
+                    }
+                    $('#qualityshower').text(finaltext);
                     let sal=JSON.parse(data['info'])[0].basicpay;
                     if(sal=="1")
                     {

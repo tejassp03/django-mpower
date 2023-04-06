@@ -109,6 +109,16 @@
                     </div>
 
                     <div class="pxp-single-job-content-details mt-4 mt-lg-5">
+                        {% if score == "Please submit your resume" %}
+                        <p>Eligibility: {{ score }} </p>
+                        {% elif score == "Please login to check eligibility" %}
+                        <p>Eligibility: {{ score }} </p>
+                        {% else %}
+                        <p>Eligibility: {{ score }} %</p>
+                        {% endif %}
+                    </div>
+
+                    <div class="pxp-single-job-content-details mt-4 mt-lg-5">
                         <h4>Overview</h4>
                         <p>{{ job_details.jobdesc }}</p>
                         <div class="mt-4">

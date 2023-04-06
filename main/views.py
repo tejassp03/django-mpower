@@ -36,7 +36,8 @@ from django.db.models import Q
 from django.db.models import Max, Min
 
 from json import dumps
-
+import PyPDF2
+import string
 
 
 @csrf_exempt
@@ -639,7 +640,58 @@ def singlejob(request, pk2):
 	responsibilities=[]
 	for i in jobdet.responsibilities.split("\n"):
 		responsibilities.append(i)
-	return render(request, 'singlejob.html', {'job_details': jobdet, 'company_details': companydet, 'liked': lik, 'loger': loger, 'skills': skills, 'requirements': requirements, 'responsibilities': responsibilities, 'date': app_date})
+	quality="Please login to check eligibility"
+	if 'pk' in request.session:
+		cand=JobSeeker.objects.get(user_id=request.session['pk'])
+		try: 
+			pdfFileObj = open("media/"+str(cand.Resume),'rb')  
+			pdfReader = PyPDF2.PdfFileReader(pdfFileObj)
+		except:
+			return render(request, 'singlejob.html', {'job_details': jobdet, 'company_details': companydet, 'liked': lik, 'loger': loger, 'skills': skills, 'requirements': requirements, 'responsibilities': responsibilities, 'date': app_date, 'score': 'Please submit your resume'})
+		num_pages = pdfReader.numPages
+		count = 0
+		text = ""
+		while count < num_pages:
+			pageObj = pdfReader.getPage(count)
+			count +=1
+			text += pageObj.extractText()
+		text = text.lower()
+		text = re.sub(r'\d+','',text)
+		text = text.translate(str.maketrans('','',string.punctuation))
+		terms = {'Python Developer':['black belt','capability analysis','control charts','doe','dmaic','fishbone',
+								'gage r&r', 'green belt','ishikawa','iso','kaizen','kpi','lean','metrics',
+								'pdsa','performance improvement','process improvement','quality',
+								'quality circles','quality tools','root cause','six sigma',
+								'stability analysis','statistical analysis','tqm'],      
+			'Django Developer':['automation','bottleneck','constraints','cycle time','efficiency','fmea',
+									'machinery','maintenance','manufacture','line balancing','oee','operations',
+									'operations research','optimization','overall equipment effectiveness',
+									'pfmea','process','process mapping','production','resources','safety',
+									'stoppage','value stream mapping','utilization'],
+			'React Developer':['abc analysis','apics','customer','customs','delivery','distribution','eoq','epq',
+							'fleet','forecast','inventory','logistic','materials','outsourcing','procurement',
+							'reorder point','rout','safety stock','scheduling','shipping','stock','suppliers',
+							'third party logistics','transport','transportation','traffic','supply chain',
+							'vendor','warehouse','wip','work in progress'],
+			'NEXT Developer':['administration','agile','budget','cost','direction','feasibility analysis',
+								'finance','kanban','leader','leadership','management','milestones','planning',
+								'pmi','pmp','problem','project','risk','schedule','scrum','stakeholders'],
+			'Project management':['administration','agile','budget','cost','direction','feasibility analysis',
+						'finance','kanban','leader','leadership','management','milestones','planning',
+						'pmi','pmp','problem','project','risk','schedule','scrum','stakeholders'],
+			'Data analytics':['analytics','api','aws','big data','busines intelligence','clustering','code',
+							'coding','data','database','data mining','data science','deep learning','hadoop',
+							'hypothesis test','iot','internet','machine learning','modeling','nosql','nlp',
+							'predictive','programming','python','r','sql','tableau','text mining',
+							'visualuzation'],}
+		quality = 0
+		for area in terms.keys():
+			if area.lower() == jobdet.title.lower():
+				for word in terms[area]:
+					if word in text:
+						quality +=1
+				break
+	return render(request, 'singlejob.html', {'job_details': jobdet, 'company_details': companydet, 'liked': lik, 'loger': loger, 'skills': skills, 'requirements': requirements, 'responsibilities': responsibilities, 'date': app_date, 'score': quality})
 
 def singlecompany(request, pk2):
 	cominfo=Employer.objects.get(eid=pk2)

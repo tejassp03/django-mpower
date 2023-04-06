@@ -195,7 +195,7 @@
                                 </td>
                                 <td>
                                     <div class="pxp-company-dashboard-jobs-bulk-actions" style="margin-left: auto">
-                                        <select class="form-select" name="action_but_option">
+                                        <select class="form-select randomselect" name="action_but_option_{{ i.user_id }}">
                                             <option value="a">Select Action</option>
                                             <option value="b_{{i.user_id}}">View profile</option>
                                             {% if i.status == 0 %}
@@ -493,7 +493,7 @@ function candifetch(id)
                     let li2=document.createElement('li');
                     let but2=document.createElement('button');
                     but2.setAttribute('title', 'Send message');
-                    idval='pxp-send-message-button-'+datainfo[i].user_id+'-'+datainfo[0].log_id;
+                    idval='pxp-send-message-button-'+datainfo[i].user_id+'-'+datainfo[i].log_id;
                     but2.setAttribute('id', idval);
                     let but2ans='messageclick('+datainfo[i].log_id+')';
                     but2.setAttribute('onclick', but2ans);
@@ -555,9 +555,11 @@ function candifetch(id)
                     seloptdiv.setAttribute('class', 'pxp-company-dashboard-jobs-bulk-actions');
                     seloptdiv.setAttribute('style', 'margin-left: auto');
                     let selectorsopt=document.createElement('select');
-                    selectorsopt.setAttribute('class', 'form-select');
-                    selectorsopt.setAttribute('name', 'action_but_option');
-                    selectorsopt.setAttribute('onchange', 'tme2()');
+                    selectorsopt.setAttribute('class', 'form-select randomselect');
+                    let finalstringval='action_but_option_'+datainfo[i].user_id;
+                    selectorsopt.setAttribute('name', finalstringval);
+                    let finalonchangeval="tme2("+datainfo[i].user_id+")";
+                    selectorsopt.setAttribute('onchange', finalonchangeval);
                     let opt1=document.createElement('option');
 
                     opt1.setAttribute('value', 'a');
@@ -745,8 +747,9 @@ $('#search2').keyup(function() {
     }).hide();
 });
 
-$("[name='action_but_option']").change(function(){
-    let val_option=$("[name='action_but_option']").val();
+$(".randomselect").change(function(){
+    let nameval=$(this).prop('name');
+    let val_option=$(`[name=${nameval}]`).val();
     val_option=val_option.split("_");
     if(val_option[0] == "b")
     {
@@ -877,10 +880,12 @@ function scheduletest()
     })
 }
 
-function tme2()
+function tme2(id)
 {
-    let val_option=$("[name='action_but_option']").val();
+    let nameval="action_but_option_"+id;
+    let val_option=$(`[name=${nameval}]`).val();
     val_option=val_option.split("_");
+    console.log(val_option);
     if(val_option[0] == "b")
     {
         let temp="#pxp-candidate-modal-button-"+val_option[1];
