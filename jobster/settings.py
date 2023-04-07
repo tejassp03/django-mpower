@@ -49,8 +49,8 @@ INSTALLED_APPS = [
     'main.apps.MainConfig',
     'candidate.apps.CandidateConfig',
     'employer.apps.EmployerConfig',
+    'mpoweradmin.apps.MpoweradminConfig',
     'django.contrib.humanize'
-    
 ]
 
 MIDDLEWARE = [
