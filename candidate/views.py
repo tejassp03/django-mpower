@@ -1,3 +1,4 @@
+import os
 from django.shortcuts import render, redirect
 from main.models import *
 from json import dumps
@@ -17,6 +18,9 @@ import pyotp
 import base64
 import PyPDF2
 import string
+import spacy
+from jobster.settings import BASE_DIR
+
 
 # Create your views here.
 def dashboard(request, pk):
@@ -961,6 +965,65 @@ def feed_get(request, pk):
     for i in feeds:
         data['feed_received'].append(i.emp_feedback)
     return JsonResponse({'info': data})
+
+def job_change(request, pk):
+    cand=JobSeeker.objects.get(user_id=pk)
+    text=cand.skills 
+    key=[]
+    value=[]
+    str1="candidate\output\model-best"
+    nlp = spacy.load(os.path.join(BASE_DIR, str1))
+    doc = nlp(text)
+    for ent in doc.ents:
+        key.append(ent.label_)
+        value.append(ent.text)
+    Dict = {key[i]: value[i] for i in range(len(key))}
+    SKILLS= Dict["SKILLS"].lower().split(",")
+    Dict.update(SKILLS=SKILLS)
+    text = Dict["SKILLS"]
+    len_user_list = len(text)
+    all_jobs=Jobs.objects.all()
+    set1=set(text)
+    final_jobs=[]
+    for i in all_jobs:
+        set2=set(i.skills.lower().split("\n"))
+        print(set1, " ", set2)
+        if set1 & set2:
+            final_jobs.append(i)
+    print(final_jobs)
+    jobs = []
+    for i in final_jobs:
+        job_skills = i.skills.lower().split("\n")
+        match = len([k for k , val in enumerate(job_skills) if val in text])
+        total_len = len(job_skills) + len_user_list
+        jobs.append([i, match/total_len])
+    sorted(jobs, key = lambda x: x[1], reverse=True)
+    final_vals=[]
+    for i in jobs:
+        temp_dic={}
+        temp_dic['eid']=i[0].eid.eid
+        temp_dic['jobid']=i[0].jobid
+        temp_dic['rank']=float(i[1])*100
+        temp_dic['title']=i[0].title
+        temp_dic['location']=i[0].location
+        temp_dic['ename']=i[0].eid.ename
+        temp_dic['fnarea']=i[0].fnarea
+        temp_dic['jobtype']=i[0].jobtype
+        final_vals.append(temp_dic)
+    count=len(final_vals)
+    GET_params = request.GET.copy()
+    if('page' in GET_params):
+        last=GET_params['page'][-1]
+        GET_params['page']=last[0]
+    p=Paginator(final_vals, 5)
+    page_number = request.GET.get('page')
+    try:
+        page_obj = p.get_page(page_number)
+    except PageNotAnInteger:
+        page_obj = p.page(1)
+    except EmptyPage:
+        page_obj = p.page(p.num_pages)
+    return render(request, 'jobsuggest-candidate.html', {'pk': pk, 'pe': page_obj, 'count': count})
 
 def logout(request, pk):
     user=Login.objects.get(log_id=JobSeeker.objects.get(user_id=pk).log_id.log_id)

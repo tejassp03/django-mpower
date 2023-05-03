@@ -88,6 +88,12 @@
                             <div><span class="fa fa-file-o"><i class="fa-light fa-lightbulb"></i></span>Suggestions</div>
                         </a>
                     </li>
+                    <li id="jch">
+                        {% comment %} <a href="candidate-dashboard-notifications.html" class="d-flex justify-content-between align-items-center"> {% endcomment %}
+                            <a href="{% url 'candidate:job_change' pk=pk %}" class="d-flex justify-content-between align-items-center">
+                            <div><span class="fa fa-user"></span>Job Change</div>
+                        </a>
+                    </li>
                 </ul>
             </nav>
 
@@ -178,6 +184,12 @@
                                         {% comment %} <a href="candidate-dashboard-notifications.html" class="d-flex justify-content-between align-items-center"> {% endcomment %}
                                         <a href="{% url 'candidate:suggestions' pk=pk %}" class="d-flex justify-content-between align-items-center">
                                             <div><span class="fa fa-file-o"></span>Suggestions</div>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        {% comment %} <a href="candidate-dashboard-notifications.html" class="d-flex justify-content-between align-items-center"> {% endcomment %}
+                                        <a href="{% url 'candidate:job_change' pk=pk %}" class="d-flex justify-content-between align-items-center">
+                                            <div><span class="fa fa-user"></span>Job Change</div>
                                         </a>
                                     </li>
                                 </ul>

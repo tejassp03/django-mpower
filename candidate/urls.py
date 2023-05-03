@@ -46,6 +46,8 @@ urlpatterns = [
     path('interviews/', views.interviews, name='interviews'),
     path('get_interview/', views.get_interview, name='get_interview'),
     path('feed_get/', views.feed_get, name='feed_get'),
+    path('job_change/', views.job_change, name='job_change'),
+    path('job_change/jobapp/', views.jobapp, name='jobapp'),
 	path('logout/', views.logout, name='logout')
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
