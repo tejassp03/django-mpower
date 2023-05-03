@@ -28,19 +28,10 @@
             <div class="col-md-6 col-xxl-3">
                 <div class="mb-3">
                     <label for="pxp-company-job-category" class="form-label">Category</label>
-                    <select id="pxp-company-job-category" class="form-select" name="fnarea">
-                        <option>Select a category</option>
-                        <option>Marketing & Communication</option>
-                        <option>Software Engineering</option>
-                        <option>Project Management</option>
-                        <option>Finance</option>
-                        <option>Retail</option>
-                        <option>Sales</option>
-                        <option>Manufacturing</option>
-                        <option>IT</option>
-                        <option>Business Development</option>
-                        <option>Human Resources</option>
-                        <option>Customer Service</option>
+                    <select id="pxp-company-job-category" class="form-select notnormal" name="fnarea">
+                        {% for i in roledetails %}
+                        <option>{{ i.role }}</option>
+                        {% endfor %}
                     </select>
                 </div>
             </div>
@@ -120,9 +111,21 @@
     </form>
 </div>
 
+
 {% endblock content%}
 
 {% block script %}
+$(function () {
+    $('.notnormal').each(function () {
+      $(this).select2({
+        theme: 'bootstrap4',
+        width: 'style',
+        placeholder: $(this).attr('placeholder'),
+        allowClear: Boolean($(this).data('allow-clear')),
+      });
+    });
+  });
+
 $(document).ready(function () {
     $('#cdas').removeClass('pxp-active');
     $('#cedi').removeClass('pxp-active');

@@ -201,12 +201,20 @@ def jobapp(request, pk):
     if(employer[0].logo):
         image = str(employer[0].logo.url)
     cand=JobSeeker.objects.get(user_id=pk)
+    actual_skills=jobinfo[0].skills.split("\n")
+    user_skills=cand.skills.split(",")
+    skills_required=[]
+    for i in actual_skills:
+        for j in user_skills:
+            if j not in i:
+                skills_required.append(i)
+                break
     quality=0
     try: 
         pdfFileObj = open("media/"+str(cand.Resume),'rb')  
         pdfReader = PyPDF2.PdfFileReader(pdfFileObj)
     except:
-        return JsonResponse({'logo': image, 'info': dumps(list(jobinfo.values()), default=str), 'company': dumps(list(employer.values())), 'emai': dumps(email), 'score': "Please submit resume to check eligibility"})
+        return JsonResponse({'logo': image, 'info': dumps(list(jobinfo.values()), default=str), 'company': dumps(list(employer.values())), 'emai': dumps(email), 'score': "Please submit resume to check eligibility", 'skills_required': skills_required})
     num_pages = pdfReader.numPages
     count = 0
     text = ""
@@ -250,7 +258,7 @@ def jobapp(request, pk):
                 if word in text:
                     quality +=1
             break
-    return JsonResponse({'logo': image, 'info': dumps(list(jobinfo.values()), default=str), 'company': dumps(list(employer.values())), 'emai': dumps(email), 'score': quality})
+    return JsonResponse({'logo': image, 'info': dumps(list(jobinfo.values()), default=str), 'company': dumps(list(employer.values())), 'emai': dumps(email), 'score': quality, 'skills_required': skills_required})
 
 
 def edit_profile(request, pk):
@@ -709,6 +717,7 @@ def notifications(request, pk):
         single_notif['ename']=com.ename
         single_notif['log_id']=com.log_id.log_id
         nots.append(single_notif)
+    count=len(notifs)
     GET_params = request.GET.copy()
     if('page' in GET_params):
         last=GET_params['page'][-1]
@@ -721,7 +730,7 @@ def notifications(request, pk):
         page_obj = p.page(1)
     except EmptyPage:
         page_obj = p.page(p.num_pages)
-    return render(request, 'notification-candidate.html', {'pk': pk, 'notif': page_obj})
+    return render(request, 'notification-candidate.html', {'pk': pk, 'notif': page_obj, 'count': count})
 
 
 def applications(request, pk):
@@ -733,6 +742,7 @@ def applications(request, pk):
         Application.objects.filter(apply_id=request.POST['apply_id']).delete()
         return redirect('candidate:applications', pk=pk)
     applics=Application.objects.filter(user_id=pk).order_by("-date_applied")
+    count=len(applics)
     all_app=[]
     for i in applics:
         app={}
@@ -760,7 +770,7 @@ def applications(request, pk):
         page_obj = p.page(1)
     except EmptyPage:
         page_obj = p.page(p.num_pages)
-    return render(request, 'applications-candidate.html', {'pk': pk, 'all_app': page_obj, 'GET_params': GET_params})
+    return render(request, 'applications-candidate.html', {'pk': pk, 'all_app': page_obj, 'GET_params': GET_params, 'count': count})
 
 def suggestions(request, pk):
     user_skills=JobSeeker.objects.get(user_id=pk)
@@ -771,7 +781,7 @@ def suggestions(request, pk):
         # print(user_skills)
         # print(i.skills.lower().split(","))
         if i.skills:
-            if(any(j in user_skills for j in i.skills.lower().split(","))):
+            if(any(j in user_skills for j in i.skills.lower().split("\n"))):
                 sugg = {}
                 sugg['jobid']=i.jobid
                 sugg['title']=i.title

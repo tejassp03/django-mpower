@@ -210,7 +210,8 @@ def newjob(request, pk):
         return redirect('employer:cand_suggest', pk=pk)
     if 'shower' in request.session:
         del request.session['shower']
-    return render(request, 'newjob-employer.html', {'pk': pk})
+    roledetails=RoleDetails.objects.all()
+    return render(request, 'newjob-employer.html', {'pk': pk, 'roledetails': roledetails})
 
 def edit(request, pk):
     context = Employer.objects.get(eid=pk)
@@ -853,7 +854,7 @@ def quiz(request, pk):
         single_quiz['jobtype']=job.jobtype
         quiz.append(single_quiz)
     GET_params = request.GET.copy()
-    count=len(quiz)
+    count=len(quizzes)
     if('page' in GET_params):
         last=GET_params['page'][-1]
         GET_params['page']=last[0]

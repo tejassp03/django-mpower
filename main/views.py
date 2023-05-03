@@ -632,6 +632,7 @@ def singlejob(request, pk2):
 			app_date=applics[0].date_applied
 	loger=Login.objects.get(log_id=companydet.log_id.log_id)
 	skills=[]
+	skills_required=[]
 	for i in jobdet.skills.split("\n"):
 		skills.append(i)
 	requirements=[]
@@ -643,11 +644,18 @@ def singlejob(request, pk2):
 	quality="Please login to check eligibility"
 	if 'pk' in request.session:
 		cand=JobSeeker.objects.get(user_id=request.session['pk'])
+		if cand.log_id.user_type == "employer":
+			return render(request, 'singlejob.html', {'job_details': jobdet, 'company_details': companydet, 'liked': lik, 'loger': loger, 'skills': skills, 'requirements': requirements, 'responsibilities': responsibilities, 'date': app_date, 'score': 'X'})
+		for i in skills:
+			for j in cand.skills.split(","):
+				if j not in i:
+					skills_required.append(i)
+					break
 		try: 
 			pdfFileObj = open("media/"+str(cand.Resume),'rb')  
 			pdfReader = PyPDF2.PdfFileReader(pdfFileObj)
 		except:
-			return render(request, 'singlejob.html', {'job_details': jobdet, 'company_details': companydet, 'liked': lik, 'loger': loger, 'skills': skills, 'requirements': requirements, 'responsibilities': responsibilities, 'date': app_date, 'score': 'Please submit your resume'})
+			return render(request, 'singlejob.html', {'job_details': jobdet, 'company_details': companydet, 'liked': lik, 'loger': loger, 'skills': skills, 'requirements': requirements, 'responsibilities': responsibilities, 'date': app_date, 'score': 'Please submit your resume', 'skills_required': skills_required})
 		num_pages = pdfReader.numPages
 		count = 0
 		text = ""
@@ -691,7 +699,7 @@ def singlejob(request, pk2):
 					if word in text:
 						quality +=1
 				break
-	return render(request, 'singlejob.html', {'job_details': jobdet, 'company_details': companydet, 'liked': lik, 'loger': loger, 'skills': skills, 'requirements': requirements, 'responsibilities': responsibilities, 'date': app_date, 'score': quality})
+	return render(request, 'singlejob.html', {'job_details': jobdet, 'company_details': companydet, 'liked': lik, 'loger': loger, 'skills': skills, 'requirements': requirements, 'responsibilities': responsibilities, 'date': app_date, 'score': quality, 'skills_required': skills_required})
 
 def singlecompany(request, pk2):
 	cominfo=Employer.objects.get(eid=pk2)

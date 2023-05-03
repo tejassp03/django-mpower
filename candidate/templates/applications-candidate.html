@@ -88,50 +88,52 @@
                 <div class="col-auto">
                     <nav class="mt-3 mt-sm-0" aria-label="Applications list pagination">
                         <ul class="pagination pxp-pagination">
+                            {% if count >= 6 %}
                             {% if all_app.has_previous %}
                                 {% if GET_params %}
-                                <li class="page-item"><a href="?{{GET_params.urlencode}}&amp;page={{all_app.previous_page_number}}" class="page-link"><i class="fa fa-chevron-left" aria-hidden="true"></i></a></li>
+                                <li class="page-item"><a style="padding: 0.7rem" href="?{{GET_params.urlencode}}&amp;page={{all_app.previous_page_number}}" class="page-link"><i class="fa fa-chevron-left" aria-hidden="true"></i></a></li>
                                 {% else %}
-                                <li class="page-item"><a href="?page={{all_app.previous_page_number}}" class="page-link"><i class="fa fa-chevron-left" aria-hidden="true"></i></a></li>
+                                <li class="page-item"><a style="padding: 0.7rem" href="?page={{all_app.previous_page_number}}" class="page-link"><i class="fa fa-chevron-left" aria-hidden="true"></i></a></li>
                                 {% endif %}
                             {% endif %}
 
                             {% if all_app.number|add:'-4' > 1 %}
                                 {% if GET_params %}
-                                <li class="page-item"><a href="?{{GET_params.urlencode}}&amp;page={{ all_app.number|add:'-5' }}" class="page-link">&hellip;</a></li>
+                                <li class="page-item"><a style="padding: 0.7rem" href="?{{GET_params.urlencode}}&amp;page={{ all_app.number|add:'-5' }}" class="page-link">&hellip;</a></li>
                                 {% else %}
-                                <li class="page-item"><a href="?page={{ all_app.number|add:'-5' }}" class="page-link">&hellip;</a></li>
+                                <li class="page-item"><a style="padding: 0.7rem" href="?page={{ all_app.number|add:'-5' }}" class="page-link">&hellip;</a></li>
                                 {% endif %}
                             {% endif %}
 
                             {% for i in all_app.paginator.page_range %}
                                 {% if all_app.number == i %}
                                     <li class="page-item active" aria-current="page">
-                                        <span class="page-link">{{all_app.number}}</span>
+                                        <span class="page-link" style="padding: 0.7rem">{{all_app.number}}</span>
                                     </li>
                                 {% elif i > all_app.number|add:'-5' and i < all_app.number|add:'5' %}
                                     {% if GET_params %}
-                                    <li class="page-item"><a href="?{{GET_params.urlencode}}&amp;page={{ i }}" class="page-link">{{i}}</a></li>
+                                    <li class="page-item"><a style="padding: 0.7rem" href="?{{GET_params.urlencode}}&amp;page={{ i }}" class="page-link">{{i}}</a></li>
                                     {% else %}
-                                    <li class="page-item"><a href="?page={{ i }}" class="page-link">{{i}}</a></li>
+                                    <li class="page-item"><a style="padding: 0.7rem" href="?page={{ i }}" class="page-link">{{i}}</a></li>
                                     {% endif %}
                                 {% endif %}
                             {% endfor %}
 
                             {% if all_app.paginator.num_pages > all_app.number|add:'4' %}
                                 {% if GET_params %}
-                                <li class="page-item"><a href="?{{GET_params.urlencode}}&amp;page={{ all_app.number|add:'5' }}" class="page-link">&hellip;</a></li>
+                                <li class="page-item"><a style="padding: 0.7rem" href="?{{GET_params.urlencode}}&amp;page={{ all_app.number|add:'5' }}" class="page-link">&hellip;</a></li>
                                 {% else %}
-                                <li class="page-item"><a href="?page={{ all_app.number|add:'5' }}" class="page-link">&hellip;</a></li>
+                                <li class="page-item"><a style="padding: 0.7rem" href="?page={{ all_app.number|add:'5' }}" class="page-link">&hellip;</a></li>
                                 {% endif %}
                             {% endif %}
 
                             {% if all_app.has_next %}
                                 {% if GET_params %}
-                                <li class="page-item"><a href="?{{GET_params.urlencode}}&amp;page={{ all_app.next_page_number }}" class="page-link"><i class="fa fa-chevron-right" aria-hidden="true"></i></a></li>
+                                <li class="page-item"><a style="padding: 0.7rem" href="?{{GET_params.urlencode}}&amp;page={{ all_app.next_page_number }}" class="page-link"><i class="fa fa-chevron-right" aria-hidden="true"></i></a></li>
                                 {% else %}
-                                <li class="page-item"><a href="?page={{all_app.next_page_number}}" class="page-link"><i class="fa fa-chevron-right" aria-hidden="true"></i></a></li>
+                                <li class="page-item"><a style="padding: 0.7rem" href="?page={{all_app.next_page_number}}" class="page-link"><i class="fa fa-chevron-right" aria-hidden="true"></i></a></li>
                                 {% endif %}
+                            {% endif %}
                             {% endif %}
                         </ul>
                     </nav>

@@ -103,50 +103,52 @@
                 <div class="col-auto">
                     <nav class="mt-3 mt-sm-0" aria-label="Notifications pagination">
                         <ul class="pagination pxp-pagination">
+                            {% if count >= 11 %}
                             {% if notif.has_previous %}
                                 {% if GET_params %}
-                                <li class="page-item"><a href="?{{GET_params.urlencode}}&amp;page={{notif.previous_page_number}}" class="page-link"><i class="fa fa-chevron-left" aria-hidden="true"></i></a></li>
+                                <li class="page-item"><a style="padding: 0.7rem" href="?{{GET_params.urlencode}}&amp;page={{notif.previous_page_number}}" class="page-link"><i class="fa fa-chevron-left" aria-hidden="true"></i></a></li>
                                 {% else %}
-                                <li class="page-item"><a href="?page={{notif.previous_page_number}}" class="page-link"><i class="fa fa-chevron-left" aria-hidden="true"></i></a></li>
+                                <li class="page-item"><a style="padding: 0.7rem" href="?page={{notif.previous_page_number}}" class="page-link"><i class="fa fa-chevron-left" aria-hidden="true"></i></a></li>
                                 {% endif %}
                             {% endif %}
 
                             {% if notif.number|add:'-4' > 1 %}
                                 {% if GET_params %}
-                                <li class="page-item"><a href="?{{GET_params.urlencode}}&amp;page={{ notif.number|add:'-5' }}" class="page-link">&hellip;</a></li>
+                                <li class="page-item"><a style="padding: 0.7rem" href="?{{GET_params.urlencode}}&amp;page={{ notif.number|add:'-5' }}" class="page-link">&hellip;</a></li>
                                 {% else %}
-                                <li class="page-item"><a href="?page={{ notif.number|add:'-5' }}" class="page-link">&hellip;</a></li>
+                                <li class="page-item"><a style="padding: 0.7rem" href="?page={{ notif.number|add:'-5' }}" class="page-link">&hellip;</a></li>
                                 {% endif %}
                             {% endif %}
 
                             {% for i in notif.paginator.page_range %}
                                 {% if notif.number == i %}
                                     <li class="page-item active" aria-current="page">
-                                        <span class="page-link">{{notif.number}}</span>
+                                        <span style="padding: 0.7rem" class="page-link">{{notif.number}}</span>
                                     </li>
                                 {% elif i > notif.number|add:'-5' and i < notif.number|add:'5' %}
                                     {% if GET_params %}
-                                    <li class="page-item"><a href="?{{GET_params.urlencode}}&amp;page={{ i }}" class="page-link">{{i}}</a></li>
+                                    <li class="page-item"><a style="padding: 0.7rem" href="?{{GET_params.urlencode}}&amp;page={{ i }}" class="page-link">{{i}}</a></li>
                                     {% else %}
-                                    <li class="page-item"><a href="?page={{ i }}" class="page-link">{{i}}</a></li>
+                                    <li class="page-item"><a style="padding: 0.7rem" href="?page={{ i }}" class="page-link">{{i}}</a></li>
                                     {% endif %}
                                 {% endif %}
                             {% endfor %}
 
                             {% if notif.paginator.num_pages > notif.number|add:'4' %}
                                 {% if GET_params %}
-                                <li class="page-item"><a href="?{{GET_params.urlencode}}&amp;page={{ notif.number|add:'5' }}" class="page-link">&hellip;</a></li>
+                                <li class="page-item"><a style="padding: 0.7rem" href="?{{GET_params.urlencode}}&amp;page={{ notif.number|add:'5' }}" class="page-link">&hellip;</a></li>
                                 {% else %}
-                                <li class="page-item"><a href="?page={{ notif.number|add:'5' }}" class="page-link">&hellip;</a></li>
+                                <li class="page-item"><a style="padding: 0.7rem" href="?page={{ notif.number|add:'5' }}" class="page-link">&hellip;</a></li>
                                 {% endif %}
                             {% endif %}
 
                             {% if notif.has_next %}
                                 {% if GET_params %}
-                                <li class="page-item"><a href="?{{GET_params.urlencode}}&amp;page={{ notif.next_page_number }}" class="page-link"><i class="fa fa-chevron-right" aria-hidden="true"></i></a></li>
+                                <li class="page-item"><a style="padding: 0.7rem" href="?{{GET_params.urlencode}}&amp;page={{ notif.next_page_number }}" class="page-link"><i class="fa fa-chevron-right" aria-hidden="true"></i></a></li>
                                 {% else %}
-                                <li class="page-item"><a href="?page={{notif.next_page_number}}" class="page-link"><i class="fa fa-chevron-right" aria-hidden="true"></i></a></li>
+                                <li class="page-item"><a style="padding: 0.7rem" href="?page={{notif.next_page_number}}" class="page-link"><i class="fa fa-chevron-right" aria-hidden="true"></i></a></li>
                                 {% endif %}
+                            {% endif %}
                             {% endif %}
                         </ul>
                     </nav>

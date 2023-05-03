@@ -282,6 +282,12 @@
                                                 <div class="pxp-single-job-content-details mt-4 mt-lg-5">
                                                     <p id="qualityshower"></p>
                                                 </div>
+
+                                                <div class="pxp-single-job-content-details mt-4 mt-lg-5">
+                                                    <h4>Required Skills</h4>
+                                                    <ul id="reqskillsshower">
+                                                    </ul>
+                                                </div>
                     
                                                 <div class="pxp-single-job-content-details mt-4 mt-lg-5">
                                                     <h4>Overview</h4>
@@ -558,6 +564,7 @@
                 },
                 success: function( data ) 
                 {
+                    let req_skills=data['skills_required'];
                     $('#jobtitle').text(JSON.parse(data['info'])[0].title);
                     $('#comname').text(JSON.parse(data['company'])[0].ename);
                     let comn=document.getElementById('comname');
@@ -580,6 +587,21 @@
                         finaltext="Your eligibility : "+data['score']+" %";
                     }
                     $('#qualityshower').text(finaltext);
+
+                    let lu_skills=document.getElementById('reqskillsshower');
+                    while (lu_skills.firstChild) {
+                        lu_skills.removeChild(lu_skills.lastChild);
+                    }
+                    if(req_skills)
+                    {
+                        for(let i=0;i<req_skills.length;i++)
+                        {
+                            let il_skill=document.createElement('li');
+                            il_skill.innerHTML=req_skills[i];
+                            lu_skills.append(il_skill);
+                        }
+                    }
+
                     let sal=JSON.parse(data['info'])[0].basicpay;
                     if(sal=="1")
                     {

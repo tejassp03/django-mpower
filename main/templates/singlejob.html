@@ -51,10 +51,12 @@
                                 <form method="POST">
                                     {% csrf_token %}
                                 {% if request.session.name %}
+                                {% if score != "X" %}
                                 {% if liked %}
                                 <button class="btn pxp-single-job-save-btn" style="background: black; color: white"><span class="fa fa-heart-o"></span></button>
                                 {% else %}
                                 <button class="btn pxp-single-job-save-btn"><span class="fa fa-heart-o"></span></button>
+                                {% endif %}
                                 {% endif %}
                                 {% endif %}
                                 </form>
@@ -89,7 +91,9 @@
                                 {% if date %}
                                 <button class="btn ms-2 pxp-single-job-apply-btn rounded-pill" style="height: 60px">Applied on <br>{{ date }}</button>
                                 {% else %}
+                                {% if score != "X" %}
                                 <button class="btn ms-2 pxp-single-job-apply-btn rounded-pill" data-bs-target="#pxp-applic-modal" data-bs-toggle="modal" onclick="applicmodal('{{job_details.jobid}}')">Apply Now</button>
+                                {% endif %}
                                 {% endif %}
                                 {% endif %}
                             </div>
@@ -113,8 +117,21 @@
                         <p>Eligibility: {{ score }} </p>
                         {% elif score == "Please login to check eligibility" %}
                         <p>Eligibility: {{ score }} </p>
+                        {% elif score == "X" %}
+                        <p></p>
                         {% else %}
                         <p>Eligibility: {{ score }} %</p>
+                        {% endif %}
+                    </div>
+
+                    <div class="pxp-single-job-content-details mt-4 mt-lg-5">
+                        {% if skills_required|length >= 1 %}
+                        <p>Skills Required</p>
+                        <ul>
+                        {% for i in skills_required %}
+                        <li> {{ i }}</li>
+                        {% endfor %}
+                        </ul>
                         {% endif %}
                     </div>
 
@@ -152,9 +169,11 @@
                             <a class="btn rounded-pill pxp-section-cta">Applied on <br>{{ date }}</a>
                         </div>
                         {% else %}
+                        {% if score != "X" %}
                         <div class="mt-4 mt-lg-5">
                             <a href="" data-bs-target="#pxp-applic-modal" data-bs-toggle="modal" onclick="applicmodal('{{job_details.jobid}}')" class="btn rounded-pill pxp-section-cta">Apply Now</a>
                         </div>
+                        {% endif %}
                         {% endif %}
                         {% endif %}
                     </div>

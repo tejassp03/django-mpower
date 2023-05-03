@@ -15,6 +15,10 @@
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600;700&display=swap" rel="stylesheet">
+
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
+        <link href="https://raw.githack.com/ttskch/select2-bootstrap4-theme/master/dist/select2-bootstrap4.css" rel="stylesheet"> <!-- for live demo page -->
+        <link href="select2-bootstrap4.css" rel="stylesheet"> 
         <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
         <link rel="stylesheet" href="{% static 'css/font-awesome.min.css' %}">
         <link rel="stylesheet" href="{% static 'css/owl.carousel.min.css' %}">
@@ -73,6 +77,19 @@
                 background: #eaf0f4;
                 border-radius: 50%;
                 margin: 0 auto 10px auto;
+              }
+              select {
+                width: 100%;
+                min-height: 100px;
+                border-radius: 3px;
+                border: 1px solid #444;
+                padding: 10px;
+                color: #444444;
+                font-size: 14px;
+              }
+              .select2-search__field
+              {
+                width: 100% !important;
               }
         </style>
     </head>
@@ -137,12 +154,60 @@
                     <input type="file" id="pxp-candidate-cover-choose-file1" accept="image/*" name="logo">
                     <label for="pxp-candidate-cover-choose-file1" class="pxp-cover" style="border-radius: 100%; width: 10rem"><span>Upload Logo</span></label>
                 </div>
+
                 <div class="form-group fg_2"> 
-                  <input type="text" class="form-control" placeholder="Employer Type" name="etype">
-                </div>
-                  <div class="form-group fg_2">
-                    <input type="text" class="form-control" placeholder="Industry" name="industry">
+                    <div class="wrapper">
+                        <div class="container">
+                            <div class="form-group">
+                                Employer Type: <select placeholder="Employer Type" name="etype" class="notnormal">
+                                <option value="Sole Proprietorship">Sole Proprietorship</option>
+                                <option value="Partnership">Partnership</option>
+                                <option value="Limited Liability Partnership">Limited Liability Partnership</option>
+                                <option value="Private Limited Companies">Private Limited Companies</option>
+                                <option value="Public Limited Companies">Public Limited Companies</option>
+                                <option value="One-Person Companies">One-Person Companies</option>
+                                <option value="Section 8 Company">Section 8 Company</option>
+                                <option value="Joint-Venture Company">Joint-Venture Company</option>
+                                <option value="Non-Government Organization (NGO)">Non-Government Organization (NGO)</option>
+                              </select>
+                            </div>
+                        </div>
+                    </div>
                   </div> 
+
+
+                  <div class="form-group fg_2"> 
+                    <div class="wrapper">
+                        <div class="container">
+                            <div class="form-group">
+                                Industry &nbsp; : &nbsp; <select placeholder="Industry" name="industry" class="notnormal">
+                                <option value="Aerospace & Defense">Aerospace & Defense</option>
+                                <option value="Apparel">Appare</option>
+                                <option value="Business Services">Business Services</option>
+                                <option value="Chemicals">Chemicals</option>
+                                <option value="Energy">Energy</option>
+                                <option value="Engineering & Construction">Engineering & Construction</option>
+                                <option value="Financials">Financials</option>
+                                <option value="Food & Drug Stores">Food & Drug Stores</option>
+                                <option value="Food, Beverages & Tobacco">Food, Beverages & Tobacco</option>
+                                <option value="Health Care">Health Care</option>
+                                <option value="Hotels, Restaurants & Leisure">Hotels, Restaurants & Leisure</option>
+                                <option value="Household Products">Household Products</option>
+                                <option value="Industrials">Industrials</option>
+                                <option value="Materials">Materials</option>
+                                <option value="Media">Media</option>
+                                <option value="Motor Vehicles & Parts">Motor Vehicles & Parts</option>
+                                <option value="Retailing">Retailing</option>
+                                <option value="Technology">Technology</option>
+                                <option value="Telecommunications">Telecommunications</option>
+                                <option value="Transportation">Transportation</option>
+                                <option value="Wholesalers">Wholesalers</option>
+                              </select>
+                            </div>
+                        </div>
+                    </div>
+                  </div> 
+
                   <div class="form-group fg_2"> 
                     <input type="text" class="form-control" placeholder="Executive" name="executive">
                   </div>
@@ -190,6 +255,7 @@
         <script src='https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/12.1.2/js/intlTelInput.js'></script>
         <script src='https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js'></script>
         <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery-nice-select/1.1.0/js/jquery.nice-select.min.js'></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
         <script src="{% static 'js/main.js' %}"></script>
         <script>
             (function($) {
@@ -310,6 +376,17 @@
                 phoneNoselect ();
                 nice_Select ();
             })(jQuery);
+
+            $(function () {
+                $('.notnormal').each(function () {
+                  $(this).select2({
+                    theme: 'bootstrap4',
+                    width: 'style',
+                    placeholder: $(this).attr('placeholder'),
+                    allowClear: Boolean($(this).data('allow-clear')),
+                  });
+                });
+              });
 
 
             var count = 1;
