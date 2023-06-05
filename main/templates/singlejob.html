@@ -33,9 +33,7 @@
                     {% if company_details.logo %}
                     <div class="pxp-single-job-cover pxp-cover" style="background-image: url({{ company_details.logo.url }});"></div>
                     <div class="pxp-single-job-cover-logo" style="background-image: url({{ company_details.logo.url }});"></div>
-                    {% else %}
-                    <div class="pxp-single-job-cover pxp-cover" style="background-image: url();"></div>
-                    <div class="pxp-single-job-cover-logo" style="background-image: url();"></div>
+                 
                     {% endif %}
 
                     <div class="row justify-content-between align-items-center mt-4 mt-lg-5">
@@ -112,15 +110,15 @@
                         </div>
                     </div>
 
-                    <div class="pxp-single-job-content-details mt-4 mt-lg-5">
+                    <div class="pxp-single-job-content-details mt-2 mt-lg-5">
                         {% if score == "Please submit your resume" %}
-                        <p>Eligibility: {{ score }} </p>
+                        <p>Resume not uploaded! </p>
                         {% elif score == "Please login to check eligibility" %}
-                        <p>Eligibility: {{ score }} </p>
+                        <p>Job Match: {{  score }} </p>
                         {% elif score == "X" %}
                         <p></p>
-                        {% else %}
-                        <p>Eligibility: {{ score }} %</p>
+                        {% else %} 
+                        <h4 class="pxp-single-job-side-panel pxp-single-job-side-info-data d-flex align-items-center">Job Match: {{ score }} % &emsp;<p style="color:lightgreen;margin-bottom: 0;">The location is suitable for you.</p> </h4> 
                         {% endif %}
                     </div>
 

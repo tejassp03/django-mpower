@@ -26,11 +26,11 @@ class JobSeeker(models.Model):
     basic_edu = models.CharField(max_length=100, default=None, null=True)
     master_edu = models.CharField(max_length=100, default=None, null=True)
     other_qual = models.CharField(max_length=100, default=None, null=True)
+    cursal = models.IntegerField(default=0)
+    expsal = models.IntegerField(default=0)
     dob = models.CharField(max_length=50, default=None, null=True)
     Resume = models.FileField(upload_to='resumes/', default=None, null=True)
     photo = models.ImageField(upload_to='photos/', default=None, null=True)
-    title = models.CharField(max_length=200, default=None, null=True)
-    about = models.CharField(max_length=700, default=None, null=True)
     def pass_to_list(self):
         return self.skills.split(',')
     class Meta:
@@ -79,7 +79,7 @@ class Jobs(models.Model):
     postdate = models.DateTimeField(default=timezone.now)
     jobtype = models.CharField(max_length=50, default="Full Time")
     skills = models.CharField(max_length=700, default=None, null=True)
-    careerlevel = models.CharField(max_length=40, default="No experience", null=True)
+    notice_period = models.CharField(max_length=50, default=None, null=True)
     responsibilities = models.CharField(max_length=700, default=None, null=True)
     requirements = models.CharField(max_length=700, default=None, null=True)
     num_of_visits = models.IntegerField(default=0)

@@ -144,7 +144,7 @@
 
 
               <fieldset>
-                <h3>Please enter details</h3>
+                <h3>Please Enter Details</h3>
                 <div class="pxp-candidate-cover1 mb-3" style="display: flex; justify-content: center; align-items: center">
                     <input type="file" id="pxp-candidate-cover-choose-file1" accept="image/*" name="photo">
                     <label for="pxp-candidate-cover-choose-file1" class="pxp-cover" style="border-radius: 100%; width: 10rem"><span>Upload Photo</span></label>
@@ -159,9 +159,10 @@
                     <div class="wrapper">
                         <div class="container">
                             <div class="form-group">
-                                Basic Education: <select placeholder="Basic Education" name="basic" class="notnormal">
+                                Basic Education<span style="color: red;">*</span> <select placeholder="Select an Option" name="basic" class="notnormal" required>
+                                <option selected disabled>Select an Option</option>
                                 {% for i in educat %}
-                                <option>{{ i.course }} - {{ i.description }} - {{ i.institution_type }}</option>
+                                <option>{{ i.course }}</option>
                                 {% endfor %}
                               </select>
                             </div>
@@ -172,9 +173,10 @@
                     <div class="wrapper">
                         <div class="container">
                             <div class="form-group">
-                                Master Education: <select placeholder="Master Education" name="master" class="notnormal">
+                                Master Education <select placeholder="Select an Option" name="master" class="notnormal">
+                                    <option disabled>Select an Option</option>
                                 {% for i in educat %}
-                                <option>{{ i.course }} - {{ i.description }} - {{ i.institution_type }}</option>
+                                <option>{{ i.course }}</option>
                                 {% endfor %}
                               </select>
                             </div>
@@ -185,9 +187,10 @@
                     <div class="wrapper">
                         <div class="container">
                             <div class="form-group">
-                                Other Qualifications: <select placeholder="Other Qualifications" name="other" class="notnormal">
+                                Other Qualifications <select placeholder="Select an Option" name="other" class="notnormal">
+                                    <option selected disabled>Select an Option</option>
                                 {% for i in educat %}
-                                <option>{{ i.course }} - {{ i.description }} - {{ i.institution_type }}</option>
+                                <option>{{ i.course }}</option>
                                 {% endfor %}
                               </select>
                             </div>
@@ -200,37 +203,39 @@
 
 
               <fieldset>
-                <h3>Please enter details</h3>
-                {% comment %} <select multiple data-placeholder="Select Skills" name="skills">
-                    <option>Python</option>
-                    <option>JavaScript</option>
-                    <option>C/C++</option>
-                    <option>Java</option>
-                    <option>Kotlin</option>
-                </select> {% endcomment %}
+                <h3>Please enter the details accurately to help us serve you better.</h3>
                 <div class="wrapper">
                     <div class="container">
                         <div class="form-group">
                           <select multiple placeholder="Choose skills" name="skills" class="notnormal">
-                            {% for i in allskil %}
-                            <option>{{ i.skill }}</option>
+                            {% for i in allskills %}
+                            <option>{{ i.role }}</option>
                             {% endfor %}
                           </select>
                         </div>
                     </div>
                 </div>
-                <hr>
+                <br>
                 <div class="form-group fg_2">
-                    Experience: <select class="form-group" name="experience" style="min-height: 3rem !important">
+                    Experience
+                    <br>
+                    <select class="form-group" name="experience" style="min-height: 3rem !important">
                         <option value="0">Fresher</option>
                         <option value="1">&#10092; 1 year</option>
                         <option value="2">1 year</option>
                         <option value="3">2 years</option>
                         <option value="4">3 years</option>
                         <option value="5">4 years</option>
-                        <option value="6">&#10093; 5 yeras</option>
+                        <option value="6">&#10093; 5 years</option>
                     </select>
                 </div>
+                <div class="form-group fg_2" style="display: flex; justify-content: center; align-items: center">
+                  <input class="form-control textbox-n" placeholder="Current Salary" name="cursal" type="number"  id="cursal">
+                </div>
+                <div class="form-group fg_2" style="display: flex; justify-content: center; align-items: center">
+                  <input class="form-control textbox-n" placeholder="Expected Salary" name="expsal" type="number" id="expsal">
+                </div>
+                
                 <button type="button" class="action-button previous previous_button" style="margin-bottom: 30px">Back</button> 
                 <button type="button" class="next action-button" style="margin-bottom: 30px">Continue</button>   
               </fieldset>

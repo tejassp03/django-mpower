@@ -103,10 +103,10 @@
     </div>
 
     <div class="row mt-4 mt-lg-5">
+        {% for i in notifics %}
         <div class="col-xxl-6">
             <h2>Recent Notifications</h2>
             <div class="pxp-candidate-dashboard-notifications">
-                {% for i in notifics %}
                 {% if i.notif_type == "M" %}
                 <div class="pxp-candidate-dashboard-notifications-item mb-3">
                     <div class="pxp-candidate-dashboard-notifications-item-left">
@@ -148,13 +148,13 @@
                     <div class="pxp-candidate-dashboard-notifications-item-right">{{ i.datetime|naturaltime }}</div>
                 </div>
                 {% endif %}
-                {% endfor%}
             </div>
         </div>
-        <div class="col-xxl-6">
-            <h2 class="mt-4 mt-lg-5 mt-xxl-0">Recent Messages</h2>
-            <div class="pxp-candidate-dashboard-messages">
+                {% endfor%}
                 {% for i in recent %}
+                <div class="col-xxl-6">
+                    <h2 class="mt-4 mt-lg-5 mt-xxl-0">Recent Messages</h2>
+                    <div class="pxp-candidate-dashboard-messages">
                 <div class="pxp-candidate-dashboard-messages-item mb-3">
                     {% if i.3 %}
                     <div class="pxp-candidate-dashboard-messages-item-avatar pxp-cover" style="background-image: url('{{i.3.url}}')"></div>
@@ -167,16 +167,16 @@
                         <p class="mt-1 mb-0">{{i.1}}</p>
                     </div>
                 </div>
-                {% endfor %}
             </div>
         </div>
+                {% endfor %}
     </div>
 
     <div class="mt-4 mt-lg-5">
-        <h2>Recent Job Apllications</h2>
+        {% for i in applications %}
+        <h2>Recent Job Applications</h2>
         <div class="table-responsive">
             <table class="table align-middle">
-                {% for i in applications %}
                 <tr>
                     {% if i.logo %}
                         <td style="width: 3%;"><div class="pxp-candidate-dashboard-job-avatar pxp-cover"  style="background-image: url('{{ i.logo.url }}')"></div></td>
@@ -198,9 +198,9 @@
                         </div>
                     </td>
                 </tr>
-                {% endfor %}
             </table>
         </div>
+                {% endfor %}
     </div>
 </div>
 <div class="modal fade pxp-user-modal" id="pxp-signup-modal" aria-hidden="true" aria-labelledby="signupModal" tabindex="-1">

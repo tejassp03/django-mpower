@@ -47,6 +47,7 @@ def index(request):
 		if(len(user)==0):
 			return JsonResponse({'message': 'X'})
 		else:
+			
 			if(check_password(request.POST['c_pass'], user[0].password)):
 				if(request.POST['user'] == 'candidate' and JobSeeker.objects.filter(log_id=user[0].log_id)):
 					jobseeker=JobSeeker.objects.get(log_id=user[0].log_id)
@@ -339,8 +340,10 @@ def profile_completion(request, pk):
 		jobseeker.location=request.POST['address']
 		jobseeker.dob=request.POST['dob']
 		jobseeker.basic_edu=request.POST['basic']
-		jobseeker.master_edu=request.POST['master']
-		jobseeker.other_qual=request.POST['other']
+		jobseeker.master_edu = request.POST.get('master', None)
+		jobseeker.other_qual = request.POST.get('other', None)
+		jobseeker.cursal = request.POST.get('cursal', None)
+		jobseeker.expsal = request.POST.get('expsal', None)
 		skills = request.POST.getlist('skills')
 		all_skills=""
 		for i in skills:
@@ -519,8 +522,8 @@ def profile_completion(request, pk):
 	if(len(Login.objects.filter(log_id=pk, user_type="candidate"))==0):
 		return redirect('main:index')
 	educat=Course.objects.all()
-	allskil=AllSkills.objects.all()
-	return render(request, 'profile_completion.html', {'educat': educat, 'allskil': allskil})
+	allskills=RoleDetails.objects.all()
+	return render(request, 'profile_completion.html', {'educat': educat, 'allskills': allskills})
 
 def pdf_reader(file):
     resource_manager = PDFResourceManager()
@@ -611,11 +614,23 @@ def verify_otp(request, pk):
 
 
 def singlejob(request, pk2):
-	if request.method=="POST":
-		like=LikedJobs()
-		like.job_id=Jobs.objects.get(jobid=pk2)
-		like.user_id=JobSeeker.objects.get(user_id=request.session['pk'])
-		like.save()
+	if request.method == "POST":
+		job_id = Jobs.objects.get(jobid=pk2)
+		user_id = JobSeeker.objects.get(user_id=request.session['pk'])
+
+		# Check if the job already exists in the LikedJobs table
+		liked_job = LikedJobs.objects.filter(job_id=job_id, user_id=user_id).first()
+
+		if liked_job:
+			# If the job exists, remove it from the LikedJobs table
+			liked_job.delete()
+			print("deleted")
+		else:
+			# If the job doesn't exist, add it to the LikedJobs table
+			like = LikedJobs(job_id=job_id, user_id=user_id)
+			like.save()
+			print("saved")
+
 		return redirect('main:singlejob', pk2=pk2)
 	jobdet=Jobs.objects.get(jobid=pk2)
 	jobdet.num_of_visits=jobdet.num_of_visits+1
@@ -651,18 +666,18 @@ def singlejob(request, pk2):
 				if j not in i:
 					skills_required.append(i)
 					break
-		try: 
+		try:
 			pdfFileObj = open("media/"+str(cand.Resume),'rb')  
-			pdfReader = PyPDF2.PdfFileReader(pdfFileObj)
+			pdfReader = PyPDF2.PdfReader(pdfFileObj)
 		except:
 			return render(request, 'singlejob.html', {'job_details': jobdet, 'company_details': companydet, 'liked': lik, 'loger': loger, 'skills': skills, 'requirements': requirements, 'responsibilities': responsibilities, 'date': app_date, 'score': 'Please submit your resume', 'skills_required': skills_required})
-		num_pages = pdfReader.numPages
+		num_pages = len(pdfReader.pages)
 		count = 0
 		text = ""
 		while count < num_pages:
-			pageObj = pdfReader.getPage(count)
+			pageObj = pdfReader.pages[count]
 			count +=1
-			text += pageObj.extractText()
+			text += pageObj.extract_text()
 		text = text.lower()
 		text = re.sub(r'\d+','',text)
 		text = text.translate(str.maketrans('','',string.punctuation))
@@ -693,13 +708,27 @@ def singlejob(request, pk2):
 							'predictive','programming','python','r','sql','tableau','text mining',
 							'visualuzation'],}
 		quality = 0
-		for area in terms.keys():
-			if area.lower() == jobdet.title.lower():
-				for word in terms[area]:
-					if word in text:
-						quality +=1
-				break
-	return render(request, 'singlejob.html', {'job_details': jobdet, 'company_details': companydet, 'liked': lik, 'loger': loger, 'skills': skills, 'requirements': requirements, 'responsibilities': responsibilities, 'date': app_date, 'score': quality, 'skills_required': skills_required})
+		for skill in skills:
+			if skill in text:
+				quality += 3
+
+    # Check for other parameters such as location, position suitability, etc.
+		if jobdet.location.lower() in text:
+			quality += 3
+
+		if jobdet.title.lower() in text:
+			quality += 2
+		quality+=2
+		# if jobdet.basicpay:
+		# 	if 'current salary' in text:
+		# 		quality += 1
+
+		# if jobdet['notice_period'].lower() in text:
+		# 	quality += 1
+
+# Print the quality score
+
+	return render(request, 'singlejob.html', {'job_details': jobdet, 'company_details': companydet, 'liked': lik, 'loger': loger, 'skills': skills, 'requirements': requirements, 'responsibilities': responsibilities, 'date': app_date, 'score': quality*10, 'skills_required': skills_required})
 
 def singlecompany(request, pk2):
 	cominfo=Employer.objects.get(eid=pk2)

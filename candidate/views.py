@@ -650,7 +650,7 @@ def change(request, pk):
                 messages.error(request, "Both your password and your confirmation password must be exactly same")
                 return redirect('candidate:change', pk=pk)
             if not re.fullmatch(r'^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$', request.POST['new']):
-                messages.error(request, "Please entere a valid password")
+                messages.error(request, "Please enter a valid password")
                 return redirect('candidate:change', pk=pk)
             if(request.POST['old']==request.POST['new']):
                 messages.error(request, "Old and new password cant be same")
@@ -972,57 +972,64 @@ def job_change(request, pk):
     key=[]
     value=[]
     str1="candidate\output\model-best"
-    nlp = spacy.load(os.path.join(BASE_DIR, str1))
+    model_path = os.path.join(BASE_DIR, str1)
+    nlp = spacy.load(model_path)
     doc = nlp(text)
     for ent in doc.ents:
         key.append(ent.label_)
         value.append(ent.text)
+    print("Key:", key)  # Print the value of 'key'
+    print("Value:", value)
     Dict = {key[i]: value[i] for i in range(len(key))}
-    SKILLS= Dict["SKILLS"].lower().split(",")
+    SKILLS = Dict["JOB ROLE"].lower().rstrip(",").split(",")
+    print(SKILLS)
     Dict.update(SKILLS=SKILLS)
-    text = Dict["SKILLS"]
+    text = Dict["JOB ROLE"]
     len_user_list = len(text)
     all_jobs=Jobs.objects.all()
     set1=set(text)
     final_jobs=[]
     for i in all_jobs:
-        set2=set(i.skills.lower().split("\n"))
-        print(set1, " ", set2)
-        if set1 & set2:
-            final_jobs.append(i)
-    print(final_jobs)
+        if i.skills is not None:
+            set2=set(i.skills.lower().split("\n"))
+            print(set1, " ", set2)
+            if set1 & set2:
+                final_jobs.append(i)
+
+    
     jobs = []
-    for i in final_jobs:
-        job_skills = i.skills.lower().split("\n")
-        match = len([k for k , val in enumerate(job_skills) if val in text])
-        total_len = len(job_skills) + len_user_list
-        jobs.append([i, match/total_len])
-    sorted(jobs, key = lambda x: x[1], reverse=True)
-    final_vals=[]
-    for i in jobs:
-        temp_dic={}
-        temp_dic['eid']=i[0].eid.eid
-        temp_dic['jobid']=i[0].jobid
-        temp_dic['rank']=float(i[1])*100
-        temp_dic['title']=i[0].title
-        temp_dic['location']=i[0].location
-        temp_dic['ename']=i[0].eid.ename
-        temp_dic['fnarea']=i[0].fnarea
-        temp_dic['jobtype']=i[0].jobtype
-        final_vals.append(temp_dic)
-    count=len(final_vals)
-    GET_params = request.GET.copy()
-    if('page' in GET_params):
-        last=GET_params['page'][-1]
-        GET_params['page']=last[0]
-    p=Paginator(final_vals, 5)
-    page_number = request.GET.get('page')
-    try:
-        page_obj = p.get_page(page_number)
-    except PageNotAnInteger:
-        page_obj = p.page(1)
-    except EmptyPage:
-        page_obj = p.page(p.num_pages)
+    if not final_jobs:
+        for i in final_jobs:
+            job_skills = i.skills.lower().split("\n")
+            match = len([k for k , val in enumerate(job_skills) if val in text])
+            total_len = len(job_skills) + len_user_list
+            jobs.append([i, match/total_len])
+        sorted(jobs, key = lambda x: x[1], reverse=True)
+        final_vals=[]
+        for i in jobs:
+            temp_dic={}
+            temp_dic['eid']=i[0].eid.eid
+            temp_dic['jobid']=i[0].jobid
+            temp_dic['rank']=float(i[1])*100
+            temp_dic['title']=i[0].title
+            temp_dic['location']=i[0].location
+            temp_dic['ename']=i[0].eid.ename
+            temp_dic['fnarea']=i[0].fnarea
+            temp_dic['jobtype']=i[0].jobtype
+            final_vals.append(temp_dic)
+        count=len(final_vals)
+        GET_params = request.GET.copy()
+        if('page' in GET_params):
+            last=GET_params['page'][-1]
+            GET_params['page']=last[0]
+        p=Paginator(final_vals, 5)
+        page_number = request.GET.get('page')
+        try:
+            page_obj = p.get_page(page_number)
+        except PageNotAnInteger:
+            page_obj = p.page(1)
+        except EmptyPage:
+            page_obj = p.page(p.num_pages)
     return render(request, 'jobsuggest-candidate.html', {'pk': pk, 'pe': page_obj, 'count': count})
 
 def logout(request, pk):
