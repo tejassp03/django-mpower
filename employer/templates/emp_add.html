@@ -1,0 +1,57 @@
+{% extends 'emp_base.html' %}
+
+{% block title %}
+<title>mpower - Manage Employers</title>
+{% endblock %}
+
+{% block content %}
+
+<p class="text-center mt-3">
+  <a href="all_emp" class="btn btn-primary">Show All Employers</a>
+</p>
+
+<div class="container mt-5">
+     <form class="col-6 mx-auto p-3 card shadow-lg" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+         <h2>Add Employer</h2>
+         <hr>
+
+         <div class="mb-3">
+          <label for="ename" class="form-label">Employer Name</label>
+          <input type="text" class="form-control" name="ename">
+        </div>
+
+        <div class="mb-3">
+          <label for="etype" class="form-label">Employer Industry</label>
+          <input type="text" class="form-control" name="etype">
+        </div>
+
+        <div class="mb-3">
+          <label for="eaddress" class="form-label">Employer Address</label>
+          <input type="text" class="form-control" name="address">
+        </div>
+
+        <div class="mb-3">
+          <label for="ephn" class="form-label">Employer Phone no</label>
+          <input type="text" class="form-control" name="phone">
+        </div>
+
+        <div class="form-group mb-3">
+            <label for="logo">Employer logo Image</label>
+            <input name="logo" type="file" class="form-control">
+        </div>
+
+        <div class="mb-3">
+            <label for="website" class="form-label">Employer Website</label>
+            <input type="text" class="form-control" name="website">
+        </div>
+
+        <div class="mb-3">
+            <label for="yearfounded" class="form-label">Year Founded</label>
+            <input type="number" class="form-control" name="yearfounded">
+        </div>
+  
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </form>
+ </div>
+{% endblock %}

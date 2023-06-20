@@ -1,0 +1,46 @@
+{% extends 'emp_base.html' %}
+
+{% block title %}
+<title>mpower - All Employers</title>
+{% endblock %}
+
+{% block content %}
+<h2 class="text-center mt-3">All Employers Details</h2>
+{% if request.user.is_authenticated %}
+<h4 class="text-center mt-1">{{request.user}} <a href="/employer/1/logout" class="btn btn-danger">Logout</a></h4>
+{% else %}
+<a href="/employer/1/login" class="btn btn-danger">Login</a>
+{% endif %}
+
+<table class="table table-bordered mt-5">
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Name</th>
+        <th scope="col">Type</th>
+        <th scope="col">Address</th>
+        <th scope="col">Phone</th>
+        <th scope="col">logo</th>
+        <th scope="col">Website</th>
+        <th scope="col">YearFounded</th>
+        <th scope="col">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+        {% for empdetail in emp %}
+      <tr>
+        <th scope="row">{{forloop.counter}}</th>
+        <td>{{empdetail.ename}}</td>
+        <td>{{empdetail.etype}}</td>
+        <td>{{empdetail.address}}</td>
+        <td>{{empdetail.phone}}</td>
+        <td><img src="/media/{{empdetail.logo}}" alt="Not Found" style="height: 200px;"></td>
+        <td>{{empdetail.website}}</td>
+        <td>{{empdetail.yearfounded}}</td>
+        <td><a href="delete_emp/{{empdetail.id}}/" class="btn btn-danger">Delete</a>
+        <a href="update_emp/{{empdetail.id}}/" class="btn btn-success">Update</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

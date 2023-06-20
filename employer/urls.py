@@ -43,4 +43,15 @@ urlpatterns = [
     path('get_link/', views.get_link, name='get_link'),
 	path('logout/', views.logout, name='clogout'),
 	path('under_development/', views.under_development, name='under_development'),
+    
+	path('emp_manage', views.emp_add, name='emp_manage'),
+    path('all_emp',views.all_emp, name='all_emp'),
+    path('delete_emp/<id>/',views.delete_emp, name='delete_emp'),
+    path('update_emp/<id>/',views.update_emp, name='update_emp'),
+    
+    path('login/',views.login_page, name='login_page'),
+    path('register/',views.register_page, name='register_page'),
+    path('logout/',views.logout_page, name='logout_page'),
+    
+
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -1164,6 +1164,125 @@ def logout(request, pk):
 
 
 
+# importing models for employers
+from .models import *
+# usermodel 
+from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 
+@login_required(login_url="employer/1/login")
+def emp_add(request,pk):
+    if request.method == "POST":
+        data = request.POST
+
+        ename = data.get('ename')
+        etype = data.get('etype')
+        address = data.get('address')
+        phone = data.get('phone')
+        logo = request.FILES['logo']
+        website = data.get('website')
+        yearfounded = data.get('yearfounded')
+
+        Emp_Manage.objects.create(
+            ename = ename,
+            etype = etype,
+            address = address,
+            phone = phone,
+            logo = logo,
+            website = website,
+            yearfounded = yearfounded,
+        )
+        # redirecting to the same page
+        return redirect(request.path_info)
+    return render(request,'emp_add.html')
+
+@login_required(login_url="employer/1/login")
+def all_emp(request,pk):
+    queryset = Emp_Manage.objects.all()
+    context = {'emp':queryset}
+    return render(request, 'all_emp.html', context)
+
+@login_required(login_url="employer/1/login")
+def delete_emp(request,pk,id):
+    queryset = Emp_Manage.objects.get(id=id)
+    queryset.delete()
+    return redirect('/')
+
+@login_required(login_url="employer/1/login")
+def update_emp(request,pk,id):
+    queryset = Emp_Manage.objects.get(id=id)
+    context = {'emp':queryset}
+
+    if request.method == "POST":
+        data = request.POST
+
+        ename = data.get('ename')
+        etype = data.get('etype')
+        address = data.get('address')
+        phone = data.get('phone')
+        logo = request.FILES['logo']
+        website = data.get('website')
+        yearfounded = data.get('yearfounded')
+
+        Emp_Manage.objects.update(
+            ename = ename,
+            etype = etype,
+            address = address,
+            phone = phone,
+            # logo = logo,
+            website = website,
+            yearfounded = yearfounded,
+        )
+        if logo:
+            queryset.logo = logo
+        queryset.save()
+        return redirect('/employer/1/all_emp')
+
+    return render(request, 'update_emp.html', context)
+
+def login_page(request,pk):
+    if request.method == "POST":
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+
+        if not User.objects.filter(username = username).exists():
+            messages.error(request, 'User doesnt exsist')
+            return redirect(request.path_info)
+
+        user = authenticate(username=username, password=password)
+
+        if user is None:
+            messages.error(request, 'Invalid Password')
+            return redirect(request.path_info)
+        else:
+            login(request, user)            
+            messages.error(request, 'Successfully Login')
+            return redirect('/employer/1/all_emp')
+    return render(request, 'login.html')
+
+@login_required(login_url="employer/1/login")
+def logout_page(request,pk):
+    logout(request)
+    return redirect('/employer/1/login')
+
+@login_required(login_url="employer/1/login")
+def register_page(request,pk):
+    if request.method == "POST":
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+
+        user = User.objects.filter(username = username)
+        if user.exists():
+            return redirect(request.path_info)
+
+        user = User.objects.create(
+            username = username,
+        )
+        user.set_password(password)
+        user.save()
+
+        return redirect('/employer/1/login')
+    return render(request, 'register.html')
 
 
