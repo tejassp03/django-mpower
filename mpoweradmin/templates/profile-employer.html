@@ -1,0 +1,324 @@
+{% extends 'employer-index.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}
+<title>mpower - Company dashboard - Edit profile</title>
+{% endblock %}
+{% block content %}
+
+<div class="pxp-dashboard-content-details">
+    <h1>Edit Profile</h1>
+    <p class="pxp-text-light">Edit your company profile page info.</p>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="row mt-4 mt-lg-5">
+            <div class="col-xxl-8">
+                <div class="mb-3">
+                    <label for="pxp-company-name" class="form-label">Company name</label>
+                    <input type="text" id="pxp-company-name" class="form-control" placeholder="Add company name" name="ename" value="{{ request.session.name }}">
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="mb-3">
+                            <label for="pxp-company-email" class="form-label">Email</label>
+                            <input type="email" id="pxp-company-email" class="form-control" placeholder="company@email.com" name="email" value="{{ request.session.email }}">
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="mb-3">
+                            <label for="pxp-company-phone" class="form-label">Phone</label>
+                            <input type="tel" id="pxp-company-phone" class="form-control" placeholder="(+12) 345 6789" name="phone" value="{{ context.phone }}">
+                            <a class="btn rounded-pill pxp-subsection-cta action-but3">Get OTP</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="pxp-company-website" class="form-label">Website</label>
+                    {% if context.website == None %}
+                    <input type="url" id="pxp-company-website" class="form-control" placeholder="https://" name="website">
+                    {% else %}
+                    <input type="url" id="pxp-company-website" class="form-control" placeholder="https://" name="website" value="{{ context.website }}">
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-xxl-4">
+                <div class="form-label">&nbsp;</div>
+                <div class="pxp-company-cover mb-3">
+                    <input type="file" id="pxp-company-cover-choose-file" accept="image/*" name="cover">
+                    {% if context.cover %}
+                        <label for="pxp-company-cover-choose-file" class="pxp-cover" style="background-image: url('{{ context.cover.url }}')"><span></span></label>
+                    {% else %}
+                        <label for="pxp-company-cover-choose-file" class="pxp-cover"><span>Upload Cover Image</span></label>
+                    {% endif %}
+                </div>
+                <div class="pxp-company-logo mb-3">
+                    <input type="file" id="pxp-company-logo-choose-file" accept="image/*" name="logo">
+                    {% if request.session.photo %}
+                        <label for="pxp-company-logo-choose-file" class="pxp-cover" style="background-image: url('{{ request.session.photo }}')"></label>
+                    {% else %}
+                        <label for="pxp-company-logo-choose-file" class="pxp-cover"><span>Upload<br>Logo</span></label>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label for="pxp-company-about" class="form-label">About the company</label>
+            {% if context.profile == None %}
+            <textarea class="form-control" id="pxp-company-about" placeholder="Type your info here..." name="profile"></textarea>
+            {% else %}
+            <textarea class="form-control" id="pxp-company-about" placeholder="Type your info here..." name="profile">{{ context.profile }}</textarea>
+            {% endif %}
+        </div>
+
+        <div class="row">
+            <div class="col-md-4">
+                <div class="mb-3">
+                    <label for="pxp-company-industry" class="form-label">Industry</label>
+                    {% if context.industry == None %}
+                    <input type="text" id="pxp-company-industry" class="form-control" placeholder="E.g. Software" name="industry">
+                    {% else %}
+                    <input type="text" id="pxp-company-industry" class="form-control" placeholder="E.g. Software" name="industry" value="{{ context.industry }}">
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="mb-3">
+                    <label for="pxp-company-founded" class="form-label">Founded in</label>
+                    {% if context.yearfounded == None %}
+                    <input type="text" id="pxp-company-founded" class="form-control" placeholder="E.g. 2001" name="yearfounded">
+                    {% else %}
+                    <input type="text" id="pxp-company-founded" class="form-control" placeholder="E.g. 2001" name="yearfounded" value="{{ context.yearfounded }}">
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="mb-3">
+                    <label for="pxp-company-size" class="form-label">Company size</label>
+                    <select id="pxp-company-size" class="form-select" name="size">
+                        <option value="1">&lt; 50 employees</option>
+                        <option value="2">50 - 100 employees</option>
+                        <option value="3">100 - 150 employees</option>
+                        <option value="4">150 - 200 employees</option>
+                        <option value="5">200 - 250 employees</option>
+                        <option value="6">250 - 300 employees</option>
+                        <option value="7">&gt; 300 employees</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-4 mt-lg-5">
+            <h2>Company Location</h2>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="pxp-company-country" class="form-label">Country/State</label>
+                        {% if context.location == None %}
+                        <input type="text" id="pxp-company-country" class="form-control" placeholder="E.g. United States, CA" name="location">
+                        {% else %}
+                        <input type="text" id="pxp-company-country" class="form-control" placeholder="E.g. United States, CA" name="location" value="{{ context.location }}">
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="pxp-company-city" class="form-label">City</label>
+                        {% if context.city == None %}
+                        <input type="text" id="pxp-company-city" class="form-control" placeholder="E.g. San Francisco" name="city">
+                        {% else %}
+                        <input type="text" id="pxp-company-city" class="form-control" placeholder="E.g. San Francisco" name="city" value="{{ context.city }}">
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label for="pxp-company-address" class="form-label">Address</label>
+                {% if context.address == None %}
+                <input type="text" id="pxp-company-address" class="form-control" placeholder="Type full address here..." name="address">
+                {% else %}
+                <input type="text" id="pxp-company-address" class="form-control" placeholder="Type full address here..." name="address" value="{{ context.address }}">
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="mt-4 mt-lg-5">
+            <h2>Social Media</h2>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="pxp-company-facebook" class="form-label">Facebook</label>
+                        {% if context.fblink == None %}
+                        <input type="url" id="pxp-company-facebook" class="form-control" placeholder="https://" name="fblink">
+                        {% else %}
+                        <input type="url" id="pxp-company-facebook" class="form-control" placeholder="https://" name="fblink" value="{{ context.fblink }}">
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="pxp-company-twitter" class="form-label">Twitter</label>
+                        {% if context.twlink == None %}
+                        <input type="url" id="pxp-company-twitter" class="form-control" placeholder="https://" name="twlink">
+                        {% else %}
+                        <input type="url" id="pxp-company-twitter" class="form-control" placeholder="https://" name="twlink" value="{{ context.twlink }}">
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="pxp-company-instagram" class="form-label">Instagram</label>
+                        {% if context.inlink == None %}
+                        <input type="url" id="pxp-company-instagram" class="form-control" placeholder="https://" name="inlink">
+                        {% else %}
+                        <input type="url" id="pxp-company-instagram" class="form-control" placeholder="https://" name="inlink" value="{{ context.inlink }}">
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="pxp-company-linkedin" class="form-label">Linkedin</label>
+                        {% if context.lnlink == None %}
+                        <input type="url" id="pxp-company-linkedin" class="form-control" placeholder="https://" name="lnlink">
+                        {% else %}
+                        <input type="url" id="pxp-company-linkedin" class="form-control" placeholder="https://" name="lnlink" value="{{ context.lnlink }}">
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-4 mt-lg-5">
+            <button class="btn rounded-pill pxp-section-cta">Save Profile</button>
+        </div>
+    </form>
+</div>
+
+<div class="modal fade pxp-otp-modal" id="pxp-otp-modal" aria-hidden="true" aria-labelledby="otpModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h5 class="modal-title text-center mt-4">Verify OTP</h5>
+            </div>
+            <hr>
+            <div style="margin-right: auto; margin-left: auto; margin-bottom: 20px" id="messagesshow">
+                <input class="form-group" placeholder="Enter opt" type="text" name="otpval" id="pxp-company-otp" />
+                <button class="btn rounded-pill pxp-subsection-cta action-but4">Verify</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content%}
+
+
+{% block script %}
+let ab=0;
+$(document).ready(function () {
+    $('#cdas').removeClass('pxp-active');
+    $('#cedi').addClass('pxp-active');
+    $('#cnew').removeClass('pxp-active');
+    $('#cman').removeClass('pxp-active');
+    $('#ccan').removeClass('pxp-active');
+    $('#csub').removeClass('pxp-active');
+    $('#ccha').removeClass('pxp-active');
+    $('#cinb').removeClass('pxp-active');
+    $('#cnot').removeClass('pxp-active');
+    $('#scn').removeClass('pxp-active');
+    $('#qui').removeClass('pxp-active');
+    $('#inr').removeClass('pxp-active');
+    $('#pen').removeClass('pxp-active');
+    for(let i=0;i<7;i++)
+    {
+        if($('option')[i].value == {{ context.size }})
+        {
+            $('select').val({{ context.size }});
+        }
+    }
+})
+
+
+
+
+$('.action-but3').click(function(){
+    if(document.getElementById('pxp-company-phone').value=="")
+    {
+        alert("Please enter a valid phone number");
+        $('#pxp-company-phone').val('{{ context.phone }}');
+        return;
+    }
+    let text1 = document.getElementById('pxp-company-phone').value;
+    if(text1=='{{ context.phone }}')
+    {
+        alert("Please enter a different phone number");
+        return;
+    }
+    $.ajax(
+    {
+        type:"GET",
+        url: "{% url 'employer:get_ot' pk=pk %}",
+        data:{
+            'phone': text1,
+            csrfmiddlewaretoken: '{{ csrf_token }}'
+        },
+        success: function( data ) 
+        {
+            alert(`OTP is ${data.OTP}`);
+            $('#pxp-otp-modal').modal('show');
+        }
+     })
+    })
+
+$('.action-but4').click(function(){
+    let text1 = document.getElementById('pxp-company-phone').value;
+    let text2 = document.getElementById('pxp-company-otp').value;
+    if(text2=="")
+    {
+        alert("Please enter OTP to verify");
+        return;
+    }
+    $.ajax(
+    {
+        type:"POST",
+        url: "{% url 'employer:post_ot' pk=pk %}",
+        data:{
+            'phone': text1,
+            'OTP': text2,
+            csrfmiddlewaretoken: '{{ csrf_token }}'
+        },
+        success: function( data ) 
+        {
+            if(data.message=='Please enter correct OTP')
+            {
+                alert('Please enter correct OTP or Generate a new one');
+                ab=ab+1;
+                if(ab>2)
+                {
+                    location.reload();
+                }
+            }
+            else
+            {
+                alert('Phone number verified');
+                $.ajax(
+                {
+                    type:"POST",
+                    url: "{% url 'employer:cupd_phone' pk=pk %}",
+                    data:{
+                        'phone': text1,
+                        csrfmiddlewaretoken: '{{ csrf_token }}'
+                    },
+                    success: function( data ) 
+                    {
+                    }
+                })
+                location.reload();
+            }
+        }
+        })
+    })
+
+
+{% endblock %}

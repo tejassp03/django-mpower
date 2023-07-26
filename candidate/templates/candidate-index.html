@@ -197,8 +197,11 @@
                         </div>
                     </div>
                 </div>
-                <nav class="pxp-user-nav pxp-on-light">
+                <nav class="pxp-user-nav pxp-on-light d-flex justify-content-between align-items-center">
+                    <div style="cursor:pointer;" onclick="redirectOnboarding();"><b>Onboarding Status: </b><span class="badge rounded-pill bg-success">Approved</span></div>
+                   <div class="nav-right-group d-flex flex-row" >
                     <div class="dropdown pxp-user-nav-dropdown pxp-user-notifications">
+                       
                         <a role="button" class="dropdown-toggle" data-bs-toggle="dropdown">
                             <span class="fa fa-bell-o"></span>
                             {% if request.session.notifnum != 0%}
@@ -241,6 +244,8 @@
                             <li><a class="dropdown-item" href="{% url 'candidate:logout' pk=pk %}">Logout</a></li>
                         </ul>
                     </div>
+                   </div>
+                    
                 </nav>
             </div>
 
@@ -533,6 +538,11 @@
         <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.17.1/moment.min.js"></script>
         {% comment %} <script src="{% static 'js/main.js' %}"></script> {% endcomment %}
         <script>
+            function redirectOnboarding() {
+                var url = "{% url 'candidate:onboarding' pk %}";
+                window.location.href = url;
+            }
+
             $(document).ready(function () {
                 $(".profileimage").each(function(i, el) {
                     el.innerHTML = '{{request.session.name}}'[0]

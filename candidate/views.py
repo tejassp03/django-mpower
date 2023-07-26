@@ -580,7 +580,12 @@ def fetchmess(request, pk):
     thread=dumps(list(Threads.objects.filter(msg_id=request.GET['employer']).values()), default=str)
     messa=dumps(list(Messages.objects.filter(msg_id=request.GET['employer'], receiver_user=user.log_id, is_read=False).values()), default=str)
     company=dumps(list(Employer.objects.filter(log_id=comp_log).values()), default=str)
-    urlval=Employer.objects.filter(log_id=comp_log)[0].logo.url
+    try:
+        urlval = Employer.objects.filter(log_id=comp_log)[0].logo.url
+    except ValueError:
+    # Handle the case where 'logo' attribute has no file associated
+        urlval = None  # Set a default value or handle the error accordingly
+
     return JsonResponse({'message': 'Y', 'url': "", 'mess': messages, 'thre': temp_threads, 'count': count, 'thread': thread, 'company': company ,'messa': messa, 'all_mess': mess_all, 'image': urlval, 'unread': dumps(ind_unread), 'rece': dumps(rece)})
 
 def seenmes(request, pk):
@@ -737,6 +742,9 @@ def notifications(request, pk):
     return render(request, 'notification-candidate.html', {'pk': pk, 'notif': page_obj, 'count': count})
 
 
+def onboarding(request,pk):
+
+    return render(request, 'onboarding.html', {'pk': pk})
 def applications(request, pk):
     if request.method=="POST":
         if 'act' in request.POST:

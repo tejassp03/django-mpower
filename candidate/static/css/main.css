@@ -307,11 +307,15 @@ section .option_list .option .icon{
 
 footer{
     height: 60px;
-    padding: 0 30px;
+    width: 100%;
+    z-index: -10;
+    padding: 30px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    border-top: 1px solid lightgrey;
+    justify-content: center;
+    position: absolute;
+    
+
 }
 
 footer .total_que span{

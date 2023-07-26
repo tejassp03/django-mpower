@@ -1,0 +1,322 @@
+{% extends 'employer-index.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}
+<title>mpower - Company dashboard - Candidates</title>
+{% endblock %}
+{% block content %}
+
+<div class="pxp-dashboard-content-details">
+    <h1>Candidates</h1>
+    <p class="pxp-text-light">Detailed list of candidates that applied for your job offers.</p>
+
+    <div class="mt-4 mt-lg-5">
+        <div class="row justify-content-between align-content-center">
+            <div class="col-auto order-2 order-sm-1">
+                <div class="pxp-company-dashboard-jobs-bulk-actions mb-3">
+                    <select class="form-select" name="act">
+                        <option value="a">Bulk actions</option>
+                        <option value="c">Approve</option>
+                        <option value="d">Reject</option>
+                        <option value="b">Delete</option>
+                    </select>
+                    <button class="btn ms-2" onclick="multiple()">Apply</button>
+                </div>
+            </div>
+            <div class="col-auto order-1 order-sm-2">
+                <div class="pxp-company-dashboard-jobs-search mb-3">
+                    <div class="pxp-company-dashboard-jobs-search-results me-3">{{ count }} candidates</div>
+                    <div class="pxp-company-dashboard-jobs-search-search-form">
+                        <div class="input-group">
+                            <span class="input-group-text" style="background: white"><span class="fa fa-search"></span></span>
+                            <input type="text" class="form-control" placeholder="Search candidates..." id="search">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle" id="table">
+                <thead>
+                    <tr>
+                        <th class="pxp-is-checkbox" style="width: 1%;"><input type="checkbox" onClick="toggle(this)" class="form-check-input" name="all"></th>
+                        <th colspan="2" style="width: 25%;">Name</th>
+                        <th style="width: 20%;">Applied for</th>
+                        <th style="width: 15%;">Status</th>
+                        <th>Date<span class="fa fa-angle-up ms-3"></span></th>
+                        <th>&nbsp;</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for i in pe %}
+                    <tr>
+                        <td><input type="checkbox" class="form-check-input" name="chek" value={{ i.apply_id }}></td>
+                        <td style="width: 3%;">
+                            {% if i.photo %}
+                            <div class="pxp-company-dashboard-candidate-avatar pxp-cover" style="background-image: url('{{i.photo.url}}');"></div>
+                            {% else %}
+                            <div class="pxp-company-dashboard-candidate-avatar pxp-cover" style="background-image: url('/static/images/company-logo-1.png');"></div>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="#">
+                                <div class="pxp-company-dashboard-job-title" id="pxp-candidate-modal-button" data-bs-target="#pxp-candidate-modal" data-bs-toggle="modal" onclick="candidatemodal('{{i.user_id}}')">{{ i.name }}</div>
+                                {% if i.location %}
+                                <div class="pxp-company-dashboard-job-location"><span class="fa fa-globe me-1"></span>{{ i.location }}</div>
+                                {% else %}
+                                <div class="pxp-company-dashboard-job-location"><span class="fa fa-globe me-1"></span>Not Specified</div>
+                                {% endif %}
+                            </a>
+                        </td>
+                        <td><div class="pxp-company-dashboard-job-category">{{ i.title }}</div></td>
+                        {% if i.status == 0 %}
+                        <td><div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-secondary">Applied</span></div></td>
+                        {% elif i.status == 1 %}
+                        <td><div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-success">Approved</span></div></td>
+                        {% elif i.status == 2 %}
+                        <td><div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-danger">Rejected</span></div></td>
+                        {% endif %}
+                        <td>
+                            <div class="pxp-company-dashboard-job-date">{{ i.date_applied }}</div>
+                        </td>
+                        <td>
+                            <div class="pxp-dashboard-table-options">
+                                <ul class="list-unstyled">
+                                    <li><button title="View profile" id="pxp-candidate-modal-button" data-bs-target="#pxp-candidate-modal" data-bs-toggle="modal" onclick="candidatemodal('{{i.user_id}}')"><span class="fa fa-eye"></span></button></li>
+                                    <li><button title="Send message" onclick="messageclick({{i.log_id}})"><span class="fa fa-envelope-o"></span></button></li>
+                                    <li><button title="Approve" onclick="approve({{i.apply_id}})"><span class="fa fa-check"></span></button></li>
+                                    <li><button title="Reject" onclick="reject({{i.apply_id}})"><span class="fa fa-ban"></span></button></li>
+                                    <li><button title="Delete" onclick="delcan({{i.apply_id}})"><span class="fa fa-trash-o"></span></button></li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <div class="row mt-4 mt-lg-5 justify-content-between align-items-center">
+                <div class="col-auto">
+                    <nav class="mt-3 mt-sm-0" aria-label="Candidates pagination">
+                        <ul class="pagination pxp-pagination">
+                            {% if pe.has_previous %}
+                                {% if GET_params %}
+                                <li class="page-item"><a href="?{{GET_params.urlencode}}&amp;page={{pe.previous_page_number}}" class="page-link"><i class="fa fa-chevron-left" aria-hidden="true"></i></a></li>
+                                {% else %}
+                                <li class="page-item"><a href="?page={{pe.previous_page_number}}" class="page-link"><i class="fa fa-chevron-left" aria-hidden="true"></i></a></li>
+                                {% endif %}
+                            {% endif %}
+
+                            {% if pe.number|add:'-4' > 1 %}
+                                {% if GET_params %}
+                                <li class="page-item"><a href="?{{GET_params.urlencode}}&amp;page={{ pe.number|add:'-5' }}" class="page-link">&hellip;</a></li>
+                                {% else %}
+                                <li class="page-item"><a href="?page={{ pe.number|add:'-5' }}" class="page-link">&hellip;</a></li>
+                                {% endif %}
+                            {% endif %}
+
+                            {% for i in pe.paginator.page_range %}
+                                {% if pe.number == i %}
+                                    <li class="page-item active" aria-current="page">
+                                        <span class="page-link">{{pe.number}}</span>
+                                    </li>
+                                {% elif i > pe.number|add:'-5' and i < pe.number|add:'5' %}
+                                    {% if GET_params %}
+                                    <li class="page-item"><a href="?{{GET_params.urlencode}}&amp;page={{ i }}" class="page-link">{{i}}</a></li>
+                                    {% else %}
+                                    <li class="page-item"><a href="?page={{ i }}" class="page-link">{{i}}</a></li>
+                                    {% endif %}
+                                {% endif %}
+                            {% endfor %}
+
+                            {% if pe.paginator.num_pages > pe.number|add:'4' %}
+                                {% if GET_params %}
+                                <li class="page-item"><a href="?{{GET_params.urlencode}}&amp;page={{ pe.number|add:'5' }}" class="page-link">&hellip;</a></li>
+                                {% else %}
+                                <li class="page-item"><a href="?page={{ pe.number|add:'5' }}" class="page-link">&hellip;</a></li>
+                                {% endif %}
+                            {% endif %}
+
+                            {% if pe.has_next %}
+                                {% if GET_params %}
+                                <li class="page-item"><a href="?{{GET_params.urlencode}}&amp;page={{ pe.next_page_number }}" class="page-link"><i class="fa fa-chevron-right" aria-hidden="true"></i></a></li>
+                                {% else %}
+                                <li class="page-item"><a href="?page={{pe.next_page_number}}" class="page-link"><i class="fa fa-chevron-right" aria-hidden="true"></i></a></li>
+                                {% endif %}
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+                <div class="col-auto">
+                    <a href="#" class="btn rounded-pill pxp-section-cta mt-3 mt-sm-0">Show me more<span class="fa fa-angle-right"></span></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content%}
+
+{% block script %}
+$(document).ready(function () {
+    $('#cdas').removeClass('pxp-active');
+    $('#cedi').removeClass('pxp-active');
+    $('#cnew').removeClass('pxp-active');
+    $('#cman').removeClass('pxp-active');
+    $('#ccan').addClass('pxp-active');
+    $('#csub').removeClass('pxp-active');
+    $('#ccha').removeClass('pxp-active');
+    $('#cinb').removeClass('pxp-active');
+    $('#cnot').removeClass('pxp-active');
+    $('#scn').removeClass('pxp-active');
+})
+
+var $rows = $('#table tbody tr');
+$('#search').keyup(function() {
+    var val = $.trim($(this).val()).replace(/ +/g, ' ').toLowerCase();
+    
+    $rows.show().filter(function() {
+        var text = $(this).text().replace(/\s+/g, ' ').toLowerCase();
+        return !~text.indexOf(val);
+    }).hide();
+});
+
+
+$("[name='chek']").change(function(){
+    let a=0;
+    checkboxes = document.getElementsByName('chek');
+    let n=checkboxes.length
+    for(let i=0;i<n;i++) {
+      if(checkboxes[i].checked==false)
+      {
+        a=a+1;
+      }
+    }
+    if(a==0)
+    {
+        $("[name=all]").prop('checked', true);
+    }
+    else
+    {
+        $("[name=all]").prop('checked', false);
+    }
+})
+function toggle(source) {
+    checkboxes = document.getElementsByName('chek');
+    for(var i=0, n=checkboxes.length;i<n;i++) {
+      checkboxes[i].checked = source.checked;
+    }
+  }
+
+function delcan(id)
+{
+    $.ajax(
+        {
+            type:"POST",
+            url: "",
+            data:{
+                    'apply_id': id,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function( data ) 
+            {
+                location.reload()
+            }
+    })
+}
+
+function approve(id)
+{
+    $.ajax(
+        {
+            type:"POST",
+            url: "",
+            data:{
+                    'apply_id': id,
+                    'approve': "y",
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function( data ) 
+            {
+                location.reload()
+            }
+    })
+}
+
+function reject(id)
+{
+    $.ajax(
+        {
+            type:"POST",
+            url: "",
+            data:{
+                    'apply_id': id,
+                    'reject': "y",
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function( data ) 
+            {
+                location.reload()
+            }
+    })
+}
+
+function multiple()
+{
+    let action=$("[name='act']").val();
+    let actvalue="";
+    if(action=='a')
+    {
+        alert("Please select an appropriate action")
+        return;
+    }
+    let ids=[];
+    $("[name='chek']:checked").map(function () {
+        ids.push(this.value);
+    })
+    if(ids.length==0)
+    {
+        if(action=='b')
+        {
+            alert("Please select at least one of the records to apply delete operation");
+        }
+        else if(action=='c')
+        {
+            alert("Please select at least one of the records to apply approve operation");
+        }
+        else if(action=='d')
+        {
+            alert("Please select at least one of the records to apply reject operation");
+        }
+        return;
+    }
+    if(action=='b')
+    {
+        actvalue="delall";
+    }
+    else if(action=='c')
+    {
+        actvalue="appall";
+    }
+    else if(action=='d')
+    {
+        actvalue="rejall";
+    }
+    $.ajax(
+        {
+            type:"POST",
+            url: "",
+            data:{
+                    'ids': ids,
+                    'act': actvalue,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function( data ) 
+            {
+                location.reload()
+            }
+    })
+}
+
+
+{% endblock %}

@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate,login
 from django.contrib import messages
-from .models import JobSeeker, Login, Employer, ResumeAnalysis, Jobs, LikedJobs, Application, Interview, Feedback, Newsletter, Course, AllSkills, RoleDetails
+from .models import Admin, JobSeeker, Login, Employer, ResumeAnalysis, Jobs, LikedJobs, Application, Interview, Feedback, Newsletter, Course, AllSkills, RoleDetails
 import random
 import re
 from django.contrib.auth.hashers import make_password, check_password
@@ -175,6 +175,26 @@ def user_login(request):
 				return redirect('main:user_login')
 		else:
 			return render(request, 'sign-in.html')
+		
+def admin_login(request):
+		if request.method == 'POST':
+			username = request.POST['email']
+			password = request.POST['pass']
+			user=Login.objects.filter(email=request.POST['email'])
+			if(len(user)==0):
+				return JsonResponse({'message': 'X'})
+			elif(check_password(request.POST['c_pass'], user[0].password)):
+				login(request, user)
+				admin = Admin.objects.get(log_id=user[0].log_id)
+				request.session['name'] = admin.aname
+				request.session['pk'] = admin.aid
+				request.session['type'] = "admin"
+				return redirect('main:mpoweradmin',pk=admin.aid)
+			else:
+				messages.success(request, 'Invalid username or password')
+				return redirect('main:admin_login')
+		else:
+			return render(request, 'admin-login.html')
 
 def register(request):
 	if request.method=='POST':
@@ -189,7 +209,7 @@ def register(request):
 			messages.error(request, "Both your password and your confirmation password must be exactly same")
 			return redirect('main:index')
 		if not re.fullmatch(r'^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$', request.POST['password']):
-			messages.error(request, "Please entere a valid password")
+			messages.error(request, "Please enter a valid password")
 			return redirect('main:index')
 		user=Login()
 		user.email = request.POST['email']
@@ -213,8 +233,69 @@ def register(request):
 			employer.ename = request.POST['name']
 			employer.save()
 			messages.success(request, 'Successfully Registered')
-			return redirect('main:eprofile', pk=user.log_id)
+			return redirect('main:emp_completion', pk=user.log_id)
+		elif request.POST['user'] == "admin":
+			admin = Admin()
+			rand_num = random.randint(0, 1000000000)
+			admin.aid = rand_num
+			admin.log_id = user
+			admin.aname = request.POST['name']
+			admin.save()
+			messages.success(request, 'Successfully Registered')
+			return redirect('main:admin_completion', pk=user.log_id)
+
 	return render(request, 'sign-up.html')
+
+def admin_register(request):
+	if request.method=='POST':
+		if request.POST['name']=="" or request.POST['email']=="" or request.POST['password']=="" or request.POST['conpass']=="":
+			messages.error(request, "Dont forget to fill out every field with the appropriate information")
+			return redirect('main:admin_register')
+		all_login = Login.objects.filter(email = request.POST['email'])
+		if(len(all_login)!=0):
+			messages.success(request, 'Email address already in use, please enter some other email')
+			return redirect('main:admin_register')
+		if(request.POST['password']!=request.POST['conpass']):
+			messages.error(request, "Both your password and your confirmation password must be exactly same")
+			return redirect('main:admin_register')
+		if not re.fullmatch(r'^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$', request.POST['password']):
+			messages.error(request, "Please enter a valid password")
+			return redirect('main:admin_register')
+		user=Login()
+		user.email = request.POST['email']
+		user.password = make_password(request.POST['password'])
+		user.user_type = request.POST['user']
+		user.save()
+		if(request.POST['user']=="candidate"):
+			jobseeker = JobSeeker()
+			rand_num = random.randint(0, 1000000000)
+			jobseeker.user_id = rand_num
+			jobseeker.log_id = user
+			jobseeker.name = request.POST['name']
+			jobseeker.save()
+			messages.success(request, 'Successfully Registered')
+			return redirect('main:profilecompletion', pk=user.log_id)
+		elif(request.POST['user']=="employer"):
+			employer=Employer()
+			rand_num = random.randint(0, 1000000000)
+			employer.eid = rand_num
+			employer.log_id = user
+			employer.ename = request.POST['name']
+			employer.save()
+			messages.success(request, 'Successfully Registered')
+			return redirect('main:emp_completion', pk=user.log_id)
+		elif request.POST['user'] == "admin":
+			admin = Admin()
+			rand_num = random.randint(0, 1000000000)
+			admin.aid = rand_num
+			admin.log_id = user
+			admin.aname = request.POST['name']
+			admin.email = request.POST['email']
+			admin.save()
+			messages.success(request, 'Successfully Registered')
+			return redirect('main:admin_completion', pk=user.log_id)
+
+	return render(request, 'admin-signup.html')
 
 def blog(request):
 	return render(request, 'blog-list-1.html')
@@ -554,7 +635,6 @@ def course_recommender(course_list):
             break
     return rec_course
 
-
 def emp_completion(request, pk):
 	if request.method=="POST":
 		if(request.POST['code']=="" and request.POST['mobile']=="" and request.POST['etype']=="" and request.POST['industry']=="" and request.POST['executive']==""  and len(request.FILES)==0 and request.POST['address']=="" and request.POST['pincode']=="" and request.POST['location']=="" and request.POST['profile']==""):
@@ -592,6 +672,36 @@ def emp_completion(request, pk):
 	if(len(Login.objects.filter(log_id=pk, user_type="employer"))==0):
 		return redirect('main:index')
 	return render(request, 'emp_completion.html')
+
+def admin_completion(request, pk):
+    if request.method == "POST":
+        if request.POST['arole'] == "" and request.POST['mobile'] == "":
+            messages.success(request, 'Please enter at least one of the fields')
+            return redirect('main:admin_completion', pk=pk)
+        
+        admin = Admin.objects.get(log_id=pk)
+        admin.arole = request.POST['arole']
+        admin.phone = request.POST['mobile']
+        admin.save()
+        
+        loger = Login.objects.get(log_id=pk)
+        request.session['email'] = loger.email
+        request.session['password'] = loger.password
+        request.session['name'] = admin.aname
+        request.session['pk'] = admin.aid
+        request.session['type'] = "admin"
+
+        
+        loger.status = 1
+        loger.save()
+        
+        return redirect("mpoweradmin:cdashboard", pk=admin.aid)
+    
+    if len(Login.objects.filter(log_id=pk, user_type="admin")) == 0:
+        return redirect('main:index')
+    
+    return render(request, 'admin_completion.html')
+
 
 
 def returnvalue(phone):
@@ -711,10 +821,10 @@ def singlejob(request, pk2):
 		for skill in skills:
 			if skill in text:
 				quality += 3
-
     # Check for other parameters such as location, position suitability, etc.
 		if jobdet.location.lower() in text:
 			quality += 3
+			
 
 		if jobdet.title.lower() in text:
 			quality += 2
@@ -728,7 +838,7 @@ def singlejob(request, pk2):
 
 # Print the quality score
 
-	return render(request, 'singlejob.html', {'job_details': jobdet, 'company_details': companydet, 'liked': lik, 'loger': loger, 'skills': skills, 'requirements': requirements, 'responsibilities': responsibilities, 'date': app_date, 'score': quality*10, 'skills_required': skills_required})
+	return render(request, 'singlejob.html', {'job_details': jobdet, 'company_details': companydet, 'liked': lik, 'loger': loger, 'skills': skills, 'requirements': requirements, 'responsibilities': responsibilities, 'date': app_date, 'score': quality+50, 'skills_required': skills_required})
 
 def singlecompany(request, pk2):
 	cominfo=Employer.objects.get(eid=pk2)

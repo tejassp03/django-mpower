@@ -14,6 +14,7 @@ urlpatterns = [
     path('post_o/', views.post_o, name='post_o'),
     path('upd_phone/', views.upd_phone, name='upd_phone'),
 	path('change/', views.change, name='change'),
+	path('onboarding/', views.onboarding, name='onboarding'),
 	path('favjobs/', views.favjobs, name='favjobs'),
 	path('favjobs/jobapp/', views.jobapp, name='jobapp'),
 	path('edit_profile/add_skill/', views.add_skill, name='add_skill'),

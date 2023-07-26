@@ -1,0 +1,346 @@
+{% extends 'employer-index.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}
+<title>mpower - Company dashboard - Pending Actions</title>
+{% endblock %}
+{% block content %}
+
+
+<div class="pxp-dashboard-content-details">
+    <h1>Pending Actions</h1>
+    <p class="pxp-text-light">Future actions on candidates that have applied</p>
+
+    <div class="mt-4 mt-lg-5">
+        <div class="row justify-content-between align-content-center">
+            <div class="col-auto order-2 order-sm-1">
+            </div>
+            <div class="col-auto order-1 order-sm-2">
+                <div class="pxp-company-dashboard-jobs-search mb-3">
+                    <div class="pxp-company-dashboard-jobs-search-results me-3">{{ count }} Applications</div>
+                    <div class="pxp-company-dashboard-jobs-search-search-form">
+                        <div class="input-group">
+                            <span class="input-group-text" style="background: white"><span class="fa fa-search"></span></span>
+                            <input type="text" class="form-control" placeholder="Search candidates..." id="search">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle" id="table">
+                <thead>
+                    <tr>
+                        <th style="width: 3%">&nbsp;</th>
+                        <th style="width: 25%;">Name</th>
+                        <th style="width: 20%;">Applied for</th>
+                        <th style="width: 20%;">Apply Date<span class="fa fa-angle-up ms-3"></span></th>
+                        <th style="width: 20%">Current status</th>
+                        <th style="width: 20%;">Pending Action</th>
+                        <th style="width: 20%;">&nbsp;</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for i in pe %}
+                    <tr>
+                        <td>
+                            {% if i.photo %}
+                            <div class="pxp-company-dashboard-candidate-avatar pxp-cover" style="background-image: url('{{i.photo}}');"></div>
+                            {% else %}
+                            <div class="pxp-company-dashboard-candidate-avatar pxp-cover" style="background-image: url('/static/images/company-logo-1.png');"></div>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="#">
+                                <div class="pxp-company-dashboard-job-title" id="pxp-candidate-modal-button" data-bs-target="#pxp-candidate-modal" data-bs-toggle="modal" onclick="candidatemodal('{{i.user_id}}')">{{ i.name }}</div>
+                                <div class="pxp-company-dashboard-job-location"><span class="fa fa-globe me-1"></span>{{ i.location }}</div>
+                            </a>
+                        </td>
+                        <td>
+                            <a href="#">
+                                <div class="pxp-company-dashboard-job-title" onclick="loadermodal('{{i.jobid}}')" data-bs-target="#pxp-job-modal" data-bs-toggle="modal">{{ i.title }}</div>
+                                <div class="pxp-company-dashboard-job-location"><span class="fa fa-globe me-1"></span>{{ i.job_location }}</div>
+                            </a>
+                        </td>
+                        <td><div class="pxp-company-dashboard-job-type">{{ i.apply_date }}</div></td>
+                        {% if i.status == 0 %}
+                        <td><div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-secondary">Applied</span></div></td>
+                        <td><button class="btn rounded-pill pxp-nav-btn" title="Schedule Test" id="pxp-schedule-modal-button" data-bs-target="#pxp-schedule-modal" data-bs-toggle="modal" onclick="setter('{{i.apply_id}}')">Schedule Test</button></td>
+                        {% elif i.status == 4 %}
+                        <td><div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-primary">Test Answered <br> {{ i.results }} %</span></div></td>
+                        <td><button class="btn rounded-pill pxp-nav-btn" title="Schedule Interview" id="pxp-interview-modal-button" data-bs-target="#pxp-results-modal" data-bs-toggle="modal" onclick="resultsmodal('{{i.test_id}}')">Schedule Interview</button></td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <div class="row mt-4 mt-lg-5 justify-content-between align-items-center">
+                <div class="col-auto">
+                    <nav class="mt-3 mt-sm-0" aria-label="Jobs list pagination">
+                        <ul class="pagination pxp-pagination">
+                            {% if count >= 11 %}
+                            {% if pe.has_previous %}
+                                {% if GET_params %}
+                                <li class="page-item"><a style="padding: 0.7rem" href="?{{GET_params.urlencode}}&amp;page={{pe.previous_page_number}}" class="page-link"><i class="fa fa-chevron-left" aria-hidden="true"></i></a></li>
+                                {% else %}
+                                <li class="page-item"><a style="padding: 0.7rem" href="?page={{pe.previous_page_number}}" class="page-link"><i class="fa fa-chevron-left" aria-hidden="true"></i></a></li>
+                                {% endif %}
+                            {% endif %}
+
+                            {% if pe.number|add:'-4' > 1 %}
+                                {% if GET_params %}
+                                <li class="page-item"><a style="padding: 0.7rem" href="?{{GET_params.urlencode}}&amp;page={{ pe.number|add:'-5' }}" class="page-link">&hellip;</a></li>
+                                {% else %}
+                                <li class="page-item"><a style="padding: 0.7rem" href="?page={{ pe.number|add:'-5' }}" class="page-link">&hellip;</a></li>
+                                {% endif %}
+                            {% endif %}
+
+                            {% for i in pe.paginator.page_range %}
+                                {% if pe.number == i %}
+                                    <li class="page-item active" aria-current="page">
+                                        <span style="padding: 0.7rem" class="page-link">{{pe.number}}</span>
+                                    </li>
+                                {% elif i > pe.number|add:'-5' and i < pe.number|add:'5' %}
+                                    {% if GET_params %}
+                                    <li class="page-item"><a style="padding: 0.7rem" href="?{{GET_params.urlencode}}&amp;page={{ i }}" class="page-link">{{i}}</a></li>
+                                    {% else %}
+                                    <li class="page-item"><a style="padding: 0.7rem" href="?page={{ i }}" class="page-link">{{i}}</a></li>
+                                    {% endif %}
+                                {% endif %}
+                            {% endfor %}
+
+                            {% if pe.paginator.num_pages > pe.number|add:'4' %}
+                                {% if GET_params %}
+                                <li class="page-item"><a style="padding: 0.7rem" href="?{{GET_params.urlencode}}&amp;page={{ pe.number|add:'5' }}" class="page-link">&hellip;</a></li>
+                                {% else %}
+                                <li class="page-item"><a style="padding: 0.7rem" href="?page={{ pe.number|add:'5' }}" class="page-link">&hellip;</a></li>
+                                {% endif %}
+                            {% endif %}
+
+                            {% if pe.has_next %}
+                                {% if GET_params %}
+                                <li class="page-item"><a style="padding: 0.7rem" href="?{{GET_params.urlencode}}&amp;page={{ pe.next_page_number }}" class="page-link"><i class="fa fa-chevron-right" aria-hidden="true"></i></a></li>
+                                {% else %}
+                                <li class="page-item"><a style="padding: 0.7rem" href="?page={{pe.next_page_number}}" class="page-link"><i class="fa fa-chevron-right" aria-hidden="true"></i></a></li>
+                                {% endif %}
+                            {% endif %}
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+                <div class="col-auto">
+                    {% comment %} <a href="#" class="btn rounded-pill pxp-section-cta mt-3 mt-sm-0">Show me more<span class="fa fa-angle-right"></span></a> {% endcomment %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade pxp-user-modal" id="pxp-edit-modal" aria-hidden="true" aria-labelledby="expModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered" style="
+    display: flex;
+    align-items: center;
+    justify-content: center;">
+        <div class="modal-content" style="width: 100vw; display: flex; flex-direction: row; align-items: center">
+            <div class="modal-body" style="width: 70vw; padding: 15px 15px !important">
+                <div class="pxp-dashboard-content-details" style="margin-right:0px; box-shadow: none; padding: 0px">
+                    <form>
+                        <div class="row mt-4 mt-lg-5">
+                            <div class="col-xxl-6">
+                                <div class="mb-3">
+                                    <label for="pxp-company-job-title" class="form-label">Job title</label>
+                                    <input type="text" id="pxp-company-job-title" class="form-control" placeholder="Add title" name="title">
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-xxl-3">
+                                <label for="pxp-company-job-location" class="form-label">Location</label>
+                                <input type="text" id="pxp-company-job-location" class="form-control" placeholder="E.g. San Francisco, CA" name="location">
+                            </div>
+                            <div class="col-md-6 col-xxl-3">
+                                <div class="mb-3">
+                                    <label for="pxp-company-job-category" class="form-label">Category</label>
+                                    <select id="pxp-company-job-category" class="form-select" name="fnarea">
+                                        <option>Select a category</option>
+                                        <option>Marketing & Communication</option>
+                                        <option>Software Engineering</option>
+                                        <option>Project Management</option>
+                                        <option>Finance</option>
+                                        <option>Retail</option>
+                                        <option>Sales</option>
+                                        <option>Manufacturing</option>
+                                        <option>IT</option>
+                                        <option>Business Development</option>
+                                        <option>Human Resources</option>
+                                        <option>Customer Service</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                
+                        <div class="mb-3">
+                            <label for="pxp-company-job-description" class="form-label">Job description</label>
+                            <textarea class="form-control" id="pxp-company-job-description" placeholder="Type the description here..." name="description"></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="pxp-company-job-description" class="form-label">Skills</label>
+                            <textarea class="form-control" id="pxp-company-job-description" placeholder="Type the skills here..." name="skills"></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="pxp-company-job-description" class="form-label">Responsibilities</label>
+                            <textarea class="form-control" id="pxp-company-job-description" placeholder="Type the responsibilities here..." name="responsibilities"></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="pxp-company-job-description" class="form-label">Requirements</label>
+                            <textarea class="form-control" id="pxp-company-job-description" placeholder="Type the requirements here..." name="requirements"></textarea>
+                        </div>
+                
+                        <div class="row">
+                            <div class="col-md-6 col-xxl-3">
+                                <div class="mb-3">
+                                    <label for="pxp-company-job-experience" class="form-label">Experience</label>
+                                    <input type="text" id="pxp-company-job-experience" class="form-control" placeholder="E.g. Minimum 3 years" name="experience">
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-xxl-3">
+                                <div class="mb-3">
+                                    <label for="pxp-company-job-level" class="form-label">Career level</label>
+                                    <select id="pxp-company-job-level" class="form-select" name="careerlevel">
+                                        <option>No Experience</option>
+                                        <option>Entry-Level</option>
+                                        <option>Mid-Level</option>
+                                        <option>Senior-Level</option>
+                                        <option>Manager / Executive</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-xxl-3">
+                                <div class="mb-3">
+                                    <label for="pxp-company-job-type" class="form-label">Employment type</label>
+                                    <select id="pxp-company-job-type" class="form-select" name="jobtype">
+                                        <option>Full Time</option>
+                                        <option>Part Time</option>
+                                        <option>Remote</option>
+                                        <option>Internship</option>
+                                        <option>Contract</option>
+                                        <option>Training</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-xxl-3">
+                                <div class="mb-3">
+                                    <label for="pxp-company-job-salary" class="form-label">Salary range</label>
+                                    <select id="pxp-company-job-salary" class="form-select" name="basicpay">
+                                        <option value="1">$0 - $700</option>
+                                        <option value="2">$700 - $1000</option>
+                                        <option value="3">$1000 - $1200</option>
+                                        <option value="4">$1200 - $1400</option>
+                                        <option value="5">$1500 - $1800</option>
+                                        <option value="6">$2000 - $3000</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <input style="display: none" name="jobidm">
+                <button class="btn rounded-pill pxp-subsection-cta" onclick="jobmodalsub()">Edit Job</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade pxp-user-modal" id="pxp-schedule-modal" aria-hidden="true" aria-labelledby="scheduleModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered widthadjuster" style="justify-content: center">
+        <div class="modal-content" style="width: 40rem">
+            <div class="modal-header" style="padding: 10px">
+                Please select the test
+            </div>
+            <hr style="margin: 0px" />
+            <div class="modal-body" style="padding: 1rem !important">
+                <div class="pxp-company-dashboard-jobs-bulk-actions" style="margin-left: auto">
+                    <select class="form-select" name="testinfo">
+                            {% for i in test %}
+                            <option value="{{ i.testinfoid }}">
+                            {{ i.test_name }}
+                            </option>
+                            {% endfor %}
+                    </select>
+                    <button class="btn ms-2" onclick="scheduletest()">Schedule</button>
+                </div>
+            </div>
+            <div>
+                <input type="datetime-local">
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content%}
+
+{% block script %}
+$(document).ready(function () {
+    $('#cdas').removeClass('pxp-active');
+    $('#cedi').removeClass('pxp-active');
+    $('#cnew').removeClass('pxp-active');
+    $('#cman').removeClass('pxp-active');
+    $('#ccan').removeClass('pxp-active');
+    $('#csub').removeClass('pxp-active');
+    $('#ccha').removeClass('pxp-active');
+    $('#cinb').removeClass('pxp-active');
+    $('#cnot').removeClass('pxp-active');
+    $('#scn').removeClass('pxp-active');
+    $('#qui').removeClass('pxp-active');
+    $('#inr').removeClass('pxp-active');
+    $('#pen').addClass('pxp-active');
+})
+
+var $rows = $('#table tbody tr');
+$('#search').keyup(function() {
+    var val = $.trim($(this).val()).replace(/ +/g, ' ').toLowerCase();
+    
+    $rows.show().filter(function() {
+        var text = $(this).text().replace(/\s+/g, ' ').toLowerCase();
+        return !~text.indexOf(val);
+    }).hide();
+});
+
+let user;
+
+function setter(id)
+{
+    user=id;
+}
+function scheduletest()
+{
+    let ids=[];
+    $("[name='chek']:checked").map(function () {
+        ids.push(this.value);
+    })
+    $.ajax(
+    {
+        type:"POST",
+        url: "{% url 'employer:schedule' pk %}",
+        data:{
+                id: user,
+                ids: ids,
+                testinfoid: $("[name='testinfo']").val(),
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+        },
+        success: function( data ) 
+        {
+            if(data['message']=="X")
+            {
+                alert('Test already scheduled');
+            }
+            location.reload();
+        }
+    })
+}
+{% endblock %}

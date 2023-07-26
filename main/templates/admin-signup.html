@@ -1,0 +1,317 @@
+{% load static %}
+<!doctype html>
+<html lang="en" class="pxp-root">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <link rel="shortcut icon" href="images/favicon.png" type="image/x-icon">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600;700&display=swap" rel="stylesheet">
+        <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+        <link rel="stylesheet" href="{% static 'css/font-awesome.min.css' %}">
+        <link rel="stylesheet" href="{% static 'css/owl.carousel.min.css' %}">
+        <link rel="stylesheet" href="{% static 'css/owl.theme.default.min.css' %}">
+        <link rel="stylesheet" href="{% static 'css/animate.css' %}">
+        <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+        <title>mpower - Sign up</title>
+
+    </head>
+
+    <body>
+        {% if messages %}
+        {% for message in messages %}
+         {% if message.tags %}  
+         <script>alert('{{ message }}')</script>
+        {% endif %}
+
+        {% endfor %}
+
+        {% endif %}
+        <div class="pxp-preloader"><span>Loading...</span></div>
+
+        <header class="pxp-header fixed-top">
+            <div class="pxp-container">
+                <div class="pxp-header-container">
+                    <div class="pxp-logo">
+                        <a href="index.html" class="pxp-animate"><span style="color: var(--pxpMainColor)">m</span>power</a>
+                    </div>
+                    <div class="pxp-nav-trigger navbar d-xl-none flex-fill">
+                        <a role="button" data-bs-toggle="offcanvas" data-bs-target="#pxpMobileNav" aria-controls="pxpMobileNav">
+                            <div class="pxp-line-1"></div>
+                            <div class="pxp-line-2"></div>
+                            <div class="pxp-line-3"></div>
+                        </a>
+                        <div class="offcanvas offcanvas-start pxp-nav-mobile-container" tabindex="-1" id="pxpMobileNav">
+                            <div class="offcanvas-header">
+                                <div class="pxp-logo">
+                                    <a href="index.html" class="pxp-animate"><span style="color: var(--pxpMainColor)">m</span>power</a>
+                                </div>
+                                <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                            </div>
+                        </div>
+                    </div>
+                   
+                </div>
+            </div>
+        </header>
+
+        <section class="pxp-hero vh-100" style="background-color: var(--pxpMainColorLight);">
+            <div class="row align-items-center pxp-sign-hero-container">
+                <div class="col-xl-6 pxp-column">
+                    <div class="pxp-sign-hero-fig text-center pb-100 pt-100">
+                        <img src="/static/images/signup-big-fig.png" alt="Sign up">
+                        <h1 class="mt-4 mt-lg-5">Create an account</h1>
+                    </div>
+                </div>
+                <div class="col-xl-6 pxp-column pxp-is-light">
+                    <div class="pxp-sign-hero-form pb-100 pt-100">
+                        <div class="row justify-content-center">
+                            <div class=" w-92 col-lg-4 col-xl-7 col-xxl-12 px-10">
+                                <div class="pxp-sign-hero-form-content" style="
+                                justify-content: center;
+                                ">
+                                    
+                                    <form class="mt-4" method="post" enctype="multipart/form-data">
+                                        {% csrf_token %}
+                                        <div>
+                                     
+                                                
+                                                <form class="mt-4" method="post" action="{% url 'main:admin_register' %}">
+                                                    {% csrf_token %}
+                                                    <input value="admin" style="display: none" name="user" />
+                                                    <div class="form-floating mb-3">
+                                                        <input type="text" class="form-control" id="pxp-signin-page-email" name="name" placeholder="Company Name">
+                                                        <label for="pxp-signin-page-email">Enter your Name</label>
+                                                        <span class="fa fa-user"></span>
+                                                    </div>
+                                                    <div class="form-floating mb-3">
+                                                        <input type="email" class="form-control" id="pxp-signup-email" placeholder="Email address" name="email">
+                                                        <label for="pxp-signup-email">Email address</label>
+                                                        <span class="fa fa-envelope-o"></span>
+                                                    </div>
+                                                    <div class="form-floating mb-3">
+                                                        <input type="password" class="form-control" id="pxp-signup-password" placeholder="Create password" name="password">
+                                                        <label for="pxp-signup-password">Create password</label>
+                                                        <span class="fa fa-lock"></span>
+                                                    </div>
+                                                    <div class="form-floating mb-3">
+                                                        <input type="password" class="form-control" id="pxp-signup-password" placeholder="Confirm password" name="conpass">
+                                                        <label for="pxp-signup-password">Confirm password</label>
+                                                        <span class="fa fa-lock"></span>
+                                                    </div>
+                                                    <input type="submit" value="Sign Up" class="btn rounded-pill pxp-modal-cta" style="width: 100%">
+                                                    <div class="mt-4 text-center pxp-modal-small">
+                                                        Already have an account? <a role="button" class="" data-bs-target="#pxp-signin-modal" data-bs-toggle="modal">Sign in</a>
+                                                    </div>
+                                                </form>
+                                     
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <div class="modal fade pxp-user-modal" id="pxp-signin-modal" aria-hidden="true" aria-labelledby="signinModal" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="pxp-user-modal-fig text-center">
+                            <img src="/static/images/signin-fig.png" alt="Sign in">
+                        </div>
+                        <h5 class="modal-title text-center mt-4" id="signinModal">Welcome back!</h5>
+                        <form class="mt-4">
+                            <div class="form-floating mb-3">
+                                <input type="email" class="form-control" id="pxp-signin-email" placeholder="Email address">
+                                <label for="pxp-signin-email">Email address</label>
+                                <span class="fa fa-envelope-o"></span>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input type="password" class="form-control" id="pxp-signin-password" placeholder="Password">
+                                <label for="pxp-signin-password">Password</label>
+                                <span class="fa fa-lock"></span>
+                            </div>
+                            <a href="#" class="btn rounded-pill pxp-modal-cta">Continue</a>
+                            <div class="mt-4 text-center pxp-modal-small">
+                                <a href="#" class="pxp-modal-link">Forgot password</a>
+                            </div>
+                            <div class="mt-4 text-center pxp-modal-small">
+                                New to mpower? <a role="button" class="" data-bs-target="#pxp-signup-modal" data-bs-toggle="modal" data-bs-dismiss="modal">Create an account</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade pxp-user-modal" id="pxp-signup-modal" aria-hidden="true" aria-labelledby="signupModal" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="pxp-user-modal-fig text-center">
+                            <img src="/static/images/signup-big-fig.png" alt="Sign up">
+                        </div>
+                        <h5 class="modal-title text-center mt-4" id="signupModal">Create an account</h5>
+                        <form class="mt-4">
+                            <div class="form-floating mb-3">
+                                <input type="email" class="form-control" id="pxp-signup-email" placeholder="Email address">
+                                <label for="pxp-signup-email">Email address</label>
+                                <span class="fa fa-envelope-o"></span>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input type="password" class="form-control" id="pxp-signup-password" placeholder="Create password">
+                                <label for="pxp-signup-password">Create password</label>
+                                <span class="fa fa-lock"></span>
+                            </div>
+                            <a href="#" class="btn rounded-pill pxp-modal-cta">Continue</a>
+                            <div class="mt-4 text-center pxp-modal-small">
+                                Already have an account? <a role="button" class="" data-bs-target="#pxp-signin-modal" data-bs-toggle="modal">Sign in</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="{% static 'js/jquery-3.4.1.min.js' %}"></script>
+        <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+        <script src="{% static 'js/owl.carousel.min.js' %}"></script>
+        <script src="{% static 'js/nav.js' %}"></script>
+        <script src="{% static 'js/main.js' %}"></script>
+        <script>
+            var count = 1;
+var radioCount = 2;
+var totalRadioCount = 2;
+var questionRadioCount = "2";
+var totalQuestionCount = 1;
+var latestQuestionID = 1;
+
+// [sq#, radioCount]
+var questionRadioCountArray = [[1, 2]];
+            function addQuestion() {
+                count++;
+                totalQuestionCount++;
+                latestQuestionID++;
+                radioCount = 1;
+                totalRadioCount++;
+                updateCountOnForm(count);
+            
+                latestQuestionID = Math.max(latestQuestionID, totalQuestionCount);
+            
+            
+            
+            
+                const questionDiv = document.createElement('div');
+                questionDiv.setAttribute('id', `sq${totalQuestionCount}`);
+                questionDiv.setAttribute('class', `single_question${totalQuestionCount} Ques`);
+            
+            
+                const individualQuestion = document.createElement('div');
+                individualQuestion.setAttribute('class', 'individualQuestion');
+            
+                
+                const question = document.createElement('input');
+                question.setAttribute('class', 'form-control specialInputQuestions');
+                question.setAttribute('type', 'text');
+                question.setAttribute('placeholder', 'Question');
+                question.setAttribute('id', `question${totalQuestionCount}`);
+                question.setAttribute('name', `question`);
+            
+                const deleteButton = document.createElement('a');
+                deleteButton.setAttribute('class', 'btn delete_button');
+                deleteButton.setAttribute('id', `${totalQuestionCount}`);
+                deleteButton.setAttribute('onclick', 'deleteQuestion(this.id)');
+            
+                const deleteIcon = document.createElement('i');
+                deleteButton.setAttribute('class', 'fa fa-trash');
+                
+                deleteButton.appendChild(deleteIcon);
+            
+                individualQuestion.appendChild(question);
+                individualQuestion.appendChild(deleteButton);
+            
+            
+                
+                questionDiv.appendChild(individualQuestion);
+                
+                updateRadioCountOnForm(totalRadioCount);
+                
+                var quest=document.getElementById('questioneer');
+                quest.appendChild(questionDiv);
+            
+            
+            
+            
+                questionRadioCountArray.push([totalQuestionCount, radioCount]);
+            
+                rdc(questionRadioCountArray);
+            }
+            function updateCountOnForm(count) {
+                var countKeeper = document.getElementById('QuestionCount');
+                countKeeper.value = count; 
+            }
+            
+            function updateRadioCountOnForm(totalRadioCount) {
+                var countKeeper = document.getElementById('radioCount');
+                countKeeper.value = totalRadioCount; 
+            }
+            
+            function rdc(questionRadioCountArray) {
+                var questionRadioCountString = document.getElementById('rdc');
+                questionRadioCountString.value = questionRadioCountArray;
+            }
+
+            function deleteQuestion(questionID) {
+                
+                
+                var classNameOfQuestionToRemove = "sq" + questionID;
+                const element = document.getElementById(classNameOfQuestionToRemove);
+                
+                element.remove();
+                count--;
+                updateCountOnForm(count);
+                totalRadioCount = totalRadioCount - radioCount;
+                updateRadioCountOnForm(totalRadioCount);
+                
+                questionID = parseInt(questionID);
+                if (questionID == totalQuestionCount) {
+                    totalQuestionCount--;
+                }
+                
+                
+                
+                
+                
+                var firstArray = [];
+                for (var i = 0; i < questionRadioCountArray.length; i++) {
+                    firstArray.push(questionRadioCountArray[i][0]);
+                }    
+                var index = firstArray.indexOf(questionID);
+                questionRadioCountArray.splice(index, 1);
+                
+                console.log(questionRadioCountArray[questionRadioCountArray.length-1]);
+                latestQuestionID = parseInt(questionRadioCountArray[questionRadioCountArray.length-1][0]);
+                
+                var double = questionRadioCountArray.pop();
+                radioCount = double.pop();
+                double.push(radioCount);
+                questionRadioCountArray.push(double);
+                rdc(questionRadioCountArray);
+            }
+        </script>
+    </body>
+</html>
+

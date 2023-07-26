@@ -1,0 +1,87 @@
+{% extends 'employer-index.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}
+<title>mpower - Company dashboard - Subscriptions</title>
+{% endblock %}
+{% block content %}
+
+
+<div class="pxp-dashboard-content-details">
+    <h1>Subscriptions</h1>
+    <p class="pxp-text-light">History of all your subscriptions.</p>
+
+    <div class="mt-4 mt-lg-5">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th style="width: 25%;">Subscription plan</th>
+                        <th style="width: 25%;">Status</th>
+                        <th style="width: 25%;">Expiration date<span class="fa fa-angle-up ms-3"></span></th>
+                        <th>&nbsp;</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><div class="pxp-company-dashboard-subscriptions-plan">Basic</div></td>
+                        <td><div class="pxp-company-dashboard-subscriptions-status"><span class="badge rounded-pill bg-success">Active</span></div></td>
+                        <td><div class="pxp-company-dashboard-job-date">2021/11/24</div></td>
+                        <td>
+                            <div class="pxp-dashboard-table-options">
+                                <ul class="list-unstyled">
+                                    <li><button title="Cancel subscription"><span class="fa fa-ban"></span></button></li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><div class="pxp-company-dashboard-subscriptions-plan">Standard</div></td>
+                        <td><div class="pxp-company-dashboard-subscriptions-status"><span class="badge rounded-pill bg-danger">Expired</span></div></td>
+                        <td><div class="pxp-company-dashboard-job-date">2021/09/01</div></td>
+                        <td><div class="pxp-company-dashboard-job-options">&nbsp;</div></td>
+                    </tr>
+                    <tr>
+                        <td><div class="pxp-company-dashboard-subscriptions-plan">Professional</div></td>
+                        <td><div class="pxp-company-dashboard-subscriptions-status"><span class="badge rounded-pill bg-danger">Expired</span></div></td>
+                        <td><div class="pxp-company-dashboard-job-date">2021/09/01</div></td>
+                        <td><div class="pxp-company-dashboard-job-options">&nbsp;</div></td>
+                    </tr>
+                    <tr>
+                        <td><div class="pxp-company-dashboard-subscriptions-plan">Extended</div></td>
+                        <td><div class="pxp-company-dashboard-subscriptions-status"><span class="badge rounded-pill bg-danger">Expired</span></div></td>
+                        <td><div class="pxp-company-dashboard-job-date">2021/09/01</div></td>
+                        <td><div class="pxp-company-dashboard-job-options">&nbsp;</div></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <div class="pxp-footer-copyright pxp-text-light">© 2021 mpower. All Right Reserved.</div>
+</footer>
+</div>
+
+{% endblock content%}
+
+{% block script %}
+$(document).ready(function () {
+$('#cdas').removeClass('pxp-active');
+$('#cedi').removeClass('pxp-active');
+$('#cnew').removeClass('pxp-active');
+$('#cman').removeClass('pxp-active');
+$('#ccan').removeClass('pxp-active');
+$('#csub').addClass('pxp-active');
+$('#ccha').removeClass('pxp-active');
+$('#cinb').removeClass('pxp-active');
+$('#cnot').removeClass('pxp-active');
+$('#scn').removeClass('pxp-active');
+$('#qui').removeClass('pxp-active');
+$('#inr').removeClass('pxp-active');
+$('#pen').removeClass('pxp-active');
+})
+
+{% endblock %}

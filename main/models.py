@@ -62,6 +62,18 @@ class Employer(models.Model):
     class Meta:
         db_table = "employer"
 
+class Admin(models.Model):
+    aid = models.AutoField(primary_key=True)
+    log_id = models.ForeignKey(Login, default=None, null=True, on_delete=models.CASCADE)
+    aname = models.CharField(max_length=100, default=None, null=True)
+    arole = models.CharField(max_length=100, default=None, null=True)
+    phone = models.CharField(max_length=100, default=None, null=True)
+    email = models.EmailField(max_length=100, default=None, null=True)
+    # profile_picture = models.ImageField(upload_to='admin_profiles/', default=None, blank=True, null=True)
+    class Meta:
+        db_table = "admin"
+
+
 class Jobs(models.Model):
     jobid = models.AutoField(primary_key=True)
     eid = models.ForeignKey(Employer, default=None, null=True, on_delete=models.CASCADE)

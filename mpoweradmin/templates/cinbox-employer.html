@@ -1,0 +1,660 @@
+{% extends 'employer-index.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}
+<title>mpower - Company dashboard - Inbox</title>
+{% endblock %}
+{% block content %}
+
+        
+<div class="pxp-dashboard-content-details">
+    <h1>Inbox</h1>
+    <p class="pxp-text-light">Keep in touch with your candidates.</p>
+
+    <div class="row mt-4 mt-lg-5">
+        <div class="col-xxl-4">
+            <div class="pxp-dashboard-inbox-search-form">
+                <div class="input-group">
+                    <span class="input-group-text" style="background: white"><span class="fa fa-search"></span></span>
+                    <input type="text" class="form-control" placeholder="Search messages..." id="search">
+                </div>
+            </div>
+
+            <div class="mt-3 mt-lg-4 pxp-dashboard-inbox-list">
+                <ul class="list-unstyled" id="table">
+                    {% for i in threads %}
+                    <li onclick="caller({{ i.msg_id }}, {{ mess }}, {{ thre }})" id={{i.msg_id}} class="threads">
+                        <a href="#" class="pxp-dashboard-inbox-list-item">
+                            <div class="pxp-dashboard-inbox-list-item-top">
+                                <div class="pxp-dashboard-inbox-list-item-left">
+                                    {% if i.photo %}
+                                    <div class="pxp-dashboard-inbox-list-item-avatar pxp-cover" style="background-image: url('{{ i.photo.url }}');"></div>
+                                    {% else %}
+                                    <div class="pxp-dashboard-inbox-list-item-avatar pxp-cover" style="back);"></div>
+                                    {% endif %}
+                                    <div class="pxp-dashboard-inbox-list-item-name ms-2">{{ i.name }}</div>
+                                </div>
+                                <div class="pxp-dashboard-inbox-list-item-right">
+                                    <div class="pxp-dashboard-inbox-list-item-time">{{ i.date|date:"M d" }}</div>
+                                </div>
+                            </div>
+                            <div class="mt-2 d-flex justify-content-between">
+                                {% if i.end == "y" %}
+                                <div class="pxp-dashboard-inbox-list-item-text pxp-text-light idrec{{i.msg_id}}" id="you{{i.msg_id}}" style="text-overflow: ellipsis; word-wrap: nowrap; overflow: hidden">You: {{ i.body }}</div>
+                                <div class="pxp-dashboard-inbox-list-item-no ms-3"><span class="badge rounded-pill" id="count{{i.msg_id}}"></span></div>
+                                {% elif i.end == "c" %}
+                                <div class="pxp-dashboard-inbox-list-item-text pxp-text-light idrec{{i.msg_id}}" id="they{{i.msg_id}}" style="text-overflow: ellipsis; word-wrap: nowrap; overflow: hidden">{{ i.name }}: {{ i.body }}</div>
+                                <div class="pxp-dashboard-inbox-list-item-no ms-3"><span class="badge rounded-pill" id="count{{i.msg_id}}"></span></div>
+                                {% endif %}
+                            </div>
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        <div class="col-xxl-8" id="messages-shower">
+            <div class="pxp-dashboard-inbox-messages-container">
+                {% if threads|length == 0 %}
+                {% elif shower != "" %}
+                <input style="display: none" class="sho" id={{shower}} value={{shower}} />
+                {% else %}
+                <div class="pxp-dashboard-inbox-messages-header" style="background: var(--pxpMainColorLight)">
+                    <div class="pxp-dashboard-inbox-list-item-left">
+                        {% if threads.0.photo %}
+                        <div class="pxp-dashboard-inbox-list-item-avatar pxp-cover" style="background-image: url('{{ threads.0.photo.url }}');"></div>
+                        {% else %}
+                        <div class="pxp-dashboard-inbox-list-item-avatar pxp-cover" style="background-image: url();"></div>
+                        {% endif %}
+                        <div class="pxp-dashboard-inbox-list-item-name ms-2">{{ threads.0.name }}</div>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <div class="pxp-dashboard-inbox-list-item-options">
+                            <button title="Delete conversation" onclick="deletemess({{threads.0.msg_id}})"><span class="fa fa-trash-o"></span></button>
+                        </div>
+                        <button class="btn rounded-pill pxp-dashboard-inbox-messages-close-btn d-inline-block d-xxl-none"><span class="fa fa-angle-left"></span> Back</button>
+                    </div>
+                </div>
+                <div class="pxp-dashboard-inbox-messages-content">
+                    {% for i in m.0 %}
+                    {% if i.receiver_user|stringformat:'s' != threads.0.receiver|stringformat:'s' %}
+                    <div class="pxp-dashboard-inbox-messages-item">
+                        <div class="row">
+                            <div class="col-7">
+                                <div class="pxp-dashboard-inbox-messages-item-header">
+                                    {% if threads.0.photo %}
+                                    <div class="pxp-dashboard-inbox-messages-item-avatar pxp-cover" style="background-image: url('{{ threads.0.photo.url }}');"></div>
+                                    {% else %}
+                                    <div class="pxp-dashboard-inbox-messages-item-avatar pxp-cover" style="background-image: url();"></div>
+                                    {% endif %}
+                                    <div class="pxp-dashboard-inbox-messages-item-name ms-2">{{ threads.0.name }}</div>
+                                    <div class="pxp-dashboard-inbox-messages-item-time pxp-text-light ms-3">{{ i.date }}</div>
+                                </div>
+                                <div class="pxp-dashboard-inbox-messages-item-message pxp-is-other mt-2">
+                                    {{ i.body }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="pxp-dashboard-inbox-messages-item mt-4">
+                        <div class="row justify-content-end">
+                            <div class="col-7">
+                                <div class="pxp-dashboard-inbox-messages-item-header flex-row-reverse">
+                                    {% if request.session.photo %}
+                                    <div class="pxp-dashboard-inbox-messages-item-avatar pxp-cover" style="background-image: url('{{ request.session.photo }}');"></div>
+                                    {% else %}
+                                    <div class="pxp-dashboard-inbox-messages-item-avatar pxp-cover" style="background-image: url();"></div>
+                                    {% endif %}
+                                    <div class="pxp-dashboard-inbox-messages-item-name me-2">You</div>
+                                    <div class="pxp-dashboard-inbox-messages-item-time pxp-text-light me-3">{{ i.date }}</div>
+                                </div>
+                                <div class="pxp-dashboard-inbox-messages-item-message pxp-is-self mt-2">
+                                    {{ i.body }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                    </div>
+                    <div class="pxp-dashboard-inbox-messages-footer" style="background: var(--pxpMainColorLight)">
+                        <div class="pxp-dashboard-inbox-messages-footer-field">
+                            <input type="text" class="form-control" placeholder="Type your message here..." name="message" style="background: var(--pxpMainColorLight)">
+                            <input type="text" class="form-control" placeholder="Type your message here..." name="candidate" style="display: none" value={{ threads.0.msg_id }}>
+                        </div>
+                        <div class="pxp-dashboard-inbox-messages-footer-btn">
+                            <button class="btn rounded-pill pxp-section-cta" id="sender1">Send</button>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content%}
+
+{% block script %}
+
+if($('.sho').val())
+{
+    caller($('.sho').val(), '{{mess}}', '{{thre}}')
+}
+
+var $rows = $('#table li');
+$('#search').keyup(function() {
+    var val = $.trim($(this).val()).replace(/ +/g, ' ').toLowerCase();
+    
+    $rows.show().filter(function() {
+        var text = $(this).text().replace(/\s+/g, ' ').toLowerCase();
+        return !~text.indexOf(val);
+    }).hide();
+});
+
+$(document).ready(function () {
+    $('#cdas').removeClass('pxp-active');
+    $('#cedi').removeClass('pxp-active');
+    $('#cnew').removeClass('pxp-active');
+    $('#cman').removeClass('pxp-active');
+    $('#ccan').removeClass('pxp-active');
+    $('#csub').removeClass('pxp-active');
+    $('#ccha').removeClass('pxp-active');
+    $('#cinb').addClass('pxp-active');
+    $('#cnot').removeClass('pxp-active');
+    $('#scn').removeClass('pxp-active');
+    $('#qui').removeClass('pxp-active');
+    $('#inr').removeClass('pxp-active');
+    $('#pen').removeClass('pxp-active');
+    if('{{shower}}')
+    {
+        $('.threads').removeClass('pxp-active');
+        let finalid="#"+'{{shower}}'
+        $(finalid).addClass('pxp-active');
+    }
+    else
+    {
+        if({{threads|length}})
+        {
+            let ab='#'+{{ threads.0.msg_id }};
+            $(ab).addClass('pxp-active')
+        }
+    }
+    $('.pxp-dashboard-inbox-messages-content').scrollTop($('.pxp-dashboard-inbox-messages-content')[0].scrollHeight);
+    $('#sender1').click(function(e){
+        e.preventDefault();
+        $.ajax(
+        {
+            type:"POST",
+            url: "sendmess/",
+            data:{
+                    candidate: $('[name="candidate"]').val(),
+                    message: $('[name="message"]').val(),
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function( data ) 
+            {
+                caller(data['id'], data['m'], data['thre'])
+            }
+         })
+    })
+
+    {% comment %} if({{threads|length}})
+    {
+        let ab='#'+{{ threads.0.msg_id }};
+        $(ab).addClass('pxp-active')
+    } {% endcomment %}
+    setInterval(mesRec, 10000);
+    function mesRec()
+    {
+    $.ajax(
+    {
+        type:"GET",
+        url: "fetch/",
+        data:{
+                candidate: $('[name="candidate"]').val(),
+        },
+        success: function( data ) 
+        {
+            let recent=JSON.parse(data['rece']);
+            for(let i=0;i<recent.length;i++)
+            {
+                let idrec=".idrec"+recent[i].msg_id;
+                $(idrec).text(recent[i].body);
+            }
+            let unread=JSON.parse(data['unread']);
+            for(let i=0;i<unread.length;i++)
+            {
+                let idval='#count'+unread[i][0];
+                if(unread[i][1]>0)
+                {
+                    $(idval).text(unread[i][1]);
+                }
+                else
+                {
+                    $(idval).text("");
+                }
+            }
+            if(data['message']=='X')
+            {
+                return;
+            }
+            if(window.innerWidth >= 1400 )
+            {
+                $.ajax(
+                {
+                    type:"POST",
+                    url: "seen/",
+                    data:{
+                            candidate: $('[name="candidate"]').val(),
+                            csrfmiddlewaretoken: '{{ csrf_token }}'
+                    },
+                    success: function( data ) 
+                    {
+                        if(data['message']=='X')
+                        {
+                            return;
+                        }
+                        let mpower="";
+                    },
+                    async: false
+                })
+            }
+            let mes=data['messa'];
+            let thre=data['thread'];
+            let company=data['company'];
+            let ms=JSON.parse(mes);
+            let tempele=$('.pxp-dashboard-inbox-messages-content');
+            let flag=0;
+            let ans;
+            let urlval=data['image']
+            for(let i=0;i<ms.length;i++)
+            {            
+                if(ms[i])
+                {
+                if(ms[i].receiver_user_id!= JSON.parse(thre)[0].receiver_id)
+                {
+                    let itemdiv=document.createElement('div');
+                    itemdiv.setAttribute('class', 'pxp-dashboard-inbox-messages-item')
+                    let rowdiv=document.createElement('div');
+                    rowdiv.setAttribute('class', 'row')
+                    let coldiv=document.createElement('div');
+                    coldiv.setAttribute('class', 'col-7')
+                    let ithediv=document.createElement('div');
+                    ithediv.setAttribute('class', 'pxp-dashboard-inbox-messages-item-header')
+                    let firindiv=document.createElement('div');
+                    firindiv.setAttribute('class', 'pxp-dashboard-inbox-messages-item-avatar pxp-cover')
+                    if(JSON.parse(company)[0].photo)
+                    {
+                        ans='url('+urlval+')';
+                        firindiv.style.backgroundImage=ans
+                    }
+                    else
+                    {
+                        firindiv.style.backgroundImage='url({% static 'images/company-logo-2.png' %})';
+                    }
+                    let secindiv=document.createElement('div');
+                    secindiv.setAttribute('class', 'pxp-dashboard-inbox-messages-item-name ms-2')
+                    secindiv.innerHTML=JSON.parse(company)[0].name
+                    let thiindiv=document.createElement('div');
+                    thiindiv.setAttribute('class', 'pxp-dashboard-inbox-messages-item-time pxp-text-light ms-3')
+                    thiindiv.innerHTML=moment(ms[i].date.slice(0, 19)).format("MMM. D, YYYY, h:mm a")
+                    ithediv.append(firindiv);
+                    ithediv.append(secindiv);
+                    ithediv.append(thiindiv);
+                    let indiv=document.createElement('div');
+                    indiv.setAttribute('class', 'pxp-dashboard-inbox-messages-item-message pxp-is-other mt-2')
+                    indiv.innerHTML=ms[i].body
+                    coldiv.append(ithediv);
+                    coldiv.append(indiv);
+                    rowdiv.append(coldiv);
+                    itemdiv.append(rowdiv);
+                    tempele.append(itemdiv)
+                }
+                else
+                {
+                    let itemdiv=document.createElement('div');
+                    itemdiv.setAttribute('class', 'pxp-dashboard-inbox-messages-item mt-4')
+                    let rowdiv=document.createElement('div');
+                    rowdiv.setAttribute('class', 'row justify-content-end')
+                    let coldiv=document.createElement('div');
+                    coldiv.setAttribute('class', 'col-7')
+                    let ithediv=document.createElement('div');
+                    ithediv.setAttribute('class', 'pxp-dashboard-inbox-messages-item-header flex-row-reverse')
+                    let firindiv=document.createElement('div');
+                    firindiv.setAttribute('class', 'pxp-dashboard-inbox-messages-item-avatar pxp-cover')
+                    let imageLetterdiv=document.createElement('div');
+                    if("{{request.session.photo}}")
+                    {
+                        firindiv.style.backgroundImage='url({{request.session.photo}})';
+                    }
+                    else
+                    {
+                        imageLetterdiv.setAttribute('class', 'profileimage')
+                    }
+                    firindiv.append(imageLetterdiv);
+                    let secindiv=document.createElement('div');
+                    secindiv.setAttribute('class', 'pxp-dashboard-inbox-messages-item-name me-2')
+                    secindiv.innerHTML='You'
+                    let thiindiv=document.createElement('div');
+                    thiindiv.setAttribute('class', 'pxp-dashboard-inbox-messages-item-time pxp-text-light me-3')
+                    thiindiv.innerHTML=moment(ms[i].date.slice(0, 19)).format("MMM. D, YYYY, h:mm a")
+                    ithediv.append(firindiv);
+                    ithediv.append(secindiv);
+                    ithediv.append(thiindiv);
+                    let indiv=document.createElement('div');
+                    indiv.setAttribute('class', 'pxp-dashboard-inbox-messages-item-message pxp-is-self mt-2')
+                    indiv.innerHTML=ms[i].body
+                    coldiv.append(ithediv);
+                    coldiv.append(indiv);
+                    rowdiv.append(coldiv);
+                    itemdiv.append(rowdiv);
+                    tempele.append(itemdiv)
+                }
+            }
+            }
+        },
+        async: false
+     })
+     $(".profileimage").each(function(i, el) {
+        el.innerHTML = '{{request.session.name}}'[0]
+    })
+    }
+})
+
+function deletemess(id)
+{
+    $.ajax(
+    {
+        type:"POST",
+        url: "delete/",
+        data:{
+                candidate: id,
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+        },
+        success: function( data ) 
+        {
+            location.reload();
+        }, 
+        async: false
+     })
+}
+
+function caller(id, mess, thre1)
+{
+    let idval='#count'+id;
+    $(idval).text("");
+    $('.threads').removeClass('pxp-active');
+    let ab='#'+id;
+    $(ab).addClass('pxp-active')  
+    $.ajax(
+    {
+        type:"POST",
+        url: "seen/",
+        data:{
+                candidate: id,
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+        },
+        success: function( data ) 
+        {
+            let mpower="";
+        }, 
+        async: false
+     })
+     let th=thre1;
+     let mes=mess;
+     let ms=[];
+     let thre;
+     let company;
+     let urlval;
+     $.ajax(
+    {
+        type:"GET",
+        url: "fetch/",
+        data:{
+            candidate: id
+        },
+        success: function( data ) 
+        {
+            th=data['thre'];
+            mes=data['all_mess'];
+            company=data['company'];
+            urlval=data['image'];
+        },
+        async: false
+    })
+    for(let j=0;j<JSON.parse(th[0]).length;j++)
+    {
+        if(JSON.parse(th[0])[j].msg_id==id)
+        {
+            thre=JSON.parse(th[0])[j]
+        }
+    }
+    for (let i = 0; i < mes.length; i++) {
+        if(JSON.parse(mes[i])[0])
+        {
+            if(JSON.parse(mes[i])[0].msg_id_id==id)
+            {
+            ms=JSON.parse(mes[i]);
+            }
+        }
+    }
+    $('.pxp-dashboard-inbox-messages-container').remove();
+
+let headerdiv=document.createElement('div');
+headerdiv.setAttribute('class', 'pxp-dashboard-inbox-messages-header');
+headerdiv.setAttribute('style', 'background: var(--pxpMainColorLight)')
+let photodiv=document.createElement('div');
+photodiv.setAttribute('class', 'pxp-dashboard-inbox-list-item-left');
+let avatardiv=document.createElement('div');
+avatardiv.setAttribute('class', 'pxp-dashboard-inbox-list-item-avatar pxp-cover');
+if(JSON.parse(company)[0].photo)
+{
+    let ans='url('+urlval+')';
+    avatardiv.style.backgroundImage=ans
+}
+else
+{
+    avatardiv.style.backgroundImage='url({% static 'images/company-logo-2.png' %})';
+}
+let namediv=document.createElement('div');
+namediv.setAttribute('class', 'pxp-dashboard-inbox-list-item-name ms-2');
+namediv.innerHTML=JSON.parse(company)[0].name;
+photodiv.append(avatardiv);
+photodiv.append(namediv);
+let deleterdiv=document.createElement('div');
+deleterdiv.setAttribute('class', 'd-flex align-items-center');
+let icondiv=document.createElement('div');
+icondiv.setAttribute('class', 'pxp-dashboard-inbox-list-item-options');
+let iconbutton=document.createElement('button');
+iconbutton.setAttribute('title', 'Delete conversation');
+let spandiv=document.createElement('span');
+spandiv.setAttribute('class', 'fa fa-trash-o');
+// icondiv.append(iconbutton);
+let backbutton=document.createElement('button');
+backbutton.setAttribute('class', 'btn rounded-pill pxp-dashboard-inbox-messages-close-btn d-inline-block d-xxl-none');
+let backspan=document.createElement('span');
+backspan.setAttribute('class', 'fa fa-angle-left');
+backspan.innerHTML=' Back';
+let deleteicondiv=document.createElement('div');
+deleteicondiv.setAttribute('class', 'pxp-dashboard-inbox-list-item-options');
+let delbutton=document.createElement('button');
+delbutton.setAttribute('title', 'Delete conversation');
+let callerfunction="deletemess("+id+")";
+delbutton.setAttribute('onclick', callerfunction);
+let spandeldiv=document.createElement('span');
+spandeldiv.setAttribute('class', 'fa fa-trash-o');
+delbutton.append(spandeldiv);
+deleteicondiv.append(delbutton);
+backbutton.append(backspan);
+deleterdiv.append(icondiv);
+deleterdiv.append(deleteicondiv);
+deleterdiv.append(backbutton);
+headerdiv.append(photodiv);
+headerdiv.append(deleterdiv);
+
+
+let topdiv=document.createElement('div');
+topdiv.setAttribute('class', 'pxp-dashboard-inbox-messages-container pxp-show');
+topdiv.append(headerdiv);
+
+
+
+let firstDiv=document.createElement('div')
+firstDiv.setAttribute('class', 'pxp-dashboard-inbox-messages-content')
+for(let i=0;i<ms.length;i++)
+{
+    if(ms[i].receiver_user_id != thre.receiver_id)
+    {
+        let itemdiv=document.createElement('div');
+        itemdiv.setAttribute('class', 'pxp-dashboard-inbox-messages-item')
+        let rowdiv=document.createElement('div');
+        rowdiv.setAttribute('class', 'row')
+        let coldiv=document.createElement('div');
+        coldiv.setAttribute('class', 'col-7')
+        let ithediv=document.createElement('div');
+        ithediv.setAttribute('class', 'pxp-dashboard-inbox-messages-item-header')
+        let firindiv=document.createElement('div');
+        firindiv.setAttribute('class', 'pxp-dashboard-inbox-messages-item-avatar pxp-cover')
+        let imageLetterdiv=document.createElement('div');
+        if(JSON.parse(company)[0].photo)
+        {
+            ans='url('+urlval+')';
+            firindiv.style.backgroundImage=ans
+        }
+        else
+        {
+            firindiv.style.backgroundImage='url({% static 'images/company-logo-2.png' %})';
+        }
+        firindiv.append(imageLetterdiv);
+        let secindiv=document.createElement('div');
+        secindiv.setAttribute('class', 'pxp-dashboard-inbox-messages-item-name ms-2')
+        secindiv.innerHTML=JSON.parse(company)[0].name
+        let thiindiv=document.createElement('div');
+        thiindiv.setAttribute('class', 'pxp-dashboard-inbox-messages-item-time pxp-text-light ms-3')
+        thiindiv.innerHTML=moment(ms[i].date.slice(0, 19)).format("MMM. D, YYYY, h:mm a")
+        ithediv.append(firindiv);
+        ithediv.append(secindiv);
+        ithediv.append(thiindiv);
+        let indiv=document.createElement('div');
+        indiv.setAttribute('class', 'pxp-dashboard-inbox-messages-item-message pxp-is-other mt-2')
+        indiv.innerHTML=ms[i].body
+        coldiv.append(ithediv);
+        coldiv.append(indiv);
+        rowdiv.append(coldiv);
+        itemdiv.append(rowdiv);
+        firstDiv.append(itemdiv)
+    }
+    else
+    {
+        let itemdiv=document.createElement('div');
+        itemdiv.setAttribute('class', 'pxp-dashboard-inbox-messages-item mt-4')
+        let rowdiv=document.createElement('div');
+        rowdiv.setAttribute('class', 'row justify-content-end')
+        let coldiv=document.createElement('div');
+        coldiv.setAttribute('class', 'col-7')
+        let ithediv=document.createElement('div');
+        ithediv.setAttribute('class', 'pxp-dashboard-inbox-messages-item-header flex-row-reverse')
+        let firindiv=document.createElement('div');
+        firindiv.setAttribute('class', 'pxp-dashboard-inbox-messages-item-avatar pxp-cover')
+        let imageLetterdiv=document.createElement('div');
+        if("{{request.session.photo}}")
+        {
+            firindiv.style.backgroundImage='url({{request.session.photo}})';
+        }
+        else
+        {
+            imageLetterdiv.setAttribute('class', 'profileimage')
+        }
+        firindiv.append(imageLetterdiv);
+        let secindiv=document.createElement('div');
+        secindiv.setAttribute('class', 'pxp-dashboard-inbox-messages-item-name me-2')
+        secindiv.innerHTML='You'
+        let thiindiv=document.createElement('div');
+        thiindiv.setAttribute('class', 'pxp-dashboard-inbox-messages-item-time pxp-text-light me-3')
+        thiindiv.innerHTML=moment(ms[i].date.slice(0, 19)).format("MMM. D, YYYY, h:mm a")
+        ithediv.append(firindiv);
+        ithediv.append(secindiv);
+        ithediv.append(thiindiv);
+        let indiv=document.createElement('div');
+        indiv.setAttribute('class', 'pxp-dashboard-inbox-messages-item-message pxp-is-self mt-2')
+        indiv.innerHTML=ms[i].body
+        coldiv.append(ithediv);
+        coldiv.append(indiv);
+        rowdiv.append(coldiv);
+        itemdiv.append(rowdiv);
+        firstDiv.append(itemdiv)
+    }
+}
+
+topdiv.append(firstDiv)
+
+
+let form=document.createElement('form');
+form.setAttribute('method', 'POST');
+let footer=document.createElement('div');
+footer.setAttribute('class', 'pxp-dashboard-inbox-messages-footer');
+footer.setAttribute('style', 'background: var(--pxpMainColorLight)');
+let field=document.createElement('div');
+field.setAttribute('class', 'pxp-dashboard-inbox-messages-footer-field');
+let inp1=document.createElement('input');
+inp1.setAttribute('type', 'text');
+inp1.setAttribute('class', 'form-control');
+inp1.setAttribute('placeholder', 'Type your message here....');
+inp1.setAttribute('name', 'message');
+inp1.setAttribute('style', 'background: var(--pxpMainColorLight)')
+let inp2=document.createElement('input');
+inp2.setAttribute('type', 'text');
+inp2.setAttribute('class', 'form-control');
+inp2.setAttribute('name', 'candidate');
+inp2.style.display='none';
+inp2.setAttribute('value', id);
+field.append(inp1);
+field.append(inp2);
+let fotbtn=document.createElement('div');
+fotbtn.setAttribute('class', 'pxp-dashboard-inbox-messages-footer-btn');
+let sendbtn=document.createElement('button');
+sendbtn.setAttribute('id', 'sender');
+sendbtn.setAttribute('class', 'btn rounded-pill pxp-section-cta');
+sendbtn.innerHTML='Send';
+fotbtn.append(sendbtn);
+footer.append(field);
+footer.append(fotbtn);
+var csrf =document.createElement('input')
+csrf.setAttribute('type','hidden');
+csrf.setAttribute('value','{{ csrf_token }}');
+form.append(csrf);
+form.append(footer);
+topdiv.append(footer);
+$('#messages-shower').append(topdiv);
+$('.pxp-dashboard-inbox-messages-content').scrollTop($('.pxp-dashboard-inbox-messages-content')[0].scrollHeight);
+$('#sender').click(function(e){
+    e.preventDefault();
+    $.ajax(
+    {
+        type:"POST",
+        url: "sendmess/",
+        data:{
+                candidate: $('[name="candidate"]').val(),
+                message: $('[name="message"]').val(),
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+        },
+        success: function( data ) 
+        {
+            caller(data['id'], data['m'], data['thre'])
+        }
+     })
+})
+
+$('.pxp-dashboard-inbox-messages-close-btn').click(function(e){
+    $('.pxp-dashboard-inbox-messages-container').removeClass('pxp-show');
+})
+$(".profileimage").each(function(i, el) {
+    el.innerHTML = '{{request.session.name}}'[0]
+})
+}
+
+
+
+{% endblock %}

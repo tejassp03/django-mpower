@@ -3,7 +3,7 @@
 {% load humanize %}
 
 {% block title %}
-<title>mpower - Company dashboard - All tests</title>
+<title>mpower - Company dashboard - All interviews</title>
 {% endblock %}
 {% block content %}
 
@@ -15,8 +15,8 @@
         {% endif %}
         {% endfor %}
     {% endif %}
-    <h1>All tests</h1>
-    <p class="pxp-text-light">Test that are created to evaluate candidates.</p>
+    <h1>Interviews</h1>
+    <p class="pxp-text-light">Interviews that are scheduled to evaluate candidates.</p>
 
     <div class="mt-4 mt-lg-5">
         <div class="row justify-content-between align-content-center">
@@ -25,6 +25,7 @@
                     <select class="form-select" name="act">
                         <option value="a">Bulk actions</option>
                         {% comment %} <option>Edit</option> {% endcomment %}
+                        <option value="c">Done</option>
                         <option value="b">Delete</option>
                     </select>
                     <button class="btn ms-2" onclick="multiple()">Apply</button>
@@ -32,59 +33,51 @@
             </div>
             <div class="col-auto order-1 order-sm-2">
                 <div class="pxp-company-dashboard-jobs-search mb-3">
-                    <div class="pxp-company-dashboard-jobs-search-results me-3">{{ count }} Tests</div>
+                    <div class="pxp-company-dashboard-jobs-search-results me-3">{{ count }} Interviews</div>
                     <div class="pxp-company-dashboard-jobs-search-search-form">
                         <div class="input-group">
                             <span class="input-group-text" style="background: white"><span class="fa fa-search"></span></span>
-                            <input type="text" class="form-control" placeholder="Search tests..." id="search">
+                            <input type="text" class="form-control" placeholder="Search interviews..." id="search">
                         </div>
                     </div>
-                    {% if count > 0 %}
-                        <div class="pxp-company-dashboard-jobs-bulk-actions">
-                            <a class="btn ms-2" href="{% url 'employer:test' pk %}">Create Test</a>
-                        </div>
-                    {% endif %}
-
                 </div>
             </div>
         </div>
-        {%  if count == 0 %}
-        <div class="pt-5 d-flex flex-column justify-content-center align-items-center">
-        <h4>No Tests to display.</h4>    
-        <div class="pxp-company-dashboard-jobs-bulk-actions"><a class="btn ms-2 mt-2 btn-primary" href="{% url 'employer:test' pk %}">Create Test</a></div>
-        </div>
-        {% else %}
         <div class="table-responsive">
             <table class="table table-hover align-middle" id="table">
                 <thead>
                     <tr>
                         <th class="pxp-is-checkbox" style="width: 1%;"><input type="checkbox" onClick="toggle(this)" class="form-check-input" name="all"></th>
-                        <th style="width: 15%;">Test Name</th>
-                        <th style="width: 15%;">Created Date<span class="fa fa-angle-up ms-3"></span></th>
-                        <th style="width: 15%;">Time limit</th>
-                        <th style="width: 15%;">Questions</th>
+                        <th style="width: 15%;">Name</th>
+                        <th style="width: 15%;">Date<span class="fa fa-angle-up ms-3"></span></th>
+                        <th style="width: 15%;">Link</th>
+                        <th style="width: 15%;">Status</th>
                         <th style="width: 15%;">&nbsp;</th>
                     </tr>
                 </thead>
                 <tbody>
-                    
                     {% for i in pe %}
                     <tr>
-                        <td><input type="checkbox" name="chek" class="form-check-input" value={{ i.test_id }}></td>
+                        <td><input type="checkbox" name="chek" class="form-check-input" value={{ i.int_id }}></td>
                         <td>
                             <a href="#">
-                                <div class="pxp-company-dashboard-job-title" onclick="testmodal('{{i.testinfoid}}')" data-bs-target="#pxp-test-modal" data-bs-toggle="modal">{{ i.name }}</div>
+                                <div class="pxp-company-dashboard-job-title" id="pxp-candidate-modal-button" data-bs-target="#pxp-candidate-modal" data-bs-toggle="modal" onclick="candidatemodal('{{i.user_id}}')">{{ i.name }}</div>
                             </a>
                         </td>
-                        <td><div class="pxp-company-dashboard-job-date mt-1">{{ i.created_date }}</div></td>
-                        <td><div class="pxp-company-dashboard-job-category">{{ i.time_limit }} Minutes</div></td>
-                        <td><a href="#" class="pxp-company-dashboard-job-applications">{{ i.num }}</a></td>
+                        <td><div class="pxp-company-dashboard-job-date mt-1">{{ i.date }}</div></td>
+                        <td><a href={{i.link}} target="_blank" class="pxp-company-dashboard-job-date mt-1">{{ i.link }}</div></td>
+                        {% if i.isdone == 1 %}
+                        <td><div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-success">Done</span></div></td>
+                        {% else %}
+                        <td><div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-secondary">Pending</span></div></td>
+                        {% endif %}
                         <td>
                             <div class="pxp-dashboard-table-options">
                                 <ul class="list-unstyled">
-                                    <li><button title="Edit" id="pxp-test-modal-button" data-bs-target="#pxp-test-modal" data-bs-toggle="modal" onclick="testmodal('{{ i.test_id }}')"><span class="fa fa-eye"></span></button></li>
-                                    <input style="display: none" value={{i.test_id}}>
-                                    <li><button title="Delete" onclick="deltest({{i.test_id}})"><span class="fa fa-trash-o"></span></button></li>
+                                    <li><button title="Feedback Info" onclick="feedb({{i.int_id}})" href="#" data-bs-target="#pxp-feedback-modal" data-bs-toggle="modal"><span class="fa fa-eye"></span></button></li>
+                                    <li><button title="Done" onclick="done({{i.int_id}})"><span class="fa fa-check"></span></button></li>
+                                    <input style="display: none" value={{i.int_id}}>
+                                    <li><button title="Delete" onclick="delint({{i.int_id}})"><span class="fa fa-trash-o"></span></button></li>
                                 </ul>
                             </div>
                         </td>
@@ -152,7 +145,6 @@
                 </div>
             </div>
         </div>
-        {% endif %}
     </div>
 </div>
 
@@ -168,7 +160,7 @@
                                 <div class="col-lg-7 col-xl-8 col-xxl-9">
                                     <div class="row justify-content-between align-items-center mt-4 mt-lg-5">
                                         <div class="col-xl-8 col-xxl-6">
-                                            <h1 id="name"></h1>
+                                            <h1 id="name3"></h1>
                                         </div>
                                     </div>
         
@@ -199,6 +191,33 @@
     </div>
 </div>
 
+
+<div class="modal fade pxp-user-modal" id="pxp-feedback-modal" aria-hidden="true" aria-labelledby="feedbackModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered widthadjuster" style="justify-content: center">
+        <div class="modal-content" style="width: 35rem">
+            <div class="modal-header" style="padding: 10px">
+                <h3 id="user_name2"></h3>
+            </div>
+            <hr style="margin: 0px" />
+            <div class="modal-body" style="padding: 1rem !important">
+                <div class="pxp-company-dashboard-jobs-bulk-actions" style="margin-left: auto; flex-direction: column">
+                    <div id="feedback_link">
+                    </div>
+                </div>
+            </div>
+            <hr style="margin: 0px" />
+            <div class="modal-header" style="padding: 10px">
+                <p id="descri"></p>
+            </div>
+            <hr style="margin: 0px" />
+            <div class="modal-header" style="padding: 10px" id="already_feedback">
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
 {% endblock %}
 
 {% block script %}
@@ -214,8 +233,8 @@ $(document).ready(function () {
     $('#cinb').removeClass('pxp-active');
     $('#cnot').removeClass('pxp-active');
     $('#scn').removeClass('pxp-active');
-    $('#qui').addClass('pxp-active');
-    $('#inr').removeClass('pxp-active');
+    $('#qui').removeClass('pxp-active');
+    $('#inr').addClass('pxp-active');
     $('#pen').removeClass('pxp-active');
 })
 
@@ -257,14 +276,14 @@ function toggle(source) {
     }
 }
 
-function deltest(id)
+function delint(id)
 {
     $.ajax(
         {
             type:"POST",
             url: "",
             data:{
-                    'test_id': id,
+                    'int_id': id,
                     csrfmiddlewaretoken: '{{ csrf_token }}'
             },
             success: function( data ) 
@@ -288,8 +307,24 @@ function multiple()
     })
     if(ids.length==0)
     {
-        alert("Please select at least one of the records to apply delete operation")
+        if(action=="b")
+        {
+            alert("Please select at least one of the records to apply delete operation")
+        }
+        else if(action=="c")
+        {
+            alert("Please select at least one of the records to apply done operation")
+        }
         return;
+    }
+    let act_val="";
+    if(action=="b")
+    {
+        act_val="delall";
+    }
+    else if(action=="c")
+    {
+        act_val="donall";
     }
     $.ajax(
         {
@@ -297,7 +332,7 @@ function multiple()
             url: "",
             data:{
                     'ids': ids,
-                    'act': "delall",
+                    'act': act_val,
                     csrfmiddlewaretoken: '{{ csrf_token }}'
             },
             success: function( data ) 
@@ -307,75 +342,78 @@ function multiple()
     })
 }
 
-
-function testmodal(id)
+function done(id)
 {
     $.ajax(
-    {
-        type:"GET",
-        url: "{% url 'employer:test_info' pk %}",
-        data:{
-                testinfoid: id
-        },
-        success: function( data ) 
         {
-            let datainfo=JSON.parse(data['test']);
-            $('#name').text(datainfo[0].test_name);
-            $('#timelimit').text(datainfo[0].time_limit);
-            $('#created_date').text(JSON.parse(data['date']))
-            let ques=JSON.parse(data['ques']);
-            $('#ind').remove();
-            let maindiv=document.createElement('div');
-            maindiv.setAttribute('id', 'ind');
-            let extern=$('#questions');
-            for(let i=0;i<ques.length;i++)
+            type:"POST",
+            url: "{% url 'employer:done' pk %}",
+            data:{
+                    'id': id,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function( data ) 
             {
-                let div=document.createElement('div');
-                let h4=document.createElement('h4');
-                h4.innerText="Q. "+ques[i].ques_name;
-                div.append(h4);
-                maindiv.append(div);
-                let options=document.createElement('div');
-                let op1=document.createElement('p');
-                op1.innerText="A. "+ques[i].option1;
-                options.append(op1);
-                let op2=document.createElement('p');
-                op2.innerText="B. "+ques[i].option2;
-                options.append(op2);
-                let op3=document.createElement('p');
-                op3.innerText="C. "+ques[i].option3;
-                options.append(op3);
-                let op4=document.createElement('p');
-                op4.innerText="D. "+ques[i].option4;
-                options.append(op4);
-                maindiv.append(options);
-                let corr=document.createElement('h4');
-                let inf=ques[i].correct;
-                let ans="";
-                if(inf==1)
-                {
-                    ans="A";
-                }
-                else if(inf==2)
-                {
-                    ans="B";
-                }
-                else if(inf==3)
-                {
-                    ans="C";
-                }
-                else
-                {
-                    ans="D";
-                }
-                corr.innerText="Correct answer: "+ans;
-                maindiv.append(corr);
-                extern.append(maindiv)
+                location.reload();
             }
-            extern.append(maindiv)
-        }
     })
 }
 
+function feedb(id)
+{
+    $.ajax(
+        {
+            type:"GET",
+            url: "{% url "employer:get_link" pk %}",
+            data:{
+                    'int_id': id
+            },
+            success: function( data ) 
+            {
+                if(data['message']=="X")
+                {
+                    $('#user_name2').text(data['name']);
+                    $('#feedback_link').text("Interview must be completed before giving feedback!");
+                }
+                else
+                {
+                    $('#user_name2').text(data['name']);
+                    $('#feedback_link').text("Link: "+data['url']);
+                    $('#descri').text("Please share this link with other panel members of the interview for feedback");
+                    $('already_feedback').empty();
+                    let mainsec=document.getElementById('already_feedback');
+                    let ul=document.createElement('ul');
+                    let info=data['info'];
+                    if(info[0]==false)
+                    {
+                        if(info[1]==false)
+                        {
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        let li=document.createElement('li');
+                        li.innerHTML="Feedback by candidate: "+info[0];
+                        ul.append(li);
+                        if(info[1]==false)
+                        {
+                            return;
+                        }
+                    }
+                    let li2=document.createElement('li');
+                    li2.innerHTML="Feedback given by panel members: "
+                    ul.append(li2);
+                    for(let i=1;i<info.length;i++)
+                    {
+                        li2=document.createElement('li');
+                        li2.innerHTML=info[i][0]+" : "+info[i][1];
+                        ul.append(li2);
+                    }
+                    mainsec.append(ul);
+                }
+            }
+    })
+}
 
 {% endblock %}

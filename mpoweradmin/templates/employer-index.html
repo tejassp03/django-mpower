@@ -1,0 +1,865 @@
+{% load static %}
+{% load humanize %}
+<!doctype html>
+<html lang="en" class="pxp-root">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <link rel="shortcut icon" href="{% static 'images/favicon.png' %}" type="image/x-icon">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600;700&display=swap" rel="stylesheet">
+        <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.3.0/css/datepicker.css" rel="stylesheet" type="text/css" />
+
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
+        <link href="https://raw.githack.com/ttskch/select2-bootstrap4-theme/master/dist/select2-bootstrap4.css" rel="stylesheet"> <!-- for live demo page -->
+        <link href="select2-bootstrap4.css" rel="stylesheet"> 
+        
+        <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+        <link rel="stylesheet" href="{% static 'css/font-awesome.min.css' %}">
+        <link rel="stylesheet" href="{% static 'css/owl.carousel.min.css' %}">
+        <link rel="stylesheet" href="{% static 'css/owl.theme.default.min.css' %}">
+        <link rel="stylesheet" href="{% static 'css/animate.css' %}">
+        <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+        {% block header %}
+        {% endblock header %}
+
+
+        {% block title %}
+        {% endblock %}
+
+    </head>
+    <body style="background-color: var(--pxpMainColorLight);">
+        {% if messages %}
+            {% for message in messages %}
+            {% if message.tags %}  
+            <script>alert('{{ message }}')</script>
+            {% endif %}
+            {% endfor %}
+        {% endif %}
+        <div class="pxp-preloader"><span>Loading...</span></div>
+
+        <div class="pxp-dashboard-side-panel d-none d-lg-block">
+            <div class="pxp-logo">
+                <a href="{% url 'main:index' %}" class="pxp-animate"><span style="color: var(--pxpMainColor)">m</span>power</a>
+            </div>
+
+            <nav class="mt-3 mt-lg-4 d-flex justify-content-between flex-column pb-100">
+                <div class="pxp-dashboard-side-label">Employer tools</div>
+                <ul class="list-unstyled">
+                    <li id="cdas"><a href="{% url 'employer:cdashboard' pk=pk %}"><span class="fa fa-home"></span>Dashboard</a></li>
+                    <li id="cedi"><a href="{% url 'employer:cedit' pk=pk %}"><span class="fa fa-pencil"></span>Edit Profile</a></li>
+                    <li id="cnew"><a href="{% url 'employer:newjob' pk=pk %}"><span class="fa fa-file-text-o"></span>New Job Offer</a></li>
+                    <li id="cman"><a href="{% url 'employer:manage' pk=pk %}"><span class="fa fa-briefcase"></span>Manage Jobs</a></li>
+                    <li id="ccan"><a href="{% url 'employer:candidates' pk=pk %}"><span class="fa fa-user-circle-o"></span>Candidates</a></li>
+                    <li id="csub"><a href="{% url 'employer:subscriptions' pk=pk %}"><span class="fa fa-credit-card"></span>Subscriptions</a></li>
+                    <li id="ccha"><a href="{% url 'employer:change_pass' pk=pk %}"><span class="fa fa-lock"></span>Change Password</a></li>
+                    <li id="qui"><a href="{% url 'employer:show_tests' pk=pk %}"><span class="fa fa-question"></span>Create Test</a></li>
+                    <li id="inr"><a href="{% url 'employer:all_interviews' pk=pk %}"><span class="fa fa-user"></span>Interviews</a></li>
+                </ul>
+                <div class="pxp-dashboard-side-label mt-3 mt-lg-4">Insights</div>
+                <ul class="list-unstyled">
+                    <li id="cinb">
+                        <a href="{% url 'employer:cinbox' pk=pk %}" class="d-flex justify-content-between align-items-center">
+                            <div><span class="fa fa-envelope-o"></span>Inbox</div>
+                            {% if countunmess == 0 %}
+                            <span class="badge rounded-pill" id="countinbox"></span>
+                            {% else %}
+                            <span class="badge rounded-pill" id="countinbox">{{ countunmess }}</span>
+                            {% endif %}
+                        </a>
+                    </li>
+                    <li id="cnot">
+                        <a href="{% url 'employer:cnotifications' pk=pk %}" class="d-flex justify-content-between align-items-center">
+                            <div><span class="fa fa-bell-o"></span>Notifications</div>
+                            {% if request.session.notifnum != 0%}
+                            <span class="badge rounded-pill">{{ request.session.notifnum }}</span>
+                            {% endif %}
+                        </a>
+                    </li>
+                </ul>
+                <div class="pxp-dashboard-side-label mt-3 mt-lg-4">AI Tools<sup style="background: var(--pxpMainColor); padding: 3px; color: white; border-radius: 50rem; margin-left: 5px">Beta</sup></div>
+                <ul class="list-unstyled">
+                    <li id="scn">
+                        {% comment %} <a href="candidate-dashboard-notifications.html" class="d-flex justify-content-between align-items-center"> {% endcomment %}
+                            <a href="{% url 'employer:cand_suggest' pk=pk %}" class="d-flex justify-content-between align-items-center">
+                            <div><span class="fa fa-file-o"><i class="fa-light fa-lightbulb"></i></span>Suggestions</div>
+                        </a>
+                    </li>
+                    <li id="pen">
+                        {% comment %} <a href="candidate-dashboard-notifications.html" class="d-flex justify-content-between align-items-center"> {% endcomment %}
+                            <a href="{% url 'employer:pending_actions' pk=pk %}" class="d-flex justify-content-between align-items-center">
+                            <div><span class="fa fa-tasks"></span>Actions</div>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <nav class="pxp-dashboard-side-user-nav-container">
+                <div class="pxp-dashboard-side-user-nav">
+                    <div class="dropdown pxp-dashboard-side-user-nav-dropdown dropup">
+                        <a role="button" class="dropdown-toggle" data-bs-toggle="dropdown">
+
+                            {% if request.session.photo %}
+                                <div class="pxp-dashboard-side-user-nav-avatar pxp-cover" style="background-image: url('{{ request.session.photo }}')"></div>
+                            {% else %}
+                            <div class="pxp-dashboard-side-user-nav-avatar pxp-cover" style="background-image: url()"><div class="profileimage" id="profileImage"></div></div>
+                            {% endif %}
+                            <div class="pxp-dashboard-side-user-nav-name">{{ request.session.name }}</div>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{% url 'employer:cdashboard' pk=pk %}">Dashboard</a></li>
+                            <li><a class="dropdown-item" href="{% url 'employer:cedit' pk=pk %}">Edit profile</a></li>
+                            <li><a class="dropdown-item" href="{% url 'employer:clogout' pk=pk %}">Logout</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </div>
+        <div class="pxp-dashboard-content">
+            <div class="pxp-dashboard-content-header">
+                <div class="pxp-nav-trigger navbar pxp-is-dashboard d-lg-none">
+                    <a role="button" data-bs-toggle="offcanvas" data-bs-target="#pxpMobileNav" aria-controls="pxpMobileNav">
+                        <div class="pxp-line-1"></div>
+                        <div class="pxp-line-2"></div>
+                        <div class="pxp-line-3"></div>
+                    </a>
+                    <div class="offcanvas offcanvas-start pxp-nav-mobile-container pxp-is-dashboard" tabindex="-1" id="pxpMobileNav">
+                        <div class="offcanvas-header">
+                            <div class="pxp-logo">
+                                <a href="{% url 'main:index' %}" class="pxp-animate"><span style="color: var(--pxpMainColor)">m</span>power</a>
+                            </div>
+                            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                        </div>
+                        <div class="offcanvas-body">
+                            <nav class="pxp-nav-mobile">
+                                <ul class="navbar-nav justify-content-end flex-grow-1">
+                                    <li class="pxp-dropdown-header">Company tools</li>
+                                    <li class="nav-item"><a href="{% url 'employer:cdashboard' pk=pk %}"><span class="fa fa-home"></span>Dashboard</a></li>
+                                    <li class="nav-item"><a href="{% url 'employer:cedit' pk=pk %}"><span class="fa fa-pencil"></span>Edit Profile</a></li>
+                                    <li class="nav-item"><a href="{% url 'employer:newjob' pk=pk %}"><span class="fa fa-file-text-o"></span>New Job Offer</a></li>
+                                    <li class="nav-item"><a href="{% url 'employer:manage' pk=pk %}"><span class="fa fa-briefcase"></span>Manage Jobs</a></li>
+                                    <li class="nav-item"><a href="{% url 'employer:candidates' pk=pk %}"><span class="fa fa-user-circle-o"></span>Candidates</a></li>
+                                    <li class="nav-item"><a href="{% url 'employer:subscriptions' pk=pk %}"><span class="fa fa-credit-card"></span>Subscriptions</a></li>
+                                    <li class="nav-item"><a href="{% url 'employer:change_pass' pk=pk %}"><span class="fa fa-lock"></span>Change Password</a></li>
+                                    <li class="nav-item"><a href="{% url 'employer:show_tests' pk=pk %}"><span class="fa fa-question"></span>Create Test</a></li>
+                                    <li class="nav-item"><a href="{% url 'employer:all_interviews' pk=pk %}"><span class="fa fa-user"></span>Interviews</a></li>
+                                    <li class="pxp-dropdown-header mt-4">Insights</li>
+                                    <li class="nav-item">
+                                        <a href="{% url 'employer:cinbox' pk=pk %}" class="d-flex justify-content-between align-items-center">
+                                            <div><span class="fa fa-envelope-o"></span>Inbox</div>
+                                            {% if countunmess == 0 %}
+                                            <span class="badge rounded-pill" id="countinbox2"></span>
+                                            {% else %}
+                                            <span class="badge rounded-pill" id="countinbox2">{{ countunmess }}</span>
+                                            {% endif %}
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{% url 'employer:cnotifications' pk=pk %}" class="d-flex justify-content-between align-items-center">
+                                            <div><span class="fa fa-bell-o"></span>Notifications</div>
+                                            {% if request.session.notifnum != 0%}
+                                            <span class="badge rounded-pill">{{ request.session.notifnum }}</span>
+                                            {% endif %}
+                                        </a>
+                                    </li>
+                                    <li class="pxp-dropdown-header mt-4">AI Tools<sup style="background: var(--pxpMainColor); padding: 3px; color: white; border-radius: 50rem; margin-left: 5px">Beta</sup></li>
+                                    <li class="nav-item">
+                                        {% comment %} <a href="candidate-dashboard-notifications.html" class="d-flex justify-content-between align-items-center"> {% endcomment %}
+                                        <a href="{% url 'employer:cand_suggest' pk=pk %}" class="d-flex justify-content-between align-items-center">
+                                            <div><span class="fa fa-file-o"></span>Suggestions</div>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        {% comment %} <a href="candidate-dashboard-notifications.html" class="d-flex justify-content-between align-items-center"> {% endcomment %}
+                                        <a href="{% url 'employer:pending_actions' pk=pk %}" class="d-flex justify-content-between align-items-center">
+                                            <div><span class="fa fa-tasks"></span>Actions</div>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+                <nav class="pxp-user-nav pxp-on-light">
+                    <a href="{% url 'employer:newjob' pk=pk %}" class="btn rounded-pill pxp-nav-btn">Post a Job</a>
+                    <div class="dropdown pxp-user-nav-dropdown pxp-user-notifications">
+                        <a role="button" class="dropdown-toggle" data-bs-toggle="dropdown">
+                            <span class="fa fa-bell-o"></span>
+                            {% if request.session.notifnum != 0%}
+                            <div class="pxp-user-notifications-counter">{{ request.session.notifnum }}</div>
+                            {% endif %}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            {% if notis|length %}
+                                {% for i in notis %}
+                                {% if i.notif_type == "M" %}
+                                <li><a class="dropdown-item" href="#" onclick="messageclick({{i.log_id}})"><strong>{{ i.name }}</strong> sent you a message. <span class="pxp-is-time">{{ i.datetime|naturaltime }}</span></a></li>
+                                {% elif i.notif_type == "V" %}
+                                <li><a class="dropdown-item" href="#" data-bs-target="#pxp-candidate-modal" data-bs-toggle="modal" onclick="candidatemodal('{{i.user_id}}')"><strong>{{ i.name }}</strong> viewed your profile. <span class="pxp-is-time">{{ i.datetime|naturaltime }}</span></a></li>
+                                {% elif i.notif_type == "T" %}
+                                <li><a class="dropdown-item" href="#" data-bs-target="#pxp-results-modal" data-bs-toggle="modal" onclick="resultsmodal('{{i.test_id}}')"><strong>{{ i.name }}</strong> had attempted {{i.test_name}} test. <span class="pxp-is-time">{{ i.datetime|naturaltime }}</span></a></li>
+                                {% else %}
+                                <li><a class="dropdown-item" href="{% url 'employer:under_development' pk=pk %}"><strong>{{ i.name }}</strong> applied for <strong>{{ i.title }}</strong>. <span class="pxp-is-time">{{ i.datetime|naturaltime }}</span></a></li>
+                                {% endif %}
+                                {% endfor %}
+                            {% else %}
+                            <li><a class="dropdown-item" href="#" style="cursor: text"><strong></strong>No new notifications<span class="pxp-is-time"></span></a></li>
+                            {% endif %}
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item pxp-link" href="{% url 'employer:cnotifications' pk=pk %}">Read All</a></li>
+                        </ul>
+                    </div>
+                    <div class="dropdown pxp-user-nav-dropdown">
+                        <a role="button" class="dropdown-toggle" data-bs-toggle="dropdown">
+
+                            {% if request.session.photo %}
+                                <div class="pxp-user-nav-avatar pxp-cover" style="background-image: url('{{ request.session.photo }}')"></div>
+                            {% else %}
+                            <div class="pxp-user-nav-avatar pxp-cover"  style="background-image: url()"><div class="profileimage" id="profileImage2"></div></div>
+                            {% endif %}
+                            <div class="pxp-user-nav-name d-none d-md-block">{{ request.session.name }}</div>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="{% url 'employer:cdashboard' pk=pk %}">Dashboard</a></li>
+                            <li><a class="dropdown-item" href="{% url 'employer:cedit' pk=pk %}">Edit profile</a></li>
+                            <li><a class="dropdown-item" href="{% url 'employer:clogout' pk=pk %}">Logout</a></li>
+                        </ul>
+                    </div>
+                </nav>
+            </div>
+
+            {% block content %}
+            {% endblock content %}
+
+            <footer>
+                <div class="pxp-footer-copyright pxp-text-light">© 2021 mpower. All Right Reserved.</div>
+            </footer>
+        </div>
+
+
+        <div class="modal fade pxp-user-modal" id="pxp-job-modal" aria-hidden="true" aria-labelledby="jobModal" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered widthadjuster">
+                <div class="modal-content">
+                    <div class="modal-body" style="padding: 1rem !important">
+                        <section>
+                            <div class="pxp-container">
+                                <div class="pxp-single-job-content pxp-has-columns" style="margin-top: 0px">
+                                    <div class="row">
+                                        <div class="col-lg-7 col-xl-8 col-xxl-9">
+                
+                                            <div class="row justify-content-between align-items-center mt-4 mt-lg-5">
+                                                <div class="col-xl-8 col-xxl-6">
+                                                    <h1 id="jobtitle"></h1>
+                                                    <div class="pxp-single-job-company-location">
+                                                        In 
+                                                        <a href="jobs-list-1.html" class="pxp-single-job-location" id="loca"></a>
+                                                    </div>
+                                                </div>
+                                                <div class="col-auto">
+                                                    <div class="pxp-single-job-options mt-4 col-xl-0">
+                                                    </div>
+                                                </div>
+                                            </div>
+                
+                                            <div class="row mt-4 justify-content-between align-items-center">
+                                                <div class="col-6">
+                                                    <a href="jobs-list-1.html" class="pxp-single-job-category">
+                                                        <div class="pxp-single-job-category-icon"><span class="fa fa-calendar-o"></span></div>
+                                                        <div class="pxp-single-job-category-label" id="jobtit"></div>
+                                                    </a>
+                                                </div>
+                                                <div class="col-auto">
+                                                    <div class="pxp-single-job-date pxp-text-light" id="datesh"></div>
+                                                </div>
+                                            </div>
+                
+                                            <div class="pxp-single-job-content-details mt-4 mt-lg-5">
+                                                <h4>Overview</h4>
+                                                <p id="desc"></p>
+                                                <div class="mt-4">
+                                                    <h4>Responsibilities</h4>
+                                                    <ul id="resp">
+                                                    </ul>
+                                                </div>
+                                                <div class="mt-4">
+                                                    <h4>Requirements</h4>
+                                                    <ul id="requ"></ul>
+                                                </div>
+                                                <div class="mt-4">
+                                                    <h4>Skills</h4>
+                                                    <ul id="skil"></ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-5 col-xl-4 col-xxl-3">
+                                            <div class="pxp-single-job-side-panel mt-5 mt-lg-0">
+                                                <div>
+                                                    <div class="pxp-single-job-side-info-label pxp-text-light">Experience</div>
+                                                    <div class="pxp-single-job-side-info-data" id="exp"></div>
+                                                </div>
+                                                <div class="mt-4">
+                                                    <div class="pxp-single-job-side-info-label pxp-text-light">Work Level</div>
+                                                    <div class="pxp-single-job-side-info-data">Senior Level</div>
+                                                </div>
+                                                <div class="mt-4">
+                                                    <div class="pxp-single-job-side-info-label pxp-text-light">Employment Type</div>
+                                                    <div class="pxp-single-job-side-info-data">Full Time</div>
+                                                </div>
+                                                <div class="mt-4">
+                                                    <div class="pxp-single-job-side-info-label pxp-text-light">Salary</div>
+                                                    <div class="pxp-single-job-side-info-data" id="sal"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>        
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="modal fade pxp-user-modal" id="pxp-candidate-modal" aria-hidden="true" aria-labelledby="candidateModal" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered widthadjuster">
+                <div class="modal-content">
+                    <div class="modal-body" style="padding: 1rem !important">
+                        <section class="pxp-single-candidate-hero pxp-cover" style="background-image: url();">
+                            <div class="pxp-hero-opacity"></div>
+                            <div class="pxp-single-candidate-hero-caption">
+                                <div class="pxp-container">
+                                    <div class="pxp-single-candidate-hero-content">
+                                        <div class="" id="photoimage"></div>
+                                        <div class="pxp-single-candidate-hero-name">
+                                            <h1 id="name">Rebecca Eason</h1>
+                                            <div class="pxp-single-candidate-hero-title" id="title">Not Specified</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                
+                        <section class="mt-100">
+                            <div class="pxp-container">
+                                <div class="row">
+                                    <div class="col-lg-7 col-xl-8 col-xxl-9">
+                                        <div class="pxp-single-candidate-content">
+                                            <div style="display: flex"><h2>About</h2> <h2 style="margin-left: 10px" id="name2"></h2></div>
+                                            <p id="about">Not Specified</p>
+                
+                                            <div class="mt-4 mt-lg-5">
+                                                <h2>Skills</h2>
+                                                <div class="pxp-single-candidate-skills">
+                                                    <ul class="list-unstyled" id="skillsadder">
+                                                    </ul>
+                                                </div>
+                                            </div>
+                
+                                            <div class="mt-4 mt-lg-5">
+                                                <h2>Work Experience</h2>
+                                                <div class="pxp-single-candidate-timeline" id="expadder">
+                                                    
+                                                </div>
+                                            </div>
+                
+                                            <div class="mt-4 mt-lg-5">
+                                                <h2>Education & Training</h2>
+                                                <div class="pxp-single-candidate-timeline" id="eduadder">
+                                                    
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-5 col-xl-4 col-xxl-3">
+                                        <div class="pxp-single-candidate-side-panel mt-5 mt-lg-0">
+                                            <div>
+                                                <div class="pxp-single-candidate-side-info-label pxp-text-light">Email</div>
+                                                <div class="pxp-single-candidate-side-info-data" id="email">Not Specified</div>
+                                            </div>
+                                            <div class="mt-4">
+                                                <div class="pxp-single-candidate-side-info-label pxp-text-light">Location</div>
+                                                <div class="pxp-single-candidate-side-info-data" id="location">Not Specified</div>
+                                            </div>
+                                            <div class="mt-4">
+                                                <div class="pxp-single-candidate-side-info-label pxp-text-light">Phone</div>
+                                                <div class="pxp-single-candidate-side-info-data" id="phone">Not Specified</div>
+                                            </div>
+                                        </div>
+                
+                                        <div class="pxp-single-candidate-side-panel mt-4 mt-lg-5">
+                                            <h3>Contact</h3>
+                                            <form class="mt-4">
+                                                <div class="mb-3">
+                                                    <label for="contact-candidate-name" class="form-label">Name</label>
+                                                    <input type="text" class="form-control" id="contact-candidate-name" placeholder="Enter your name">
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="contact-candidate-email" class="form-label">Email</label>
+                                                    <input type="text" class="form-control" id="contact-candidate-email" placeholder="Enter your email address">
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="contact-candidate-message" class="form-label">Message</label>
+                                                    <textarea class="form-control" id="contact-candidate-message" placeholder="Type your message here..."></textarea>
+                                                </div>
+                                                <a href="#" class="btn rounded-pill pxp-section-cta d-block">Send Message</a>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="modal fade pxp-user-modal" id="pxp-results-modal" aria-hidden="true" aria-labelledby="resultsModal" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered widthadjuster" style="justify-content: center">
+                <div class="modal-content" style="width: 35rem">
+                    <div class="modal-header" style="padding: 10px">
+                        <h3 id="user_name"></h3>
+                    </div>
+                    <hr style="margin: 0px" />
+                    <div class="modal-body" style="padding: 1rem !important">
+                        <div class="pxp-company-dashboard-jobs-bulk-actions" style="margin-left: auto; flex-direction: column">
+                            <div id="test_name">
+                            </div>
+                            <div id="date">
+                            </div>
+                            <div id="num">
+                            </div>
+                            <div id="correct">
+                            </div>
+                            <div id="percent">
+                            </div>
+                        </div>
+                    </div>
+                    <hr style="margin: 0px" />
+                    <div class="modal-header" style="padding: 10px">
+                        <input type="text" style="display: none" name="user_id_val" />
+                        <input type="text" class="form-control" placeholder="Paste interview link" name="intlink" />
+                        <a class="btn rounded-pill pxp-nav-btn" onclick="sched()">Schedule</a>
+                    </div>
+                    <div class="modal-header" id="spanadder">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+
+
+        <script src="{% static 'js/jquery-3.4.1.min.js' %}"></script>
+        <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+        <script src="{% static 'js/owl.carousel.min.js' %}"></script>
+        <script src="{% static 'js/nav.js' %}"></script>
+        <script src="{% static 'js/Chart.min.js' %}"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.17.1/moment.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.3.0/js/bootstrap-datepicker.js"></script>
+        
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+
+        <script>
+            $(document).ready(function () {
+                $(".profileimage").each(function(i, el) {
+                    el.innerHTML = '{{request.session.name}}'[0]
+                })
+            })
+
+            setInterval(getCount, 10000);
+            function getCount()
+            {
+                let url = "{% url 'employer:inbox_count' pk %}"
+                $.ajax(
+                {
+                    type:"GET",
+                    url: url,
+                    data:{
+                    },
+                    success: function( data ) 
+                    {
+                        if(data['count']!=0)
+                        {
+                            $('#countinbox').text(data['count'])
+                            $('#countinbox2').text(data['count'])
+                        }
+                        else
+                        {
+                            $('#countinbox').text("")
+                            $('#countinbox2').text("")
+                        }
+                    },
+                    async: false
+                })
+            }
+
+            function loadermodal(id)
+        {
+            $.ajax(
+            {
+                type:"GET",
+                url: "cjobapp/",
+                data:{
+                        jobid: id
+                },
+                success: function( data ) 
+                {
+                    $('#jobtitle').text(JSON.parse(data['info'])[0].title);
+                    $('#comname').text(JSON.parse(data['company'])[0].ename);
+                    $('#loca').text(JSON.parse(data['info'])[0].location);
+                    $('#jobtit').text(JSON.parse(data['info'])[0].fnarea);
+                    $('#datesh').text(JSON.parse(data['info'])[0].postdate);
+                    $('#desc').text(JSON.parse(data['info'])[0].jobdesc);
+                    $('#exp').text(JSON.parse(data['info'])[0].experience);
+                    let salrange=JSON.parse(data['info'])[0].basicpay;
+                    if(salrange=="1")
+                    {
+                        $('#sal').text("$0 - $700");
+                    }
+                    else if(salrange=="2")
+                    {
+                        $('#sal').text("$700 - $1000");
+                    }
+                    else if(salrange=="3")
+                    {
+                        $('#sal').text("$1000 - $1200");
+                    }
+                    else if(salrange=="4")
+                    {
+                        $('#sal').text("$1200 - $1400");
+                    }
+                    else if(salrange=="5")
+                    {
+                        $('#sal').text("$1500 - $1800");
+                    }
+                    else if(salrange=="6")
+                    {
+                        $('#sal').text("$2000 - $3000");
+                    }
+                    $('#comna').text(JSON.parse(data['company'])[0].ename);
+                    $('#indus').text(JSON.parse(data['company'])[0].industry);
+                    $('#locat').text(JSON.parse(data['company'])[0].location);
+                    let ski=JSON.parse(data['info'])[0].skills;
+                    let lu=document.getElementById('skil');
+                    while (lu.firstChild) {
+                        lu.removeChild(lu.lastChild);
+                    }
+                    if(ski)
+                    {
+                        ski=ski.split("\n");
+                        for(let i=0;i<ski.length;i++)
+                        {
+                            let il=document.createElement('li');
+                            il.innerHTML=ski[i];
+                            lu.append(il);
+                        }
+                    }
+                    let resp=JSON.parse(data['info'])[0].responsibilities;
+                    let lur=document.getElementById('resp');
+                    while (lur.firstChild) {
+                        lur.removeChild(lur.lastChild);
+                    }
+                    if(resp)
+                    {
+                        resp=resp.split("\n");
+                        for(let i=0;i<resp.length;i++)
+                        {
+                            let il=document.createElement('li');
+                            il.innerHTML=resp[i];
+                            lur.append(il);
+                        }
+                    }
+                    let reqr=JSON.parse(data['info'])[0].requirements;
+                    let luq=document.getElementById('requ');
+                    while (luq.firstChild) {
+                        luq.removeChild(luq.lastChild);
+                    }
+                    if(reqr)
+                    {
+                        reqr=reqr.split("\n");
+                        for(let i=0;i<reqr.length;i++)
+                        {
+                            let il=document.createElement('li');
+                            il.innerHTML=reqr[i];
+                            luq.append(il);
+                        }
+                    }
+                }
+            })
+        }
+
+        function candidatemodal(id)
+        {
+            $.ajax(
+            {
+                type:"GET",
+                url: "{% url 'employer:get_candidate' pk=pk %}",
+                data:{
+                        user_id: id
+                },
+                success: function( data ) 
+                {
+                    let datainfo = JSON.parse(data['info']);
+                    $('#name').text(datainfo.name);
+                    $('#name2').text(datainfo.name);
+                    $('#email').text(datainfo.email);
+                    if(datainfo.title)
+                    {
+                        $('#title').text(datainfo.title);
+                    }
+                    if(datainfo.about)
+                    {
+                        $('#about').text(datainfo.about);
+                    }
+                    if(datainfo.location)
+                    {
+                        $('#location').text(datainfo.location);
+                    }
+                    if(datainfo.phone)
+                    {
+                        $('#phone').text(datainfo.phone);
+                    }
+                    let photo=datainfo.photo;
+                    $('#photoim').remove();
+                    if(photo)
+                    {
+                        let ab=document.createElement('img')
+                        ab.setAttribute('src', photo);
+                        ab.setAttribute('id', 'photoim');
+                        ab.style.width='7rem';
+                        ab.style.height='7rem';
+                        ab.setAttribute('class', 'pxp-single-candidate-hero-avatar')
+                        document.getElementById('photoimage').append(ab)
+                    }
+                    let ul=$('#skillsadder');
+                    ul.empty();
+                    let skil=datainfo.skills;
+                    if(skil.length>0)
+                    {
+                        for(let i=0;i<skil.length;i++)
+                        {
+                            let ab=document.createElement('li');
+                            ab.innerHTML=skil[i];
+                            ul.append(ab);
+                        }
+                    }
+                    else
+                    {
+                        let ab=document.createElement('li');
+                        ab.text('Not Specified');
+                        ul.append(ab);
+                    }
+                    let work=JSON.parse(data['work']);
+                    let bigdiv=document.getElementById('expadder');
+                    bigdiv.innerHTML="";
+                    if(work.length>0)
+                    {
+                        for(let i=0;i<work.length;i++)
+                        {
+                            let itemdiv=document.createElement('div');
+                            itemdiv.setAttribute('class', 'pxp-single-candidate-timeline-item');
+                            let dotdiv=document.createElement('div');
+                            dotdiv.setAttribute('class', 'pxp-single-candidate-timeline-dot');
+                            itemdiv.append(dotdiv);
+                            let infodiv=document.createElement('div');
+                            infodiv.setAttribute('class', 'pxp-single-candidate-timeline-info ms-3');
+                            let timediv=document.createElement('div');
+                            timediv.setAttribute('class', 'pxp-single-candidate-timeline-time')
+                            let spandiv=document.createElement('span');
+                            spandiv.setAttribute('class', 'me-3');
+                            spandiv.innerHTML=work[i].time_period;
+                            timediv.append(spandiv);
+                            infodiv.append(timediv);
+                            let positiondiv=document.createElement('div');
+                            positiondiv.setAttribute('class', 'pxp-single-candidate-timeline-position mt-2');
+                            positiondiv.innerHTML=work[i].job_title;
+                            infodiv.append(positiondiv);
+                            let companydiv=document.createElement('div');
+                            companydiv.setAttribute('class', 'pxp-single-candidate-timeline-company pxp-text-light');
+                            companydiv.innerHTML=work[i].company;
+                            infodiv.append(companydiv);
+                            let aboutdiv=document.createElement('div');
+                            aboutdiv.setAttribute('class', 'pxp-single-candidate-timeline-about mt-2 pb-4');
+                            aboutdiv.innerHTML=work[i].description;
+                            infodiv.append(aboutdiv);
+                            itemdiv.append(infodiv)
+                            bigdiv.append(itemdiv);
+                        }
+                    }
+                    else
+                    {
+                        let notdiv=document.createElement('div');
+                        notdiv.innerHTML="Not Specified";
+                        bigdiv.append(notdiv);
+                    }
+
+
+                    let edu=JSON.parse(data['edu']);
+                    let bigdiv2=document.getElementById('eduadder');
+                    bigdiv2.innerHTML="";
+                    if(edu.length>0)
+                    {
+                        for(let i=0;i<edu.length;i++)
+                        {
+                            let itemdiv=document.createElement('div');
+                            itemdiv.setAttribute('class', 'pxp-single-candidate-timeline-item');
+                            let dotdiv=document.createElement('div');
+                            dotdiv.setAttribute('class', 'pxp-single-candidate-timeline-dot');
+                            itemdiv.append(dotdiv);
+                            let infodiv=document.createElement('div');
+                            infodiv.setAttribute('class', 'pxp-single-candidate-timeline-info ms-3');
+                            let timediv=document.createElement('div');
+                            timediv.setAttribute('class', 'pxp-single-candidate-timeline-time')
+                            let spandiv=document.createElement('span');
+                            spandiv.setAttribute('class', 'me-3');
+                            spandiv.innerHTML=edu[i].time_period;
+                            timediv.append(spandiv);
+                            infodiv.append(timediv);
+                            let positiondiv=document.createElement('div');
+                            positiondiv.setAttribute('class', 'pxp-single-candidate-timeline-position mt-2');
+                            positiondiv.innerHTML=edu[i].title;
+                            infodiv.append(positiondiv);
+                            let companydiv=document.createElement('div');
+                            companydiv.setAttribute('class', 'pxp-single-candidate-timeline-company pxp-text-light');
+                            companydiv.innerHTML=edu[i].school;
+                            infodiv.append(companydiv);
+                            let aboutdiv=document.createElement('div');
+                            aboutdiv.setAttribute('class', 'pxp-single-candidate-timeline-about mt-2 pb-4');
+                            aboutdiv.innerHTML=edu[i].description;
+                            infodiv.append(aboutdiv);
+                            itemdiv.append(infodiv)
+                            bigdiv2.append(itemdiv);
+                        }
+                    }
+                    else
+                    {
+                        let notdiv=document.createElement('div');
+                        notdiv.innerHTML="Not Specified";
+                        bigdiv2.append(notdiv);
+                    }
+                }
+            })
+        }
+
+        function messageclick(id)
+        {
+            $.ajax(
+                {
+                    type:"POST",
+                    url: "{% url 'employer:createthread' pk %}",
+                    data:{
+                        receiver: id,
+                        csrfmiddlewaretoken: '{{ csrf_token }}'
+                    },
+                    success: function( data ) 
+                    {
+                        window.location="{% url 'employer:cinbox' pk %}";
+                    },
+                })
+        }
+
+        function resultsmodal(id)
+        {
+            $('[name=checkdate]').css({'z-index': "1600 !important"})
+            $.ajax(
+                {
+                    type:"GET",
+                    url: "{% url 'employer:get_results' pk %}",
+                    data:{
+                        id: id
+                    },
+                    success: function( data ) 
+                    {
+                        let datainfo=JSON.parse(data['data']);
+                        $('[name=user_id_val]').val(datainfo.user_id);
+                        $('#user_name').text(datainfo.user_name);
+                        $('#test_name').text("Test name: "+datainfo.name);
+                        $('#date').text("Attempted on: "+datainfo.date.slice(0, 19));
+                        $('#num').text("Total questions: "+datainfo.num);
+                        $('#correct').text("Correct answers: "+datainfo.correct);
+                        $('#percent').text("Percentage score: "+datainfo.percent+" %");
+                        let span=document.getElementById('spanadder');
+                        let span2;
+                        let remover=document.getElementById('smallspan');
+                        if(remover)
+                        {
+                            remover.remove();
+                        }
+                        if(datainfo.int_link!="")
+                        {
+                            span2=document.createElement('span');
+                            span2.innerHTML="Scheduled";
+                            span2.setAttribute('id', 'smallspan');
+                            span.setAttribute('style', 'padding: 10px; background: green; color: white; border-radius: 0rem 0rem 1rem 1rem;');
+                            $('[name=intlink]').val(datainfo.int_link);
+                            span.append(span2);
+                        }
+                    },
+            })
+        }
+
+        function sched()
+        {
+            let link=$('[name=intlink]').val();
+            let user=$('[name=user_id_val]').val();
+            if(link=="")
+            {
+                alert("Please enter a link");
+                return;
+            }
+            $.ajax(
+                {
+                    type:"POST",
+                    url: "{% url 'employer:schedule_interview' pk %}",
+                    data:{
+                        user_id: user,
+                        int_link: link,
+                        csrfmiddlewaretoken: '{{ csrf_token }}'
+                    },
+                    success: function( data ) 
+                    {
+                        let span=document.getElementById('spanadder');
+                        let span2;
+                        let remover=document.getElementById('smallspan');
+                        if(remover)
+                        {
+                            remover.remove();
+                        }
+                        if(data['m']=="Y")
+                        {
+                            span2=document.createElement('span');
+                            span2.innerHTML="Scheduled";
+                            span2.setAttribute('id', 'smallspan');
+                            span.setAttribute('style', 'padding: 10px; background: green; color: white; border-radius: 0rem 0rem 1rem 1rem;');
+                        }
+                        else if(data['m']=="A")
+                        {
+                            span2=document.createElement('span');
+                            span2.innerHTML="Rescheduled successfully";
+                            span2.setAttribute('id', 'smallspan');
+                            span.setAttribute('style', 'padding: 10px; background: yellow; color: black; border-radius: 0rem 0rem 1rem 1rem;');
+                        }
+                        else
+                        {
+                            span2=document.createElement('span');
+                            span2.innerHTML="Internal server error";
+                            span2.setAttribute('id', 'smallspan');
+                            span.setAttribute('style', 'padding: 10px; background: red; color: white; border-radius: 0rem 0rem 1rem 1rem;');
+                        }
+                        span.append(span2);
+                    },
+            })
+        }
+            {% block script %}
+            {% endblock script %}
+        </script>
+        <script src="{% static 'js/main.js' %}"></script>
+    </body>
+</html>

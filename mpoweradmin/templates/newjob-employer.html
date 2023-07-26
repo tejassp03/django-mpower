@@ -1,0 +1,145 @@
+{% extends 'employer-index.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}
+<title>mpower - Company dashboard - New job offer</title>
+{% endblock %}
+{% block content %}
+
+
+<div class="pxp-dashboard-content-details">
+    <h1>New Job Offer</h1>
+    <p class="pxp-text-light">Add a new job to your company's jobs list.</p>
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="row mt-4 mt-lg-5">
+            <div class="col-xxl-6">
+                <div class="mb-3">
+                    <label for="pxp-company-job-title" class="form-label">Job title</label>
+                    <input type="text" id="pxp-company-job-title" class="form-control" placeholder="Add title" name="title" reqiured>
+                </div>
+            </div>
+            <div class="col-md-6 col-xxl-3">
+                <label for="pxp-company-job-location" class="form-label">Location</label>
+                <input type="text" id="pxp-company-job-location" class="form-control" placeholder="E.g. San Francisco, CA" name="location" required>
+            </div>
+            <div class="col-md-6 col-xxl-3">
+                <div class="mb-3">
+                    <label for="pxp-company-job-category" class="form-label">Category</label>
+                    <select id="pxp-company-job-category" class="form-select notnormal" name="fnarea">
+                        {% for i in roledetails %}
+                        <option>{{ i.role }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label for="pxp-company-job-description" class="form-label">Job description</label>
+            <textarea class="form-control" id="pxp-company-job-description" placeholder="Type the description here..." name="description" minlength=150></textarea>
+        </div>
+
+        <div class="mb-3">
+            <label for="pxp-company-job-description" class="form-label">Skills</label>
+            <textarea class="form-control" id="pxp-company-job-description" placeholder="Type the skills here..." name="skills" minlength=50></textarea>
+        </div>
+        
+        <div class="mb-3">
+            <label for="pxp-company-job-description" class="form-label">Responsibilities</label>
+            <textarea class="form-control" id="pxp-company-job-description" placeholder="Type the responsibilities here..." name="responsibilities" minlength=150></textarea>
+        </div>
+
+        <div class="mb-3">
+            <label for="pxp-company-job-description" class="form-label">Requirements</label>
+            <textarea class="form-control" id="pxp-company-job-description" placeholder="Type the requirements here..." name="requirements" minlength=150></textarea>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 col-xxl-3">
+                <div class="mb-3">
+                    <label for="pxp-company-job-experience" class="form-label">Experience</label>
+                    <input type="text" id="pxp-company-job-experience" class="form-control" placeholder="E.g. Minimum 3 years" name="experience">
+                </div>
+            </div>
+            <div class="col-md-6 col-xxl-3">
+                <div class="mb-3">
+                    <label for="pxp-company-job-level" class="form-label">Career level</label>
+                    <select id="pxp-company-job-level" class="form-select" name="careerlevel">
+                        <option>No Experience</option>
+                        <option>Entry-Level</option>
+                        <option>Mid-Level</option>
+                        <option>Senior-Level</option>
+                        <option>Manager / Executive</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-6 col-xxl-3">
+                <div class="mb-3">
+                    <label for="pxp-company-job-type" class="form-label">Employment type</label>
+                    <select id="pxp-company-job-type" class="form-select" name="jobtype">
+                        <option>Full Time</option>
+                        <option>Part Time</option>
+                        <option>Remote</option>
+                        <option>Internship</option>
+                        <option>Contract</option>
+                        <option>Training</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-6 col-xxl-3">
+                <div class="mb-3">
+                    <label for="pxp-company-job-salary" class="form-label">Salary range</label>
+                    <select id="pxp-company-job-salary" class="form-select" name="basicpay">
+                        <option value="1">$0 - $700</option>
+                        <option value="2">$700 - $1000</option>
+                        <option value="3">$1000 - $1200</option>
+                        <option value="4">$1200 - $1400</option>
+                        <option value="5">$1500 - $1800</option>
+                        <option value="6">$2000 - $3000</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-4 mt-lg-5">
+            <button class="btn rounded-pill pxp-section-cta">Publish Job</button>
+            {% comment %} <button class="btn rounded-pill pxp-section-cta-o ms-3">Save Draft</button> {% endcomment %}
+        </div>
+    </form>
+</div>
+
+
+{% endblock content%}
+
+{% block script %}
+$(function () {
+    $('.notnormal').each(function () {
+      $(this).select2({
+        theme: 'bootstrap4',
+        width: 'style',
+        placeholder: $(this).attr('placeholder'),
+        allowClear: Boolean($(this).data('allow-clear')),
+      });
+    });
+  });
+
+$(document).ready(function () {
+    $('#cdas').removeClass('pxp-active');
+    $('#cedi').removeClass('pxp-active');
+    $('#cnew').addClass('pxp-active');
+    $('#cman').removeClass('pxp-active');
+    $('#ccan').removeClass('pxp-active');
+    $('#csub').removeClass('pxp-active');
+    $('#ccha').removeClass('pxp-active');
+    $('#cinb').removeClass('pxp-active');
+    $('#cnot').removeClass('pxp-active');
+    $('#scn').removeClass('pxp-active');
+    $('#qui').removeClass('pxp-active');
+    $('#inr').removeClass('pxp-active');
+    $('#pen').removeClass('pxp-active');
+})
+
+{% endblock %}

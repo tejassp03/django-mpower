@@ -37,7 +37,7 @@ def dashboard(request, pk):
         single_notis['name']=user.name
         single_notis['user_id']=user.user_id
         single_notis['log_id']=user.log_id.log_id
-        heapq.heappush(recent_candidates, (i.datetime, user.user_id, user.photo, user.name, user.title, user.location, user.log_id.log_id))
+        heapq.heappush(recent_candidates, (i.datetime, user.user_id, user.photo, user.name, user.location, user.log_id.log_id))
         # recent_candidates.put([i.datetime, user.user_id, user.photo, user.name, user.title, user.location])
         if i.job_id:
             job=jobs.filter(jobid=i.job_id.jobid)
@@ -67,7 +67,7 @@ def dashboard(request, pk):
             jobseek=JobSeeker.objects.get(log_id=mess[0].sender_user.log_id)
             tempval.append(jobseek.name)
             tempval.append(jobseek.photo)
-            heapq.heappush(recent_candidates, (mess[0].date, jobseek.user_id, jobseek.photo, jobseek.name, jobseek.title, jobseek.location, jobseek.log_id.log_id))
+            heapq.heappush(recent_candidates, (mess[0].date, jobseek.user_id, jobseek.photo, jobseek.name, jobseek.location, jobseek.log_id.log_id))
             # recent_candidates.put([mess[0].date, jobseek.user_id, jobseek.photo, jobseek.name, jobseek.title, jobseek.location])
             recent_mess.append(tempval)
     finalrecent=[]
@@ -450,11 +450,9 @@ def get_candidate(request, pk):
     if(candidate.photo):
         cand['photo']=candidate.photo.url
     cand['name']=candidate.name
-    cand['about']=candidate.about
     cand['email']=loger.email
     cand['location']=candidate.location
     cand['phone']=candidate.phone
-    cand['title']=candidate.title
     if(candidate.skills):
         cand['skills']=candidate.skills.split(",")
     work=ExperienceJob.objects.filter(user_id=candidate.user_id)
@@ -601,7 +599,10 @@ def fetch(request, pk):
     thread=dumps(list(Threads.objects.filter(msg_id=request.GET['candidate']).values()), default=str)
     messa=dumps(list(Messages.objects.filter(msg_id=request.GET['candidate'], receiver_user=user.log_id, is_read=False).values()), default=str)
     company=dumps(list(JobSeeker.objects.filter(log_id=comp_log).values()), default=str)
-    urlval=JobSeeker.objects.filter(log_id=comp_log)[0].photo.url
+    try:
+        urlval=JobSeeker.objects.filter(log_id=comp_log)[0].photo.url
+    except:
+        urlval=None
     return JsonResponse({'message': 'Y', 'url': "", 'mess': messages, 'thre': temp_threads, 'count': count, 'thread': thread, 'company': company ,'messa': messa, 'all_mess': mess_all, 'image': urlval, 'unread': dumps(ind_unread), 'rece': dumps(rece)})
 
 
@@ -820,7 +821,10 @@ def get_cands(request, pk):
         single_can['user_id']=user.user_id
         single_can['name']=user.name
         single_can['location']=user.location
-        single_can['photo']=user.photo.url
+        try:
+            single_can['photo']=user.photo.url
+        except:
+            single_can['photo']=None
         job=Jobs.objects.get(jobid=i.job_id.jobid)
         single_can['jobid']=job.jobid
         single_can['title']=job.title
@@ -931,7 +935,11 @@ def create_test(request, pk):
             count=count+4
             single.correct=correct[i]
             single.save()
-        return redirect('employer:test', pk=pk)
+        if request.GET.get('redirect'):
+            return redirect('employer:candidates', pk=pk)
+        else:
+            return redirect('employer:show_tests', pk=pk)
+  
     return render(request, 'create_quiz-employer.html', {'pk':pk})
 
 def schedule(request, pk):
