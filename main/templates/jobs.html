@@ -94,7 +94,7 @@
                         <div class="pxp-list-side-filter-header-label">Filter Jobs</div>
                         <a role="button"><span class="fa fa-sliders"></span></a>
                     </div>
-                    <form method="GET">
+                <form method="GET">
                     <div class="mt-4 mt-lg-0 d-lg-block pxp-list-side-filter-panel">
                         <h3>Type of Employment</h3>
                         <div class="list-group mt-2 mt-lg-3">
@@ -122,6 +122,7 @@
                             {% endfor %}
                             {% comment %} </form> {% endcomment %}
                         </div>
+                        <!--  -->
 
                         <h3 class="mt-3 mt-lg-4">Experience Level</h3>
                         <div class="list-group mt-2 mt-lg-3">
@@ -147,12 +148,12 @@
                                 </label>
                                 {% endif %}
                                 {% endfor %}
-                                
+                                {% comment %} </form> {% endcomment %}  
                         </div>
-                    {% comment %} </form> {% endcomment %}
-
+                    
                         <h3 class="mt-3 mt-lg-4">Salary Range</h3>
                         <div class="list-group mt-2 mt-lg-3">
+                            {% comment %} <form method="GET"> {% endcomment %}
                             {% for i, j in saltype %}
                                 {% if i.basicpay in context.els %}
                                 <label class="list-group-item d-flex justify-content-between align-items-center pxp-checked">
@@ -198,13 +199,65 @@
                                 </label>
                                 {% endif %}
                                 {% endfor %}
+                                {% comment %} </form> {% endcomment %}
+                        </div>
+                        <h3 class="mt-3 mt-lg-4">Work Type</h3>
+                        <div class="list-group mt-2 mt-lg-3">
+                            {% comment %} <form method="GET"> {% endcomment %}
+                                <label class="list-group-item d-flex justify-content-between align-items-center pxp-checked">
+                                    <span class="d-flex">
+                                        <input class="form-check-input me-2 wt" type="checkbox" value="Work From Home" name="wt">
+                                        Work From Home
+                                    </span>
+                                </label>
+                                <label class="list-group-item d-flex justify-content-between align-items-center pxp-checked">
+                                    <span class="d-flex">
+                                        <input class="form-check-input me-2 wt" type="checkbox" value="Office" name="wt">
+                                        Office
+                                    </span>
+                                </label>
+                                <label class="list-group-item d-flex justify-content-between align-items-center pxp-checked">
+                                    <span class="d-flex">
+                                        <input class="form-check-input me-2 wt" type="checkbox" value="Hybrid" name="wt">
+                                        Hybrid
+                                    </span>
+                                </label>
+
+                            {% comment %} </form> {% endcomment %}
+                        </div>
+                        <h3 class="mt-3 mt-lg-4">Category</h3>
+                        <div class="list-group mt-2 mt-lg-3">
+                            {% comment %} <form method="GET"> {% endcomment %}
+                                {% for i in categories%}
+                                <label class="list-group-item d-flex justify-content-between align-items-center pxp-checked">
+                                    <span class="d-flex">
+                                        <input class="form-check-input me-2 cat" type="checkbox" value="{{i.fnarea}}" name="cat">
+                                        {{i.fnarea}}
+                                    </span>
+                                </label>
+                                {% endfor %}
+                            {% comment %} </form> {% endcomment %}
+                        </div>
+                        <h3 class="mt-3 mt-lg-4">Location</h3>
+                        <div class="list-group mt-2 mt-lg-3">
+                            {% comment %} <form method="GET"> {% endcomment %}
+                                {% for i in locations%}
+                                <label class="list-group-item d-flex justify-content-between align-items-center pxp-checked">
+                                    <span class="d-flex">
+                                        <input class="form-check-input me-2 cat" type="checkbox" value="{{i.location}}" name="loc">
+                                        {{i.location}}
+                                    </span>
+                                </label>
+                                {% endfor %}
+                            {% comment %} </form> {% endcomment %}
                         </div>
                         <div class="filterbuttons">
                         <input type="submit" value="Apply Filters" class="btn rounded-pill pxp-card-btn">
                         <a role="button" class="btn rounded-pill pxp-card-btn cancelshow">Cancel</a>
                         </div>
-                    {% comment %} </form> {% endcomment %}
+                    
                     </div>
+                    </form>
                 </div>
             </div>
             <div class="col-lg-6 col-xl-7 col-xxl-8">

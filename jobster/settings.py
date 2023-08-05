@@ -10,17 +10,26 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
+import pymysql
+from dotenv import load_dotenv
 from pathlib import Path
 import os
+from . info import *
 import mimetypes
 mimetypes.add_type("text/css", ".css", True)
-from dotenv import load_dotenv
-
+pymysql.install_as_MySQLdb()
 load_dotenv()
+import nltk
+# nltk.download('punkt')
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+EMAIL_USE_TLS = EMAIL_USE_TLS
+EMAIL_HOST = EMAIL_HOST
+EMAIL_HOST_USER = EMAIL_HOST_USER
+EMAIL_PASSWORD = EMAIL_PASSWORD
+EMAIL_PORT = EMAIL_PORT
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
@@ -50,7 +59,8 @@ INSTALLED_APPS = [
     'candidate.apps.CandidateConfig',
     'employer.apps.EmployerConfig',
     'mpoweradmin.apps.MpoweradminConfig',
-    'django.contrib.humanize'
+    'django.contrib.humanize',
+    'django_crontab'
 ]
 
 MIDDLEWARE = [
@@ -76,7 +86,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'candidate.context_processors.notifs' 
+                'candidate.context_processors.notifs'
             ],
         },
     },
@@ -90,13 +100,13 @@ WSGI_APPLICATION = 'jobster.wsgi.application'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
 DATABASES = {
-   'default': {
+    'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'mpower',
         'USER': 'root',
         'PASSWORD': '',
         'HOST': 'localhost',
-        'PORT': '',
+        'PORT': '3306',
     }
 }
 
@@ -136,9 +146,12 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 STATIC_URL = 'static/'
-STATICFILES_DIRS =[BASE_DIR / 'main/static', BASE_DIR / 'candidate/static',]
+STATICFILES_DIRS = [BASE_DIR / 'main/static', BASE_DIR / 'candidate/static',]
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+CRONJOBS = [
+    ('0 0 * * *', 'main.views.daily_mail'),
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
