@@ -305,7 +305,12 @@
                                     {% endif %}
                                 </div>
                                 <div class="col-sm-9 col-md-10 col-lg-9 col-xl-10 col-xxl-4">
+                                    {% if request.session.name %}
                                     <a href="{% url 'main:singlejob' pk2=i.jobid %}" class="pxp-jobs-card-3-title mt-3 mt-sm-0">{{ i.title }}</a>
+                                    {% else %}
+                                    <a href="#" role="button" class="pxp-jobs-card-3-title mt-3 mt-sm-0" data-bs-toggle="modal" data-bs-target="#pxp-signin-modal" data-jobid="{{ i.jobid }}">{{ i.title }}</a>
+
+                                    {% endif %}
                                     <div class="pxp-jobs-card-3-details">
                                         <a href="#" class="pxp-jobs-card-3-location">
                                             <span class="fa fa-globe"></span>{{ i.location }}
@@ -321,9 +326,14 @@
                                         <span class="pxp-jobs-card-3-date pxp-text-light">{{ i.postdate }}</span> <a href="{% url 'main:singlecompany' pk2=i.eid %}" class="pxp-jobs-card-3-company">{{ i.ename }}</a>
                                     </div>
                                 </div>
-                                <div class="col-sm-4 col-xl-2 col-xxl-auto mt-3 mt-xxl-0 pxp-text-right" style="display: none">
-                                    <a href="{% url 'main:singlejob' pk2=i.jobid %}" class="btn rounded-pill pxp-card-btn">Apply</a>
+                                <div class="col-sm-4 col-xl-2 col-xxl-auto mt-3 mt-xxl-0 pxp-text-right">
+                                    {% if request.session.name %}
+                                        <a href="{% url 'main:singlejob' pk2=i.jobid %}" class="btn rounded-pill pxp-card-btn">Apply</a>
+                                    {% else %}
+                                        <a href="#" role="button" class="btn rounded-pill pxp-card-btn" data-bs-toggle="modal" data-bs-target="#pxp-signin-modal" data-jobid="{{ i.jobid }}">Apply</a>
+                                    {% endif %}
                                 </div>
+                                
                             </div>
                         </div>
                     {% endfor %}
@@ -393,3 +403,12 @@
 {% include "footer.html" %}
 
 {% endblock %}
+{% block script %}
+    var buttons = document.querySelectorAll(".pxp-card-btn");
+    buttons.forEach(function(button) {
+        button.addEventListener("click", function(event) {
+            jobid = event.target.dataset.jobid;
+        });
+    });
+
+{% endblock script %}

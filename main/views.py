@@ -91,7 +91,16 @@ def index(request):
                     request.session['type'] = "c"
                     if (empls.photo):
                         request.session['photo'] = empls.photo.url
-                    urlval = "/candidate/"+str(jobseeker.user_id)
+                    
+                    
+                    
+                    jobid = request.POST.get('jobid')
+                    if jobid:
+                        urlval = "/singlejob/"+jobid
+                    else:
+                        urlval = "/candidate/"+str(jobseeker.user_id)
+
+                    # print(request.POST['jobid'])
                     return JsonResponse({'message': 'Y', 'url': urlval})
                 else:
                     emp = Employer.objects.get(log_id=user[0].log_id)
@@ -101,6 +110,7 @@ def index(request):
                     if (emp.logo):
                         request.session['photo'] = emp.logo.url
                     urlval = "/employer/"+str(emp.eid)
+                    
                     return JsonResponse({'message': 'Y', 'url': urlval})
             else:
                 return JsonResponse({'message': 'X'})
@@ -462,7 +472,6 @@ def findjobs(request):
         countsal.append(len(jobs.filter(basicpay=i['basicpay'])))
     for i in locations:
         countloc.append(len(jobs.filter(location=i['location'])))
-    print(countloc)
     context = {'c': c_val, 'l': l_val, 't': t_val, 'd': d_val,
                'sel': emp_sel, 'eel': exp_sel, 'els': sal_sel,'wls':wt_sel,'cls':cat_sel,'lcs':loc_sel}
     return render(request, 'jobs.html', {'page_obj': page_obj, 'pe': page_obj, 'count': count, 'locations': locations,'countloc':countloc, 'titles': titles, 'categories': categories, 'GET_params': GET_params, 'jobtype': zip(jobtype, countjob), 'emptype': zip(emptype, countemp), 'saltype': zip(salary, countsal), 'context': context})
@@ -893,11 +902,11 @@ class JobMatcher:
         # Check if skills match
         if self.jobseeker.skills and self.job.skills:
             job_skills = set(self.job.skills.lower().split(','))
-            print(job_skills)
+            # print(job_skills)
             seeker_skills = set(self.jobseeker.skills.lower().split(','))
-            print(seeker_skills)
+            # print(seeker_skills)
             if job_skills.intersection(seeker_skills):
-                print(job_skills.intersection(seeker_skills))
+                # print(job_skills.intersection(seeker_skills))
                 matched_params += 1
 
         # Check if location matches

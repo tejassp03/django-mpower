@@ -434,7 +434,11 @@ input::-webkit-calendar-picker-indicator {
                             <div class="pxp-jobs-card-1-category-icon"><span class="fa fa-bullhorn"></span></div>
                             <div class="pxp-jobs-card-1-category-label">{{ i.fnarea }}</div>
                         </a>
-                        <a href="{% url 'main:singlejob' pk2=i.jobid %}" class="pxp-jobs-card-1-title">{{ i.title }}</a>
+                        {% if request.session.name %}
+                            <a href="{% url 'main:singlejob' pk2=i.jobid %}" class="pxp-jobs-card-1-title" data-jobid="{{ i.jobid }}">{{ i.title }}</a>
+                        {% else %}
+                            <a href="#" role="button" class="pxp-jobs-card-1-title jobidbutton" data-bs-toggle="modal" data-bs-target="#pxp-signin-modal" data-jobid="{{ i.jobid }}">{{ i.title }}</a>
+                        {% endif %}
                         <div class="pxp-jobs-card-1-details">
                             <a href="#" class="pxp-jobs-card-1-location">
                                 <span class="fa fa-globe"></span>{{ i.location }}
@@ -994,22 +998,11 @@ function showSuggestions2(list){
     }
     resultBox2.innerHTML = listData;
 }
-// document.getElementById("searchForm").addEventListener("submit", function(event) {
-//             // Prevent form submission so we can modify the form data before submitting
-//             event.preventDefault();
+var buttons = document.querySelectorAll(".jobidbutton");
+    buttons.forEach(function(button) {
+        button.addEventListener("click", function(event) {
+            jobid = event.target.dataset.jobid;
+        });
+    });
 
-//             // Get the form input elements
-//             const title = document.getElementById("title");
-//             const location = document.getElementById("location");
-
-//             // Set default value "all" for empty fields
-//             if (title.value.trim() === '') field1.value = 'all';
-//             if (location.value.trim() === '') field2.value = 'all';
-
-//             // Submit the form after setting default values
-//             setTimeout(() => {
-//                 event.target.submit();
-//             }, 100);
-//         });
 {% endblock script %}
-
