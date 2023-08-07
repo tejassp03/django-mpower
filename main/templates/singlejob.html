@@ -6,6 +6,149 @@
 {% endblock %}
 
 {% block style %}
+/* styles.css */
+
+/* Base styles for the matching details box */
+<!-- .matching-details-box {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #f9f9f9;
+  border: 1px solid #ccc;
+  padding: 10px;
+  width: 300px;
+  z-index: 1;
+  max-height: 200px; /* Added max-height to make the box scrollable */
+  overflow-y: auto; /* Added overflow-y to enable vertical scrolling */
+  border:solid black 1px;
+  border-radius:1rem;
+  padding-right:1rem;
+  overflow-x: auto;
+  white-space: nowrap;
+  border-top-right-radius: 0px;
+  border-bottom-right-radius: 0px;
+}
+
+
+  
+  
+  
+  
+
+
+/* Styling for the "View Details" button */
+.btn-view-details {
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 4px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+}
+
+.btn-view-details:hover {
+  background-color: #0056b3;
+}
+
+/* Container for the "View Details" button and matching details box */
+.details-container {
+  position: relative;
+}
+
+/* Show the matching details box when hovering over the button container */
+.details-container:hover .matching-details-box {
+  display: block;
+}
+
+/* Styling for the matching details text */
+.matching-details-box h3 {
+  color: #007bff;
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.matching-details-box p {
+  font-size: 14px;
+  margin: 4px 0;
+}
+
+/* Give red color to "No" and green color to "Yes" */
+.matching-details-box p.yes {
+  color: green;
+}
+
+.matching-details-box p.no {
+  color: red;
+} -->
+
+<!-- .accordion-item {
+    margin-bottom: 10px;
+    }
+    
+    .accordion-header {
+    cursor: pointer;
+    padding: 10px;
+    background-color: #f1f1f1;
+    color: blue;
+    }
+    
+    .accordion-content {
+    display: none;
+    padding: 10px;
+    border: 1px solid #ccc;
+    }
+    
+    /* Show the accordion content when the header is clicked */
+    .accordion-item.active .accordion-content {
+    display: block;
+    }
+    
+    /* Styling for the tick mark and X symbol */
+    .status {
+    margin-left: 10px;
+    font-size: 20px;
+    }
+    
+    .status::before {
+    content: "\2713"; /* Unicode for tick mark */
+    color: green;
+    }
+    
+    .status.no::before {
+    content: "\2717"; /* Unicode for X symbol */
+    color: red;
+    } -->
+    <!-- .accordion-content.show {
+        display: block;
+      } -->
+.accordion {
+    background-color: #f9f9f9;
+    color: #444;
+    cursor: pointer;
+    padding: 18px;
+    width: 100%;
+    border: none;
+    text-align: left;
+    outline: none;
+    font-size: 15px;
+    transition: 0.4s;
+}
+
+.panel {
+    padding: 0 18px;
+    display: none;
+    background-color: white;
+    overflow: hidden;
+}
+.green-check {
+    color: green !important;
+}
+
+.red-cross {
+    color: red !important;
+}
 .pxp-user-nav-trigger{
     color: black;
     border-color: black;
@@ -110,7 +253,7 @@
                         </div>
                     </div>
 
-                    <div class="pxp-single-job-content-details mt-2 mt-lg-5">
+                    <!-- <div class="pxp-single-job-content-details mt-2 mt-lg-5">
                         {% if score == "Please submit your resume" %}
                         <p>Resume not uploaded! </p>
                         {% elif score == "Please login to check eligibility" %}
@@ -120,7 +263,193 @@
                         {% else %} 
                         <h4 class="pxp-single-job-side-panel pxp-single-job-side-info-data d-flex align-items-center">Job Match: {{ score }} % &emsp;<p style="color:lightgreen;margin-bottom: 0;">The location is suitable for you.</p> </h4> 
                         {% endif %}
+                    </div> -->
+                   
+                    <div class="pxp-single-job-content-details mt-2 mt-lg-5">
+                        {% if score == "Please submit your resume" %}
+                        <p>Resume not uploaded! </p>
+                        {% elif score == "Please login to check eligibility" %}
+                        <h4 class="pxp-single-job-side-panel pxp-single-job-side-info-data d-flex align-items-center">Job Match: {{ score }} % &emsp;</h4>
+                        {% elif score == "X" %}
+                        <p></p>
+                        {% else %}
+                        <h4 class="pxp-single-job-side-panel pxp-single-job-side-info-data d-flex align-items-center">Job Match: {{ score }} % &emsp;</h4>
+                        <button class="accordion">View Details</button>
+                        <div class="panel">
+                            <h4>Details</h4>
+                            {% if matching_details.skills %}
+                        <p>Skills:</p>
+                        <p>
+                            {% if matching_details.skills.match|length > 0 %}
+                                {{ matching_details.skills.match|length }} Skill(s) Matched: 
+                                <span style="color: green;">{{ matching_details.skills.match|join:", " }}</span>
+                            {% else %}
+                                No Matching Skills Found
+                            {% endif %}
+                        </p>
+                        {% if matching_details.skills.not_match|length > 0 %}
+                            <p>
+                                {{ matching_details.skills.not_match|length }} Skill(s) Not Matched: 
+                                <span style="color:red;">{{ matching_details.skills.not_match|join:", " }}</span>
+                                
+                            </p>
+                        {% endif %}
+                    {% endif %}
+                            <p>Location: {% if matching_details.location.match %}<span class="green-check">&#10004;</span>{% else %}<span class="red-cross">&#10008;</span>{% endif %}</p>
+                            <p>Notice Period: {% if matching_details.notice_period.match %}<span class="green-check">&#10004;</span>{% else %}<span class="red-cross">&#10008;</span>{% endif %}</p>
+                            <p>Expected Salary: {% if matching_details.expected_salary.match %}<span class="green-check">&#10004;</span>{% else %}<span class="red-cross">&#10008;</span>{% endif %}</p>
+                            <p>Experience: {% if matching_details.experience.match %}<span class="green-check">&#10004;</span>{% else %}<span class="red-cross">&#10008;</span>{% endif %}</p>
+
+                        </div>
+                        {% endif %}
                     </div>
+<!-- <div class="pxp-single-job-content-details mt-2 mt-lg-5">
+    {% if score == "Please submit your resume" %}
+        <p>Resume not uploaded!</p>
+    {% elif score == "Please login to check eligibility" %}
+        <h4 class="pxp-single-job-side-panel pxp-single-job-side-info-data d-flex align-items-center">
+            Job Match: {{ score }} % &emsp;
+        </h4>
+    {% elif score == "X" %}
+        <p></p>
+    {% else %} 
+        <h4 class="pxp-single-job-side-panel pxp-single-job-side-info-data d-flex align-items-center">
+            Job Match: {{ score }} % &emsp;</h4> -->
+            <!-- <div class="details-container"-->
+                <!-- <button class="btn-view-details btn-primary-view-details" id="showDetailsBtn">View Details</button> -->
+                <!-- <div class="matching-details-box">
+                    Add matching details here
+                    {% if matching_details.skills %}
+                        <h3>Skills:</h3>
+                        <p>
+                            {% if matching_details.skills.match|length > 0 %}
+                                {{ matching_details.skills.match|length }} Skill(s) Matched: 
+                                {{ matching_details.skills.match|join:", " }}
+                            {% else %}
+                                No Matching Skills Found
+                            {% endif %}
+                        </p>
+                        {% if matching_details.skills.not_match|length > 0 %}
+                            <p>
+                                {{ matching_details.skills.not_match|length }} Skill(s) Not Matched: 
+                                {{ matching_details.skills.not_match|join:", " }}
+                            </p>
+                        {% endif %}
+                    {% endif %}
+
+                    {% if matching_details.location %}
+                        <h3>Location:</h3>
+                        <p class="{% if matching_details.location.match %}yes{% else %}no{% endif %}">
+                            {% if matching_details.location.match %}Yes{% else %}No{% endif %}
+                        </p>
+                    {% endif %}
+
+                    {% if matching_details.notice_period %}
+                        <h3>Notice Period:</h3>
+                        <p class="{% if matching_details.notice_period.match %}yes{% else %}no{% endif %}">
+                            {% if matching_details.notice_period.match %}Yes{% else %}No{% endif %}
+                        </p>
+                    {% endif %}
+
+                    {% if matching_details.current_salary %}
+                        <h3>Current Salary:</h3>
+                        <p class="{% if matching_details.current_salary.match %}yes{% else %}no{% endif %}">
+                            {% if matching_details.current_salary.match %}Yes{% else %}No{% endif %}
+                        </p>
+                    {% endif %}
+
+                    {% if matching_details.expected_salary %}
+                        <h3>Expected Salary:</h3>
+                        <p class="{% if matching_details.expected_salary.match %}yes{% else %}no{% endif %}">
+                            {% if matching_details.expected_salary.match %}Yes{% else %}No{% endif %}
+                        </p>
+                    {% endif %}
+                </div> -->
+                <!-- <div class="matching-details-box">
+                    <div class="accordion">
+                      <div class="accordion-item">
+                        <h3 class="accordion-header">View Details</h3>
+                        <div class="accordion-content">
+                          Add matching details here
+                          {% if matching_details.skills %}
+                            <h3>Skills:</h3>
+                            <p>
+                              {% if matching_details.skills.match|length > 0 %}
+                                {{ matching_details.skills.match|length }} Skill(s) Matched:
+                                {{ matching_details.skills.match|join:", " }}
+                                <span class="status">{% if matching_details.skills.match %}&#10003;{% else %}&#10005;{% endif %}</span>
+                              {% else %}
+                                No Matching Skills Found
+                                <span class="status">&#10005;</span>
+                              {% endif %}
+                            </p>
+                          {% endif %}
+                  
+                          {% if matching_details.location %}
+                            <h3>Location:</h3>
+                            <p class="{% if matching_details.location.match %}yes{% else %}no{% endif %}">
+                              {% if matching_details.location.match %}Yes{% else %}No{% endif %}
+                              <span class="status">{% if matching_details.location.match %}&#10003;{% else %}&#10005;{% endif %}</span>
+                            </p>
+                          {% endif %}
+                  
+                          {% if matching_details.notice_period %}
+                            <h3>Notice Period:</h3>
+                            <p class="{% if matching_details.notice_period.match %}yes{% else %}no{% endif %}">
+                              {% if matching_details.notice_period.match %}Yes{% else %}No{% endif %}
+                              <span class="status">{% if matching_details.notice_period.match %}&#10003;{% else %}&#10005;{% endif %}</span>
+                            </p>
+                          {% endif %}
+                  
+                          {% if matching_details.current_salary %}
+                            <h3>Current Salary:</h3>
+                            <p class="{% if matching_details.current_salary.match %}yes{% else %}no{% endif %}">
+                              {% if matching_details.current_salary.match %}Yes{% else %}No{% endif %}
+                              <span class="status">{% if matching_details.current_salary.match %}&#10003;{% else %}&#10005;{% endif %}</span>
+                            </p>
+                          {% endif %}
+                  
+                          {% if matching_details.expected_salary %}
+                            <h3>Expected Salary:</h3>
+                            <p class="{% if matching_details.expected_salary.match %}yes{% else %}no{% endif %}">
+                              {% if matching_details.expected_salary.match %}Yes{% else %}No{% endif %}
+                              <span class="status">{% if matching_details.expected_salary.match %}&#10003;{% else %}&#10005;{% endif %}</span>
+                            </p>
+                          {% endif %}
+                        </div>
+                      </div>
+                    </div>
+                  </div> -->
+            <!-- </div> -->
+            <!-- <div class="pxp-single-job-content-details mt-2 mt-lg-5">
+                <button class="accordion-btn" id="showDetailsBtn">View Details</button>
+                <div class="accordion-content" id="detailsAccordion">
+                  {% if score == "Please submit your resume" %}
+                    <p>Resume not uploaded!</p>
+                  {% elif score == "Please login to check eligibility" %}
+                    <h4 class="pxp-single-job-side-panel pxp-single-job-side-info-data d-flex align-items-center">Job Match: {{ score }} % &emsp;</h4>
+                  {% elif score == "X" %}
+                    <p></p>
+                  {% else %}
+                    <h4 class="pxp-single-job-side-panel pxp-single-job-side-info-data d-flex align-items-center">Job Match: {{ score }} % &emsp;<p style="color:lightgreen;margin-bottom: 0;">The location is suitable for you.</p></h4>
+                    <div class="matching-details-box">
+                      <h3>Matching Details</h3>
+                      <p>Skills: {% if matching_details.skills_match %}{{ matching_details.skills_match }}/{% endif %}{{ matching_details.total_skills }}</p>
+                      <p>Location: {% if matching_details.location_match %}&#10004;{% else %}&#10008;{% endif %}</p>
+                      <p>Notice Period: {% if matching_details.notice_period_match %}&#10004;{% else %}&#10008;{% endif %}</p>
+                      <p>Current Salary: {% if matching_details.current_salary_match %}&#10004;{% else %}&#10008;{% endif %}</p>
+                      <p>Expected Salary: {% if matching_details.expected_salary_match %}&#10004;{% else %}&#10008;{% endif %}</p>
+                    </div>
+                  {% endif %}
+                </div>
+              </div> -->
+        
+    <!-- {% endif %}
+</div> -->
+
+
+
+                    
 
                     <div class="pxp-single-job-content-details mt-4 mt-lg-5">
                         {% if skills_required|length >= 1 %}
@@ -408,3 +737,21 @@
 {% include "footer.html" %}
 
 {% endblock %}
+{% block script%}
+var acc = document.getElementsByClassName("accordion");
+    var i;
+
+    for (i = 0; i < acc.length; i++) {
+        acc[i].addEventListener("click", function () {
+            this.classList.toggle("active");
+            var panel = this.nextElementSibling;
+            if (panel.style.display === "block") {
+                panel.style.display = "none";
+            } else {
+                panel.style.display = "block";
+            }
+        });
+    }
+{% endblock %}
+
+    

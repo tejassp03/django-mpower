@@ -286,6 +286,7 @@
         <script src="{% static 'js/main.js' %}"></script>
         <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.17.1/moment.min.js"></script>
         <script>
+            var jobid;
             $(document).ready(function () {
                 $('.cancelshow').click(function(){
                     $('.pxp-list-side-filter-panel').slideToggle();
@@ -369,11 +370,14 @@
                     }
                 });
             });
-        
+            
             $('.signinbut').click(function(){
                 let user=$('.activer input').val();
+                
                 if(user=="candidate")
                 {
+                    
+
                     c_email=$('[name="c_email"]').val();
                     c_pass=$('[name="c_pass"]').val();
                 }
@@ -382,15 +386,21 @@
                     c_email=$('[name="e_email"]').val();
                     c_pass=$('[name="e_pass"]').val();
                 }
+                var dataToSend = {
+                    user: user,
+                    c_email: c_email,
+                    c_pass: c_pass
+                };
+
+                if (jobid) {
+                    dataToSend.jobid = jobid;
+                    console.log(jobid)
+                }
                 $.ajax(
                 {
                     type:"POST",
                     url: "{% url 'main:index' %}",
-                    data:{
-                            user: user,
-                            c_email: c_email,
-                            c_pass: c_pass,
-                    },
+                    data:dataToSend,
                     success: function( data ) 
                     {
                         if(data['message']=='X')
@@ -426,7 +436,9 @@
                                 }, 500)
                                 $('#signer2').css({'background': 'green', 'border': '1px solid green'})
                             }
+                            
                             window.location = data['url'];
+                            
                         }
                     }
                 })
