@@ -20,8 +20,54 @@
         <link rel="stylesheet" href="{% static 'css/main.css' %}">
         <link rel="stylesheet" href="{% static 'css/style.css' %}">
         <title>mpower - Candidate dashboard - Attempt Test</title>
+        <style>
+            :root {
+                --smaller: .75;
+            }
+            .container {
+                color: #333;
+                margin: 0 auto;
+                text-align: center;
+                background-color: yellow;
+                border-radius:30px;
+            }
+            
+            
+            
+            li {
+              display: inline-block;
+              font-size: 1.5em;
+              list-style-type: none;
+              padding: 1em;
+              text-transform: uppercase;
+            }
+
+            li span {
+              display: block;
+              font-size: 4.5rem;
+            }
+            .main-div-attempt{
+                margin-left: 30px;
+                margin-top: 3%;
+            }
+
+
+            @media all and (max-width: 768px) {
+              h1 {
+                font-size: calc(1.5rem * var(--smaller));
+              }
+              
+              li {
+                font-size: calc(1.125rem * var(--smaller));
+              }
+              
+              li span {
+                font-size: calc(3.375rem * var(--smaller));
+              }
+            }
+        </style>
     </head>
-<div class="pxp-dashboard-content-details">
+<div class="pxp-dashboard-content-details main-div-attempt">
     {% if messages %}
         {% for message in messages %}
          {% if message.tags %}  
@@ -29,9 +75,28 @@
         {% endif %}
         {% endfor %}
     {% endif %}
-    <h1>Test</h1>
+    <h1 >Test</h1>
     <p class="pxp-text-light">Please answer all the questions.</p>
-    <div class="start_btn"><button>Start Test</button></div>
+    <div id="start_btn" class="start_btn" style="display: none;">
+        <button>Start Test</button>
+    </div>
+    <div class="start_btn" id="start_btn_count" style="background-color: yellow; border-radius:30px;display: none;">
+        <div class="container">
+        <h4 id="countdown_timer">Test Time : <SPAN style="color: green;">{{start_time}}</SPAN></h4>
+
+            <h4 id="headline">Remaining Time</h4>
+            <div id="countdown">
+                <ul>
+                    <li><span id="days"></span>days</li>
+                    <li><span id="hours"></span>Hours</li>
+                    <li><span id="minutes"></span>Minutes</li>
+                    <li><span id="seconds"></span>Seconds</li>
+                </ul>
+            </div>
+        </div>
+        <input type="hidden" id="start_timestamp" value="{{ start_time|date:"U" }}">
+
+    </div>
     <!-- Info Box -->
     <div class="info_box">
         <div class="info-title"><span>Some Rules of this Test</span></div>
@@ -87,6 +152,69 @@
 <script src="{% static 'js/owl.carousel.min.js' %}"></script>
 <script src="{% static 'js/nav.js' %}"></script>
 <script src="{% static 'js/Chart.min.js' %}"></script>
+<script>
+
+        const countdownTimer = document.getElementById('countdown_timer');
+        const startTimestamp = parseInt(document.getElementById('start_timestamp').value) * 1000;
+        const cLog = document.getElementById('start_timestamp').value 
+
+        console.log(cLog)
+        
+        
+        // Function to update the countdown timer
+        function updateCountdown() {
+            const now = new Date()
+            // .toLocaleString('en-US', { timeZone: 'Asia/Kolkata' });
+            now.setHours(now.getHours() + 5); 
+            now.setMinutes(now.getMinutes() + 30);
+            const timezoneNow = new Date('{{ timezone.now|date:"U" }}') * 1000; // Convert to milliseconds
+            console.log(now)
+            // console.log(document.getElementById('start_timestamp').value)
+
+            const nowTimestamp = new Date(now).getTime();
+            const difference = startTimestamp - nowTimestamp;
+
+            
+
+            if (difference > 0) {
+                document.getElementById('start_btn').style.display = 'none';
+                document.getElementById('start_btn_count').style.display = 'block';
+                const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+                document.getElementById('days').innerHTML = `${days}`;
+                document.getElementById('hours').innerHTML = `${hours}`;
+
+                document.getElementById('minutes').innerHTML = `${minutes}`;
+
+                document.getElementById('seconds').innerHTML = `${seconds}`;
+
+
+            } else {
+                countdownTimer.innerHTML = 'Test is starting...';
+                document.getElementById('start_btn').style.display = 'block';
+                document.getElementById('start_btn_count').style.display = 'none';
+
+
+                clearInterval(interval);
+            }
+        }
+
+        // Update the countdown timer every second
+        
+        const interval = setInterval(updateCountdown, 1000);
+    
+</script>
+
+
+
+
+
+
+
+
+
 
 <script>
 $(document).ready(function () {

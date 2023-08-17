@@ -17,6 +17,7 @@ import matplotlib.pyplot as plt
 import pyotp
 import base64
 
+
 from main.utils import send_emails
 
 # Create your views here.
@@ -188,7 +189,7 @@ def dashboard(request, pk):
     nums=[len(jobs), len(applics), countunmess]
     if 'shower' in request.session:
         del request.session['shower']
-    return render(request, 'dashboard-employer.html', {'pk': pk, 'nums': nums, 'notifics': all_notis, 'recent': recent_mess_temp, 'candi': finalrecent, 'charts': charts_context, 'counts': counts})
+    return render(request, 'dashboard-mpoweradmin.html', {'pk': pk, 'nums': nums, 'notifics': all_notis, 'recent': recent_mess_temp, 'candi': finalrecent, 'charts': charts_context, 'counts': counts})
 
 def newjob(request, pk):
     if(request.method=="POST"):
@@ -211,7 +212,7 @@ def newjob(request, pk):
     if 'shower' in request.session:
         del request.session['shower']
     roledetails=RoleDetails.objects.all()
-    return render(request, 'newjob-employer.html', {'pk': pk, 'roledetails': roledetails})
+    return render(request, 'newjob-mpoweradmin.html', {'pk': pk, 'roledetails': roledetails})
 
 def edit(request, pk):
     context = Employer.objects.get(eid=pk)
@@ -258,7 +259,7 @@ def edit(request, pk):
         return redirect('employer:cedit', pk=pk)
     if 'shower' in request.session:
         del request.session['shower']
-    return render(request, 'profile-employer.html', {'pk': pk, 'context': context})
+    return render(request, 'profile-mpoweradmin.html', {'pk': pk, 'context': context})
 
 def returnvalue(phone):
 	return str(phone) + str(datetime.date(datetime.now())) + "12345"
@@ -321,7 +322,7 @@ def manage(request, pk):
         page_obj = p.page(p.num_pages)
     if 'shower' in request.session:
         del request.session['shower']
-    return render(request, 'managejob-employer.html', {'pk': pk, 'pe': page_obj, 'count': count})
+    return render(request, 'managejob-mpoweradmin.html', {'pk': pk, 'pe': page_obj, 'count': count})
 
 def candidates(request, pk):
     shower=""
@@ -375,9 +376,12 @@ def candidates(request, pk):
     applics=Application.objects.filter(eid=pk)
     jobs=Jobs.objects.filter(eid=pk).order_by('-postdate')
     app_count=[]
+    employers = Employer.objects.all()
     single_apps=[]
     for i in jobs:
         app_count.append(len(Application.objects.filter(job_id=i.jobid)))
+    if(employers):
+        e_apps = Jobs.objects.filter(eid_id=employers[0].eid)
     if(jobs):
         s_apps=Application.objects.filter(job_id=jobs[0].jobid)
         for i in s_apps:
@@ -440,7 +444,8 @@ def candidates(request, pk):
         page_obj = p.page(1)
     except EmptyPage:
         page_obj = p.page(p.num_pages)
-    return render(request, 'candidate-employer.html', {'pk': pk, 'pe': page_obj, 'count': count, 'jobs': jobs, 'app_count': app_count, 'single': single_apps, 'shower': shower, 'test': testinfo})
+    
+    return render(request, 'candidate-mpoweradmin.html', {'pk': pk, 'pe': page_obj, 'count': count, 'jobs': jobs, 'app_count': app_count, 'single': single_apps, 'shower': shower, 'test': testinfo,'employers':employers,'e_apps':e_apps})
 
 def get_candidate(request, pk):
     candidate = JobSeeker.objects.get(user_id=request.GET['user_id'])
@@ -469,9 +474,31 @@ def get_candidate(request, pk):
     notif.rece_id=loger
     notif.save()
     return JsonResponse({'info': dumps(cand, default=str), 'work': dumps(list(work.values())), 'edu': dumps(list(edu.values()))})
+def get_job(request,pk):
+    print("hello")
+    job = Jobs.objects.get(jobid=request.GET['user_id'])
+    emp_ = Employer.objects.get(eid=job.eid_id) 
+    job_data = {}
+    job_data['title'] = job.title
+    job_data['jobdesc'] = job.jobdesc
+    job_data['experience'] = job.experience
+    job_data['basicpay'] = job.basicpay
+    job_data['fnarea'] = job.fnarea
+    job_data['location'] = job.location
+    job_data['vacno'] = job.vacno
+    job_data['postdate'] = job.postdate
+    job_data['skills'] = job.skills
+    job_data['location'] = job.notice_period
+    job_data['requirements'] = job.requirements
+
+    job_data['name'] = emp_.ename
+    job_data['email'] = emp_.website
+    job_data['phone'] = emp_.phone
+    print("hello")
+    return JsonResponse({'info': dumps(job_data, default=str)})
 
 def subscriptions(request, pk):
-    return render(request, 'subscriptions-employer.html', {'pk': pk})
+    return render(request, 'subscriptions-mpoweradmin.html', {'pk': pk})
 
 def change_pass(request, pk):
     if request.method=="POST":
@@ -496,7 +523,7 @@ def change_pass(request, pk):
             return redirect('employer:change_pass', pk=pk)
     if 'shower' in request.session:
         del request.session['shower']
-    return render(request, 'password-employer.html', {'pk': pk})
+    return render(request, 'password-mpoweradmin.html', {'pk': pk})
 
 def cinbox(request, pk):
     shower=""
@@ -537,7 +564,7 @@ def cinbox(request, pk):
     all_messages.reverse()
     if 'shower' in request.session:
         del request.session['shower']
-    return render(request, 'cinbox-employer.html', {'pk': pk, 'threads': all_threads, 'm': all_messages, 'mess': messages, 'thre': temp_threads, 'shower': shower})
+    return render(request, 'cinbox-mpoweradmin.html', {'pk': pk, 'threads': all_threads, 'm': all_messages, 'mess': messages, 'thre': temp_threads, 'shower': shower})
 
 
 def sendmess(request, pk):
@@ -686,7 +713,7 @@ def cnotifications(request, pk):
         page_obj = p.page(p.num_pages)
     if 'shower' in request.session:
         del request.session['shower']
-    return render(request, 'cnotifications-employer.html', {'pk': pk, 'notif': page_obj})
+    return render(request, 'cnotifications-mpoweradmin.html', {'pk': pk, 'notif': page_obj})
 
 def under_development(request, pk):
     if 'shower' in request.session:
@@ -811,7 +838,7 @@ def cand_suggest(request, pk):
         page_obj = p.page(p.num_pages)
     if 'shower' in request.session:
         del request.session['shower']
-    return render(request, 'suggestions-employer.html', {'pk': pk, 'jobs': job, 'count': count, 'pe': page_obj, 'sel': sel})
+    return render(request, 'suggestions-mpoweradmin.html', {'pk': pk, 'jobs': job, 'count': count, 'pe': page_obj, 'sel': sel})
 
 def get_cands(request, pk):
     applics=Application.objects.filter(job_id=request.GET['jobid'])
@@ -843,6 +870,26 @@ def get_cands(request, pk):
         single_apps.append(single_can)
     return JsonResponse({'info': dumps(single_apps, default=str)})
 
+
+def get_jobs(request, pk):
+    e_apps = Jobs.objects.filter(eid_id=request.GET['jobid'])
+    e_apps_list = []
+    for i in e_apps:
+        user=Employer.objects.get(eid=request.GET['jobid'])
+        single_job = {}
+        single_job['eid_id'] = i.eid_id
+        single_job['location'] = i.location
+        single_job['postdate'] = i.postdate
+        single_job['title'] = i.title
+        single_job['jobid'] = i.jobid
+        single_job['status'] = i.status
+        single_job['log_id'] = user.log_id.log_id
+        single_job['eid'] = user.eid
+        print(user.eid)
+        e_apps_list.append(single_job)
+    return JsonResponse({'info': dumps(e_apps_list, default=str)})
+
+
 def quiz(request, pk):
     quizzes = Quiz.objects.filter(eid=pk)
     quiz = []
@@ -871,7 +918,7 @@ def quiz(request, pk):
         page_obj = p.page(1)
     except EmptyPage:
         page_obj = p.page(p.num_pages)
-    return render(request, 'quiz-employer.html', {'pk': pk, 'count': count, 'pe': page_obj})
+    return render(request, 'quiz-mpoweradmin.html', {'pk': pk, 'count': count, 'pe': page_obj})
 
 def show_tests(request, pk):
     if request.method=="POST":
@@ -908,7 +955,7 @@ def show_tests(request, pk):
         page_obj = p.page(1)
     except EmptyPage:
         page_obj = p.page(p.num_pages)
-    return render(request, 'show-employer.html', {'pk': pk, 'pe': page_obj, 'count': count})
+    return render(request, 'show-mpoweradmin.html', {'pk': pk, 'pe': page_obj, 'count': count})
 
 def create_test(request, pk):
     if request.method=="POST":
@@ -941,7 +988,7 @@ def create_test(request, pk):
         else:
             return redirect('employer:show_tests', pk=pk)
   
-    return render(request, 'create_quiz-employer.html', {'pk':pk})
+    return render(request, 'create_quiz-mpoweradmin.html', {'pk':pk})
 
 def schedule(request, pk):
     if request.method=="POST":
@@ -1093,7 +1140,7 @@ def all_interviews(request, pk):
         page_obj = p.page(1)
     except EmptyPage:
         page_obj = p.page(p.num_pages)
-    return render(request, 'interviews-employer.html', {'pk': pk, 'pe': page_obj, 'count': count})
+    return render(request, 'interviews-mpoweradmin.html', {'pk': pk, 'pe': page_obj, 'count': count})
 
 def done(request, pk):
     if request.method=="POST":
@@ -1161,7 +1208,7 @@ def pending_actions(request, pk):
         page_obj = p.page(1)
     except EmptyPage:
         page_obj = p.page(p.num_pages)
-    return render(request, 'actions-employer.html', {'pk': pk, 'count': count, 'pe': page_obj, 'test': testinfo})
+    return render(request, 'candidate-mpoweradmin.html', {'pk': pk, 'count': count, 'pe': page_obj, 'test': testinfo})
 
 def logout(request, pk):
     employer=Login.objects.get(log_id=Employer.objects.get(eid=pk).log_id.log_id)
@@ -1169,10 +1216,3 @@ def logout(request, pk):
     employer.save()
     request.session.flush()
     return redirect('main:index')
-
-
-
-
-
-
-

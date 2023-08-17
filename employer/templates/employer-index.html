@@ -329,8 +329,8 @@
             <div class="modal-dialog modal-dialog-centered widthadjuster">
                 <div class="modal-content">
                     <div class="modal-body" style="padding: 1rem !important">
-                        <section class="pxp-single-candidate-hero pxp-cover" style="background-image: url();">
-                            <div class="pxp-hero-opacity"></div>
+                        <section class="pxp-single-candidate-hero pxp-cover" style="background-image: url(); border-radius: 30px;">
+                            <div class="pxp-hero-opacity" style="border-radius: 30px;"></div>
                             <div class="pxp-single-candidate-hero-caption">
                                 <div class="pxp-container">
                                     <div class="pxp-single-candidate-hero-content">
@@ -444,6 +444,7 @@
                     <div class="modal-header" style="padding: 10px">
                         <input type="text" style="display: none" name="user_id_val" />
                         <input type="text" class="form-control" placeholder="Paste interview link" name="intlink" />
+                        <input type="datetime-local" name="interviewDate" id="" class="form-control">
                         <a class="btn rounded-pill pxp-nav-btn" onclick="sched()">Schedule</a>
                     </div>
                     <div class="modal-header" id="spanadder">
@@ -809,6 +810,11 @@
         {
             let link=$('[name=intlink]').val();
             let user=$('[name=user_id_val]').val();
+            let int_time=$('[name=interviewDate]').val();
+            console.log(int_time);
+            if (!int_time || int_time.length < 16) { // Adjust the length as needed
+                alert("Please enter a valid full datetime.");
+            }
             if(link=="")
             {
                 alert("Please enter a link");
@@ -821,6 +827,7 @@
                     data:{
                         user_id: user,
                         int_link: link,
+                        date_time: int_time,
                         csrfmiddlewaretoken: '{{ csrf_token }}'
                     },
                     success: function( data ) 
@@ -854,6 +861,7 @@
                             span.setAttribute('style', 'padding: 10px; background: red; color: white; border-radius: 0rem 0rem 1rem 1rem;');
                         }
                         span.append(span2);
+                        
                     },
             })
         }

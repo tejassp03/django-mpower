@@ -934,9 +934,13 @@ def tests(request, pk):
 
 
 def attempt(request, pk, pk2):
+    print(pk)
+    print(pk2)
     testinfo = TestInfo.objects.get(test_id=pk2)
     testques = TestQues.objects.filter(testinfoid=testinfo.testinfoid)
     name = testinfo.test_name
+    test_user = TestUser.objects.get(test_id=testinfo.test_id_id,user_id = pk)
+    start_time = test_user.date
     all_ques = []
     for i in testques:
         single_ques = {}
@@ -947,7 +951,7 @@ def attempt(request, pk, pk2):
         single_ques['opt3'] = i.option3
         single_ques['opt4'] = i.option4
         all_ques.append(single_ques)
-    return render(request, 'attempt-employer.html', {'pk': pk, 'pk2': pk2, 'test': all_ques, 'name': name})
+    return render(request, 'attempt-employer.html', {'pk': pk, 'pk2': pk2, 'test': all_ques, 'name': name,'start_time':start_time})
 
 
 def submit(request, pk):
