@@ -48,22 +48,22 @@
             </div>
 
             <nav class="mt-3 mt-lg-4 d-flex justify-content-between flex-column pb-100">
-                <div class="pxp-dashboard-side-label">Employer tools</div>
+                <div class="pxp-dashboard-side-label">admin tools</div>
                 <ul class="list-unstyled">
-                    <li id="cdas"><a href="{% url 'employer:cdashboard' pk=pk %}"><span class="fa fa-home"></span>Dashboard</a></li>
-                    <li id="cedi"><a href="{% url 'employer:cedit' pk=pk %}"><span class="fa fa-pencil"></span>Edit Profile</a></li>
-                    <li id="cnew"><a href="{% url 'employer:newjob' pk=pk %}"><span class="fa fa-file-text-o"></span>New Job Offer</a></li>
-                    <li id="cman"><a href="{% url 'employer:manage' pk=pk %}"><span class="fa fa-briefcase"></span>Manage Jobs</a></li>
-                    <li id="ccan"><a href="{% url 'employer:candidates' pk=pk %}"><span class="fa fa-user-circle-o"></span>Candidates</a></li>
-                    <li id="csub"><a href="{% url 'employer:subscriptions' pk=pk %}"><span class="fa fa-credit-card"></span>Subscriptions</a></li>
-                    <li id="ccha"><a href="{% url 'employer:change_pass' pk=pk %}"><span class="fa fa-lock"></span>Change Password</a></li>
-                    <li id="qui"><a href="{% url 'employer:show_tests' pk=pk %}"><span class="fa fa-question"></span>Create Test</a></li>
-                    <li id="inr"><a href="{% url 'employer:all_interviews' pk=pk %}"><span class="fa fa-user"></span>Interviews</a></li>
+                    <li id="cdas"><a href="{% url 'mpoweradmin:cdashboard' pk=pk %}"><span class="fa fa-home"></span>Dashboard</a></li>
+                    <li id="cedi"><a href="{% url 'mpoweradmin:cedit' pk=pk %}"><span class="fa fa-pencil"></span>Edit Profile</a></li>
+                    <li id="cnew"><a href="{% url 'mpoweradmin:newjob' pk=pk %}"><span class="fa fa-file-text-o"></span>New Job Offer</a></li>
+                    <li id="cman"><a href="{% url 'mpoweradmin:manage' pk=pk %}"><span class="fa fa-briefcase"></span>Manage Jobs</a></li>
+                    <li id="ccan"><a href="{% url 'mpoweradmin:candidates' pk=pk %}"><span class="fa fa-user-circle-o"></span>Employers</a></li>
+                    <li id="csub"><a href="{% url 'mpoweradmin:subscriptions' pk=pk %}"><span class="fa fa-credit-card"></span>Subscriptions</a></li>
+                    <li id="ccha"><a href="{% url 'mpoweradmin:change_pass' pk=pk %}"><span class="fa fa-lock"></span>Change Password</a></li>
+                    <li id="qui"><a href="{% url 'mpoweradmin:show_tests' pk=pk %}"><span class="fa fa-question"></span>Create Test</a></li>
+                    <li id="inr"><a href="{% url 'mpoweradmin:all_interviews' pk=pk %}"><span class="fa fa-user"></span>Interviews</a></li>
                 </ul>
                 <div class="pxp-dashboard-side-label mt-3 mt-lg-4">Insights</div>
                 <ul class="list-unstyled">
                     <li id="cinb">
-                        <a href="{% url 'employer:cinbox' pk=pk %}" class="d-flex justify-content-between align-items-center">
+                        <a href="{% url 'mpoweradmin:cinbox' pk=pk %}" class="d-flex justify-content-between align-items-center">
                             <div><span class="fa fa-envelope-o"></span>Inbox</div>
                             {% if countunmess == 0 %}
                             <span class="badge rounded-pill" id="countinbox"></span>
@@ -73,7 +73,7 @@
                         </a>
                     </li>
                     <li id="cnot">
-                        <a href="{% url 'employer:cnotifications' pk=pk %}" class="d-flex justify-content-between align-items-center">
+                        <a href="{% url 'mpoweradmin:cnotifications' pk=pk %}" class="d-flex justify-content-between align-items-center">
                             <div><span class="fa fa-bell-o"></span>Notifications</div>
                             {% if request.session.notifnum != 0%}
                             <span class="badge rounded-pill">{{ request.session.notifnum }}</span>
@@ -85,13 +85,13 @@
                 <ul class="list-unstyled">
                     <li id="scn">
                         {% comment %} <a href="candidate-dashboard-notifications.html" class="d-flex justify-content-between align-items-center"> {% endcomment %}
-                            <a href="{% url 'employer:cand_suggest' pk=pk %}" class="d-flex justify-content-between align-items-center">
+                            <a href="{% url 'mpoweradmin:cand_suggest' pk=pk %}" class="d-flex justify-content-between align-items-center">
                             <div><span class="fa fa-file-o"><i class="fa-light fa-lightbulb"></i></span>Suggestions</div>
                         </a>
                     </li>
                     <li id="pen">
                         {% comment %} <a href="candidate-dashboard-notifications.html" class="d-flex justify-content-between align-items-center"> {% endcomment %}
-                            <a href="{% url 'employer:pending_actions' pk=pk %}" class="d-flex justify-content-between align-items-center">
+                            <a href="{% url 'mpoweradmin:pending_actions' pk=pk %}" class="d-flex justify-content-between align-items-center">
                             <div><span class="fa fa-tasks"></span>Actions</div>
                         </a>
                     </li>
@@ -111,9 +111,9 @@
                             <div class="pxp-dashboard-side-user-nav-name">{{ request.session.name }}</div>
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="{% url 'employer:cdashboard' pk=pk %}">Dashboard</a></li>
-                            <li><a class="dropdown-item" href="{% url 'employer:cedit' pk=pk %}">Edit profile</a></li>
-                            <li><a class="dropdown-item" href="{% url 'employer:clogout' pk=pk %}">Logout</a></li>
+                            <li><a class="dropdown-item" href="{% url 'mpoweradmin:cdashboard' pk=pk %}">Dashboard</a></li>
+                            <li><a class="dropdown-item" href="{% url 'mpoweradmin:cedit' pk=pk %}">Edit profile</a></li>
+                            <li><a class="dropdown-item" href="{% url 'mpoweradmin:clogout' pk=pk %}">Logout</a></li>
                         </ul>
                     </div>
                 </div>
@@ -138,18 +138,18 @@
                             <nav class="pxp-nav-mobile">
                                 <ul class="navbar-nav justify-content-end flex-grow-1">
                                     <li class="pxp-dropdown-header">Company tools</li>
-                                    <li class="nav-item"><a href="{% url 'employer:cdashboard' pk=pk %}"><span class="fa fa-home"></span>Dashboard</a></li>
-                                    <li class="nav-item"><a href="{% url 'employer:cedit' pk=pk %}"><span class="fa fa-pencil"></span>Edit Profile</a></li>
-                                    <li class="nav-item"><a href="{% url 'employer:newjob' pk=pk %}"><span class="fa fa-file-text-o"></span>New Job Offer</a></li>
-                                    <li class="nav-item"><a href="{% url 'employer:manage' pk=pk %}"><span class="fa fa-briefcase"></span>Manage Jobs</a></li>
-                                    <li class="nav-item"><a href="{% url 'employer:candidates' pk=pk %}"><span class="fa fa-user-circle-o"></span>Candidates</a></li>
-                                    <li class="nav-item"><a href="{% url 'employer:subscriptions' pk=pk %}"><span class="fa fa-credit-card"></span>Subscriptions</a></li>
-                                    <li class="nav-item"><a href="{% url 'employer:change_pass' pk=pk %}"><span class="fa fa-lock"></span>Change Password</a></li>
-                                    <li class="nav-item"><a href="{% url 'employer:show_tests' pk=pk %}"><span class="fa fa-question"></span>Create Test</a></li>
-                                    <li class="nav-item"><a href="{% url 'employer:all_interviews' pk=pk %}"><span class="fa fa-user"></span>Interviews</a></li>
+                                    <li class="nav-item"><a href="{% url 'mpoweradmin:cdashboard' pk=pk %}"><span class="fa fa-home"></span>Dashboard</a></li>
+                                    <li class="nav-item"><a href="{% url 'mpoweradmin:cedit' pk=pk %}"><span class="fa fa-pencil"></span>Edit Profile</a></li>
+                                    <li class="nav-item"><a href="{% url 'mpoweradmin:newjob' pk=pk %}"><span class="fa fa-file-text-o"></span>New Job Offer</a></li>
+                                    <li class="nav-item"><a href="{% url 'mpoweradmin:manage' pk=pk %}"><span class="fa fa-briefcase"></span>Manage Jobs</a></li>
+                                    <li class="nav-item"><a href="{% url 'mpoweradmin:candidates' pk=pk %}"><span class="fa fa-user-circle-o"></span>Candidates</a></li>
+                                    <li class="nav-item"><a href="{% url 'mpoweradmin:subscriptions' pk=pk %}"><span class="fa fa-credit-card"></span>Subscriptions</a></li>
+                                    <li class="nav-item"><a href="{% url 'mpoweradmin:change_pass' pk=pk %}"><span class="fa fa-lock"></span>Change Password</a></li>
+                                    <li class="nav-item"><a href="{% url 'mpoweradmin:show_tests' pk=pk %}"><span class="fa fa-question"></span>Create Test</a></li>
+                                    <li class="nav-item"><a href="{% url 'mpoweradmin:all_interviews' pk=pk %}"><span class="fa fa-user"></span>Interviews</a></li>
                                     <li class="pxp-dropdown-header mt-4">Insights</li>
                                     <li class="nav-item">
-                                        <a href="{% url 'employer:cinbox' pk=pk %}" class="d-flex justify-content-between align-items-center">
+                                        <a href="{% url 'mpoweradmin:cinbox' pk=pk %}" class="d-flex justify-content-between align-items-center">
                                             <div><span class="fa fa-envelope-o"></span>Inbox</div>
                                             {% if countunmess == 0 %}
                                             <span class="badge rounded-pill" id="countinbox2"></span>
@@ -159,7 +159,7 @@
                                         </a>
                                     </li>
                                     <li class="nav-item">
-                                        <a href="{% url 'employer:cnotifications' pk=pk %}" class="d-flex justify-content-between align-items-center">
+                                        <a href="{% url 'mpoweradmin:cnotifications' pk=pk %}" class="d-flex justify-content-between align-items-center">
                                             <div><span class="fa fa-bell-o"></span>Notifications</div>
                                             {% if request.session.notifnum != 0%}
                                             <span class="badge rounded-pill">{{ request.session.notifnum }}</span>
@@ -169,13 +169,13 @@
                                     <li class="pxp-dropdown-header mt-4">AI Tools<sup style="background: var(--pxpMainColor); padding: 3px; color: white; border-radius: 50rem; margin-left: 5px">Beta</sup></li>
                                     <li class="nav-item">
                                         {% comment %} <a href="candidate-dashboard-notifications.html" class="d-flex justify-content-between align-items-center"> {% endcomment %}
-                                        <a href="{% url 'employer:cand_suggest' pk=pk %}" class="d-flex justify-content-between align-items-center">
+                                        <a href="{% url 'mpoweradmin:cand_suggest' pk=pk %}" class="d-flex justify-content-between align-items-center">
                                             <div><span class="fa fa-file-o"></span>Suggestions</div>
                                         </a>
                                     </li>
                                     <li class="nav-item">
                                         {% comment %} <a href="candidate-dashboard-notifications.html" class="d-flex justify-content-between align-items-center"> {% endcomment %}
-                                        <a href="{% url 'employer:pending_actions' pk=pk %}" class="d-flex justify-content-between align-items-center">
+                                        <a href="{% url 'mpoweradmin:pending_actions' pk=pk %}" class="d-flex justify-content-between align-items-center">
                                             <div><span class="fa fa-tasks"></span>Actions</div>
                                         </a>
                                     </li>
@@ -185,7 +185,7 @@
                     </div>
                 </div>
                 <nav class="pxp-user-nav pxp-on-light">
-                    <a href="{% url 'employer:newjob' pk=pk %}" class="btn rounded-pill pxp-nav-btn">Post a Job</a>
+                    <a href="{% url 'mpoweradmin:newjob' pk=pk %}" class="btn rounded-pill pxp-nav-btn">Post a Job</a>
                     <div class="dropdown pxp-user-nav-dropdown pxp-user-notifications">
                         <a role="button" class="dropdown-toggle" data-bs-toggle="dropdown">
                             <span class="fa fa-bell-o"></span>
@@ -203,14 +203,14 @@
                                 {% elif i.notif_type == "T" %}
                                 <li><a class="dropdown-item" href="#" data-bs-target="#pxp-results-modal" data-bs-toggle="modal" onclick="resultsmodal('{{i.test_id}}')"><strong>{{ i.name }}</strong> had attempted {{i.test_name}} test. <span class="pxp-is-time">{{ i.datetime|naturaltime }}</span></a></li>
                                 {% else %}
-                                <li><a class="dropdown-item" href="{% url 'employer:under_development' pk=pk %}"><strong>{{ i.name }}</strong> applied for <strong>{{ i.title }}</strong>. <span class="pxp-is-time">{{ i.datetime|naturaltime }}</span></a></li>
+                                <li><a class="dropdown-item" href="{% url 'mpoweradmin:under_development' pk=pk %}"><strong>{{ i.name }}</strong> applied for <strong>{{ i.title }}</strong>. <span class="pxp-is-time">{{ i.datetime|naturaltime }}</span></a></li>
                                 {% endif %}
                                 {% endfor %}
                             {% else %}
                             <li><a class="dropdown-item" href="#" style="cursor: text"><strong></strong>No new notifications<span class="pxp-is-time"></span></a></li>
                             {% endif %}
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item pxp-link" href="{% url 'employer:cnotifications' pk=pk %}">Read All</a></li>
+                            <li><a class="dropdown-item pxp-link" href="{% url 'mpoweradmin:cnotifications' pk=pk %}">Read All</a></li>
                         </ul>
                     </div>
                     <div class="dropdown pxp-user-nav-dropdown">
@@ -224,9 +224,9 @@
                             <div class="pxp-user-nav-name d-none d-md-block">{{ request.session.name }}</div>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="{% url 'employer:cdashboard' pk=pk %}">Dashboard</a></li>
-                            <li><a class="dropdown-item" href="{% url 'employer:cedit' pk=pk %}">Edit profile</a></li>
-                            <li><a class="dropdown-item" href="{% url 'employer:clogout' pk=pk %}">Logout</a></li>
+                            <li><a class="dropdown-item" href="{% url 'mpoweradmin:cdashboard' pk=pk %}">Dashboard</a></li>
+                            <li><a class="dropdown-item" href="{% url 'mpoweradmin:cedit' pk=pk %}">Edit profile</a></li>
+                            <li><a class="dropdown-item" href="{% url 'mpoweradmin:clogout' pk=pk %}">Logout</a></li>
                         </ul>
                     </div>
                 </nav>
@@ -476,7 +476,7 @@
             setInterval(getCount, 10000);
             function getCount()
             {
-                let url = "{% url 'employer:inbox_count' pk %}"
+                let url = "{% url 'mpoweradmin:inbox_count' pk %}"
                 $.ajax(
                 {
                     type:"GET",
@@ -596,11 +596,11 @@
         }
 
         function candidatemodal(id)
-        {
+        {console.log(id);
             $.ajax(
             {
                 type:"GET",
-                url: "{% url 'employer:get_candidate' pk=pk %}",
+                url: "{% url 'mpoweradmin:get_job' pk=pk %}",
                 data:{
                         user_id: id
                 },
@@ -614,9 +614,9 @@
                     {
                         $('#title').text(datainfo.title);
                     }
-                    if(datainfo.about)
+                    if(datainfo.jobdesc)
                     {
-                        $('#about').text(datainfo.about);
+                        $('#about').text(datainfo.jobdesc);
                     }
                     if(datainfo.location)
                     {
@@ -753,14 +753,14 @@
             $.ajax(
                 {
                     type:"POST",
-                    url: "{% url 'employer:createthread' pk %}",
+                    url: "{% url 'mpoweradmin:createthread' pk %}",
                     data:{
                         receiver: id,
                         csrfmiddlewaretoken: '{{ csrf_token }}'
                     },
                     success: function( data ) 
                     {
-                        window.location="{% url 'employer:cinbox' pk %}";
+                        window.location="{% url 'mpoweradmin:cinbox' pk %}";
                     },
                 })
         }
@@ -771,7 +771,7 @@
             $.ajax(
                 {
                     type:"GET",
-                    url: "{% url 'employer:get_results' pk %}",
+                    url: "{% url 'mpoweradmin:get_results' pk %}",
                     data:{
                         id: id
                     },
@@ -817,7 +817,7 @@
             $.ajax(
                 {
                     type:"POST",
-                    url: "{% url 'employer:schedule_interview' pk %}",
+                    url: "{% url 'mpoweradmin:schedule_interview' pk %}",
                     data:{
                         user_id: user,
                         int_link: link,

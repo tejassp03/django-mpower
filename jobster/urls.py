@@ -22,5 +22,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('main.urls', namespace = 'main')),
     path('candidate/<int:pk>/', include('candidate.urls', namespace= 'candidate')),
-    path('employer/<int:pk>/', include('employer.urls', namespace= 'employer'))
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    path('employer/<int:pk>/', include('employer.urls', namespace= 'employer')),
+    path('mpoweradmin/<int:pk>/', include('mpoweradmin.urls', namespace= 'mpoweradmin'))
+ ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

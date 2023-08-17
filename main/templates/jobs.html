@@ -37,11 +37,11 @@
                         <span class="input-group-text"><span class="fa fa-search"></span></span>
                         <select id="select-titles" placeholder="Job titles" class="form-select" name="title">
                             <option value="all" selected>Job title</option>
-                            {% for i in titles %}
+                            {% for i in all_titles %}
                                 {% if i.title == context.t %}
-                                <option value='{{ i.title }}' selected>{{ i.title }}</option>
+                                    <option value='{{ i.title }}' selected>{{ i.title }}</option>
                                 {% else %}
-                                <option value='{{ i.title }}'>{{ i.title }}</option>
+                                    <option value='{{ i.title }}'>{{ i.title }}</option>
                                 {% endif %}
                             {% endfor %}
                         </select>
@@ -52,11 +52,11 @@
                         <span class="input-group-text"><span class="fa fa-globe"></span></span>
                         <select id="select-locations" placeholder="Pick a Category..." class="form-select"  name="location">
                             <option value="all">All locations</option>
-                            {% for i in locations %}
+                            {% for i in all_locations %}
                                 {% if i.location == context.l %}
-                                <option value='{{ i.location }}' selected>{{ i.location }}</option>
+                                    <option value='{{ i.location }}' selected>{{ i.location }}</option>
                                 {% else %}
-                                <option value='{{ i.location }}'>{{ i.location }}</option>
+                                    <option value='{{ i.location }}'>{{ i.location }}</option>
                                 {% endif %}
                             {% endfor %}
                         </select>
@@ -67,7 +67,7 @@
                         <span class="input-group-text"><span class="fa fa-folder-o"></span></span>
                         <select id="select-categories" placeholder="Pick a Category..." class="form-select"  name="category">
                             <option value="all">All categories</option>
-                            {% for i in categories %}
+                            {% for i in all_cats %}
                                 {% if i.fnarea == context.c %}
                                 <option value='{{ i.fnarea }}' selected>{{ i.fnarea }}</option>
                                 {% else %}
@@ -127,27 +127,18 @@
                         <h3 class="mt-3 mt-lg-4">Experience Level</h3>
                         <div class="list-group mt-2 mt-lg-3">
                             {% comment %} <form method="GET"> {% endcomment %}
-                                {% for i, j in emptype %}
-                                {% if i.experience in context.eel %}
-                                <label class="list-group-item d-flex justify-content-between align-items-center pxp-checked">
-                                    <span class="d-flex">
-                                        <input class="form-check-input me-2 exp" type="checkbox" value='{{i.experience}}' name="exp" checked>
-                                        {{i.experience}}
-                                        <input type="submit" style="display: none" class="expbutton">
-                                    </span>
-                                    <span class="badge rounded-pill">{{j}}</span>
-                                </label>
+                                <h3 class="mt-3 mt-lg-4">Experience Level</h3>
+                                {% if 'exp' in context%}
+                                <div class="mt-2 mt-lg-3">
+                                    <input type="range" class="form-range" min="0" max="9" step="1" id="experienceSlider" name="exp" value="{{context.exp}}">
+                                    <span id="selectedExperience">{{context.exp}}</span> years
+                                </div>
                                 {% else %}
-                                <label class="list-group-item d-flex justify-content-between align-items-center mt-2 mt-lg-3">
-                                    <span class="d-flex">
-                                        <input class="form-check-input me-2 exp" type="checkbox" value='{{i.experience}}' name="exp">
-                                        {{i.experience}}
-                                        <input type="submit" style="display: none" class="expbutton">
-                                    </span>
-                                    <span class="badge rounded-pill">{{j}}</span>
-                                </label>
+                                <div class="mt-2 mt-lg-3">
+                                    <input type="range" class="form-range" min="0" max="9" step="1" id="experienceSlider" name="exp" value="0">
+                                    <span id="selectedExperience">0</span> years
+                                </div>
                                 {% endif %}
-                                {% endfor %}
                                 {% comment %} </form> {% endcomment %}  
                         </div>
                     
@@ -305,12 +296,8 @@
                                     {% endif %}
                                 </div>
                                 <div class="col-sm-9 col-md-10 col-lg-9 col-xl-10 col-xxl-4">
-                                    {% if request.session.name %}
                                     <a href="{% url 'main:singlejob' pk2=i.jobid %}" class="pxp-jobs-card-3-title mt-3 mt-sm-0">{{ i.title }}</a>
-                                    {% else %}
-                                    <a href="#" role="button" class="pxp-jobs-card-3-title mt-3 mt-sm-0" data-bs-toggle="modal" data-bs-target="#pxp-signin-modal" data-jobid="{{ i.jobid }}">{{ i.title }}</a>
 
-                                    {% endif %}
                                     <div class="pxp-jobs-card-3-details">
                                         <a href="#" class="pxp-jobs-card-3-location">
                                             <span class="fa fa-globe"></span>{{ i.location }}
@@ -327,11 +314,7 @@
                                     </div>
                                 </div>
                                 <div class="col-sm-4 col-xl-2 col-xxl-auto mt-3 mt-xxl-0 pxp-text-right">
-                                    {% if request.session.name %}
                                         <a href="{% url 'main:singlejob' pk2=i.jobid %}" class="btn rounded-pill pxp-card-btn">Apply</a>
-                                    {% else %}
-                                        <a href="#" role="button" class="btn rounded-pill pxp-card-btn" data-bs-toggle="modal" data-bs-target="#pxp-signin-modal" data-jobid="{{ i.jobid }}">Apply</a>
-                                    {% endif %}
                                 </div>
                                 
                             </div>
@@ -403,12 +386,12 @@
 {% include "footer.html" %}
 
 {% endblock %}
-{% block script %}
-    var buttons = document.querySelectorAll(".pxp-card-btn");
-    buttons.forEach(function(button) {
-        button.addEventListener("click", function(event) {
-            jobid = event.target.dataset.jobid;
-        });
-    });
 
+{% block script %}
+const experienceSlider = document.getElementById('experienceSlider');
+    const selectedExperience = document.getElementById('selectedExperience');
+
+    experienceSlider.addEventListener('input', () => {
+        selectedExperience.textContent = experienceSlider.value;
+    });
 {% endblock script %}

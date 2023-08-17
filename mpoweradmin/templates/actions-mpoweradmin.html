@@ -1,36 +1,28 @@
-{% extends 'employer-index.html' %}
+{% extends 'mpoweradmin-index.html' %}
 {% load static %}
 {% load humanize %}
 
 {% block title %}
-<title>mpower - Company dashboard - Manage jobs</title>
+<title>mpower - Company dashboard - Pending Actions</title>
 {% endblock %}
 {% block content %}
 
 
 <div class="pxp-dashboard-content-details">
-    <h1>Manage Jobs</h1>
-    <p class="pxp-text-light">Detailed list with all your job offers.</p>
+    <h1>Pending Actions</h1>
+    <p class="pxp-text-light">Future actions on candidates that have applied</p>
 
     <div class="mt-4 mt-lg-5">
         <div class="row justify-content-between align-content-center">
             <div class="col-auto order-2 order-sm-1">
-                <div class="pxp-company-dashboard-jobs-bulk-actions mb-3">
-                    <select class="form-select" name="act">
-                        <option value="a">Bulk actions</option>
-                        {% comment %} <option>Edit</option> {% endcomment %}
-                        <option value="b">Delete</option>
-                    </select>
-                    <button class="btn ms-2" onclick="multiple()">Apply</button>
-                </div>
             </div>
             <div class="col-auto order-1 order-sm-2">
                 <div class="pxp-company-dashboard-jobs-search mb-3">
-                    <div class="pxp-company-dashboard-jobs-search-results me-3">{{ count }} Jobs</div>
+                    <div class="pxp-company-dashboard-jobs-search-results me-3">{{ count }} Applications</div>
                     <div class="pxp-company-dashboard-jobs-search-search-form">
                         <div class="input-group">
                             <span class="input-group-text" style="background: white"><span class="fa fa-search"></span></span>
-                            <input type="text" class="form-control" placeholder="Search jobs..." id="search">
+                            <input type="text" class="form-control" placeholder="Search candidates..." id="search">
                         </div>
                     </div>
                 </div>
@@ -40,42 +32,45 @@
             <table class="table table-hover align-middle" id="table">
                 <thead>
                     <tr>
-                        <th class="pxp-is-checkbox" style="width: 1%;"><input type="checkbox" onClick="toggle(this)" class="form-check-input" name="all"></th>
-                        <th style="width: 25%;">Job</th>
-                        <th style="width: 20%;">Category</th>
-                        <th style="width: 12%;">Type</th>
-                        <th style="width: 15%;">Applications</th>
-                        <th>Date<span class="fa fa-angle-up ms-3"></span></th>
-                        <th>&nbsp;</th>
+                        <th style="width: 3%">&nbsp;</th>
+                        <th style="width: 25%;">Name</th>
+                        <th style="width: 20%;">Applied for</th>
+                        <th style="width: 20%;">Apply Date<span class="fa fa-angle-up ms-3"></span></th>
+                        <th style="width: 20%">Current status</th>
+                        <th style="width: 20%;">Pending Action</th>
+                        <th style="width: 20%;">&nbsp;</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for i in pe %}
                     <tr>
-                        <td><input type="checkbox" name="chek" class="form-check-input" value={{ i.jobid }}></td>
+                        <td>
+                            {% if i.photo %}
+                            <div class="pxp-company-dashboard-candidate-avatar pxp-cover" style="background-image: url('{{i.photo}}');"></div>
+                            {% else %}
+                            <div class="pxp-company-dashboard-candidate-avatar pxp-cover" style="background-image: url('/static/images/company-logo-1.png');"></div>
+                            {% endif %}
+                        </td>
                         <td>
                             <a href="#">
-                                <div class="pxp-company-dashboard-job-title" onclick="loadermodal('{{i.jobid}}')" data-bs-target="#pxp-job-modal" data-bs-toggle="modal">{{ i.title }}</div>
+                                <div class="pxp-company-dashboard-job-title" id="pxp-candidate-modal-button" data-bs-target="#pxp-candidate-modal" data-bs-toggle="modal" onclick="candidatemodal('{{i.user_id}}')">{{ i.name }}</div>
                                 <div class="pxp-company-dashboard-job-location"><span class="fa fa-globe me-1"></span>{{ i.location }}</div>
                             </a>
                         </td>
-                        <td><div class="pxp-company-dashboard-job-category">{{ i.fnarea }}</div></td>
-                        <td><div class="pxp-company-dashboard-job-type">{{ i.jobtype }}</div></td>
-                        <td><a href="#" class="pxp-company-dashboard-job-applications">{{ i.num }} Candidates</a></td>
                         <td>
-                            <div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-success">Published</span></div>
-                            <div class="pxp-company-dashboard-job-date mt-1">{{ i.postdate }}</div>
+                            <a href="#">
+                                <div class="pxp-company-dashboard-job-title" onclick="loadermodal('{{i.jobid}}')" data-bs-target="#pxp-job-modal" data-bs-toggle="modal">{{ i.title }}</div>
+                                <div class="pxp-company-dashboard-job-location"><span class="fa fa-globe me-1"></span>{{ i.job_location }}</div>
+                            </a>
                         </td>
-                        <td>
-                            <div class="pxp-dashboard-table-options">
-                                <ul class="list-unstyled">
-                                    <li><button title="Edit" id="pxp-exp-modal-button" data-bs-target="#pxp-edit-modal" data-bs-toggle="modal" onclick="expmodal('{{i.jobid}}')"><span class="fa fa-pencil"></span></button></li>
-                                    <li><button onclick="loadermodal('{{i.jobid}}')" data-bs-target="#pxp-job-modal" data-bs-toggle="modal" title="Preview"><span class="fa fa-eye"></span></button></li>
-                                    <input style="display: none" value={{i.jobid}}>
-                                    <li><button title="Delete" onclick="delfav({{i.jobid}})"><span class="fa fa-trash-o"></span></button></li>
-                                </ul>
-                            </div>
-                        </td>
+                        <td><div class="pxp-company-dashboard-job-type">{{ i.apply_date }}</div></td>
+                        {% if i.status == 0 %}
+                        <td><div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-secondary">Applied</span></div></td>
+                        <td><button class="btn rounded-pill pxp-nav-btn" title="Schedule Test" id="pxp-schedule-modal-button" data-bs-target="#pxp-schedule-modal" data-bs-toggle="modal" onclick="setter('{{i.apply_id}}')">Schedule Test</button></td>
+                        {% elif i.status == 4 %}
+                        <td><div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-primary">Test Answered <br> {{ i.results }} %</span></div></td>
+                        <td><button class="btn rounded-pill pxp-nav-btn" title="Schedule Interview" id="pxp-interview-modal-button" data-bs-target="#pxp-results-modal" data-bs-toggle="modal" onclick="resultsmodal('{{i.test_id}}')">Schedule Interview</button></td>
+                        {% endif %}
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -85,7 +80,7 @@
                 <div class="col-auto">
                     <nav class="mt-3 mt-sm-0" aria-label="Jobs list pagination">
                         <ul class="pagination pxp-pagination">
-                            {% if count >= 6%}
+                            {% if count >= 11 %}
                             {% if pe.has_previous %}
                                 {% if GET_params %}
                                 <li class="page-item"><a style="padding: 0.7rem" href="?{{GET_params.urlencode}}&amp;page={{pe.previous_page_number}}" class="page-link"><i class="fa fa-chevron-left" aria-hidden="true"></i></a></li>
@@ -260,6 +255,33 @@
     </div>
 </div>
 
+
+<div class="modal fade pxp-user-modal" id="pxp-schedule-modal" aria-hidden="true" aria-labelledby="scheduleModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered widthadjuster" style="justify-content: center">
+        <div class="modal-content" style="width: 40rem">
+            <div class="modal-header" style="padding: 10px">
+                Please select the test
+            </div>
+            <hr style="margin: 0px" />
+            <div class="modal-body" style="padding: 1rem !important">
+                <div class="pxp-company-dashboard-jobs-bulk-actions" style="margin-left: auto">
+                    <select class="form-select" name="testinfo">
+                            {% for i in test %}
+                            <option value="{{ i.testinfoid }}">
+                            {{ i.test_name }}
+                            </option>
+                            {% endfor %}
+                    </select>
+                    <button class="btn ms-2" onclick="scheduletest()">Schedule</button>
+                </div>
+            </div>
+            <div>
+                <input type="datetime-local">
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock content%}
 
 {% block script %}
@@ -267,7 +289,7 @@ $(document).ready(function () {
     $('#cdas').removeClass('pxp-active');
     $('#cedi').removeClass('pxp-active');
     $('#cnew').removeClass('pxp-active');
-    $('#cman').addClass('pxp-active');
+    $('#cman').removeClass('pxp-active');
     $('#ccan').removeClass('pxp-active');
     $('#csub').removeClass('pxp-active');
     $('#ccha').removeClass('pxp-active');
@@ -276,7 +298,7 @@ $(document).ready(function () {
     $('#scn').removeClass('pxp-active');
     $('#qui').removeClass('pxp-active');
     $('#inr').removeClass('pxp-active');
-    $('#pen').removeClass('pxp-active');
+    $('#pen').addClass('pxp-active');
 })
 
 var $rows = $('#table tbody tr');
@@ -289,139 +311,36 @@ $('#search').keyup(function() {
     }).hide();
 });
 
-$("[name='chek']").change(function(){
-    let a=0;
-    checkboxes = document.getElementsByName('chek');
-    let n=checkboxes.length
-    for(let i=0;i<n;i++) {
-      if(checkboxes[i].checked==false)
-      {
-        a=a+1;
-      }
-    }
-    if(a==0)
-    {
-        $("[name=all]").prop('checked', true);
-    }
-    else
-    {
-        $("[name=all]").prop('checked', false);
-    }
-})
-function delfav(id)
-{
-    $.ajax(
-        {
-            type:"POST",
-            url: "",
-            data:{
-                    'job_id': id,
-                    csrfmiddlewaretoken: '{{ csrf_token }}'
-            },
-            success: function( data ) 
-            {
-                location.reload()
-            }
-    })
-}
+let user;
 
-function multiple()
+function setter(id)
 {
-    let action=$("[name='act']").val();
-    if(action=='a')
-    {
-        alert("Please select an appropriate action")
-        return;
-    }
+    user=id;
+}
+function scheduletest()
+{
     let ids=[];
     $("[name='chek']:checked").map(function () {
         ids.push(this.value);
     })
-    if(ids.length==0)
-    {
-        alert("Please select at least one of the records to apply delete operation")
-        return;
-    }
     $.ajax(
+    {
+        type:"POST",
+        url: "{% url 'employer:schedule' pk %}",
+        data:{
+                id: user,
+                ids: ids,
+                testinfoid: $("[name='testinfo']").val(),
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+        },
+        success: function( data ) 
         {
-            type:"POST",
-            url: "",
-            data:{
-                    'ids': ids,
-                    'act': "delall",
-                    csrfmiddlewaretoken: '{{ csrf_token }}'
-            },
-            success: function( data ) 
+            if(data['message']=="X")
             {
-                location.reload()
+                alert('Test already scheduled');
             }
+            location.reload();
+        }
     })
 }
-
-function toggle(source) {
-    checkboxes = document.getElementsByName('chek');
-    for(var i=0, n=checkboxes.length;i<n;i++) {
-      checkboxes[i].checked = source.checked;
-    }
-  }
-
-  function expmodal(id)
-  {
-      $.ajax(
-      {
-          type:"GET",
-          url: "{% url 'employer:edit_job' pk=pk %}",
-          data:{
-                  jobid: id
-          },
-          success: function( data ) 
-          {
-              $('[name="jobidm"]').val(JSON.parse(data['info'])[0].jobid);
-              $('[name="title"]').val(JSON.parse(data['info'])[0].title);
-              $('[name="location"]').val(JSON.parse(data['info'])[0].location);
-              $('[name="fnarea"]').val(JSON.parse(data['info'])[0].fnarea);
-              $('[name="description"]').val(JSON.parse(data['info'])[0].jobdesc);
-              $('[name="experience"]').val(JSON.parse(data['info'])[0].experience);
-              $('[name="careerlevel"]').val(JSON.parse(data['info'])[0].careerlevel);
-              $('[name="jobtype"]').val(JSON.parse(data['info'])[0].jobtype);
-              $('[name="basicpay"]').val(JSON.parse(data['info'])[0].basicpay);
-              $('[name="skills"]').val(JSON.parse(data['info'])[0].skills);
-              $('[name="responsibilities"]').val(JSON.parse(data['info'])[0].responsibilities);
-              $('[name="requirements"]').val(JSON.parse(data['info'])[0].requirements);
-          }
-      })
-  }
-  
-  function jobmodalsub()
-  {
-      $.ajax(
-      {
-          type:"POST",
-          url: "{% url 'employer:edit_job' pk=pk %}",
-          data:{
-                  jobid: $('[name="jobidm"]').val(),
-                  title: $('[name="title"]').val(),
-                  location: $('[name="location"]').val(),
-                  fnarea: $('[name="fnarea"]').val(),
-                  description: $('[name="description"]').val(),
-                  experience: $('[name="experience"]').val(),
-                  careerlevel: $('[name="careerlevel"]').val(),
-                  jobtype: $('[name="jobtype"]').val(),
-                  basicpay: $('[name="basicpay"]').val(),
-                  skills: $('[name="skills"]').val(),
-                  responsibilities: $('[name="responsibilities"]').val(),
-                  requirements: $('[name="requirements"]').val(),
-                  csrfmiddlewaretoken: '{{ csrf_token }}'
-          },
-          success: function( data ) 
-          {
-             alert("Data updated successfully");
-             window.location.reload()
-          }
-      })
-  }
-  
-
-
-
 {% endblock %}

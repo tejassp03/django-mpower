@@ -307,7 +307,7 @@ section .option_list .option .icon{
 
 footer{
     height: 60px;
-    width: 100%;
+    /* width: 100%; */
     z-index: -10;
     padding: 30px;
     display: flex;

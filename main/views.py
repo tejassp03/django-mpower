@@ -44,9 +44,11 @@ from django.core.files.base import ContentFile
 from django.core.files import File
 from django.core.files.base import ContentFile
 from django.contrib.auth.decorators import login_required
+
 # import plotly.express as px
 
-
+from django.utils import timezone
+from datetime import date, timedelta, datetime
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from itertools import chain
 
@@ -368,6 +370,7 @@ def findjobs(request):
     cat_sel = []
     loc_sel = []
     data = []
+    exp = int(0)
     t_val = request.GET.get('title', '') or 'all'
     c_val = request.GET.get('category', '') or 'all'
     l_val = request.GET.get('location', '') or 'all'
@@ -411,11 +414,14 @@ def findjobs(request):
         jobs = jobs.filter(jobtype__in=request.GET.getlist('emp'))
         emp_sel = request.GET.getlist('emp')
     if 'exp' in request.GET:
-        jobs = jobs.filter(experience__in=request.GET.getlist('exp'))
-        exp_sel = request.GET.getlist('exp')
+        exp = int(request.GET['exp'])
+        jobs = jobs.filter(experience__lte=exp)
+        exp_sel = exp
+        
     if 'sal' in request.GET:
         jobs = jobs.filter(basicpay__in=request.GET.getlist('sal'))
         sal_sel = request.GET.getlist('sal')
+
     if 'cat' in request.GET:
         jobs = jobs.filter(fnarea__in=request.GET.getlist('cat'))
         cat_sel = request.GET.getlist('cat')
@@ -464,6 +470,10 @@ def findjobs(request):
     countemp = []
     countsal = []
     countloc = []
+    all_jobs = Jobs.objects.all()
+    all_titles = all_jobs.order_by().values('title').distinct()
+    all_locations = all_jobs.order_by().values('location').distinct()
+    all_cat = all_jobs.order_by().values('fnarea').distinct()
     for i in jobtype:
         countjob.append(len(jobs.filter(jobtype=i['jobtype'])))
     for i in emptype:
@@ -472,9 +482,12 @@ def findjobs(request):
         countsal.append(len(jobs.filter(basicpay=i['basicpay'])))
     for i in locations:
         countloc.append(len(jobs.filter(location=i['location'])))
+    
     context = {'c': c_val, 'l': l_val, 't': t_val, 'd': d_val,
                'sel': emp_sel, 'eel': exp_sel, 'els': sal_sel,'wls':wt_sel,'cls':cat_sel,'lcs':loc_sel}
-    return render(request, 'jobs.html', {'page_obj': page_obj, 'pe': page_obj, 'count': count, 'locations': locations,'countloc':countloc, 'titles': titles, 'categories': categories, 'GET_params': GET_params, 'jobtype': zip(jobtype, countjob), 'emptype': zip(emptype, countemp), 'saltype': zip(salary, countsal), 'context': context})
+    if exp != 0:
+        context['exp'] = exp
+    return render(request, 'jobs.html', {'page_obj': page_obj, 'pe': page_obj, 'count': count, 'locations': locations,'countloc':countloc, 'titles': titles, 'categories': categories, 'GET_params': GET_params, 'jobtype': zip(jobtype, countjob), 'emptype': zip(emptype, countemp), 'saltype': zip(salary, countsal), 'context': context,'all_titles':all_titles,'all_locations':all_locations,'all_cats':all_cat})
 
 
 def profile_completion(request, pk):
@@ -1016,7 +1029,6 @@ def singlejob(request, pk2):
             like = LikedJobs(job_id=job_id, user_id=user_id)
             like.save()
             print("saved")
-
         return redirect('main:singlejob', pk2=pk2)
     jobdet = Jobs.objects.get(jobid=pk2)
     jobdet.num_of_visits = jobdet.num_of_visits+1
@@ -1115,36 +1127,37 @@ def singlejob(request, pk2):
 
 
     #######################################################################################
-    job = Jobs.objects.get(jobid=pk2)
-    job_seeker = JobSeeker.objects.get(user_id=request.session['pk'])
+    if 'pk' in request.session:
+        job = Jobs.objects.get(jobid=pk2)
+        job_seeker = JobSeeker.objects.get(user_id=request.session['pk'])
 
-    important_data_jobs = f"{job.title} {job.jobdesc} {job.fnarea} {job.skills} {job.experience} {job.basicpay} {job.location} {job.industry} {job.ugqual} {job.pgqual} {job.profile} {job.jobtype} {job.requirements} {job.responsibilities} {job.notice_period}"
-    job_description = preprocess_text(important_data_jobs)
+        important_data_jobs = f"{job.title} {job.jobdesc} {job.fnarea} {job.skills} {job.experience} {job.basicpay} {job.location} {job.industry} {job.ugqual} {job.pgqual} {job.profile} {job.jobtype} {job.requirements} {job.responsibilities} {job.notice_period}"
+        job_description = preprocess_text(important_data_jobs)
 
-    important_data_jobseeker = f"{job_seeker.location} {job_seeker.experience} {job_seeker.skills} {job_seeker.basic_edu} {job_seeker.master_edu} {job_seeker.other_qual} {job_seeker.cursal} {job_seeker.expsal} {job_seeker.notice_period}"
-    job_seeker_data = preprocess_text(important_data_jobseeker)
+        important_data_jobseeker = f"{job_seeker.location} {job_seeker.experience} {job_seeker.skills} {job_seeker.basic_edu} {job_seeker.master_edu} {job_seeker.other_qual} {job_seeker.cursal} {job_seeker.expsal} {job_seeker.notice_period}"
+        job_seeker_data = preprocess_text(important_data_jobseeker)
 
-    resume_pdf_file = job_seeker.Resume.path
-    resume_text = extract_text_from_pdf(resume_pdf_file)
-    resume_text = preprocess_text(resume_text)
-    total_job_seeker_data = f"{job_seeker_data}{resume_text}"
-    vectorizer = CountVectorizer()
+        resume_pdf_file = job_seeker.Resume.path
+        resume_text = extract_text_from_pdf(resume_pdf_file)
+        resume_text = preprocess_text(resume_text)
+        total_job_seeker_data = f"{job_seeker_data}{resume_text}"
+        vectorizer = CountVectorizer()
 
-    job_description_vector = vectorizer.fit_transform([job_description])
-    job_seeker_data_vector = vectorizer.transform([total_job_seeker_data])
+        job_description_vector = vectorizer.fit_transform([job_description])
+        job_seeker_data_vector = vectorizer.transform([total_job_seeker_data])
 
-    cosine_sim_job_seeker = cosine_similarity(job_description_vector, job_seeker_data_vector)
+        cosine_sim_job_seeker = cosine_similarity(job_description_vector, job_seeker_data_vector)
 
-    job_matching_percentage = round(cosine_sim_job_seeker[0][0] * 100, 2)
+        job_matching_percentage = round(cosine_sim_job_seeker[0][0] * 100, 2)
     # print(f"Job Matching Percentage (Job Seeker Skills): {job_matching_percentage}%")
     #######################################################################################
 
     
     
 
-    job_matcher = JobMatcher(jobseeker=job_seeker, job=job)
-    match_percentage = job_matcher.calculate_match_percentage()
-    matching_details = job_matcher.get_matching_details()
+        job_matcher = JobMatcher(jobseeker=job_seeker, job=job)
+        match_percentage = job_matcher.calculate_match_percentage()
+        matching_details = job_matcher.get_matching_details()
     
     
     # print(match_percentage)
@@ -1153,7 +1166,10 @@ def singlejob(request, pk2):
     #     'match_percentage': match_percentage,
     #     'matching_details': matching_details,
     # }
-    job_matching_percentage = round((job_matching_percentage+match_percentage)/2,2)
+        job_matching_percentage = round((job_matching_percentage+match_percentage)/2,2)
+    else:
+        job_matching_percentage = "Please login to check eligibility"
+        matching_details = "No"
     return render(request, 'singlejob.html', {'job_details': jobdet, 'company_details': companydet, 'liked': lik, 'loger': loger, 'skills': skills, 'requirements': requirements, 'responsibilities': responsibilities, 'date': app_date, 'score': job_matching_percentage, 'skills_required': skills_required,'matching_details': matching_details})
 
 
@@ -1199,13 +1215,21 @@ def calculate_similarity(cluster_skills, job_skills):
     job_vector = [1 if skill in job_skills else 0 for skill in skill_set]
     similarity_score = cosine_similarity([your_vector], [job_vector])
     return similarity_score[0][0]
+def group_jobseekers_by_role():
+    jobseekers_by_role = defaultdict(list)
+    
+    jobseekers = JobSeeker.objects.all()
+    for jobseeker in jobseekers:
+        jobseekers_by_role[jobseeker.role].append(jobseeker.log_id.email)
+    
+    return dict(jobseekers_by_role)
+
+
 
 def daily_mail():
-    all_job_seekers = JobSeeker.objects.all()
-    clustered_job_seekers, cluster_info = create_clusters_with_kmeans(all_job_seekers)
+    jobs_queryset = Jobs.objects.all()
     email_subject = "Daily Job Recommendations"
 
-    jobs_queryset = Jobs.objects.all()
     jobs_data = []
     for job in jobs_queryset:
         eid_id = job.eid_id
@@ -1219,6 +1243,51 @@ def daily_mail():
             'skills': skills
         }
         jobs_data.append(job_data)
+    grouped_jobs = {}
+    for job_data in jobs_data:
+        title = job_data['title']
+        if title in grouped_jobs:
+            grouped_jobs[title].append(job_data)
+        else:
+            grouped_jobs[title] = [job_data]
+    
+    role_email_list = []
+    grouped_jobseekers = group_jobseekers_by_role()
+    
+   
+    for role ,email_list in grouped_jobseekers.items():
+        job_eid = []
+        job_titles = []
+        job_locations = []
+        job_company = []
+        
+        if role is not None:
+            job_list_for_role = grouped_jobs[role]
+            for i in job_list_for_role:
+                job_eid.append(i['eid_id'])
+                job_titles.append(i['title'])
+                job_locations.append(i['location'])
+                
+        if len(job_eid)>0:
+            matching_employers = Employer.objects.filter(eid__in=job_eid)
+            ename_dict = {employer.eid: employer.ename for employer in matching_employers}
+            job_company = [ename_dict[eid] for eid in job_eid]
+            message = render_to_string('daily-email.html', {  
+                'suggestions': zip(job_company, job_titles, job_locations),
+                'suggestions_match': True
+            })
+            role_email_list.extend(email_list)
+            email = EmailMessage(email_subject, message, settings.EMAIL_HOST_USER, email_list)
+            email.fail_silently = True
+            email.content_subtype = "html"
+            email.send()
+
+
+    
+    all_job_seekers = JobSeeker.objects.exclude(log_id__email__in=role_email_list)
+    clustered_job_seekers, cluster_info = create_clusters_with_kmeans(all_job_seekers)
+
+    
 
     for cluster_label, info in cluster_info.items():
         cluster_skill_list = []
@@ -1271,6 +1340,7 @@ def get_job(request):
         applic.job_id = Jobs.objects.get(jobid=request.POST['id'])
         applic.eid = applic.job_id.eid
         applic.why_desc = request.POST['whyhire']
+        applic.date_applied = timezone.localtime() + timedelta(hours=5, minutes=30)
         applic.save()
         return JsonResponse({'message': 'Y'})
 

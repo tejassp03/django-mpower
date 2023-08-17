@@ -16,6 +16,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import pyotp
 import base64
+from django.utils import timezone
 
 from main.utils import send_emails
 
@@ -221,7 +222,12 @@ def newjob(request, pk):
         job.careerlevel = request.POST['careerlevel']
         job.jobtype = request.POST['jobtype']
         job.basicpay = request.POST['basicpay']
-        job.skills = request.POST['skills']
+        #############################################
+        # job.skills = request.POST['skills']
+        raw_skills = request.POST['skills']
+        normalized_skills = ','.join(skill.strip() for skill in raw_skills.split(','))
+        job.skills = normalized_skills
+        #############################################
         job.responsibilities = request.POST['responsibilities']
         job.requirements = request.POST['requirements']
         job.save()
@@ -1009,6 +1015,11 @@ def create_test(request, pk):
 
 def schedule(request, pk):
     if request.method == "POST":
+        date_time_str = request.POST['date_time']
+        desired_datetime = timezone.datetime.strptime(date_time_str, "%Y-%m-%dT%H:%M")
+        aware_datetime = timezone.make_aware(desired_datetime)
+        ist_datetime = aware_datetime 
+        # + timezone.timedelta(hours=5, minutes=30)
         if 'ids[]' in request.POST:
             ids = request.POST.getlist('ids[]')
             f = False
@@ -1028,6 +1039,7 @@ def schedule(request, pk):
                     applics.status = 3
                     request.session['shower'] = applics.job_id.jobid
                     testuser = TestUser()
+                    testuser.date = ist_datetime
                     testuser.user_id = applics.user_id
                     testuser.test_id = testinfo.test_id
                     applics.test = testinfo
@@ -1047,17 +1059,27 @@ def schedule(request, pk):
             return JsonResponse({'message': 'scheduled'})
         applics = Application.objects.get(apply_id=request.POST['id'])
         if applics.status == 3:
+            print("status")
+
             return JsonResponse({'message': 'X'})
+        print("hello")
         testinfo = TestInfo.objects.get(testinfoid=request.POST['testinfoid'])
+        # print(applics.user_id,testinfo.test_id.test_id)
         tuser = TestUser.objects.filter(
             user_id=applics.user_id, test_id=testinfo.test_id.test_id)
-        if (len(tuser) > 0):
-            return JsonResponse({'message': 'X'})
+        # con_user = TestUser.objects.filter(user_id=applics.user_id, test_id=testinfo.test_id.test_id,jobid = applics.job_id.jobid)
+        # if (len(con_user) > 0):
+        #     print("testuser")
+        #     return JsonResponse({'message': 'X'})
+        
         applics.status = 3
         request.session['shower'] = applics.job_id.jobid
         testuser = TestUser()
         testuser.user_id = applics.user_id
         testuser.test_id = testinfo.test_id
+        print("hello")
+
+        testuser.date = ist_datetime
         applics.test = testinfo
         applics.save()
         testuser.save()
@@ -1103,16 +1125,23 @@ def get_results(request, pk):
 
 def schedule_interview(request, pk):
     if request.method == "POST":
+        date_time_str = request.POST['date_time']
+        desired_datetime = timezone.datetime.strptime(date_time_str, "%Y-%m-%dT%H:%M")
+        aware_datetime = timezone.make_aware(desired_datetime)
+        ist_datetime = aware_datetime 
+        # + timezone.timedelta(hours=5, minutes=30)
         check = Interview.objects.filter(
             user_id=request.POST['user_id'], eid=pk)
         if (len(check) != 0):
             check[0].int_link = request.POST['int_link']
+            check[0].schedule_date = ist_datetime
             check[0].save()
             return JsonResponse({'m': 'A'})
         intval = Interview()
         intval.eid = Employer.objects.get(eid=pk)
         intval.user_id = JobSeeker.objects.get(user_id=request.POST['user_id'])
         intval.int_link = request.POST['int_link']
+        intval.schedule_date = ist_datetime
         intval.is_done = False
         intval.is_feedgiven = False
         intval.save()

@@ -197,11 +197,12 @@
                                     <div class="pxp-company-dashboard-jobs-bulk-actions" style="margin-left: auto">
                                         <select class="form-select randomselect" name="action_but_option_{{ i.user_id }}">
                                             <option value="a">Select Action</option>
+                                            
                                             <option value="b_{{i.user_id}}">View profile</option>
-                                            {% if i.status != 3 %}
-                                            <option value="c_{{i.user_id}}_{{i.apply_id}}">Schedule Test</option>
-                                            {% elif i.status == 4 %}
+                                            {% if i.status == 4 %}
                                             <option value="h_{{i.user_id}}_{{i.test_id}}">Schedule Interview</option>
+                                            {% else %}
+                                            <option value="c_{{i.user_id}}_{{i.apply_id}}">Schedule Test</option>
                                             {% endif %}
                                             <option value="d_{{i.user_id}}_{{i.log_id}}">Send Message</option>
                                             <option value="e_{{i.user_id}}_{{i.apply_id}}">Approve</option>
@@ -265,8 +266,8 @@
                     <button class="btn ms-2" onclick="scheduletest()">Schedule</button>
                 </div>
             </div>
-            <div>
-                <input type="datetime-local">
+            <div style="position: relative;left: 35%;bottom: 0.5rem;width: 34.5%;">
+                <input type="datetime-local" class="form-control" name="intdate">
             </div>
             {% endif %}
             
@@ -334,6 +335,7 @@ function candifetch(id)
             },
             success: function( data ) 
             {
+                console.log(data)
                 let datainfo=JSON.parse(data['info']);
                 let idval;
                 $('#childrem tr').remove();
@@ -457,7 +459,7 @@ function candifetch(id)
                         let interviewli=document.createElement('li');
                         let interviewbut=document.createElement('button');
                         interviewbut.setAttribute('title', 'Schedule Interview');
-                        idval='pxp-interview-modal-button-'+datainfo[i].user_id+'-'+datainfo[0].test_id;
+                        idval='pxp-interview-modal-button-'+datainfo[i].user_id+'-'+datainfo[i].test_id;
                         interviewbut.setAttribute('id', idval);
                         interviewbut.setAttribute('data-bs-target', '#pxp-results-modal');
                         interviewbut.setAttribute('data-bs-toggle', 'modal');
@@ -489,7 +491,7 @@ function candifetch(id)
                     let li6=document.createElement('li');
                     let but6=document.createElement('button');
                     but6.setAttribute('title', 'Schedule Test');
-                    idval='pxp-schedule-modal-button-'+datainfo[i].user_id+'-'+datainfo[0].apply_id;
+                    idval='pxp-schedule-modal-button-'+datainfo[i].user_id+'-'+datainfo[i].apply_id;
                     but6.setAttribute('id', idval);
                     but6.setAttribute('data-bs-target', '#pxp-schedule-modal');
                     but6.setAttribute('data-bs-toggle', 'modal');
@@ -522,7 +524,7 @@ function candifetch(id)
                     let li3=document.createElement('li');
                     let but3=document.createElement('button');
                     but3.setAttribute('title', 'Approve');
-                    idval='pxp-approve-button-'+datainfo[i].user_id+'-'+datainfo[0].apply_id;
+                    idval='pxp-approve-button-'+datainfo[i].user_id+'-'+datainfo[i].apply_id;
                     but3.setAttribute('id', idval);
                     but3.setAttribute('style', 'display: none');
                     let but3ans='approve('+datainfo[i].apply_id+')';
@@ -537,7 +539,7 @@ function candifetch(id)
                     let li4=document.createElement('li');
                     let but4=document.createElement('button');
                     but4.setAttribute('title', 'Reject');
-                    idval='pxp-reject-button-'+datainfo[i].user_id+'-'+datainfo[0].apply_id;
+                    idval='pxp-reject-button-'+datainfo[i].user_id+'-'+datainfo[i].apply_id;
                     but4.setAttribute('id', idval);
                     but4.setAttribute('style', 'display: none');
                     let but4ans='reject('+datainfo[i].apply_id+')';
@@ -551,7 +553,7 @@ function candifetch(id)
                     let li5=document.createElement('li');
                     let but5=document.createElement('button');
                     but5.setAttribute('title', 'Delete');
-                    idval='pxp-delete-button-'+datainfo[i].user_id+'-'+datainfo[0].apply_id;
+                    idval='pxp-delete-button-'+datainfo[i].user_id+'-'+datainfo[i].apply_id;
                     but5.setAttribute('id', idval);
                     but5.setAttribute('style', 'display: none');
                     let but5ans='delcan('+datainfo[i].apply_id+')';
@@ -873,6 +875,10 @@ function scheduletest()
     $("[name='chek']:checked").map(function () {
         ids.push(this.value);
     })
+    let date_time=$('[name=intdate]').val();
+    if (!date_time || date_time.length < 16) { 
+        alert("Please enter a valid full datetime.");
+    }else{
     $.ajax(
     {
         type:"POST",
@@ -880,6 +886,7 @@ function scheduletest()
         data:{
                 id: user,
                 ids: ids,
+                date_time: date_time,
                 testinfoid: $("[name='testinfo']").val(),
                 csrfmiddlewaretoken: '{{ csrf_token }}'
         },
@@ -891,7 +898,7 @@ function scheduletest()
             }
             location.reload();
         }
-    })
+    })}
 }
 function createtest()
 {
@@ -904,9 +911,10 @@ function tme2(id)
     let nameval="action_but_option_"+id;
     let val_option=$(`[name=${nameval}]`).val();
     val_option=val_option.split("_");
-    console.log(val_option);
     if(val_option[0] == "b")
     {
+        console.log('b');
+
         let temp="#pxp-candidate-modal-button-"+val_option[1];
         $(temp).click();
     }
@@ -937,6 +945,7 @@ function tme2(id)
     }
     else if(val_option[0] == "h")
     {
+        console.log('h');
         let temp="#pxp-interview-modal-button-"+val_option[1]+"-"+val_option[2];
         $(temp).click();
     }   

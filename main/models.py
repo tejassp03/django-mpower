@@ -113,6 +113,7 @@ class Jobs(models.Model):
         max_length=700, default=None, null=True)
     requirements = models.CharField(max_length=700, default=None, null=True)
     num_of_visits = models.IntegerField(default=0)
+    status = models.IntegerField(default=3)
 
     class Meta:
         db_table = "jobs"
@@ -238,6 +239,7 @@ class Test(models.Model):
 
     class Meta:
         db_table = "test"
+        
 
 
 class TestInfo(models.Model):
@@ -278,6 +280,7 @@ class TestUser(models.Model):
     total_ques = models.IntegerField(default=0)
     answers = models.CharField(max_length=100, default=None, null=True)
     date = models.DateTimeField(default=timezone.now)
+    
 
     class Meta:
         db_table = "testuser"

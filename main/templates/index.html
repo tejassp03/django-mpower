@@ -426,7 +426,7 @@ input::-webkit-calendar-picker-indicator {
         <p class="pxp-text-light text-center">Search your career opportunity through {{ total }} jobs</p>
 
         <div class="row mt-4 mt-md-5 pxp-animate-in pxp-animate-in-top" style="justify-content: center">
-            {% for i in jobs %}
+            {% for i in jobs|slice:":4" %}
             <div class="col-md-6 col-xl-4 col-xxl-3 pxp-jobs-card-1-container">
                 <div class="pxp-jobs-card-1 pxp-has-shadow">
                     <div class="pxp-jobs-card-1-top">
@@ -434,11 +434,9 @@ input::-webkit-calendar-picker-indicator {
                             <div class="pxp-jobs-card-1-category-icon"><span class="fa fa-bullhorn"></span></div>
                             <div class="pxp-jobs-card-1-category-label">{{ i.fnarea }}</div>
                         </a>
-                        {% if request.session.name %}
+                     
                             <a href="{% url 'main:singlejob' pk2=i.jobid %}" class="pxp-jobs-card-1-title" data-jobid="{{ i.jobid }}">{{ i.title }}</a>
-                        {% else %}
-                            <a href="#" role="button" class="pxp-jobs-card-1-title jobidbutton" data-bs-toggle="modal" data-bs-target="#pxp-signin-modal" data-jobid="{{ i.jobid }}">{{ i.title }}</a>
-                        {% endif %}
+                            
                         <div class="pxp-jobs-card-1-details">
                             <a href="#" class="pxp-jobs-card-1-location">
                                 <span class="fa fa-globe"></span>{{ i.location }}
