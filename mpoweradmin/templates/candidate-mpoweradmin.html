@@ -23,7 +23,7 @@
             <div class="mt-3 mt-lg-4 pxp-dashboard-inbox-list">
                 <ul class="list-unstyled" id="table">
                     {% for i in employers %}
-                    <li onclick="candifetch({{ i.eid }})" id="{{i.jobid}}" class="acti">
+                    <li onclick="candifetch('{{ i.eid }}')" id="{{i.jobid}}" class="acti">
                         <a href="#" class="pxp-dashboard-inbox-list-item">
                             <div class="pxp-dashboard-inbox-list-item-top">
                                 <div class="pxp-dashboard-inbox-list-item-left">
@@ -182,13 +182,13 @@
                                 {% if i.status == 0 %}
                                 <td><div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-secondary">Applied</span></div></td>
                                 {% elif i.status == 1 %}
-                                <td><div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-success">Portal</span></div></td>
+                                <td><div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-info">Portal</span></div></td>
                                 {% elif i.status == 2 %}
-                                <td><div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-danger">Mpower only</span></div></td>
+                                <td><div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-info">Mpower only</span></div></td>
                                 {% elif i.status == 3 %}
                                 <td><div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-info">Both</span></div></td>
                                 {% elif i.status == 4 %}
-                                <td><div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-primary">Test Answered <br> {{ i.results }} %</span></div></td>
+                                <td><div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-success">Suggested</span></div></td>
                                 {% endif %}
                 
 
@@ -197,29 +197,22 @@
                                 </td>
                                 <td>
                                     <div class="pxp-company-dashboard-jobs-bulk-actions" style="margin-left: auto">
-                                        <select class="form-select randomselect" name="action_but_option_{{ i.eid }}">
+                                        <select class="form-select randomselect" name="action_but_option_{{ i.eid.eid.eid }}">
                                             <option value="a">Select Action</option>
-                                            <option value="b_{{i.eid}}">View Job</option>
+                                            <option value="b_{{i.eid.eid}}">View Job</option>
                                             {% if i.status == 3 %}
-                                            <option value="c_{{i.eid}}_{{i.jobid}}">Suggest Candidates</option>
-                                            {% elif i.status == 4 %}
-                                            <option value="h_{{i.eid}}_{{i.test_id}}">Schedule Interview</option>
+                                            <option value="c_{{i.eid.eid}}_{{i.jobid}}">Suggest Candidates</option>
                                             {% endif %}
-                                            <option value="d_{{i.eid}}_{{i.log_id}}">Send Message</option>
-                                            <!-- <option value="e_{{i.eid}}_{{i.jobid}}">Approve</option>
-                                            <option value="f_{{i.eid}}_{{i.jobid}}">Reject</option> -->
-                                            <option value="g_{{i.eid}}_{{i.jobid}}">Delete</option>
+                                            <!-- <option value="d_{{i.eid.eid}}_{{i.log_id}}">Send Message</option> -->
+                                            <option value="g_{{i.eid.eid}}_{{i.jobid}}">Delete</option>
                                         </select>
                                     </div>
                                     <div class="pxp-dashboard-table-options">
                                         <ul class="list-unstyled">
-                                            <!-- <li><button title="Schedule Interview" id="pxp-interview-modal-button-{{i.eid}}-{{i.test_id}}" data-bs-target="#pxp-results-modal" data-bs-toggle="modal" onclick="resultsmodal('{{i.test_id}}')" style="display: none"></button></li> -->
                                             <li><button title="View Job" id="pxp-candidate-modal-button-{{i.jobid}}" data-bs-target="#pxp-candidate-modal" data-bs-toggle="modal" onclick="candidatemodal('{{i.jobid}}')" style="display: none"><span class="fa fa-eye"></span></button></li>
-                                            <li><button title="Suggest candidats" id="pxp-schedule-modal-button-{{i.eid}}-{{i.jobid}}" data-bs-target="#pxp-schedule-modal" data-bs-toggle="modal" onclick="setter('{{i.jobid}}')" style="display: none"><span class="fa fa-question"></span></button></li>
-                                            <li><button title="Send message" id="pxp-send-message-button-{{i.jobid}}-{{i.log_id}}" onclick="messageclick({{i.log_id}})" style="display: none"><span class="fa fa-envelope-o"></span></button></li>
-                                            <!-- <li><button title="Approve" id="pxp-approve-button-{{i.eid}}-{{i.jobid}}" onclick="approve({{i.jobid}})" style="display: none"><span class="fa fa-check"></span></button></li> -->
-                                            <!-- <li><button title="Reject" id="pxp-reject-button-{{i.eid}}-{{i.jobid}}" onclick="reject({{i.jobid}})" style="display: none"><span class="fa fa-ban"></span></button></li> -->
-                                            <li><button title="Delete" id="pxp-delete-button-{{i.eid}}-{{i.jobid}}" onclick="delcan({{i.jobid}})" style="display: none"><span class="fa fa-trash-o"></span></button></li>
+                                            <li><button title="Suggest candidates" id="pxp-schedule-modal-button-{{i.eid.eid}}-{{i.jobid}}"  onclick="suggest('{{i.jobid}}')" style="display: none"><span class="fa fa-question"></span></button></li>
+                                            <!-- <li><button title="Send message" id="pxp-send-message-button-{{i.jobid}}-{{i.log_id}}" onclick="messageclick('{{i.log_id}}')" style="display: none"><span class="fa fa-envelope-o"></span></button></li> -->
+                                            <li><button title="Delete" id="pxp-delete-button-{{i.eid.eid}}-{{i.jobid}}" onclick="delcan('{{i.jobid}}')" style="display: none"><span class="fa fa-trash-o"></span></button></li>
                                         </ul>
                                     </div>
                                 </td>
@@ -236,7 +229,7 @@
     </div>
 </div>
 
-<div class="modal fade pxp-user-modal" id="pxp-schedule-modal" aria-hidden="true" aria-labelledby="scheduleModal" tabindex="-1">
+<!-- <div class="modal fade pxp-user-modal" id="pxp-schedule-modal" aria-hidden="true" aria-labelledby="scheduleModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered widthadjuster" style="justify-content: center">
         <div class="modal-content" style="width: 40rem">
             {% if test|length == 0 %}
@@ -274,7 +267,7 @@
             
         </div>
     </div>
-</div>
+</div> -->
 
 {% endblock %}
 
@@ -304,13 +297,13 @@ $(document).ready(function () {
     $('#qui').removeClass('pxp-active');
     $('#inr').removeClass('pxp-active');
     $('#pen').removeClass('pxp-active');
-    let app_count={{app_count}};
-    if(app_count.length)
-    {
-        {% comment %} $('#cands').text('Candidates: '+app_count[0]); {% endcomment %}
-        let ab='#'+{{ jobs.0.jobid }};
-        $(ab).addClass('pxp-active')
-    }
+   // let app_count={{app_count}};
+    //if(app_count.length)
+    //{
+      //  {% comment %} $('#cands').text('Candidates: '+app_count[0]); {% endcomment %}
+        //let ab='#'+{{ jobs.0.jobid }};
+     //   $(ab).addClass('pxp-active')
+    //}
     let show='{{shower}}';
     if(show)
     {
@@ -320,13 +313,29 @@ $(document).ready(function () {
         candifetch(show);
     }
 })
+function formatDate(inputDate) {
+    const months = [
+      "January", "February", "March", "April",
+      "May", "June", "July", "August",
+      "September", "October", "November", "December"
+    ];
+  
+    const date = new Date(inputDate);
+    const month = months[date.getMonth()];
+    const day = date.getDate();
+    const year = date.getFullYear();
+  
+    const formattedDate = `${month} ${day}, ${year}, midnight`;
+    return formattedDate;
+  }
 function candifetch(id)
 {
-    let app_count={{app_count}};
-    {% comment %} $('#cands').text('Candidates: '+app_count[num-1]); {% endcomment %}
+    //let app_count={{app_count}};
+    //{% comment %} $('#cands').text('Candidates: '+app_count[num-1]); {% endcomment %}
     $('.acti').removeClass('pxp-active');
     let ab='#'+id;
     $(ab).addClass('pxp-active')
+    console.log(id)
     $.ajax(
         {
             type:"GET",
@@ -336,7 +345,7 @@ function candifetch(id)
             },
             success: function( data ) 
             {
-                console.log(data);
+                
                 let datainfo=JSON.parse(data['info']);
                 let idval;
                 $('#childrem tr').remove();
@@ -429,8 +438,8 @@ function candifetch(id)
                     }
                     else if(datainfo[i].status==4)
                     {
-                        span3.setAttribute('class', 'badge rounded-pill bg-primary');
-                        span3.innerHTML='Test Answered <br> '+datainfo[i].results+" %";
+                        span3.setAttribute('class', 'badge rounded-pill bg-success');
+                        span3.innerHTML='Suggested';
                     }
                     td3div.append(span3);
                     td3a.append(td3div);
@@ -438,7 +447,7 @@ function candifetch(id)
                     let td4=document.createElement('td');
                     let td4div=document.createElement('div');
                     td4div.setAttribute('class', 'pxp-company-dashboard-job-date');
-                    td4div.innerHTML=datainfo[i].postdate;
+                    td4div.innerHTML=formatDate(datainfo[i].postdate);
                     td4.append(td4div);
                     tr.append(td4);
                     let td5=document.createElement('td');
@@ -450,21 +459,21 @@ function candifetch(id)
 
                     
                     
-                    if(datainfo[i].status==4)
-                    {
-                        let interviewli=document.createElement('li');
-                        let interviewbut=document.createElement('button');
-                        interviewbut.setAttribute('title', 'Schedule Interview');
-                        idval='pxp-interview-modal-button-'+datainfo[i].jobid+'-'+datainfo[0].test_id;
-                        interviewbut.setAttribute('id', idval);
-                        interviewbut.setAttribute('data-bs-target', '#pxp-results-modal');
-                        interviewbut.setAttribute('data-bs-toggle', 'modal');
-                        let interviewans='resultsmodal('+datainfo[i].test_id+')';
-                        interviewbut.setAttribute('onclick', interviewans);
-                        interviewbut.setAttribute('style', 'display: none');
-                        interviewli.append(interviewbut);
-                        ul.append(interviewli);
-                    }
+                    //if(datainfo[i].status==4)
+                    //{
+                     //   let interviewli=document.createElement('li');
+                      //  let interviewbut=document.createElement('button');
+                     //   interviewbut.setAttribute('title', 'Schedule Interview');
+                     //   idval='pxp-interview-modal-button-'+datainfo[i].jobid+'-'+datainfo[0].test_id;
+                     //   interviewbut.setAttribute('id', idval);
+                     //   interviewbut.setAttribute('data-bs-target', '#pxp-results-modal');
+                     //   interviewbut.setAttribute('data-bs-toggle', 'modal');
+                     //   let interviewans='resultsmodal('+datainfo[i].test_id+')';
+                      //  interviewbut.setAttribute('onclick', interviewans);
+                     //   interviewbut.setAttribute('style', 'display: none');
+                     //   interviewli.append(interviewbut);
+                     //   ul.append(interviewli);
+                   // }
                     
                     let li1=document.createElement('li');
                     let but1=document.createElement('button');
@@ -482,39 +491,39 @@ function candifetch(id)
                     li1.append(but1);
                     ul.append(li1);
 
-                    if(datainfo[i].status==0)
-                    {
-                    let li6=document.createElement('li');
-                    let but6=document.createElement('button');
-                    but6.setAttribute('title', 'Schedule Test');
-                    idval='pxp-schedule-modal-button-'+datainfo[i].jobid+'-'+datainfo[0].jobid;
-                    but6.setAttribute('id', idval);
-                    but6.setAttribute('data-bs-target', '#pxp-schedule-modal');
-                    but6.setAttribute('data-bs-toggle', 'modal');
-                    let but6ans='setter('+datainfo[i].jobid+')';
-                    but6.setAttribute('onclick', but6ans);
-                    but6.setAttribute('style', 'display: none');
-                    let but6span=document.createElement('span');
-                    but6span.setAttribute('class', 'fa fa-question');
-                    but6.append(but6span);
-                    li6.append(but6);
-                    ul.append(li6);
-                    }
+                    ///if(datainfo[i].status==0)
+                   // {
+                   // let li6=document.createElement('li');
+                   // let but6=document.createElement('button');
+                    //but6.setAttribute('title', 'Schedule Test');
+                   // idval='pxp-schedule-modal-button-'+datainfo[i].jobid+'-'+datainfo[0].jobid;
+                   // but6.setAttribute('id', idval);
+                   // but6.setAttribute('data-bs-target', '#pxp-schedule-modal');
+                   // but6.setAttribute('data-bs-toggle', 'modal');
+                   // let but6ans='setter('+datainfo[i].jobid+')';
+                   // but6.setAttribute('onclick', but6ans);
+                   // but6.setAttribute('style', 'display: none');
+                   // let but6span=document.createElement('span');
+                   // but6span.setAttribute('class', 'fa fa-question');
+                   // but6.append(but6span);
+                   // li6.append(but6);
+                   // ul.append(li6);
+                   // }
 
 
-                    let li2=document.createElement('li');
-                    let but2=document.createElement('button');
-                    but2.setAttribute('title', 'Send message');
-                    idval='pxp-send-message-button-'+datainfo[i].jobid+'-'+datainfo[i].jobid;
-                    but2.setAttribute('id', idval);
-                    let but2ans='messageclick('+datainfo[i].jobid+')';
-                    but2.setAttribute('onclick', but2ans);
-                    but2.setAttribute('style', 'display: none');
-                    let but2span=document.createElement('span');
-                    but2span.setAttribute('class', 'fa fa-envelope-o');
-                    but2.append(but2span);
-                    li2.append(but2);
-                    ul.append(li2);
+                    //let li2=document.createElement('li');
+                    //let but2=document.createElement('button');
+                    //but2.setAttribute('title', 'Send message');
+                    //idval='pxp-send-message-button-'+datainfo[i].jobid+'-'+datainfo[i].jobid;
+                    //but2.setAttribute('id', idval);
+                    //let but2ans='messageclick('+datainfo[i].jobid+')';
+                    //but2.setAttribute('onclick', but2ans);
+                    //but2.setAttribute('style', 'display: none');
+                    //let but2span=document.createElement('span');
+                    //but2span.setAttribute('class', 'fa fa-envelope-o');
+                    //but2.append(but2span);
+                    //li2.append(but2);
+                    //ul.append(li2);
 
 
                     let li3=document.createElement('li');
@@ -591,11 +600,11 @@ function candifetch(id)
                         selectorsopt.append(opt9);
                     }
 
-                    let opt4=document.createElement('option');
-                    idval="d_"+datainfo[i].jobid+"_"+datainfo[i].jobid;
-                    opt4.setAttribute('value', idval);
-                    opt4.innerHTML="Send Message";
-                    selectorsopt.append(opt4);
+                    //let opt4=document.createElement('option');
+                    //idval="d_"+datainfo[i].jobid+"_"+datainfo[i].jobid;
+                    //opt4.setAttribute('value', idval);
+                    //opt4.innerHTML="Send Message";
+                    //selectorsopt.append(opt4);
                     //let opt5=document.createElement('option');
                     //idval="e_"+datainfo[i].jobid+"_"+datainfo[i].jobid;
                     //opt5.setAttribute('value', idval);
@@ -620,7 +629,25 @@ function candifetch(id)
     })
 }
 
-
+function suggest(id){
+    console.log(id);
+    $.ajax({
+        type:"POST",
+        url:"{% url 'mpoweradmin:suggest' pk %}",
+        data:{
+            'jobid': id,
+            csrfmiddlewaretoken: '{{ csrf_token }}'
+        },
+        success: function( data ) 
+        {
+            console.log(data);
+            //let datamessage=JSON.parse(data['message']);
+            console.log(data.message);
+            alert(data.message);
+            location.reload()
+        }
+    })
+}
 
 function approve(id)
 {
@@ -857,38 +884,38 @@ function setter(id)
 {
     user=id;
 }
-function scheduletest()
-{
-    let ids=[];
-    $("[name='chek']:checked").map(function () {
-        ids.push(this.value);
-    })
-    $.ajax(
-    {
-        type:"POST",
-        url: "{% url 'employer:schedule' pk %}",
-        data:{
-                id: user,
-                ids: ids,
-                testinfoid: $("[name='testinfo']").val(),
-                csrfmiddlewaretoken: '{{ csrf_token }}'
-        },
-        success: function( data ) 
-        {
-            if(data['message']=="X")
-            {
-                alert('Test already scheduled');
-            }
-            location.reload();
-        }
-    })
-}
-function createtest()
-{
-    var url = "{% url 'employer:test' pk %}?redirect=candidates";
-    window.location.href = url;
+//function scheduletest()
+//{
+ //   let ids=[];
+ //   $("[name='chek']:checked").map(function () {
+  //      ids.push(this.value);
+  //  })
+  //  $.ajax(
+  //  {
+   //     type:"POST",
+   //     url: "{% url 'employer:schedule' pk %}",
+   //     data:{
+   //             id: user,
+   //             ids: ids,
+   //             testinfoid: $("[name='testinfo']").val(),
+   //             csrfmiddlewaretoken: '{{ csrf_token }}'
+   //     },
+    //    success: function( data ) 
+    //    {
+    //        if(data['message']=="X")
+    //        {
+    //            alert('Test already scheduled');
+    //        }
+    //        location.reload();
+   //     }
+   // })
+//}
+//function createtest()
+//{
+  //  var url = "{% url 'employer:test' pk %}?redirect=candidates";
+  //  window.location.href = url;
     
-}
+//}
 function tme2(id)
 {
     let nameval="action_but_option_"+id;
@@ -928,7 +955,7 @@ function tme2(id)
     else if(val_option[0] == "h")
     {
         let temp="#pxp-interview-modal-button-"+val_option[1]+"-"+val_option[2];
-        $(temp).click();
+        suggest(val_option[2]);
     }   
 }
 

@@ -114,6 +114,7 @@ class Jobs(models.Model):
     requirements = models.CharField(max_length=700, default=None, null=True)
     num_of_visits = models.IntegerField(default=0)
     status = models.IntegerField(default=3)
+    suggestions = models.CharField(max_length=2000, default="[]")
 
     class Meta:
         db_table = "jobs"

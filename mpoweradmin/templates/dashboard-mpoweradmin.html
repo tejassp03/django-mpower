@@ -60,28 +60,9 @@
     </div>
 
     <div class="row mt-4 mt-lg-5">
+        
         <div class="col-xl-6">
-            <h2>Company Profile Visits</h2>
-            <div class="mt-3 mt-lg-4 pxp-dashboard-chart-container">
-                <div class="row justify-content-between align-content-center mb-4">
-                    <div class="col-auto">
-                        <span class="pxp-dashboard-chart-value vissh"></span><span class="pxp-dashboard-chart-percent text-success"><span class="fa fa-long-arrow-up"></span> 34%</span><span class="pxp-dashboard-chart-vs">vs last 7 days</span>
-                    </div>
-                    <div class="col-auto">
-                        <select class="form-select cselectVal" id="cselec">
-                            <option value="s">Last 7 days</option>
-                            <option value="t">Last 30 days</option>
-                            <option value="x">Last 60 days</option>
-                            <option value="n">Last 90 days</option>
-                            <option value="y">Last 12 months</option>
-                        </select>
-                    </div>
-                </div>
-                <canvas id="pxp-company-dashboard-visits-chart"></canvas>
-            </div>
-        </div>
-        <div class="col-xl-6">
-            <h2 class="mt-4 mt-lg-5 mt-xl-0">Applications</h2>
+            <h2 class="mt-4 mt-lg-5 mt-xl-0">Jobs Posted</h2>
             <div class="mt-3 mt-lg-4 pxp-dashboard-chart-container">
                 <div class="row justify-content-between align-content-center mb-4">
                     <div class="col-auto">
@@ -98,6 +79,26 @@
                     </div>
                 </div>
                 <canvas id="pxp-company-dashboard-app-chart"></canvas>
+            </div>
+        </div>
+        <div class="col-xl-6">
+            <h2>Total Applications</h2>
+            <div class="mt-3 mt-lg-4 pxp-dashboard-chart-container">
+                <div class="row justify-content-between align-content-center mb-4">
+                    <div class="col-auto">
+                        <span class="pxp-dashboard-chart-value vissh"></span><span class="pxp-dashboard-chart-percent text-success"><span class="fa fa-long-arrow-up"></span> 34%</span><span class="pxp-dashboard-chart-vs">vs last 7 days</span>
+                    </div>
+                    <div class="col-auto">
+                        <select class="form-select cselectVal" id="cselec">
+                            <option value="s">Last 7 days</option>
+                            <option value="t">Last 30 days</option>
+                            <option value="x">Last 60 days</option>
+                            <option value="n">Last 90 days</option>
+                            <option value="y">Last 12 months</option>
+                        </select>
+                    </div>
+                </div>
+                <canvas id="pxp-company-dashboard-visits-chart"></canvas>
             </div>
         </div>
     </div>
@@ -242,7 +243,7 @@ function chart_show(dates, chart_data, para)
         gradient.addColorStop(0, 'rgba(255, 255, 255, 0)');
         gradient.addColorStop(.5, 'rgba(0, 112, 201, 0.09)');
         gradient.addColorStop(1, 'rgba(0, 112, 201, 0.12)');
-        labelval='Visits';
+        labelval='Applications';
         colorval='rgba(0, 112, 201, 1)'
     }
     else
@@ -252,7 +253,7 @@ function chart_show(dates, chart_data, para)
         gradient.addColorStop(0, 'rgba(255, 255, 255, 0)');
         gradient.addColorStop(.5, 'rgba(255, 168, 35, 0.09)');
         gradient.addColorStop(1, 'rgba(255, 168, 35, 0.12)');
-        labelval='Applications';
+        labelval='Jobs';
         colorval='rgba(255, 168, 35, 1)';
     }
     var companyVisitsChart = new Chart(companyVisitsChartElem, {

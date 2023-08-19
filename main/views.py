@@ -219,13 +219,13 @@ def admin_login(request):
         user = Login.objects.filter(email=request.POST['email'])
         if (len(user) == 0):
             return JsonResponse({'message': 'X'})
-        elif (check_password(request.POST['c_pass'], user[0].password)):
-            login(request, user)
+        elif (check_password(request.POST['pass'], user[0].password)):
+            # login(request, user)
             admin = Admin.objects.get(log_id=user[0].log_id)
             request.session['name'] = admin.aname
             request.session['pk'] = admin.aid
             request.session['type'] = "admin"
-            return redirect('main:mpoweradmin', pk=admin.aid)
+            return redirect('mpoweradmin:cdashboard', pk=admin.aid)
         else:
             messages.success(request, 'Invalid username or password')
             return redirect('main:admin_login')
@@ -909,17 +909,13 @@ class JobMatcher:
     
 
     def calculate_match_percentage(self):
-        total_params = 5  # Number of parameters to match: skills, location, notice period, current salary, and expected salary
+        total_params = 5  
         matched_params = 0
 
-        # Check if skills match
         if self.jobseeker.skills and self.job.skills:
             job_skills = set(self.job.skills.lower().split(','))
-            # print(job_skills)
             seeker_skills = set(self.jobseeker.skills.lower().split(','))
-            # print(seeker_skills)
             if job_skills.intersection(seeker_skills):
-                # print(job_skills.intersection(seeker_skills))
                 matched_params += 1
 
         # Check if location matches

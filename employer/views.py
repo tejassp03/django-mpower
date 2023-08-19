@@ -17,17 +17,23 @@ import matplotlib.pyplot as plt
 import pyotp
 import base64
 from django.utils import timezone
-
+from nltk.tokenize import word_tokenize
+from nltk.stem import PorterStemmer
 from main.utils import send_emails
-
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+from nltk.corpus import stopwords
+import json
 # Create your views here.
 
 
 def dashboard(request, pk):
+    
     context = Employer.objects.get(eid=pk)
     jobs = Jobs.objects.filter(eid=pk)
     applics = Application.objects.filter(eid=pk)
     visits = ProfileVisits.objects.filter(user_type="e", e_id=pk)
+    jobs = Jobs.objects.all()
     all_notis = []
     count = 0
     recent_candidates = []
@@ -110,6 +116,16 @@ def dashboard(request, pk):
     visits_365 = []
     countsv = []
     couv = 0
+    
+    jobs_chart = []
+    jobs_7 = []
+    jobs_30 = []
+    jobs_60 = []
+    jobs_90 = []
+    jobs_365 = []
+    countsj = []
+    couj = 0
+
     for i in range(0, 365):
         d = date.today()-timedelta(days=i)
         temp = applics.filter(date_applied__year=d.year,
@@ -122,36 +138,52 @@ def dashboard(request, pk):
         n = len(temp)
         heapq.heappush(visits_chart, (-1*(n), n, d))
         couv = couv+n
+
+        temp = jobs.filter(postdate__year=d.year,postdate__month=d.month, postdate__day=d.day)
+        n = len(temp)
+        heapq.heappush(jobs_chart, (-1*(n), n, d))
+        couj = couj+n
         if (len(applics_chart) == 7):
             counts.append(cou)
             countsv.append(couv)
+            countsj.append(couj)
             for j in range(0, 7):
                 applics_7.append([applics_chart[j][2], applics_chart[j][1]])
                 visits_7.append([visits_chart[j][2], visits_chart[j][1]])
+                jobs_7.append([jobs_chart[j][2],jobs_chart[j][1]])
         if (len(applics_chart) == 30):
             counts.append(cou)
             countsv.append(couv)
+            countsj.append(couj)
             for j in range(0, 7):
                 applics_30.append([applics_chart[j][2], applics_chart[j][1]])
                 visits_30.append([visits_chart[j][2], visits_chart[j][1]])
+                jobs_30.append([jobs_chart[j][2],jobs_chart[j][1]])
         if (len(applics_chart) == 60):
             counts.append(cou)
             countsv.append(couv)
+            countsj.append(couj)
             for j in range(0, 7):
                 applics_60.append([applics_chart[j][2], applics_chart[j][1]])
                 visits_60.append([visits_chart[j][2], visits_chart[j][1]])
+                jobs_60.append([jobs_chart[j][2],jobs_chart[j][1]])
         if (len(applics_chart) == 90):
             counts.append(cou)
             countsv.append(couv)
+            countsj.append(couj)
             for j in range(0, 7):
                 applics_90.append([applics_chart[j][2], applics_chart[j][1]])
                 visits_90.append([visits_chart[j][2], visits_chart[j][1]])
+                jobs_90.append([jobs_chart[j][2],jobs_chart[j][1]])
         if (len(applics_chart) == 364):
             counts.append(cou)
             countsv.append(couv)
+            countsj.append(couj)
             for j in range(0, 7):
                 applics_365.append([applics_chart[j][2], applics_chart[j][1]])
                 visits_365.append([visits_chart[j][2], visits_chart[j][1]])
+                jobs_365.append([jobs_chart[j][2],jobs_chart[j][1]])
+    
     applics_7.sort()
     applics_30.sort()
     applics_60.sort()
@@ -162,6 +194,35 @@ def dashboard(request, pk):
     visits_60.sort()
     visits_90.sort()
     visits_365.sort()
+    jobs_7.sort()
+    jobs_30.sort()
+    jobs_60.sort()
+    jobs_90.sort()
+    jobs_365.sort()
+    ############################################################
+    charts_context_ = {}
+    charts_context_['pastsev'] = dumps([item[1] for item in jobs_7])
+    charts_context_['dates'] = dumps(
+        [item[0] for item in jobs_7], default=str)
+    charts_context_['count_7'] = dumps(countsj[0])
+    charts_context_['pastthi'] = dumps([item[1] for item in jobs_30])
+    charts_context_['dates30'] = dumps(
+        [item[0] for item in jobs_30], default=str)
+    charts_context_['count_30'] = dumps(countsj[1])
+    charts_context_['pastsix'] = dumps([item[1] for item in jobs_60])
+    charts_context_['dates60'] = dumps(
+        [item[0] for item in jobs_60], default=str)
+    charts_context_['count_60'] = dumps(countsj[2])
+    charts_context_['pastnin'] = dumps([item[1] for item in jobs_60])
+    charts_context_['dates90'] = dumps(
+        [item[0] for item in jobs_60], default=str)
+    charts_context_['count_90'] = dumps(countsj[3])
+    charts_context_['pastyea'] = dumps([item[1] for item in jobs_365])
+    charts_context_['dates365'] = dumps(
+        [item[0] for item in jobs_365], default=str)
+    charts_context_['count_365'] = dumps(countsj[4])
+    print(charts_context_)
+    ############################################################
     charts_context = {}
     charts_context['pastsev'] = dumps([item[1] for item in applics_7])
     charts_context['dates'] = dumps(
@@ -207,6 +268,7 @@ def dashboard(request, pk):
     nums = [len(jobs), len(applics), countunmess]
     if 'shower' in request.session:
         del request.session['shower']
+    # print(charts_context)
     return render(request, 'dashboard-employer.html', {'pk': pk, 'nums': nums, 'notifics': all_notis, 'recent': recent_mess_temp, 'candi': finalrecent, 'charts': charts_context, 'counts': counts})
 
 
@@ -706,6 +768,8 @@ def createthread(request, pk):
 
 def cnotifications(request, pk):
     loger = Login.objects.get(email=request.session['email'])
+    for key, value in request.session.items():
+        print(f"Key: {key}, Value: {value}")
     notifs = Notifications.objects.filter(
         rece_id=loger.log_id).order_by('-datetime')
     nots = []
@@ -785,81 +849,211 @@ def edit_job(request, pk):
         return redirect('employer:manage', pk=pk)
     return JsonResponse({'info': dumps(list(job.values()), default=str)})
 
+class JobMatcher:
+    def __init__(self, jobseeker, job):
+        self.jobseeker = jobseeker
+        self.job = job
+    
+    
 
+    def calculate_match_percentage(self):
+        total_params = 5  
+        matched_params = 0
+
+        if self.jobseeker.skills and self.job.skills:
+            job_skills = set(self.job.skills.lower().split(','))
+            seeker_skills = set(self.jobseeker.skills.lower().split(','))
+            if job_skills.intersection(seeker_skills):
+                matched_params += 1
+
+        # Check if location matches
+        if self.job.location and self.jobseeker.location:
+            if self.job.location.lower() == self.jobseeker.location.lower():
+                matched_params += 1
+
+        # Check if notice period matches
+        if self.job.notice_period and self.jobseeker.notice_period:
+            if self.job.notice_period.lower() == self.jobseeker.notice_period.lower():
+                matched_params += 1
+
+        # Check if Experience matches
+        if self.jobseeker.experience and self.job.experience:
+            if int(self.jobseeker.experience) >= int(self.job.experience):
+                matched_params += 1
+
+        # Check if expected salary matches
+        if self.jobseeker.expsal and self.job.basicpay:
+            if self.jobseeker.expsal <= int(self.job.basicpay):
+                matched_params += 1
+
+        # Calculate match percentage
+        match_percentage = (matched_params / total_params) * 100
+
+        return match_percentage
+
+    def get_matching_details(self):
+        matching_details = {}
+
+        # Check if skills match
+        if self.jobseeker.skills and self.job.skills:
+            job_skills = set(self.job.skills.lower().split(','))
+            seeker_skills = set(self.jobseeker.skills.lower().split(','))
+            matching_details['skills'] = {
+                'match': list(job_skills.intersection(seeker_skills)),
+                'not_match': list(job_skills.difference(seeker_skills))
+            }
+            
+
+        # Check if location matches
+        if self.job.location and self.jobseeker.location:
+            matching_details['location'] = {
+                'match': True if self.job.location.lower() == self.jobseeker.location.lower() else False
+            }
+
+        # Check if notice period matches
+        if self.job.notice_period and self.jobseeker.notice_period:
+            matching_details['notice_period'] = {
+                'match': True if self.job.notice_period.lower() == self.jobseeker.notice_period.lower() else False
+            }
+
+        # Check if current salary matches
+        if self.jobseeker.cursal and self.job.basicpay:
+            matching_details['experience'] = {
+                'match': True if int(self.jobseeker.experience) >= int(self.job.experience) else False
+            }
+
+        # Check if expected salary matches
+        if self.jobseeker.expsal and self.job.basicpay:
+            matching_details['expected_salary'] = {
+                'match': True if self.jobseeker.expsal <= int(self.job.basicpay) else False
+            }
+
+        return matching_details
+
+def preprocess_text(text):
+    words = word_tokenize(text)
+
+    stop_words = set(stopwords.words('english'))
+    words = [word for word in words if word.lower() not in stop_words]
+
+    stemmer = PorterStemmer()
+    words = [stemmer.stem(word) for word in words]
+
+    preprocessed_text = ' '.join(words)
+    return preprocessed_text
+
+
+def extract_text_from_pdf(pdf_file):
+    pdf_text = ""
+    with open(pdf_file, 'rb') as file:
+        pdf_reader = PyPDF2.PdfReader(file)
+        num_pages = len(pdf_reader.pages)
+        for page_num in range(num_pages):
+            page = pdf_reader.pages[page_num]
+            pdf_text += page.extract_text()
+    return pdf_text
 def cand_suggest(request, pk):
+    print("hello")
     job = Jobs.objects.filter(eid=pk)
+    # for i in job:
+        # print(i.title)
     candid = []
+    # if(request.GET['job_id']):
+    #     print(request.GET['job_id'])
     sel = ""
-    if ('job_id' in request.GET and request.GET['job_id'] != 'a') or 'c_s_id' in request.session:
-        single_job = None
-        if 'c_s_id' in request.session:
-            sel = int(request.session['c_s_id'])
-            single_job = Jobs.objects.get(jobid=request.session['c_s_id'])
-            del request.session['c_s_id']
-        else:
-            sel = int(request.GET['job_id'])
-            single_job = Jobs.objects.get(jobid=request.GET['job_id'])
-        jobs = JobSeeker.objects.all()
-        for i in jobs:
-            if i.Resume:
-                try:
-                    pdfFileObj = open("media/"+str(i.Resume), 'rb')
-                    pdfReader = PyPDF2.PdfFileReader(pdfFileObj)
-                except:
-                    continue
-                num_pages = pdfReader.numPages
-                count = 0
-                text = ""
-                while count < num_pages:
-                    pageObj = pdfReader.getPage(count)
-                    count += 1
-                    text += pageObj.extractText()
-                text = text.lower()
-                text = re.sub(r'\d+', '', text)
-                text = text.translate(
-                    str.maketrans('', '', string.punctuation))
-                terms = {'Python Developer': ['black belt', 'capability analysis', 'control charts', 'doe', 'dmaic', 'fishbone',
-                                              'gage r&r', 'green belt', 'ishikawa', 'iso', 'kaizen', 'kpi', 'lean', 'metrics',
-                                              'pdsa', 'performance improvement', 'process improvement', 'quality',
-                                              'quality circles', 'quality tools', 'root cause', 'six sigma',
-                                              'stability analysis', 'statistical analysis', 'tqm'],
-                         'Django Developer': ['automation', 'bottleneck', 'constraints', 'cycle time', 'efficiency', 'fmea',
-                                              'machinery', 'maintenance', 'manufacture', 'line balancing', 'oee', 'operations',
-                                              'operations research', 'optimization', 'overall equipment effectiveness',
-                                              'pfmea', 'process', 'process mapping', 'production', 'resources', 'safety',
-                                              'stoppage', 'value stream mapping', 'utilization'],
-                         'React Developer': ['abc analysis', 'apics', 'customer', 'customs', 'delivery', 'distribution', 'eoq', 'epq',
-                                             'fleet', 'forecast', 'inventory', 'logistic', 'materials', 'outsourcing', 'procurement',
-                                             'reorder point', 'rout', 'safety stock', 'scheduling', 'shipping', 'stock', 'suppliers',
-                                             'third party logistics', 'transport', 'transportation', 'traffic', 'supply chain',
-                                             'vendor', 'warehouse', 'wip', 'work in progress'],
-                         'NEXT Developer': ['administration', 'agile', 'budget', 'cost', 'direction', 'feasibility analysis',
-                                            'finance', 'kanban', 'leader', 'leadership', 'management', 'milestones', 'planning',
-                                            'pmi', 'pmp', 'problem', 'project', 'risk', 'schedule', 'scrum', 'stakeholders'],
-                         'Project management': ['administration', 'agile', 'budget', 'cost', 'direction', 'feasibility analysis',
-                                                'finance', 'kanban', 'leader', 'leadership', 'management', 'milestones', 'planning',
-                                                'pmi', 'pmp', 'problem', 'project', 'risk', 'schedule', 'scrum', 'stakeholders'],
-                         'Data analytics': ['analytics', 'api', 'aws', 'big data', 'busines intelligence', 'clustering', 'code',
-                                            'coding', 'data', 'database', 'data mining', 'data science', 'deep learning', 'hadoop',
-                                            'hypothesis test', 'iot', 'internet', 'machine learning', 'modeling', 'nosql', 'nlp',
-                                            'predictive', 'programming', 'python', 'r', 'sql', 'tableau', 'text mining',
-                                            'visualuzation'], }
-                quality = 0
-                for area in terms.keys():
-                    if area.lower() == single_job.title.lower():
-                        for word in terms[area]:
-                            if word in text:
-                                quality += 1
-                        break
-                single_candidate = {}
-                single_candidate['user_id'] = i.user_id
-                single_candidate['name'] = i.name
-                if i.photo:
-                    single_candidate['photo'] = i.photo
-                single_candidate['score'] = quality
-                single_candidate['location'] = i.location
-                candid.append(single_candidate)
+    # if ('job_id' in request.GET and request.GET['job_id'] != 'a') or 'c_s_id' in request.session:
+    #     print('hello')
+    #     single_job = None
+    #     if 'c_s_id' in request.session:
+    #         sel = int(request.session['c_s_id'])
+    #         single_job = Jobs.objects.get(jobid=request.session['c_s_id'])
+    #         del request.session['c_s_id']
+    #     else:
+    #         sel = int(request.GET['job_id'])
+    #         single_job = Jobs.objects.get(jobid=request.GET['job_id'])
+    #     jobs = JobSeeker.objects.all()
+    #     for i in jobs:
+    #         if i.Resume:
+
+    #             try:
+    #                 pdfFileObj = open("media/"+str(i.Resume), 'rb')
+    #                 pdfReader = PyPDF2.PdfFileReader(pdfFileObj)
+    #             except:
+    #                 continue
+    #             num_pages = pdfReader.numPages
+    #             count = 0
+    #             text = ""
+    #             while count < num_pages:
+    #                 pageObj = pdfReader.getPage(count)
+    #                 count += 1
+    #                 text += pageObj.extractText()
+    #             text = text.lower()
+    #             text = re.sub(r'\d+', '', text)
+    #             text = text.translate(
+    #                 str.maketrans('', '', string.punctuation))
+    #             terms = {'Python Developer': ['black belt', 'capability analysis', 'control charts', 'doe', 'dmaic', 'fishbone',
+    #                                           'gage r&r', 'green belt', 'ishikawa', 'iso', 'kaizen', 'kpi', 'lean', 'metrics',
+    #                                           'pdsa', 'performance improvement', 'process improvement', 'quality',
+    #                                           'quality circles', 'quality tools', 'root cause', 'six sigma',
+    #                                           'stability analysis', 'statistical analysis', 'tqm'],
+    #                      'Django Developer': ['automation', 'bottleneck', 'constraints', 'cycle time', 'efficiency', 'fmea',
+    #                                           'machinery', 'maintenance', 'manufacture', 'line balancing', 'oee', 'operations',
+    #                                           'operations research', 'optimization', 'overall equipment effectiveness',
+    #                                           'pfmea', 'process', 'process mapping', 'production', 'resources', 'safety',
+    #                                           'stoppage', 'value stream mapping', 'utilization'],
+    #                      'React Developer': ['abc analysis', 'apics', 'customer', 'customs', 'delivery', 'distribution', 'eoq', 'epq',
+    #                                          'fleet', 'forecast', 'inventory', 'logistic', 'materials', 'outsourcing', 'procurement',
+    #                                          'reorder point', 'rout', 'safety stock', 'scheduling', 'shipping', 'stock', 'suppliers',
+    #                                          'third party logistics', 'transport', 'transportation', 'traffic', 'supply chain',
+    #                                          'vendor', 'warehouse', 'wip', 'work in progress'],
+    #                      'NEXT Developer': ['administration', 'agile', 'budget', 'cost', 'direction', 'feasibility analysis',
+    #                                         'finance', 'kanban', 'leader', 'leadership', 'management', 'milestones', 'planning',
+    #                                         'pmi', 'pmp', 'problem', 'project', 'risk', 'schedule', 'scrum', 'stakeholders'],
+    #                      'Project management': ['administration', 'agile', 'budget', 'cost', 'direction', 'feasibility analysis',
+    #                                             'finance', 'kanban', 'leader', 'leadership', 'management', 'milestones', 'planning',
+    #                                             'pmi', 'pmp', 'problem', 'project', 'risk', 'schedule', 'scrum', 'stakeholders'],
+    #                      'Data analytics': ['analytics', 'api', 'aws', 'big data', 'busines intelligence', 'clustering', 'code',
+    #                                         'coding', 'data', 'database', 'data mining', 'data science', 'deep learning', 'hadoop',
+    #                                         'hypothesis test', 'iot', 'internet', 'machine learning', 'modeling', 'nosql', 'nlp',
+    #                                         'predictive', 'programming', 'python', 'r', 'sql', 'tableau', 'text mining',
+    #                                         'visualuzation'], }
+    #             quality = 0
+    #             for area in terms.keys():
+    #                 if area.lower() == single_job.title.lower():
+    #                     for word in terms[area]:
+    #                         if word in text:
+    #                             quality += 1
+    #                     break
+    #             single_candidate = {}
+    #             single_candidate['user_id'] = i.user_id
+    #             single_candidate['name'] = i.name
+    #             if i.photo:
+    #                 single_candidate['photo'] = i.photo
+    #             single_candidate['score'] = quality
+    #             single_candidate['location'] = i.location
+    #             candid.append(single_candidate)
     GET_params = request.GET.copy()
+
+    #############################################################################
+    if ('job_id' in request.GET):
+        job_ = Jobs.objects.get(jobid=request.GET['job_id'])
+        sel = int(request.GET['job_id'])
+        if job_.status == 4:
+            top_matching_job_seekers = job_.suggestions
+            python_list = json.loads(top_matching_job_seekers)
+            # print(python_list)
+            for i in python_list:
+                seek = JobSeeker.objects.get(user_id=i[0])
+                single_candidate = {}
+                single_candidate['user_id'] = seek.user_id
+                single_candidate['name'] = seek.name
+                if seek.photo:
+                    single_candidate['photo'] = seek.photo
+                single_candidate['score'] = i[1]
+                single_candidate['location'] = seek.location
+                candid.append(single_candidate)
+
+    #############################################################################
     count = len(candid)
     if ('page' in GET_params):
         last = GET_params['page'][-1]
@@ -874,6 +1068,7 @@ def cand_suggest(request, pk):
         page_obj = p.page(p.num_pages)
     if 'shower' in request.session:
         del request.session['shower']
+    
     return render(request, 'suggestions-employer.html', {'pk': pk, 'jobs': job, 'count': count, 'pe': page_obj, 'sel': sel})
 
 

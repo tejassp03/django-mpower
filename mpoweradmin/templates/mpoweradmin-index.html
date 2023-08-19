@@ -51,14 +51,14 @@
                 <div class="pxp-dashboard-side-label">admin tools</div>
                 <ul class="list-unstyled">
                     <li id="cdas"><a href="{% url 'mpoweradmin:cdashboard' pk=pk %}"><span class="fa fa-home"></span>Dashboard</a></li>
-                    <li id="cedi"><a href="{% url 'mpoweradmin:cedit' pk=pk %}"><span class="fa fa-pencil"></span>Edit Profile</a></li>
+                    <!--<li id="cedi"><a href="{% url 'mpoweradmin:cedit' pk=pk %}"><span class="fa fa-pencil"></span>Edit Profile</a></li>
                     <li id="cnew"><a href="{% url 'mpoweradmin:newjob' pk=pk %}"><span class="fa fa-file-text-o"></span>New Job Offer</a></li>
-                    <li id="cman"><a href="{% url 'mpoweradmin:manage' pk=pk %}"><span class="fa fa-briefcase"></span>Manage Jobs</a></li>
+                    <li id="cman"><a href="{% url 'mpoweradmin:manage' pk=pk %}"><span class="fa fa-briefcase"></span>Manage Jobs</a></li>-->
                     <li id="ccan"><a href="{% url 'mpoweradmin:candidates' pk=pk %}"><span class="fa fa-user-circle-o"></span>Employers</a></li>
-                    <li id="csub"><a href="{% url 'mpoweradmin:subscriptions' pk=pk %}"><span class="fa fa-credit-card"></span>Subscriptions</a></li>
+                    <!--<li id="csub"><a href="{% url 'mpoweradmin:subscriptions' pk=pk %}"><span class="fa fa-credit-card"></span>Subscriptions</a></li>-->
                     <li id="ccha"><a href="{% url 'mpoweradmin:change_pass' pk=pk %}"><span class="fa fa-lock"></span>Change Password</a></li>
-                    <li id="qui"><a href="{% url 'mpoweradmin:show_tests' pk=pk %}"><span class="fa fa-question"></span>Create Test</a></li>
-                    <li id="inr"><a href="{% url 'mpoweradmin:all_interviews' pk=pk %}"><span class="fa fa-user"></span>Interviews</a></li>
+                   <!-- <li id="qui"><a href="{% url 'mpoweradmin:show_tests' pk=pk %}"><span class="fa fa-question"></span>Create Test</a></li>
+                    <li id="inr"><a href="{% url 'mpoweradmin:all_interviews' pk=pk %}"><span class="fa fa-user"></span>Interviews</a></li>-->
                 </ul>
                 <div class="pxp-dashboard-side-label mt-3 mt-lg-4">Insights</div>
                 <ul class="list-unstyled">
@@ -81,7 +81,7 @@
                         </a>
                     </li>
                 </ul>
-                <div class="pxp-dashboard-side-label mt-3 mt-lg-4">AI Tools<sup style="background: var(--pxpMainColor); padding: 3px; color: white; border-radius: 50rem; margin-left: 5px">Beta</sup></div>
+               <!-- <div class="pxp-dashboard-side-label mt-3 mt-lg-4">AI Tools<sup style="background: var(--pxpMainColor); padding: 3px; color: white; border-radius: 50rem; margin-left: 5px">Beta</sup></div>
                 <ul class="list-unstyled">
                     <li id="scn">
                         {% comment %} <a href="candidate-dashboard-notifications.html" class="d-flex justify-content-between align-items-center"> {% endcomment %}
@@ -95,7 +95,7 @@
                             <div><span class="fa fa-tasks"></span>Actions</div>
                         </a>
                     </li>
-                </ul>
+                </ul>-->
             </nav>
 
             <nav class="pxp-dashboard-side-user-nav-container">
@@ -185,7 +185,7 @@
                     </div>
                 </div>
                 <nav class="pxp-user-nav pxp-on-light">
-                    <a href="{% url 'mpoweradmin:newjob' pk=pk %}" class="btn rounded-pill pxp-nav-btn">Post a Job</a>
+                    <!--<a href="{% url 'mpoweradmin:newjob' pk=pk %}" class="btn rounded-pill pxp-nav-btn">Post a Job</a>-->
                     <div class="dropdown pxp-user-nav-dropdown pxp-user-notifications">
                         <a role="button" class="dropdown-toggle" data-bs-toggle="dropdown">
                             <span class="fa fa-bell-o"></span>
