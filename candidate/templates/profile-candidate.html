@@ -199,6 +199,41 @@
             <button class="btn rounded-pill pxp-section-cta">Save Profile</button>
         </div>
     </form>
+    <form method="post" action="{% url 'candidate:change' pk%}" >
+            {% csrf_token %}
+        <div class="mt-4 mt-lg-5">
+
+            <h2>Change Password</h2>
+            <p class="pxp-text-light">Choose a new account password.</p>
+            <div class="row mt-4 mt-lg-5">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="pxp-company-old-password" class="form-label">Old password</label>
+                        <input type="password" id="pxp-company-old-password" class="form-control" placeholder="Enter old password" name="old">
+                    </div>
+                </div>
+            </div>
+    
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="pxp-company-new-password" class="form-label">New password</label>
+                        <input type="password" id="pxp-company-new-password" class="form-control" placeholder="Enter new password" name="new">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="pxp-company-new-password-repeat" class="form-label">New password repeat</label>
+                        <input type="password" id="pxp-company-new-password-repeat" class="form-control" placeholder="Repeat new password" name="cnew">
+                    </div>
+                </div>
+            </div>
+    
+            <div class="mt-4 mt-lg-5">
+                <button class="btn rounded-pill pxp-section-cta">Save New Password</button>
+            </div>
+        </div>
+        </form>
 </div>
 <div class="modal fade pxp-user-modal" id="pxp-signup-modal" aria-hidden="true" aria-labelledby="signupModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">

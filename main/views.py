@@ -1343,21 +1343,36 @@ def get_job(request):
 
 def give_feedback(request, pk):
     if request.method == "POST":
-        int_val = Interview.objects.get(int_id=pk)
+        int_val = Interview.objects.get(apply_id=pk)
+        applics = Application.objects.get(apply_id = pk)
+        eid_id = applics.eid.eid
+        applics.status = 7
+        applics.save()
         int_val.is_feedgiven = 1
         int_val.save()
-        feedback = Feedback()
-        feedback.int_id = int_val
-        feedback.emp_feedback = request.POST['feedback']
-        feedback.name = request.POST['name']
-        feedback.save()
+        existing_feedback = Feedback.objects.get(int_id=int_val)
+        if existing_feedback:
+            print(existing_feedback)
+            existing_feedback.rating = request.POST['rating']
+            existing_feedback.emp_feedback = request.POST['feedback']
+            existing_feedback.name = request.POST['name']
+            existing_feedback.save()
+            messages.error(request, "Feedback successfully Modified!")
+            return redirect('employer:candidates', pk=eid_id)
+        else:
+            feedback = Feedback()
+            feedback.int_id = int_val
+            feedback.rating = request.POST['rating']
+            feedback.emp_feedback = request.POST['feedback']
+            feedback.name = request.POST['name']
+            feedback.save()
         messages.error(request, "Feedback successfully recorded!")
-        return redirect('main:give_feedback', pk=pk)
-    int_val = Interview.objects.get(int_id=pk)
+        return redirect('employer:candidates', pk=eid_id)
+    int_val = Interview.objects.get(apply_id=pk)
     data = {}
     data['name'] = int_val.user_id.name
     data['location'] = int_val.user_id.location
-    data['title'] = int_val.user_id.title
+    data['title'] = int_val.user_id.role
     if int_val.user_id.photo:
         data['photo'] = int_val.user_id.photo
     return render(request, 'give_feedback.html', {'data': data})

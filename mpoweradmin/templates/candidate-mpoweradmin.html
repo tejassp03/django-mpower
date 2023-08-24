@@ -179,16 +179,11 @@
                                         {% endif %}
                                     </a>
                                 </td>
-                                {% if i.status == 0 %}
-                                <td><div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-secondary">Applied</span></div></td>
-                                {% elif i.status == 1 %}
-                                <td><div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-info">Portal</span></div></td>
-                                {% elif i.status == 2 %}
-                                <td><div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-info">Mpower only</span></div></td>
-                                {% elif i.status == 3 %}
-                                <td><div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-info">Both</span></div></td>
-                                {% elif i.status == 4 %}
-                                <td><div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-success">Suggested</span></div></td>
+                                {% if i.status == 6 %}
+                                <td><div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-info">Requested</span></div></td>
+                               {%else%}
+                               <td><div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-secondary">Posted</span></div></td>
+                               
                                 {% endif %}
                 
 
@@ -200,9 +195,9 @@
                                         <select class="form-select randomselect" name="action_but_option_{{ i.eid.eid.eid }}">
                                             <option value="a">Select Action</option>
                                             <option value="b_{{i.eid.eid}}">View Job</option>
-                                            {% if i.status == 3 %}
+                                            <!-- {% if i.status == 3 %}
                                             <option value="c_{{i.eid.eid}}_{{i.jobid}}">Suggest Candidates</option>
-                                            {% endif %}
+                                            {% endif %} -->
                                             <!-- <option value="d_{{i.eid.eid}}_{{i.log_id}}">Send Message</option> -->
                                             <option value="g_{{i.eid.eid}}_{{i.jobid}}">Delete</option>
                                         </select>
@@ -423,23 +418,33 @@ function candifetch(id)
                     let span3=document.createElement('span');
                     if(datainfo[i].status==1)
                     {
-                        span3.setAttribute('class', 'badge rounded-pill bg-danger');
-                        span3.innerHTML='Portal';
+                        span3.setAttribute('class', 'badge rounded-pill bg-secondary');
+                        span3.innerHTML='Posted';
                     }
                     else if(datainfo[i].status==2)
                     {
-                        span3.setAttribute('class', 'badge rounded-pill bg-success');
-                        span3.innerHTML='Mpower Only';
+                        span3.setAttribute('class', 'badge rounded-pill bg-secondary');
+                        span3.innerHTML='Posted';
                     }
                     else if(datainfo[i].status==3)
                     {
-                        span3.setAttribute('class', 'badge rounded-pill bg-info');
-                        span3.innerHTML='Both';
+                        span3.setAttribute('class', 'badge rounded-pill bg-secondary');
+                        span3.innerHTML='Posted';
                     }
                     else if(datainfo[i].status==4)
                     {
-                        span3.setAttribute('class', 'badge rounded-pill bg-success');
-                        span3.innerHTML='Suggested';
+                        span3.setAttribute('class', 'badge rounded-pill bg-secondary');
+                        span3.innerHTML='Posted';
+                    }
+                    else if(datainfo[i].status==5)
+                    {
+                        span3.setAttribute('class', 'badge rounded-pill bg-secondary');
+                        span3.innerHTML='Posted';
+                    }
+                    else if(datainfo[i].status==6)
+                    {
+                        span3.setAttribute('class', 'badge rounded-pill bg-info');
+                        span3.innerHTML='Requested';
                     }
                     td3div.append(span3);
                     td3a.append(td3div);
@@ -591,14 +596,14 @@ function candifetch(id)
                     opt2.setAttribute('value', idval);
                     opt2.innerHTML="View Job";
                     selectorsopt.append(opt2);
-                    if(datainfo[i].status==3)
-                    {
-                        let opt9=document.createElement('option');
-                        idval="h_"+datainfo[i].jobid+"_"+datainfo[i].jobid;
-                        opt9.setAttribute('value', idval);
-                        opt9.innerHTML="Suggest Candidates";
-                        selectorsopt.append(opt9);
-                    }
+                    //if(datainfo[i].status==3)
+                    //{
+                      //  let opt9=document.createElement('option');
+                        //idval="h_"+datainfo[i].jobid+"_"+datainfo[i].jobid;
+                        //opt9.setAttribute('value', idval);
+                        //opt9.innerHTML="Suggest Candidates";
+                        //selectorsopt.append(opt9);
+                    //}
 
                     //let opt4=document.createElement('option');
                     //idval="d_"+datainfo[i].jobid+"_"+datainfo[i].jobid;
@@ -629,25 +634,7 @@ function candifetch(id)
     })
 }
 
-function suggest(id){
-    console.log(id);
-    $.ajax({
-        type:"POST",
-        url:"{% url 'mpoweradmin:suggest' pk %}",
-        data:{
-            'jobid': id,
-            csrfmiddlewaretoken: '{{ csrf_token }}'
-        },
-        success: function( data ) 
-        {
-            console.log(data);
-            //let datamessage=JSON.parse(data['message']);
-            console.log(data.message);
-            alert(data.message);
-            location.reload()
-        }
-    })
-}
+
 
 function approve(id)
 {

@@ -704,21 +704,21 @@ def change(request, pk):
             if request.POST['new'] != request.POST['cnew']:
                 messages.error(
                     request, "Both your password and your confirmation password must be exactly same")
-                return redirect('candidate:change', pk=pk)
+                return redirect('candidate:edit', pk=pk)
             if not re.fullmatch(r'^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$', request.POST['new']):
                 messages.error(request, "Please enter a valid password")
-                return redirect('candidate:change', pk=pk)
+                return redirect('candidate:edit', pk=pk)
             if (request.POST['old'] == request.POST['new']):
                 messages.error(request, "Old and new password cant be same")
-                return redirect('candidate:change', pk=pk)
+                return redirect('candidate:edit', pk=pk)
             user.password = make_password(request.POST['new'])
             user.save()
             request.session['password'] = user.password
             messages.success(request, 'Password changed successfully')
-            return redirect('candidate:change', pk=pk)
+            return redirect('candidate:edit', pk=pk)
         else:
             messages.error(request, "Please enter correct old password")
-            return redirect('candidate:change', pk=pk)
+            return redirect('candidate:edit', pk=pk)
     return render(request, 'password-candidate.html', {'pk': pk})
 
 
@@ -913,6 +913,7 @@ def tests(request, pk):
             testinfo = TestInfo.objects.get(test_id=i.test_id.test_id)
             single_test['name'] = testinfo.test_name
             single_test['timelimit'] = testinfo.time_limit
+            single_test['apply_id'] = i.apply_id.apply_id
             emp = Employer.objects.get(eid=testinfo.eid.eid)
             single_test['eid'] = emp.eid
             single_test['ename'] = emp.ename
@@ -933,13 +934,14 @@ def tests(request, pk):
     return render(request, 'tests-candidate.html', {'pk': pk, 'all_app': page_obj, 'count': count})
 
 
-def attempt(request, pk, pk2):
+def attempt(request, pk, pk2, pk3):
     print(pk)
     print(pk2)
+    print(pk3)
     testinfo = TestInfo.objects.get(test_id=pk2)
     testques = TestQues.objects.filter(testinfoid=testinfo.testinfoid)
     name = testinfo.test_name
-    test_user = TestUser.objects.get(test_id=testinfo.test_id_id,user_id = pk)
+    test_user = TestUser.objects.get(test_id=testinfo.test_id_id,user_id = pk,emp_id_id = testinfo.eid.eid, apply_id = pk3)
     start_time = test_user.date
     all_ques = []
     for i in testques:
@@ -951,14 +953,17 @@ def attempt(request, pk, pk2):
         single_ques['opt3'] = i.option3
         single_ques['opt4'] = i.option4
         all_ques.append(single_ques)
-    return render(request, 'attempt-employer.html', {'pk': pk, 'pk2': pk2, 'test': all_ques, 'name': name,'start_time':start_time})
+    return render(request, 'attempt-employer.html', {'pk': pk, 'pk2': pk2, 'pk3':pk3, 'test': all_ques, 'name': name,'start_time':start_time})
 
 
 def submit(request, pk):
     if request.method == "POST":
-        usertest = TestUser.objects.get(
-            user_id=pk, test_id=request.POST['testid'])
+        print(request.POST['apply_id'])
         testinfo = TestInfo.objects.get(test_id=request.POST['testid'])
+        print(request.POST['apply_id'])
+        usertest = TestUser.objects.get(
+            user_id=pk, test_id=request.POST['testid'],emp_id_id = testinfo.eid.eid,apply_id = request.POST['apply_id'])
+        print(request.POST['apply_id'])
         testques = TestQues.objects.filter(testinfoid=testinfo.testinfoid)
         ans = request.POST.getlist('answers[]')
         usertest.total_ques = len(testques)
@@ -972,7 +977,7 @@ def submit(request, pk):
         usertest.answers = str_ans
         usertest.date = datetime.now()
         usertest.save()
-        applics = Application.objects.get(user_id=pk, test=testinfo)
+        applics = Application.objects.get(user_id=pk, test=testinfo, apply_id = request.POST['apply_id'])
         applics.status = 4
         applics.save()
         notif = Notifications()

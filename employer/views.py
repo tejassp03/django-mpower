@@ -24,6 +24,8 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from nltk.corpus import stopwords
 import json
+from django.core.mail import EmailMessage
+from jobster import settings
 # Create your views here.
 
 
@@ -284,6 +286,9 @@ def newjob(request, pk):
         job.careerlevel = request.POST['careerlevel']
         job.jobtype = request.POST['jobtype']
         job.basicpay = request.POST['basicpay']
+        sta = request.POST['reqCand']
+        if(int(sta) == 2):
+            job.status = 6
         #############################################
         # job.skills = request.POST['skills']
         raw_skills = request.POST['skills']
@@ -398,6 +403,7 @@ def manage(request, pk):
         applications = Application.objects.filter(job_id=i.jobid)
         data['num'] = len(applications)
         data['postdate'] = i.postdate
+        data['status'] = i.status
         all_det.append(data)
     count = len(all_jobs)
     GET_params = request.GET.copy()
@@ -415,6 +421,25 @@ def manage(request, pk):
     if 'shower' in request.session:
         del request.session['shower']
     return render(request, 'managejob-employer.html', {'pk': pk, 'pe': page_obj, 'count': count})
+
+def matchPercent(user,job):
+    important_data_jobs = f"{job.title} {job.jobdesc} {job.fnarea} {job.skills} {job.experience} {job.basicpay} {job.location} {job.industry} {job.ugqual} {job.pgqual} {job.profile} {job.jobtype} {job.requirements} {job.responsibilities} {job.notice_period}"
+    job_description = preprocess_text(important_data_jobs)
+    important_data_jobseeker = f"{user.location} {user.experience} {user.skills} {user.basic_edu} {user.master_edu} {user.other_qual} {user.cursal} {user.expsal} {user.notice_period}"
+    job_seeker_data = preprocess_text(important_data_jobseeker)
+    resume_pdf_file = user.Resume.path
+    resume_text = extract_text_from_pdf(resume_pdf_file)
+    resume_text = preprocess_text(resume_text)
+    total_job_seeker_data = f"{job_seeker_data}{resume_text}"
+    vectorizer = CountVectorizer()
+    job_description_vector = vectorizer.fit_transform([job_description])
+    job_seeker_data_vector = vectorizer.transform([total_job_seeker_data])
+    cosine_sim_job_seeker = cosine_similarity(job_description_vector, job_seeker_data_vector)
+    job_matching_percentage = round(cosine_sim_job_seeker[0][0] * 100, 2)
+    job_matcher = JobMatcher(jobseeker=user, job=job)
+    match_percentage = job_matcher.calculate_match_percentage()
+    job_matching_percentage = round((job_matching_percentage+match_percentage)/2,2)
+    return job_matching_percentage
 
 
 def candidates(request, pk):
@@ -482,6 +507,8 @@ def candidates(request, pk):
             single_can['location'] = user.location
             single_can['photo'] = user.photo
             job = Jobs.objects.get(jobid=i.job_id.jobid)
+            # print("hello1",matchPercent(user,job))
+            single_can['match'] = matchPercent(user,job)
             single_can['jobid'] = job.jobid
             single_can['title'] = job.title
             single_can['status'] = i.status
@@ -491,7 +518,7 @@ def candidates(request, pk):
             if i.status == 4:
                 testinfo1 = TestInfo.objects.get(testinfoid=i.test.testinfoid)
                 testuser1 = TestUser.objects.get(
-                    test_id=testinfo1.test_id.test_id, user_id=user.user_id)
+                    test_id=testinfo1.test_id.test_id, user_id=user.user_id,emp_id_id = pk,apply_id = i.apply_id)
                 single_can['results'] = (
                     int(testuser1.correct_answers)/int(testuser1.total_ques))*100
                 single_can['test_id'] = testuser1.testuser_id
@@ -502,21 +529,23 @@ def candidates(request, pk):
     for i in applics:
         single_can = {}
         user = JobSeeker.objects.get(user_id=i.user_id.user_id)
+        job = Jobs.objects.get(jobid=i.job_id.jobid)
+        # print("hello2",matchPercent(user,job))
         single_can['user_id'] = user.user_id
         single_can['name'] = user.name
         single_can['location'] = user.location
         single_can['photo'] = user.photo
-        job = Jobs.objects.get(jobid=i.job_id.jobid)
         single_can['jobid'] = job.jobid
         single_can['title'] = job.title
         single_can['status'] = i.status
         single_can['date_applied'] = i.date_applied
         single_can['apply_id'] = i.apply_id
         single_can['log_id'] = user.log_id.log_id
+        single_can['match'] = matchPercent(user,job)
         if i.status == 4:
             testinfo1 = TestInfo.objects.get(testinfoid=i.test.testinfoid)
             testuser1 = TestUser.objects.get(
-                test_id=testinfo1.test_id.test_id, user_id=user.user_id)
+                test_id=testinfo1.test_id.test_id, user_id=user.user_id,emp_id_id = pk,apply_id = i.apply_id)
             single_can['test_id'] = testuser1.testuser_id
             single_can['results'] = (
                 int(testuser1.correct_answers)/int(testuser1.total_ques))*100
@@ -538,7 +567,19 @@ def candidates(request, pk):
         page_obj = p.page(1)
     except EmptyPage:
         page_obj = p.page(p.num_pages)
-    return render(request, 'candidate-employer.html', {'pk': pk, 'pe': page_obj, 'count': count, 'jobs': jobs, 'app_count': app_count, 'single': single_apps, 'shower': shower, 'test': testinfo})
+    jobs_ = Jobs.objects.filter(eid=pk).exclude(status=6)  
+    
+    return render(request, 'candidate-employer.html', {'pk': pk, 'pe': page_obj, 'count': count, 'jobs': jobs, 'app_count': app_count, 'single': single_apps, 'shower': shower, 'test': testinfo,'jobs_':jobs_})
+
+def interview_complete(request,pk):
+    inter = Interview.objects.get(apply_id = request.POST['apply_id'])
+    applics = Application.objects.get(apply_id = request.POST['apply_id'])
+    applics.status = 6
+    applics.save()
+    inter.is_done = 1
+    inter.save()
+    return JsonResponse({'info': "interview Marked Completed"})
+
 
 
 def get_candidate(request, pk):
@@ -580,21 +621,21 @@ def change_pass(request, pk):
             if request.POST['new'] != request.POST['cnew']:
                 messages.error(
                     request, "Both your password and your confirmation password must be exactly same")
-                return redirect('employer:change_pass', pk=pk)
+                return redirect('employer:cedit', pk=pk)
             if not re.fullmatch(r'^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$', request.POST['new']):
                 messages.error(request, "Please entere a valid password")
-                return redirect('employer:change_pass', pk=pk)
+                return redirect('employer:cedit', pk=pk)
             if (request.POST['old'] == request.POST['new']):
                 messages.error(request, "Old and new password cant be same")
-                return redirect('employer:change_pass', pk=pk)
+                return redirect('employer:cedit', pk=pk)
             user.password = make_password(request.POST['new'])
             user.save()
             request.session['password'] = user.password
             messages.success(request, 'Password changed successfully')
-            return redirect('employer:change_pass', pk=pk)
+            return redirect('employer:cedit', pk=pk)
         else:
             messages.error(request, "Please enter correct old password")
-            return redirect('employer:change_pass', pk=pk)
+            return redirect('employer:cedit', pk=pk)
     if 'shower' in request.session:
         del request.session['shower']
     return render(request, 'password-employer.html', {'pk': pk})
@@ -811,10 +852,7 @@ def cnotifications(request, pk):
     return render(request, 'cnotifications-employer.html', {'pk': pk, 'notif': page_obj})
 
 
-def under_development(request, pk):
-    if 'shower' in request.session:
-        del request.session['shower']
-    return render(request, 'under_develop.html', {'pk': pk})
+
 
 
 def jobapp(request, pk):
@@ -953,13 +991,8 @@ def extract_text_from_pdf(pdf_file):
             pdf_text += page.extract_text()
     return pdf_text
 def cand_suggest(request, pk):
-    print("hello")
-    job = Jobs.objects.filter(eid=pk)
-    # for i in job:
-        # print(i.title)
+    job = Jobs.objects.filter(eid=pk).exclude(suggestions="[]")
     candid = []
-    # if(request.GET['job_id']):
-    #     print(request.GET['job_id'])
     sel = ""
     # if ('job_id' in request.GET and request.GET['job_id'] != 'a') or 'c_s_id' in request.session:
     #     print('hello')
@@ -1033,7 +1066,7 @@ def cand_suggest(request, pk):
     #             single_candidate['location'] = i.location
     #             candid.append(single_candidate)
     GET_params = request.GET.copy()
-
+    # print("hello1",request.GET['job_id'])
     #############################################################################
     if ('job_id' in request.GET):
         job_ = Jobs.objects.get(jobid=request.GET['job_id'])
@@ -1068,7 +1101,7 @@ def cand_suggest(request, pk):
         page_obj = p.page(p.num_pages)
     if 'shower' in request.session:
         del request.session['shower']
-    
+    print(sel)
     return render(request, 'suggestions-employer.html', {'pk': pk, 'jobs': job, 'count': count, 'pe': page_obj, 'sel': sel})
 
 
@@ -1078,6 +1111,8 @@ def get_cands(request, pk):
     for i in applics:
         single_can = {}
         user = JobSeeker.objects.get(user_id=i.user_id.user_id)
+        job = Jobs.objects.get(jobid=i.job_id.jobid)
+        single_can['match'] = matchPercent(user,job)
         single_can['user_id'] = user.user_id
         single_can['name'] = user.name
         single_can['location'] = user.location
@@ -1085,14 +1120,13 @@ def get_cands(request, pk):
             single_can['photo'] = user.photo.url
         except:
             single_can['photo'] = None
-        job = Jobs.objects.get(jobid=i.job_id.jobid)
         single_can['jobid'] = job.jobid
         single_can['title'] = job.title
         single_can['status'] = i.status
         if i.status == 4:
             testinfo1 = TestInfo.objects.get(testinfoid=i.test.testinfoid)
             testuser1 = TestUser.objects.get(
-                test_id=testinfo1.test_id.test_id, user_id=user.user_id)
+                test_id=testinfo1.test_id.test_id, user_id=user.user_id,emp_id=pk,apply_id = i.apply_id)
             single_can['results'] = (
                 int(testuser1.correct_answers)/int(testuser1.total_ques))*100
             single_can['test_id'] = testuser1.testuser_id
@@ -1234,6 +1268,9 @@ def schedule(request, pk):
                     applics.status = 3
                     request.session['shower'] = applics.job_id.jobid
                     testuser = TestUser()
+                    # print("hellooooooo",applics.eid)
+                    testuser.emp_id = applics.eid
+                    testuser.apply_id = applics
                     testuser.date = ist_datetime
                     testuser.user_id = applics.user_id
                     testuser.test_id = testinfo.test_id
@@ -1272,8 +1309,9 @@ def schedule(request, pk):
         testuser = TestUser()
         testuser.user_id = applics.user_id
         testuser.test_id = testinfo.test_id
-        print("hello")
-
+        # print("hello",applics.eid.eid)
+        testuser.emp_id = applics.eid
+        testuser.apply_id = applics
         testuser.date = ist_datetime
         applics.test = testinfo
         applics.save()
@@ -1300,20 +1338,21 @@ def test_info(request, pk):
 
 
 def get_results(request, pk):
-    testuser = TestUser.objects.get(testuser_id=request.GET['id'])
+    testuser = TestUser.objects.get(testuser_id=request.GET['id'],emp_id=pk)
     testinfo = TestInfo.objects.get(test_id=testuser.test_id.test_id)
     data = {}
     data['user_id'] = testuser.user_id.user_id
-    inters = Interview.objects.filter(user_id=testuser.user_id.user_id, eid=pk)
+    # inters = Interview.objects.filter(user_id=testuser.user_id.user_id, eid_id=pk,apply_id = request.GET['applyid'])
+    # print(inters)
     data['user_name'] = testuser.user_id.name
     data['name'] = testinfo.test_name
     data['num'] = testuser.total_ques
     data['correct'] = testuser.correct_answers
     data['date'] = testuser.date
-    if (len(inters) > 0):
-        data['int_link'] = inters[0].int_link
-    else:
-        data['int_link'] = ""
+    # if (len(inters) > 0):
+        # data['int_link'] = inters[0].int_link
+    # else:
+    data['int_link'] = ""
     data['percent'] = (data['correct']/data['num'])*100
     return JsonResponse({'data': dumps(data, default=str)})
 
@@ -1321,21 +1360,26 @@ def get_results(request, pk):
 def schedule_interview(request, pk):
     if request.method == "POST":
         date_time_str = request.POST['date_time']
+        print(date_time_str)
         desired_datetime = timezone.datetime.strptime(date_time_str, "%Y-%m-%dT%H:%M")
         aware_datetime = timezone.make_aware(desired_datetime)
         ist_datetime = aware_datetime 
         # + timezone.timedelta(hours=5, minutes=30)
+        print("hello",request.POST['user_id'])
         check = Interview.objects.filter(
-            user_id=request.POST['user_id'], eid=pk)
+            user_id=request.POST['user_id'], eid=pk,apply_id=request.POST['apply_id'])
         if (len(check) != 0):
             check[0].int_link = request.POST['int_link']
             check[0].schedule_date = ist_datetime
             check[0].save()
             return JsonResponse({'m': 'A'})
         intval = Interview()
+        applics = Application.objects.get(apply_id=request.POST['apply_id'])
         intval.eid = Employer.objects.get(eid=pk)
         intval.user_id = JobSeeker.objects.get(user_id=request.POST['user_id'])
         intval.int_link = request.POST['int_link']
+        # print("hello",applics.apply_id)
+        intval.apply_id = applics
         intval.schedule_date = ist_datetime
         intval.is_done = False
         intval.is_feedgiven = False
@@ -1345,6 +1389,8 @@ def schedule_interview(request, pk):
         notif.send_id = intval.eid.log_id
         notif.rece_id = intval.user_id.log_id
         notif.save()
+        applics.status = 5
+        applics.save()
         subject = "Interview scheduled by "+intval.eid.ename
         message = "Interview link: "+intval.int_link + \
             "\nDate: "+str(intval.schedule_date)
@@ -1476,3 +1522,189 @@ def logout(request, pk):
     employer.save()
     request.session.flush()
     return redirect('main:index')
+
+class JobMatcher:
+    def __init__(self, jobseeker, job):
+        self.jobseeker = jobseeker
+        self.job = job
+    
+    
+
+    def calculate_match_percentage(self):
+        total_params = 5  
+        matched_params = 0
+
+        if self.jobseeker.skills and self.job.skills:
+            job_skills = set(self.job.skills.lower().split(','))
+            seeker_skills = set(self.jobseeker.skills.lower().split(','))
+            if job_skills.intersection(seeker_skills):
+                matched_params += 1
+
+        # Check if location matches
+        if self.job.location and self.jobseeker.location:
+            if self.job.location.lower() == self.jobseeker.location.lower():
+                matched_params += 1
+
+        # Check if notice period matches
+        if self.job.notice_period and self.jobseeker.notice_period:
+            if self.job.notice_period.lower() == self.jobseeker.notice_period.lower():
+                matched_params += 1
+
+        # Check if Experience matches
+        if self.jobseeker.experience and self.job.experience:
+            if int(self.jobseeker.experience) >= int(self.job.experience):
+                matched_params += 1
+
+        # Check if expected salary matches
+        if self.jobseeker.expsal and self.job.basicpay:
+            if self.jobseeker.expsal <= int(self.job.basicpay):
+                matched_params += 1
+
+        # Calculate match percentage
+        match_percentage = (matched_params / total_params) * 100
+
+        return match_percentage
+
+    def get_matching_details(self):
+        matching_details = {}
+
+        # Check if skills match
+        if self.jobseeker.skills and self.job.skills:
+            job_skills = set(self.job.skills.lower().split(','))
+            seeker_skills = set(self.jobseeker.skills.lower().split(','))
+            matching_details['skills'] = {
+                'match': list(job_skills.intersection(seeker_skills)),
+                'not_match': list(job_skills.difference(seeker_skills))
+            }
+            
+
+        # Check if location matches
+        if self.job.location and self.jobseeker.location:
+            matching_details['location'] = {
+                'match': True if self.job.location.lower() == self.jobseeker.location.lower() else False
+            }
+
+        # Check if notice period matches
+        if self.job.notice_period and self.jobseeker.notice_period:
+            matching_details['notice_period'] = {
+                'match': True if self.job.notice_period.lower() == self.jobseeker.notice_period.lower() else False
+            }
+
+        # Check if current salary matches
+        if self.jobseeker.cursal and self.job.basicpay:
+            matching_details['experience'] = {
+                'match': True if int(self.jobseeker.experience) >= int(self.job.experience) else False
+            }
+
+        # Check if expected salary matches
+        if self.jobseeker.expsal and self.job.basicpay:
+            matching_details['expected_salary'] = {
+                'match': True if self.jobseeker.expsal <= int(self.job.basicpay) else False
+            }
+
+        return matching_details
+
+def preprocess_text(text):
+    words = word_tokenize(text)
+
+    stop_words = set(stopwords.words('english'))
+    words = [word for word in words if word.lower() not in stop_words]
+
+    stemmer = PorterStemmer()
+    words = [stemmer.stem(word) for word in words]
+
+    preprocessed_text = ' '.join(words)
+    return preprocessed_text
+
+
+def extract_text_from_pdf(pdf_file):
+    pdf_text = ""
+    with open(pdf_file, 'rb') as file:
+        pdf_reader = PyPDF2.PdfReader(file)
+        num_pages = len(pdf_reader.pages)
+        for page_num in range(num_pages):
+            page = pdf_reader.pages[page_num]
+            pdf_text += page.extract_text()
+    return pdf_text
+def suggest(request, pk):
+    if request.method == "POST":
+        send = False
+        jobid = request.POST.get('jobid')
+        if (jobid):
+            try:
+                job_ = Jobs.objects.get(jobid=jobid)
+                if job_.status == 1 or job_.status == 3:
+                    send = True
+                job_.status = 5
+                job_.save()
+                matching_percentages = []
+                for job_seeker in JobSeeker.objects.all():
+                    important_data_jobs = f"{job_.title} {job_.jobdesc} {job_.fnarea} {job_.skills} {job_.experience} {job_.basicpay} {job_.location} {job_.industry} {job_.ugqual} {job_.pgqual} {job_.profile} {job_.jobtype} {job_.requirements} {job_.responsibilities} {job_.notice_period}"
+                    job_description = preprocess_text(important_data_jobs)
+
+                    important_data_jobseeker = f"{job_seeker.location} {job_seeker.experience} {job_seeker.skills} {job_seeker.basic_edu} {job_seeker.master_edu} {job_seeker.other_qual} {job_seeker.cursal} {job_seeker.expsal} {job_seeker.notice_period}"
+                    job_seeker_data = preprocess_text(important_data_jobseeker)
+                    resume_pdf_file = job_seeker.Resume.path
+                    resume_text = extract_text_from_pdf(resume_pdf_file)
+                    resume_text = preprocess_text(resume_text)
+                    total_job_seeker_data = f"{job_seeker_data}{resume_text}"
+                    vectorizer = CountVectorizer()
+
+                    job_description_vector = vectorizer.fit_transform([job_description])
+                    job_seeker_data_vector = vectorizer.transform([total_job_seeker_data])
+                    cosine_sim_job_seeker = cosine_similarity(job_description_vector, job_seeker_data_vector)
+
+                    job_matching_percentage = round(cosine_sim_job_seeker[0][0] * 100, 2)
+                    job_matcher = JobMatcher(jobseeker=job_seeker, job=job_)
+                    match_percentage = job_matcher.calculate_match_percentage()
+                    total_matching_percentage = round((job_matching_percentage + match_percentage) / 2, 2)
+                    matching_percentages.append((job_seeker.user_id, total_matching_percentage))
+                    matching_percentages.sort(key=lambda x: x[1], reverse=True)
+
+                top_matching_job_seekers = matching_percentages[:20]
+                if(send):
+                    email_list = []
+                    for i in top_matching_job_seekers:
+                        seek = JobSeeker.objects.get(user_id=i[0])
+                        email_list.append(seek.log_id.email)
+                    email_subject = "Job Alert"
+                    message = "You are among top 20 best profiles for this job"
+                    email = EmailMessage(email_subject, message, settings.EMAIL_HOST_USER, email_list)
+                    email.fail_silently = True
+                    # email.content_subtype = "html"
+                    email.send()
+                email_subject = "Candidate suggestions"
+                message = "Suggestions have been provided for {job_.title} job"
+                email = EmailMessage(email_subject, message, settings.EMAIL_HOST_USER, [job_.eid.log_id.email])
+                email.fail_silently = True
+                    # email.content_subtype = "html"
+                email.send()
+                
+                    
+                # print(top_matching_job_seekers)
+                serialized_list = json.dumps(top_matching_job_seekers)
+                job_.suggestions = serialized_list
+                job_.status = 4
+                job_.save()
+                
+                return JsonResponse({'message': 'Candidate Suggestions are provided'})
+            except Jobs.DoesNotExist:
+                return JsonResponse({'message': 'Job not found'}, status=404)
+        else:
+            return JsonResponse({'message': 'Missing jobid'}, status=400)
+    else:
+        return JsonResponse({'message': 'Invalid request method'}, status=405)
+def requestCand(request,pk):
+    if (request.method == "POST"):
+        if(request.POST['jobid']):
+            job = Jobs.objects.get(jobid=request.POST['jobid'])
+            job.status = 6
+            job.save()
+            return JsonResponse({'message': 'Successfully Requested'}, status=200)
+        else:
+            return JsonResponse({'message': 'Try again'}, status=500)
+    return JsonResponse({'message': 'Try again'}, status=500)
+def under_development(request, pk):
+    if 'shower' in request.session:
+        del request.session['shower']
+    return render(request, 'under_develop.html', {'pk': pk})

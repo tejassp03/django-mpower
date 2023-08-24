@@ -58,7 +58,7 @@
                     <tr>
                         {% comment %} <td><input type="checkbox" name="chek" class="form-check-input" value={{ i.apply_id }}></td> {% endcomment %}
                         <td>
-                            <a href="{% url 'candidate:attempt' pk i.test_id %}">
+                            <a href="{% url 'candidate:attempt' pk i.test_id i.apply_id%}">
                                 <div class="pxp-candidate-dashboard-job-title">{{ i.name }}</div>
                                 {% comment %} <div class="pxp-candidate-dashboard-job-location"><span class="fa fa-globe me-1"></span>{{ i.location }}</div> {% endcomment %}
                             </a>
@@ -78,7 +78,7 @@
                         </td> {% endcomment %}.
                         <td>
                         <div class="pxp-candidate-dashboard-jobs-bulk-actions mb-3">
-                            <a class="btn ms-2" href="{% url 'candidate:attempt' pk i.test_id %}" target="_blank">Attempt</a>
+                            <a class="btn ms-2" href="{% url 'candidate:attempt' pk i.test_id i.apply_id %}" target="_blank">Attempt</a>
                         </div>
                     </td>
                     </tr>

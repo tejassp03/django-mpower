@@ -357,7 +357,8 @@ function optionSelected(answer){
     next_btn.classList.add("show");
 }
 function showResult(){
-    let pk2={{pk2}};
+    let pk2='{{pk2}}';
+    let pk3 = "{{pk3}}"
     info_box.classList.remove("activeInfo");
     quiz_box.classList.remove("activeQuiz");
     result_box.classList.add("activeResult");
@@ -369,6 +370,7 @@ function showResult(){
         data:{
                 answers: ans,
                 testid: pk2,
+                apply_id : pk3,
                 csrfmiddlewaretoken: '{{ csrf_token }}'
         },
         success: function( data ) 

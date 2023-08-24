@@ -54,9 +54,9 @@
                     <li id="cedi"><a href="{% url 'employer:cedit' pk=pk %}"><span class="fa fa-pencil"></span>Edit Profile</a></li>
                     <li id="cnew"><a href="{% url 'employer:newjob' pk=pk %}"><span class="fa fa-file-text-o"></span>New Job Offer</a></li>
                     <li id="cman"><a href="{% url 'employer:manage' pk=pk %}"><span class="fa fa-briefcase"></span>Manage Jobs</a></li>
-                    <li id="ccan"><a href="{% url 'employer:candidates' pk=pk %}"><span class="fa fa-user-circle-o"></span>Candidates</a></li>
+                    <li id="ccan"><a href="{% url 'employer:candidates' pk=pk %}"><span class="fa fa-user-circle-o"></span>Applications</a></li>
                     <li id="csub"><a href="{% url 'employer:subscriptions' pk=pk %}"><span class="fa fa-credit-card"></span>Subscriptions</a></li>
-                    <li id="ccha"><a href="{% url 'employer:change_pass' pk=pk %}"><span class="fa fa-lock"></span>Change Password</a></li>
+                    <!--<li id="ccha"><a href="{% url 'employer:change_pass' pk=pk %}"><span class="fa fa-lock"></span>Change Password</a></li>-->
                     <li id="qui"><a href="{% url 'employer:show_tests' pk=pk %}"><span class="fa fa-question"></span>Create Test</a></li>
                     <li id="inr"><a href="{% url 'employer:all_interviews' pk=pk %}"><span class="fa fa-user"></span>Interviews</a></li>
                 </ul>
@@ -85,8 +85,8 @@
                 <ul class="list-unstyled">
                     <li id="scn">
                         {% comment %} <a href="candidate-dashboard-notifications.html" class="d-flex justify-content-between align-items-center"> {% endcomment %}
-                            <a href="{% url 'employer:cand_suggest' pk=pk %}" class="d-flex justify-content-between align-items-center">
-                            <div><span class="fa fa-file-o"><i class="fa-light fa-lightbulb"></i></span>Suggestions</div>
+                            {% comment %}<a href="{% url 'employer:cand_suggest' pk=pk %}" class="d-flex justify-content-between align-items-center">
+                            <div><span class="fa fa-file-o"><i class="fa-light fa-lightbulb"></i></span>Suggestions</div>{% endcomment %}
                         </a>
                     </li>
                     <li id="pen">
@@ -473,6 +473,7 @@
                     el.innerHTML = '{{request.session.name}}'[0]
                 })
             })
+            var applyIdForInterview;
 
             setInterval(getCount, 10000);
             function getCount()
@@ -766,15 +767,18 @@
                 })
         }
 
-        function resultsmodal(id)
+        function resultsmodal(id,applyid)
         {
             $('[name=checkdate]').css({'z-index': "1600 !important"})
+            applyIdForInterview = applyid;
+            console.log(id+" hello "+applyIdForInterview)
             $.ajax(
                 {
                     type:"GET",
                     url: "{% url 'employer:get_results' pk %}",
                     data:{
-                        id: id
+                        id: id,
+                        applyid:applyid
                     },
                     success: function( data ) 
                     {
@@ -811,8 +815,8 @@
             let link=$('[name=intlink]').val();
             let user=$('[name=user_id_val]').val();
             let int_time=$('[name=interviewDate]').val();
-            console.log(int_time);
-            if (!int_time || int_time.length < 16) { // Adjust the length as needed
+            // console.log(int_time);
+            if (!int_time || int_time.length < 16) { 
                 alert("Please enter a valid full datetime.");
             }
             if(link=="")
@@ -828,6 +832,7 @@
                         user_id: user,
                         int_link: link,
                         date_time: int_time,
+                        apply_id:applyIdForInterview,
                         csrfmiddlewaretoken: '{{ csrf_token }}'
                     },
                     success: function( data ) 

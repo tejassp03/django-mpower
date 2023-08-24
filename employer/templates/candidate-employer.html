@@ -5,6 +5,38 @@
 {% block title %}
 <title>mpower - Company dashboard - Candidates</title>
 {% endblock %}
+{% block header %}
+<style>
+    .popup {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.popup-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+#close-popup {
+    margin-top: 10px;
+}
+.pxp-company-dashboard-job-percent{
+    font-size: 12px;
+    font-weight: 500;
+}
+
+</style>
+{% endblock header %}
 {% block content %}
 
 <div class="pxp-dashboard-content-details">
@@ -108,6 +140,7 @@
                                 <th class="pxp-is-checkbox" style="width: 1%;"><input type="checkbox" onClick="toggle(this)" class="form-check-input" name="all"></th>
                                 <th colspan="2" style="width: 25%;">Name</th>
                                 <th style="width: 15%;">Status</th>
+                                <!-- <th>Match</th> -->
                                 <th>Date<span class="fa fa-angle-up ms-3"></span></th>
                                 <th>Actions</th>
                             </tr>
@@ -155,6 +188,7 @@
                                 <th colspan="2" style="width: 25%;">Name</th>
                                 <th style="width: 15%;">Status</th>
                                 <th>Date<span class="fa fa-angle-up ms-3"></span></th>
+                                <th>Match</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -189,9 +223,19 @@
                                 <td><div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-info">Test Scheduled</span></div></td>
                                 {% elif i.status == 4 %}
                                 <td><div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-primary">Test Answered <br> {{ i.results }} %</span></div></td>
+                                {% elif i.status == 5 %}
+                                <td><div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-success">Interview Scheduled</span></div></td>
+                                {% elif i.status == 6 %}
+                                <td><div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-success">Interview Completed</span></div></td>
+                                {% elif i.status == 7 %}
+                                <td><div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-success">Feedback Provided</span></div></td>
                                 {% endif %}
+                                
                                 <td>
                                     <div class="pxp-company-dashboard-job-date">{{ i.date_applied }}</div>
+                                </td>
+                                <td>
+                                    <div class="pxp-company-dashboard-job-percent">{{ i.match }} %</div>
                                 </td>
                                 <td>
                                     <div class="pxp-company-dashboard-jobs-bulk-actions" style="margin-left: auto">
@@ -201,8 +245,12 @@
                                             <option value="b_{{i.user_id}}">View profile</option>
                                             {% if i.status == 4 %}
                                             <option value="h_{{i.user_id}}_{{i.test_id}}">Schedule Interview</option>
-                                            {% else %}
+                                            {% elif i.status == 3 or i.status == 0 %}
                                             <option value="c_{{i.user_id}}_{{i.apply_id}}">Schedule Test</option>
+                                            {% elif i.status == 5 %}
+                                            <option value="l_{{i.user_id}}_{{i.apply_id}}">Interview Completed</option>
+                                            {% elif i.status == 6 %}
+                                            <option value="m_{{i.user_id}}_{{i.apply_id}}">Interview Feedback</option>
                                             {% endif %}
                                             <option value="d_{{i.user_id}}_{{i.log_id}}">Send Message</option>
                                             <option value="e_{{i.user_id}}_{{i.apply_id}}">Approve</option>
@@ -212,13 +260,14 @@
                                     </div>
                                     <div class="pxp-dashboard-table-options">
                                         <ul class="list-unstyled">
-                                            <li><button title="Schedule Interview" id="pxp-interview-modal-button-{{i.user_id}}-{{i.test_id}}" data-bs-target="#pxp-results-modal" data-bs-toggle="modal" onclick="resultsmodal('{{i.test_id}}')" style="display: none"></button></li>
+                                            <li><button title="Interview Completed" id="pxp-feedback-modal-button-{{i.user_id}}-{{i.apply}}" onclick="interviewComplete('{{i.user_id}}','{{i.apply_id}}')" style="display: none"></button></li>
+                                            <li><button title="Schedule Interview" id="pxp-interview-modal-button-{{i.user_id}}-{{i.test_id}}" data-bs-target="#pxp-results-modal" data-bs-toggle="modal" onclick="resultsmodal('{{i.test_id}}','{{i.apply_id}}')" style="display: none"></button></li>
                                             <li><button title="View profile" id="pxp-candidate-modal-button-{{i.user_id}}" data-bs-target="#pxp-candidate-modal" data-bs-toggle="modal" onclick="candidatemodal('{{i.user_id}}')" style="display: none"><span class="fa fa-eye"></span></button></li>
                                             <li><button title="Schedule Test" id="pxp-schedule-modal-button-{{i.user_id}}-{{i.apply_id}}" data-bs-target="#pxp-schedule-modal" data-bs-toggle="modal" onclick="setter('{{i.apply_id}}')" style="display: none"><span class="fa fa-question"></span></button></li>
-                                            <li><button title="Send message" id="pxp-send-message-button-{{i.user_id}}-{{i.log_id}}" onclick="messageclick({{i.log_id}})" style="display: none"><span class="fa fa-envelope-o"></span></button></li>
-                                            <li><button title="Approve" id="pxp-approve-button-{{i.user_id}}-{{i.apply_id}}" onclick="approve({{i.apply_id}})" style="display: none"><span class="fa fa-check"></span></button></li>
-                                            <li><button title="Reject" id="pxp-reject-button-{{i.user_id}}-{{i.apply_id}}" onclick="reject({{i.apply_id}})" style="display: none"><span class="fa fa-ban"></span></button></li>
-                                            <li><button title="Delete" id="pxp-delete-button-{{i.user_id}}-{{i.apply_id}}" onclick="delcan({{i.apply_id}})" style="display: none"><span class="fa fa-trash-o"></span></button></li>
+                                            <li><button title="Send message" id="pxp-send-message-button-{{i.user_id}}-{{i.log_id}}" onclick="messageclick('{{i.log_id}}')" style="display: none"><span class="fa fa-envelope-o"></span></button></li>
+                                            <li><button title="Approve" id="pxp-approve-button-{{i.user_id}}-{{i.apply_id}}" onclick="approve('{{i.apply_id}}')" style="display: none"><span class="fa fa-check"></span></button></li>
+                                            <li><button title="Reject" id="pxp-reject-button-{{i.user_id}}-{{i.apply_id}}" onclick="reject('{{i.apply_id}}')" style="display: none"><span class="fa fa-ban"></span></button></li>
+                                            <li><button title="Delete" id="pxp-delete-button-{{i.user_id}}-{{i.apply_id}}" onclick="delcan('{{i.apply_id}}')" style="display: none"><span class="fa fa-trash-o"></span></button></li>
                                         </ul>
                                     </div>
                                 </td>
@@ -274,6 +323,31 @@
         </div>
     </div>
 </div>
+{% if jobs_ %}
+<div id="popup" class="popup">
+    <div class="popup-content">
+        <div class="d-flex justify-content-end">
+            <button id="close-popup" class="btn btn-secondary" onclick="closePopup()"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <div class="container mt-5">
+            <h5 class="text-primary">Facing difficulty in finding the right profiles?</h5>
+            <p class="text-muted">Request candidates from mPower.</p>
+        </div>
+        <div class="modal-body" style="padding: 1rem !important">
+            <div class="pxp-company-dashboard-jobs-bulk-actions" style="margin-left: auto">
+                <select class="form-select" name="jobidReq">
+                        {% for i in jobs_ %} 
+                        <option value="{{ i.jobid }}">
+                        {{ i.title }}
+                        </option>
+                        {% endfor %}
+                </select>
+                <button class="btn ms-2" onclick="requestCand()">Request</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
 
 {% endblock %}
 
@@ -319,6 +393,25 @@ $(document).ready(function () {
         candifetch(show);
     }
 })
+
+// Function to show the popup
+function showPopup() {
+    document.getElementById("popup").style.display = "flex";
+}
+
+// Function to close the popup
+function closePopup() {
+    document.getElementById("popup").style.display = "none";
+}
+
+// Show the popup when the page loads
+window.onload = function() {
+    showPopup();
+};
+
+// Close the popup when the close button is clicked
+document.getElementById("close-popup").addEventListener("click", closePopup);
+
 function candifetch(id)
 {
     let app_count={{app_count}};
@@ -436,6 +529,21 @@ function candifetch(id)
                         span3.setAttribute('class', 'badge rounded-pill bg-primary');
                         span3.innerHTML='Test Answered <br> '+datainfo[i].results+" %";
                     }
+                    else if(datainfo[i].status==5)
+                    {
+                        span3.setAttribute('class', 'badge rounded-pill bg-success');
+                        span3.innerHTML='Interview Scheduled';
+                    }
+                    else if(datainfo[i].status==6)
+                    {
+                        span3.setAttribute('class', 'badge rounded-pill bg-success');
+                        span3.innerHTML='Interview Marked';
+                    }
+                    else if(datainfo[i].status==7)
+                    {
+                        span3.setAttribute('class', 'badge rounded-pill bg-success');
+                        span3.innerHTML='Feedback Provided';
+                    }
                     td3div.append(span3);
                     td3a.append(td3div);
                     tr.append(td3a);
@@ -445,6 +553,14 @@ function candifetch(id)
                     td4div.innerHTML=moment(datainfo[i].date_applied.slice(0, 19)).format("MMM. D, YYYY, h a");
                     td4.append(td4div);
                     tr.append(td4);
+                    ////////////
+                    let td6=document.createElement('td');
+                    let td6div=document.createElement('div');
+                    td6div.setAttribute('class', 'pxp-company-dashboard-job-percent');
+                    td6div.innerHTML=datainfo[i].match+" %";
+                    td6.append(td6div);
+                    tr.append(td6);
+                    ////////////
                     let td5=document.createElement('td');
                     let td5div=document.createElement('div');
                     td5div.setAttribute('class', 'pxp-dashboard-table-options');                 
@@ -463,7 +579,7 @@ function candifetch(id)
                         interviewbut.setAttribute('id', idval);
                         interviewbut.setAttribute('data-bs-target', '#pxp-results-modal');
                         interviewbut.setAttribute('data-bs-toggle', 'modal');
-                        let interviewans='resultsmodal('+datainfo[i].test_id+')';
+                        let interviewans='resultsmodal('+datainfo[i].test_id+','+datainfo[i].apply_id+')';
                         interviewbut.setAttribute('onclick', interviewans);
                         interviewbut.setAttribute('style', 'display: none');
                         interviewli.append(interviewbut);
@@ -504,6 +620,9 @@ function candifetch(id)
                     li6.append(but6);
                     ul.append(li6);
                     }
+                    
+                    
+                    
 
 
                     let li2=document.createElement('li');
@@ -602,6 +721,22 @@ function candifetch(id)
                         opt9.innerHTML="Schedule Interview";
                         selectorsopt.append(opt9);
                     }
+                    else if(datainfo[i].status==5)
+                    {
+                        let opt9=document.createElement('option');
+                        idval="l_"+datainfo[i].user_id+"_"+datainfo[i].apply_id;
+                        opt9.setAttribute('value', idval);
+                        opt9.innerHTML="Interview Completed";
+                        selectorsopt.append(opt9);
+                    }
+                    else if(datainfo[i].status==6)
+                    {
+                        let opt9=document.createElement('option');
+                        idval="m_"+datainfo[i].user_id+"_"+datainfo[i].apply_id;
+                        opt9.setAttribute('value', idval);
+                        opt9.innerHTML="Interview Feedback";
+                        selectorsopt.append(opt9);
+                    }
 
                     let opt4=document.createElement('option');
                     idval="d_"+datainfo[i].user_id+"_"+datainfo[i].log_id;
@@ -631,8 +766,41 @@ function candifetch(id)
             }
     })
 }
-
-
+function interviewComplete(user_id,apply_id){
+    let jobidRequest=$("[name='jobidReq']").val();
+    console.log(jobidRequest);
+    $.ajax(
+        {
+            type:"POST",
+            url: "{% url 'employer:interview_complete' pk %} ",
+            data:{
+                    user_id: user_id,
+                    apply_id: apply_id,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function( data ) 
+            {
+                location.reload()
+            }
+    }) 
+}
+function requestCand(){
+    let jobidRequest=$("[name='jobidReq']").val();
+    console.log(jobidRequest);
+    $.ajax(
+        {
+            type:"POST",
+            url: "{% url 'employer:requestCand' pk %} ",
+            data:{
+                    jobid: jobidRequest,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function( data ) 
+            {
+                location.reload()
+            }
+    })
+}
 
 function approve(id)
 {
@@ -948,7 +1116,20 @@ function tme2(id)
         console.log('h');
         let temp="#pxp-interview-modal-button-"+val_option[1]+"-"+val_option[2];
         $(temp).click();
-    }   
+    } 
+    else if(val_option[0] == "l")
+    {
+        //let temp="#pxp-interview-modal-button-"+val_option[1]+"-"+val_option[2];
+        //$(temp).click();
+        console.log('h')
+        interviewComplete(val_option[1],val_option[2]);
+    } 
+    else if (val_option[0] == "m") {
+        var pka = val_option[2];
+        console.log('m' + pka);
+        var redirectUrl = "/give_feedback/" + pka;
+        window.location.href = redirectUrl;
+    }
 }
 
 
