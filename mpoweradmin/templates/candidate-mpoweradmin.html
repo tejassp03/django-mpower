@@ -181,7 +181,9 @@
                                 </td>
                                 {% if i.status == 6 %}
                                 <td><div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-info">Requested</span></div></td>
-                               {%else%}
+                                {% elif i.status == 7 %}
+                                <td><div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-info">Provided</span></div></td>
+                                {%else%}
                                <td><div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-secondary">Posted</span></div></td>
                                
                                 {% endif %}
@@ -443,8 +445,13 @@ function candifetch(id)
                     }
                     else if(datainfo[i].status==6)
                     {
-                        span3.setAttribute('class', 'badge rounded-pill bg-info');
+                        span3.setAttribute('class', 'badge rounded-pill bg-danger');
                         span3.innerHTML='Requested';
+                    }
+                    else if(datainfo[i].status==7)
+                    {
+                        span3.setAttribute('class', 'badge rounded-pill bg-success');
+                        span3.innerHTML='Provided';
                     }
                     td3div.append(span3);
                     td3a.append(td3div);
@@ -596,14 +603,14 @@ function candifetch(id)
                     opt2.setAttribute('value', idval);
                     opt2.innerHTML="View Job";
                     selectorsopt.append(opt2);
-                    //if(datainfo[i].status==3)
-                    //{
-                      //  let opt9=document.createElement('option');
-                        //idval="h_"+datainfo[i].jobid+"_"+datainfo[i].jobid;
-                        //opt9.setAttribute('value', idval);
-                        //opt9.innerHTML="Suggest Candidates";
-                        //selectorsopt.append(opt9);
-                    //}
+                    if(datainfo[i].status==6)
+                    {
+                        let opt9=document.createElement('option');
+                        idval="n_"+datainfo[i].jobid+"_"+datainfo[i].jobid;
+                        opt9.setAttribute('value', idval);
+                        opt9.innerHTML="Provided Candidates";
+                        selectorsopt.append(opt9);
+                    }
 
                     //let opt4=document.createElement('option');
                     //idval="d_"+datainfo[i].jobid+"_"+datainfo[i].jobid;
@@ -671,7 +678,22 @@ function reject(id)
             }
     })
 }
-
+function markProvided(id)
+{
+    $.ajax(
+        {
+            type:"POST",
+            url: "{% url 'mpoweradmin:mark_cand_provided' pk %}",
+            data:{
+                    'jobid': id,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function( data ) 
+            {
+                location.reload()
+            }
+    })
+}
 function multiple()
 {
     let action=$("[name='act']").val();
@@ -943,6 +965,12 @@ function tme2(id)
     {
         let temp="#pxp-interview-modal-button-"+val_option[1]+"-"+val_option[2];
         suggest(val_option[2]);
+    }
+    else if(val_option[0] == "n")
+    {
+        markProvided(val_option[2]);
+        //let temp="#pxp-interview-modal-button-"+val_option[1]+"-"+val_option[2];
+        //suggest(val_option[2]);
     }   
 }
 

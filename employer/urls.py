@@ -45,5 +45,7 @@ urlpatterns = [
 	path('suggest/', views.suggest, name='suggest'),
 	path('request_cand/', views.requestCand, name='requestCand'),
 	path('interview_complete/', views.interview_complete, name='interview_complete'),
+	path('panel_request/', views.panel_request, name='panel_request'),
+	path('resume_feedback/', views.resume_feedback, name='resume_feedback'),
 	path('under_development/', views.under_development, name='under_development'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

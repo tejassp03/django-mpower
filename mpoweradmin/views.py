@@ -26,6 +26,7 @@ import json
 from django.core.mail import EmailMessage
 from jobster import settings
 from main.utils import send_emails
+from django.db.models import Count
 # def get_registered_counts(model, days):
 #     registered_counts = []
 #     today = date.today()
@@ -476,8 +477,9 @@ def candidates(request, pk):
     # jobs=Jobs.objects.filter(eid=pk).order_by('-postdate')
     # print(jobs)
     # app_count=[]
-    employers = Employer.objects.all()
-    print(employers)
+    employers = Employer.objects.annotate(num_jobs=Count('jobs')).order_by('-num_jobs')
+
+    # print(employers)
     # single_apps=[]
     # for i in jobs:
     #     app_count.append(len(Application.objects.filter(job_id=i.jobid)))
@@ -579,7 +581,6 @@ def get_candidate(request, pk):
     notif.save()
     return JsonResponse({'info': dumps(cand, default=str), 'work': dumps(list(work.values())), 'edu': dumps(list(edu.values()))})
 def get_job(request,pk):
-    print("hello")
     job = Jobs.objects.get(jobid=request.GET['user_id'])
     emp_ = Employer.objects.get(eid=job.eid_id) 
     job_data = {}
@@ -589,16 +590,16 @@ def get_job(request,pk):
     job_data['basicpay'] = job.basicpay
     job_data['fnarea'] = job.fnarea
     job_data['location'] = job.location
+
     job_data['vacno'] = job.vacno
     job_data['postdate'] = job.postdate
     job_data['skills'] = job.skills
-    job_data['location'] = job.notice_period
+    job_data['notice_period'] = job.notice_period
     job_data['requirements'] = job.requirements
 
     job_data['name'] = emp_.ename
-    job_data['email'] = emp_.website
+    job_data['email'] = emp_.log_id.email
     job_data['phone'] = emp_.phone
-    print("hello")
     return JsonResponse({'info': dumps(job_data, default=str)})
 
 def subscriptions(request, pk):
@@ -1227,7 +1228,7 @@ def all_interviews(request, pk):
             return redirect('employer:all_interviews', pk=pk)
         Interview.objects.get(int_id=request.POST['int_id']).delete()
         return redirect('employer:all_interviews', pk=pk)
-    all_ints=Interview.objects.filter(eid=pk).order_by('-schedule_date')
+    all_ints = Interview.objects.exclude(panel_req=0).order_by('-schedule_date')
     final_ints=[]
     for i in all_ints:
         single_int={}
@@ -1238,6 +1239,7 @@ def all_interviews(request, pk):
         single_int['date']=i.schedule_date
         single_int['link']=i.int_link
         single_int['isdone']=i.is_done
+        single_int['panel_req'] = i.panel_req
         final_ints.append(single_int)
     GET_params = request.GET.copy()
     count=len(final_ints)
@@ -1260,6 +1262,28 @@ def done(request, pk):
         int_val.is_done=1
         int_val.save()
         return JsonResponse({'message': 'Y'})
+
+def interview_panel(request, pk):
+    if request.method=="POST":
+        int_val = Interview.objects.get(int_id=request.POST['int_id'])
+        email_panel = [request.POST['email']]
+        
+        email_client = [int_val.eid.log_id.email]
+        email_subject = "Interview Panel Request"
+        message = f"You are assigned as an interview panel. Interview link: {int_val.int_link}. Candidate name: {int_val.user_id.name}. Interview Time: {int_val.schedule_date}"
+        email = EmailMessage(email_subject, message, settings.EMAIL_HOST_USER, email_panel)
+        email.fail_silently = True
+        # # email.content_subtype = "html"
+        email.send()
+        email_subject = "Interview Panel Assigned"
+        message = f"You are assigned a interview panel Email Address: {email_panel[0]}"
+        email = EmailMessage(email_subject, message, settings.EMAIL_HOST_USER, email_client)
+        email.fail_silently = True
+        # # email.content_subtype = "html"
+        email.send()
+        int_val.panel_req=2
+        int_val.save()
+        return JsonResponse({'message': 'Interview Panel assigned'})
 
 def get_link(request, pk):
     int_val=Interview.objects.get(int_id=request.GET['int_id'])
@@ -1322,6 +1346,14 @@ def pending_actions(request, pk):
         page_obj = p.page(p.num_pages)
     return render(request, 'candidate-mpoweradmin.html', {'pk': pk, 'count': count, 'pe': page_obj, 'test': testinfo})
 
+
+def mark_cand_provided(request,pk):
+    if request.method == 'POST':
+        job = Jobs.objects.get(jobid= request.POST['jobid'])
+        job.status = 7
+        job.save()
+        return JsonResponse({'info':'Candidates Provided Marked'})
+    
 def logout(request, pk):
     admin=Login.objects.get(log_id=Admin.objects.get(aid=pk).log_id.log_id)
     admin.status=0

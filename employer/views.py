@@ -26,6 +26,7 @@ from nltk.corpus import stopwords
 import json
 from django.core.mail import EmailMessage
 from jobster import settings
+from django.db.models import Subquery
 # Create your views here.
 
 
@@ -148,43 +149,33 @@ def dashboard(request, pk):
         if (len(applics_chart) == 7):
             counts.append(cou)
             countsv.append(couv)
-            countsj.append(couj)
             for j in range(0, 7):
                 applics_7.append([applics_chart[j][2], applics_chart[j][1]])
                 visits_7.append([visits_chart[j][2], visits_chart[j][1]])
-                jobs_7.append([jobs_chart[j][2],jobs_chart[j][1]])
         if (len(applics_chart) == 30):
             counts.append(cou)
             countsv.append(couv)
-            countsj.append(couj)
             for j in range(0, 7):
                 applics_30.append([applics_chart[j][2], applics_chart[j][1]])
                 visits_30.append([visits_chart[j][2], visits_chart[j][1]])
-                jobs_30.append([jobs_chart[j][2],jobs_chart[j][1]])
         if (len(applics_chart) == 60):
             counts.append(cou)
             countsv.append(couv)
-            countsj.append(couj)
             for j in range(0, 7):
                 applics_60.append([applics_chart[j][2], applics_chart[j][1]])
                 visits_60.append([visits_chart[j][2], visits_chart[j][1]])
-                jobs_60.append([jobs_chart[j][2],jobs_chart[j][1]])
         if (len(applics_chart) == 90):
             counts.append(cou)
             countsv.append(couv)
-            countsj.append(couj)
             for j in range(0, 7):
                 applics_90.append([applics_chart[j][2], applics_chart[j][1]])
                 visits_90.append([visits_chart[j][2], visits_chart[j][1]])
-                jobs_90.append([jobs_chart[j][2],jobs_chart[j][1]])
         if (len(applics_chart) == 364):
             counts.append(cou)
             countsv.append(couv)
-            countsj.append(couj)
             for j in range(0, 7):
                 applics_365.append([applics_chart[j][2], applics_chart[j][1]])
                 visits_365.append([visits_chart[j][2], visits_chart[j][1]])
-                jobs_365.append([jobs_chart[j][2],jobs_chart[j][1]])
     
     applics_7.sort()
     applics_30.sort()
@@ -196,34 +187,9 @@ def dashboard(request, pk):
     visits_60.sort()
     visits_90.sort()
     visits_365.sort()
-    jobs_7.sort()
-    jobs_30.sort()
-    jobs_60.sort()
-    jobs_90.sort()
-    jobs_365.sort()
+    
     ############################################################
-    charts_context_ = {}
-    charts_context_['pastsev'] = dumps([item[1] for item in jobs_7])
-    charts_context_['dates'] = dumps(
-        [item[0] for item in jobs_7], default=str)
-    charts_context_['count_7'] = dumps(countsj[0])
-    charts_context_['pastthi'] = dumps([item[1] for item in jobs_30])
-    charts_context_['dates30'] = dumps(
-        [item[0] for item in jobs_30], default=str)
-    charts_context_['count_30'] = dumps(countsj[1])
-    charts_context_['pastsix'] = dumps([item[1] for item in jobs_60])
-    charts_context_['dates60'] = dumps(
-        [item[0] for item in jobs_60], default=str)
-    charts_context_['count_60'] = dumps(countsj[2])
-    charts_context_['pastnin'] = dumps([item[1] for item in jobs_60])
-    charts_context_['dates90'] = dumps(
-        [item[0] for item in jobs_60], default=str)
-    charts_context_['count_90'] = dumps(countsj[3])
-    charts_context_['pastyea'] = dumps([item[1] for item in jobs_365])
-    charts_context_['dates365'] = dumps(
-        [item[0] for item in jobs_365], default=str)
-    charts_context_['count_365'] = dumps(countsj[4])
-    print(charts_context_)
+    
     ############################################################
     charts_context = {}
     charts_context['pastsev'] = dumps([item[1] for item in applics_7])
@@ -270,8 +236,12 @@ def dashboard(request, pk):
     nums = [len(jobs), len(applics), countunmess]
     if 'shower' in request.session:
         del request.session['shower']
+
+    feedback_given_jobs = ResumeFeedback.objects.values('job_id')
+    jobs_ = Jobs.objects.filter(eid=pk,status=7).exclude(jobid__in=Subquery(feedback_given_jobs))
+    
     # print(charts_context)
-    return render(request, 'dashboard-employer.html', {'pk': pk, 'nums': nums, 'notifics': all_notis, 'recent': recent_mess_temp, 'candi': finalrecent, 'charts': charts_context, 'counts': counts})
+    return render(request, 'dashboard-employer.html', {'pk': pk, 'nums': nums, 'notifics': all_notis, 'recent': recent_mess_temp, 'candi': finalrecent, 'charts': charts_context, 'counts': counts,'jobs_':jobs_})
 
 
 def newjob(request, pk):
@@ -1399,7 +1369,13 @@ def schedule_interview(request, pk):
         return JsonResponse({'m': 'Y'})
     return JsonResponse({'m': 'X'})
 
-
+def panel_request(request,pk):
+    if request.method == "POST":
+        inter = Interview.objects.get(int_id = request.POST['int_id'])
+        print(inter.int_id,request.POST['int_id'])
+        inter.panel_req = 1
+        inter.save()
+        return JsonResponse({'m': 'Interview panel requested'})
 def all_interviews(request, pk):
     if request.method == "POST":
         if 'act' in request.POST:
@@ -1425,6 +1401,7 @@ def all_interviews(request, pk):
         single_int['date'] = i.schedule_date
         single_int['link'] = i.int_link
         single_int['isdone'] = i.is_done
+        single_int['is_req'] = i.panel_req
         final_ints.append(single_int)
     GET_params = request.GET.copy()
     count = len(final_ints)
@@ -1701,6 +1678,24 @@ def requestCand(request,pk):
             job.status = 6
             job.save()
             return JsonResponse({'message': 'Successfully Requested'}, status=200)
+        else:
+            return JsonResponse({'message': 'Try again'}, status=500)
+    return JsonResponse({'message': 'Try again'}, status=500)
+
+def resume_feedback(request,pk):
+    if (request.method == "POST"):
+        if(request.POST['jobid'] and request.POST['rating']):
+            try:
+                resfee = ResumeFeedback.objects.get(job_id=request.POST['jobid'])
+                resfee.rating = request.POST['rating']
+                resfee.save()
+                return JsonResponse({'message': 'Successfully Updated'}, status=200)
+            except ResumeFeedback.DoesNotExist:
+                resfee = ResumeFeedback()
+                resfee.job_id = Jobs.objects.get(jobid=request.POST['jobid'])
+                resfee.rating = request.POST['rating']
+                resfee.save()
+                return JsonResponse({'message': 'Successfully submitted'}, status=200)
         else:
             return JsonResponse({'message': 'Try again'}, status=500)
     return JsonResponse({'message': 'Try again'}, status=500)

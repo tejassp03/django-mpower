@@ -54,12 +54,12 @@
                     <li id="cdas"><a href="{% url 'mpoweradmin:cdashboard' pk=pk %}"><span class="fa fa-home"></span>Dashboard</a></li>
                     <!--<li id="cedi"><a href="{% url 'mpoweradmin:cedit' pk=pk %}"><span class="fa fa-pencil"></span>Edit Profile</a></li>
                     <li id="cnew"><a href="{% url 'mpoweradmin:newjob' pk=pk %}"><span class="fa fa-file-text-o"></span>New Job Offer</a></li>
-                    <li id="cman"><a href="{% url 'mpoweradmin:manage' pk=pk %}"><span class="fa fa-briefcase"></span>Manage Jobs</a></li>-->
+                    <li id="cman"><a href="{% url 'mpoweradmin:all_interviews' pk=pk %}"><span class="fa fa-briefcase"></span>Interviews</a></li>-->
                     <li id="ccan"><a href="{% url 'mpoweradmin:candidates' pk=pk %}"><span class="fa fa-user-circle-o"></span>Employers</a></li>
                     <!--<li id="csub"><a href="{% url 'mpoweradmin:subscriptions' pk=pk %}"><span class="fa fa-credit-card"></span>Subscriptions</a></li>-->
                     <li id="ccha"><a href="{% url 'mpoweradmin:change_pass' pk=pk %}"><span class="fa fa-lock"></span>Change Password</a></li>
-                   <!-- <li id="qui"><a href="{% url 'mpoweradmin:show_tests' pk=pk %}"><span class="fa fa-question"></span>Create Test</a></li>
-                    <li id="inr"><a href="{% url 'mpoweradmin:all_interviews' pk=pk %}"><span class="fa fa-user"></span>Interviews</a></li>-->
+                   <!-- <li id="qui"><a href="{% url 'mpoweradmin:show_tests' pk=pk %}"><span class="fa fa-question"></span>Create Test</a></li>-->
+                    <li id="inr"><a href="{% url 'mpoweradmin:all_interviews' pk=pk %}"><span class="fa fa-user"></span>Interviews</a></li>
                 </ul>
                 <div class="pxp-dashboard-side-label mt-3 mt-lg-4">Insights</div>
                 <ul class="list-unstyled">
@@ -350,7 +350,7 @@
                                 <div class="row">
                                     <div class="col-lg-7 col-xl-8 col-xxl-9">
                                         <div class="pxp-single-candidate-content">
-                                            <div style="display: flex"><h2>About</h2> <h2 style="margin-left: 10px" id="name2"></h2></div>
+                                            <div style="display: flex"><h2>About</h2> <h2 style="margin-left: 10px" id="name2">Job</h2></div>
                                             <p id="about">Not Specified</p>
                 
                                             <div class="mt-4 mt-lg-5">
@@ -362,15 +362,15 @@
                                             </div>
                 
                                             <div class="mt-4 mt-lg-5">
-                                                <h2>Work Experience</h2>
+                                                <h2>Experience Required</h2>
                                                 <div class="pxp-single-candidate-timeline" id="expadder">
                                                     
                                                 </div>
                                             </div>
                 
                                             <div class="mt-4 mt-lg-5">
-                                                <h2>Education & Training</h2>
-                                                <div class="pxp-single-candidate-timeline" id="eduadder">
+                                                <h2>Notice Period</h2>
+                                                <div class="pxp-single-candidate-timeline" id="noticeadder">
                                                     
                                                 </div>
                                             </div>
@@ -608,8 +608,9 @@
                 success: function( data ) 
                 {
                     let datainfo = JSON.parse(data['info']);
+                    console.log(datainfo);
                     $('#name').text(datainfo.name);
-                    $('#name2').text(datainfo.name);
+                    //$('#name2').text(datainfo.name);
                     $('#email').text(datainfo.email);
                     if(datainfo.title)
                     {
@@ -622,11 +623,21 @@
                     if(datainfo.location)
                     {
                         $('#location').text(datainfo.location);
+                        console.log(datainfo.location);
                     }
                     if(datainfo.phone)
                     {
                         $('#phone').text(datainfo.phone);
                     }
+                    if(datainfo.experience)
+                    {
+                        $('#expadder').text(datainfo.experience +' Years');
+                    }
+                    if(datainfo.notice_period)
+                    {
+                        $('#noticeadder').text(datainfo.notice_period);
+                    }
+
                     let photo=datainfo.photo;
                     $('#photoim').remove();
                     if(photo)
@@ -641,7 +652,9 @@
                     }
                     let ul=$('#skillsadder');
                     ul.empty();
-                    let skil=datainfo.skills;
+                    let skill=datainfo.skills;
+                    let skil = skill.split(',');
+                    console.log(skil);
                     if(skil.length>0)
                     {
                         for(let i=0;i<skil.length;i++)
@@ -657,94 +670,94 @@
                         ab.text('Not Specified');
                         ul.append(ab);
                     }
-                    let work=JSON.parse(data['work']);
-                    let bigdiv=document.getElementById('expadder');
-                    bigdiv.innerHTML="";
-                    if(work.length>0)
-                    {
-                        for(let i=0;i<work.length;i++)
-                        {
-                            let itemdiv=document.createElement('div');
-                            itemdiv.setAttribute('class', 'pxp-single-candidate-timeline-item');
-                            let dotdiv=document.createElement('div');
-                            dotdiv.setAttribute('class', 'pxp-single-candidate-timeline-dot');
-                            itemdiv.append(dotdiv);
-                            let infodiv=document.createElement('div');
-                            infodiv.setAttribute('class', 'pxp-single-candidate-timeline-info ms-3');
-                            let timediv=document.createElement('div');
-                            timediv.setAttribute('class', 'pxp-single-candidate-timeline-time')
-                            let spandiv=document.createElement('span');
-                            spandiv.setAttribute('class', 'me-3');
-                            spandiv.innerHTML=work[i].time_period;
-                            timediv.append(spandiv);
-                            infodiv.append(timediv);
-                            let positiondiv=document.createElement('div');
-                            positiondiv.setAttribute('class', 'pxp-single-candidate-timeline-position mt-2');
-                            positiondiv.innerHTML=work[i].job_title;
-                            infodiv.append(positiondiv);
-                            let companydiv=document.createElement('div');
-                            companydiv.setAttribute('class', 'pxp-single-candidate-timeline-company pxp-text-light');
-                            companydiv.innerHTML=work[i].company;
-                            infodiv.append(companydiv);
-                            let aboutdiv=document.createElement('div');
-                            aboutdiv.setAttribute('class', 'pxp-single-candidate-timeline-about mt-2 pb-4');
-                            aboutdiv.innerHTML=work[i].description;
-                            infodiv.append(aboutdiv);
-                            itemdiv.append(infodiv)
-                            bigdiv.append(itemdiv);
-                        }
-                    }
-                    else
-                    {
-                        let notdiv=document.createElement('div');
-                        notdiv.innerHTML="Not Specified";
-                        bigdiv.append(notdiv);
-                    }
+                    // let work=JSON.parse(data['work']);
+                    //let bigdiv=document.getElementById('expadder');
+                    //bigdiv.innerHTML=datainfo.experience;
+                    // if(work.length>0)
+                    // {
+                    //     for(let i=0;i<work.length;i++)
+                    //     {
+                    //         let itemdiv=document.createElement('div');
+                    //         itemdiv.setAttribute('class', 'pxp-single-candidate-timeline-item');
+                    //         let dotdiv=document.createElement('div');
+                    //         dotdiv.setAttribute('class', 'pxp-single-candidate-timeline-dot');
+                    //         itemdiv.append(dotdiv);
+                    //         let infodiv=document.createElement('div');
+                    //         infodiv.setAttribute('class', 'pxp-single-candidate-timeline-info ms-3');
+                    //         let timediv=document.createElement('div');
+                    //         timediv.setAttribute('class', 'pxp-single-candidate-timeline-time')
+                    //         let spandiv=document.createElement('span');
+                    //         spandiv.setAttribute('class', 'me-3');
+                    //         spandiv.innerHTML=work[i].time_period;
+                    //         timediv.append(spandiv);
+                    //         infodiv.append(timediv);
+                    //         let positiondiv=document.createElement('div');
+                    //         positiondiv.setAttribute('class', 'pxp-single-candidate-timeline-position mt-2');
+                    //         positiondiv.innerHTML=work[i].job_title;
+                    //         infodiv.append(positiondiv);
+                    //         let companydiv=document.createElement('div');
+                    //         companydiv.setAttribute('class', 'pxp-single-candidate-timeline-company pxp-text-light');
+                    //         companydiv.innerHTML=work[i].company;
+                    //         infodiv.append(companydiv);
+                    //         let aboutdiv=document.createElement('div');
+                    //         aboutdiv.setAttribute('class', 'pxp-single-candidate-timeline-about mt-2 pb-4');
+                    //         aboutdiv.innerHTML=work[i].description;
+                    //         infodiv.append(aboutdiv);
+                    //         itemdiv.append(infodiv)
+                    //         bigdiv.append(itemdiv);
+                    //     }
+                    // }
+                    // else
+                    // {
+                    //     let notdiv=document.createElement('div');
+                    //     notdiv.innerHTML="Not Specified";
+                    //     bigdiv.append(notdiv);
+                    // }
 
 
-                    let edu=JSON.parse(data['edu']);
-                    let bigdiv2=document.getElementById('eduadder');
-                    bigdiv2.innerHTML="";
-                    if(edu.length>0)
-                    {
-                        for(let i=0;i<edu.length;i++)
-                        {
-                            let itemdiv=document.createElement('div');
-                            itemdiv.setAttribute('class', 'pxp-single-candidate-timeline-item');
-                            let dotdiv=document.createElement('div');
-                            dotdiv.setAttribute('class', 'pxp-single-candidate-timeline-dot');
-                            itemdiv.append(dotdiv);
-                            let infodiv=document.createElement('div');
-                            infodiv.setAttribute('class', 'pxp-single-candidate-timeline-info ms-3');
-                            let timediv=document.createElement('div');
-                            timediv.setAttribute('class', 'pxp-single-candidate-timeline-time')
-                            let spandiv=document.createElement('span');
-                            spandiv.setAttribute('class', 'me-3');
-                            spandiv.innerHTML=edu[i].time_period;
-                            timediv.append(spandiv);
-                            infodiv.append(timediv);
-                            let positiondiv=document.createElement('div');
-                            positiondiv.setAttribute('class', 'pxp-single-candidate-timeline-position mt-2');
-                            positiondiv.innerHTML=edu[i].title;
-                            infodiv.append(positiondiv);
-                            let companydiv=document.createElement('div');
-                            companydiv.setAttribute('class', 'pxp-single-candidate-timeline-company pxp-text-light');
-                            companydiv.innerHTML=edu[i].school;
-                            infodiv.append(companydiv);
-                            let aboutdiv=document.createElement('div');
-                            aboutdiv.setAttribute('class', 'pxp-single-candidate-timeline-about mt-2 pb-4');
-                            aboutdiv.innerHTML=edu[i].description;
-                            infodiv.append(aboutdiv);
-                            itemdiv.append(infodiv)
-                            bigdiv2.append(itemdiv);
-                        }
-                    }
-                    else
-                    {
-                        let notdiv=document.createElement('div');
-                        notdiv.innerHTML="Not Specified";
-                        bigdiv2.append(notdiv);
-                    }
+                    //let edu=JSON.parse(data['edu']);
+                    //let bigdiv2=document.getElementById('eduadder');
+                    // bigdiv2.innerHTML="";
+                    // if(edu.length>0)
+                    // {
+                    //     for(let i=0;i<edu.length;i++)
+                    //     {
+                    //         let itemdiv=document.createElement('div');
+                    //         itemdiv.setAttribute('class', 'pxp-single-candidate-timeline-item');
+                    //         let dotdiv=document.createElement('div');
+                    //         dotdiv.setAttribute('class', 'pxp-single-candidate-timeline-dot');
+                    //         itemdiv.append(dotdiv);
+                    //         let infodiv=document.createElement('div');
+                    //         infodiv.setAttribute('class', 'pxp-single-candidate-timeline-info ms-3');
+                    //         let timediv=document.createElement('div');
+                    //         timediv.setAttribute('class', 'pxp-single-candidate-timeline-time')
+                    //         let spandiv=document.createElement('span');
+                    //         spandiv.setAttribute('class', 'me-3');
+                    //         spandiv.innerHTML=edu[i].time_period;
+                    //         timediv.append(spandiv);
+                    //         infodiv.append(timediv);
+                    //         let positiondiv=document.createElement('div');
+                    //         positiondiv.setAttribute('class', 'pxp-single-candidate-timeline-position mt-2');
+                    //         positiondiv.innerHTML=edu[i].title;
+                    //         infodiv.append(positiondiv);
+                    //         let companydiv=document.createElement('div');
+                    //         companydiv.setAttribute('class', 'pxp-single-candidate-timeline-company pxp-text-light');
+                    //         companydiv.innerHTML=edu[i].school;
+                    //         infodiv.append(companydiv);
+                    //         let aboutdiv=document.createElement('div');
+                    //         aboutdiv.setAttribute('class', 'pxp-single-candidate-timeline-about mt-2 pb-4');
+                    //         aboutdiv.innerHTML=edu[i].description;
+                    //         infodiv.append(aboutdiv);
+                    //         itemdiv.append(infodiv)
+                    //         bigdiv2.append(itemdiv);
+                    //     }
+                    // }
+                    // else
+                    // {
+                    //     let notdiv=document.createElement('div');
+                    //     notdiv.innerHTML="Not Specified";
+                    //     bigdiv2.append(notdiv);
+                    // }
                 }
             })
         }

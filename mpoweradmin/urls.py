@@ -42,7 +42,9 @@ urlpatterns = [
     path('schedule_interview/', views.schedule_interview, name='schedule_interview'),
     path('all_interviews/', views.all_interviews, name='all_interviews'),
     path('done/', views.done, name='done'),
+    path('interview_panel/', views.interview_panel, name='interview_panel'),
     path('get_link/', views.get_link, name='get_link'),
+    path('mark_cand_provided/', views.mark_cand_provided, name='mark_cand_provided'),
 	path('logout/', views.logout, name='clogout'),
 
 	path('under_development/', views.under_development, name='under_development'),

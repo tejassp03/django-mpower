@@ -347,6 +347,7 @@ class Interview(models.Model):
         max_length=500, default=None, blank=True, null=True)
     testuser_id = models.ForeignKey(
         TestUser, on_delete=models.CASCADE, blank=True, null=True)
+    panel_req = models.IntegerField(default=0)
 
     class Meta:
         db_table = "interview"
@@ -364,6 +365,16 @@ class Feedback(models.Model):
 
     class Meta:
         db_table = "feedback"
+
+class ResumeFeedback(models.Model):
+    feed_id = models.AutoField(primary_key=True)
+    job_id = models.ForeignKey(
+        Jobs, on_delete=models.CASCADE, blank=True, null=True)
+    
+    rating = models.IntegerField()
+
+    class Meta:
+        db_table = "Resumefeedback"
 
 
 class Newsletter(models.Model):
