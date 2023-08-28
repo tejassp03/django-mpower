@@ -316,7 +316,7 @@
                 </div>
             </div>
             <div style="position: relative;left: 35%;bottom: 0.5rem;width: 34.5%;">
-                <input type="datetime-local" class="form-control" name="intdate">
+                <input type="text" id="datetimeInput" class="form-control">
             </div>
             {% endif %}
             
@@ -1042,7 +1042,13 @@ function scheduletest()
     $("[name='chek']:checked").map(function () {
         ids.push(this.value);
     })
-    let date_time=$('[name=intdate]').val();
+    var datetimeInput = document.getElementById("datetimeInput").value;
+    var selectedDateTime = new Date(datetimeInput);
+
+    var formattedDate = selectedDateTime.toISOString().split('T')[0];
+    var formattedTime = selectedDateTime.toISOString().split('T')[1].substring(0, 5);
+    var date_time = formattedDate + "T" + formattedTime;
+    //let date_time=$('[name=intdate]').val();
     if (!date_time || date_time.length < 16) { 
         alert("Please enter a valid full datetime.");
     }else{

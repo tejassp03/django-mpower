@@ -1,7 +1,7 @@
 from main.models import Notifications, JobSeeker, Employer, Jobs, TestInfo, Admin
 def notifs(request):
     if len(request.session.keys())!=0:
-        if(request.session['type']=="c"):
+        if(request.session.get('type')=="c"):
             emp=JobSeeker.objects.get(user_id=request.session['pk'])
             notifs=Notifications.objects.filter(rece_id=emp.log_id, readed=0).order_by('-datetime')
             request.session['notifnum']=len(notifs)
@@ -18,7 +18,7 @@ def notifs(request):
             return {
                 'notis' : data
             }
-        elif(request.session['type']=="e"):
+        elif(request.session.get('type')=="e"):
             emp=Employer.objects.get(eid=request.session['pk'])
             notifs=Notifications.objects.filter(rece_id=emp.log_id, readed=0).order_by('-datetime')
             request.session['notifnum']=len(notifs)
@@ -43,7 +43,8 @@ def notifs(request):
             return {
                 'notis' : data
             }
-        else:
+        
+        elif(request.session.get('type')=="a"):
             emp=Admin.objects.get(aid=request.session['pk'])
             notifs=Notifications.objects.filter(rece_id=emp.log_id, readed=0).order_by('-datetime')
             request.session['notifnum']=len(notifs)
@@ -67,6 +68,10 @@ def notifs(request):
                 data.append(new_data)
             return {
                 'notis' : data
+            }
+        else:
+            return{
+                'notis':""
             }
 
     return {}

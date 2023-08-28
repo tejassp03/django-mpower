@@ -1217,7 +1217,7 @@ def schedule(request, pk):
         date_time_str = request.POST['date_time']
         desired_datetime = timezone.datetime.strptime(date_time_str, "%Y-%m-%dT%H:%M")
         aware_datetime = timezone.make_aware(desired_datetime)
-        ist_datetime = aware_datetime 
+        ist_datetime = aware_datetime + timezone.timedelta(hours=5, minutes=30)
         # + timezone.timedelta(hours=5, minutes=30)
         if 'ids[]' in request.POST:
             ids = request.POST.getlist('ids[]')
@@ -1333,7 +1333,7 @@ def schedule_interview(request, pk):
         print(date_time_str)
         desired_datetime = timezone.datetime.strptime(date_time_str, "%Y-%m-%dT%H:%M")
         aware_datetime = timezone.make_aware(desired_datetime)
-        ist_datetime = aware_datetime 
+        ist_datetime = aware_datetime + timezone.timedelta(hours=5, minutes=30)
         # + timezone.timedelta(hours=5, minutes=30)
         print("hello",request.POST['user_id'])
         check = Interview.objects.filter(

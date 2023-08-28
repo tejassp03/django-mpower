@@ -485,7 +485,7 @@ def candidates(request, pk):
     #     app_count.append(len(Application.objects.filter(job_id=i.jobid)))
     if(employers):
         e_apps = Jobs.objects.filter(eid_id=employers[0].eid)
-        print(e_apps)
+        # print(e_apps)
     # if(jobs):
     #     s_apps=Application.objects.filter(job_id=jobs[0].jobid)
     #     for i in s_apps:

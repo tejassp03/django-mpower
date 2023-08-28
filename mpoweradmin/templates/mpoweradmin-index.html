@@ -596,8 +596,8 @@
             })
         }
 
-        function candidatemodal(id)
-        {console.log(id);
+        function candidatemodal(id){
+            console.log(id);
             $.ajax(
             {
                 type:"GET",
@@ -608,7 +608,7 @@
                 success: function( data ) 
                 {
                     let datainfo = JSON.parse(data['info']);
-                    console.log(datainfo);
+                    // console.log(datainfo);
                     $('#name').text(datainfo.name);
                     //$('#name2').text(datainfo.name);
                     $('#email').text(datainfo.email);
