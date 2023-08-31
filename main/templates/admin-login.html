@@ -1,189 +1,28 @@
-{% load static %}
-{% block content %}
-<!doctype html>
-<html lang="en" class="pxp-root">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Google OAuth Example</title>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+    <button id="google-signin-button">Sign in with Google</button>
 
-        <link rel="shortcut icon" href="{% static 'images/favicon.png' %}" type="image/x-icon">
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600;700&display=swap" rel="stylesheet">
-        <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
-        <link rel="stylesheet" href="{% static 'css/font-awesome.min.css' %}">
-        <link rel="stylesheet" href="{% static 'css/owl.carousel.min.css' %}">
-        <link rel="stylesheet" href="{% static 'css/owl.theme.default.min.css' %}">
-        <link rel="stylesheet" href="{% static 'css/animate.css' %}">
-        <link rel="stylesheet" href="{% static 'css/style.css' %}">
-
-        <title>mpower - Sign in</title>
-    </head>
-    <style>
-        body
-        {
-            overflow-y: hidden;
-        }
-        .pxp-header {
-            background-color: rgba(1,1,1,0.1) !important;
-        }
-        .pxp-nav .pxp-usernav
-        {
-            display: none !important; 
-        }
-        .btn-sign
-        {
-            margin: auto;
-        width: 100%;
-        }
-        .google-button {
-        display: flex; /* Use flexbox to layout the button's content */
-        align-items: center; /* Center the button's content vertically */
-        justify-content: center; /* Add space between the logo and text */
-        background-color: white; /* Set the button's background color to white */
-        color: black; /* Set the button's text color to black */
-        padding: 10 15px; /* Add some padding to the button */
-        border: 1px solid darkgray; /* Add some padding to the buttonSet the button's height */
-        font-size: 18px; /* Set the font size of the button's text */
+    <script>
+        function handleCredentialResponse(response) {
+            const credential = response.credential;
+            const username = credential.displayName;
+            console.log("User Name:", username);
         }
 
-/* Style the Google logo */
-        .google-button .logo {
-        width: 30px; /* Set the logo's width */
-        height: 30px; /* Set the logo's height */
-        background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRu1PJmT_THldF0n5APcmt9p10utgu6KSw4cH2fQ5Xhpw&s'); /* Set the logo's background image */
-        background-size: contain; /* Scale the logo to fit inside the button */
-        background-repeat: no-repeat; /* Don't repeat the logo's background image */
-        margin-right: 15px; /* Add some space between the logo and text */
-        }
-        .google-button:hover {
-        color:#357ae8;
-        background-color: white !important;/* A darker shade of Google's blue color */
+        function handleSignIn() {
+            google.accounts.id.initialize({
+                client_id: 'YOUR_CLIENT_ID',
+                callback: handleCredentialResponse
+            });
+            google.accounts.id.prompt();
         }
 
-        .emp_btn:hover
-        {
-            background: var(--pxpMainColor) !important;
-            color: lightblue;
-        }
-    </style>
-    
-    <body>
-        {% if messages %}
-        {% for message in messages %}
-         {% if message.tags %}  
-         <script>alert('{{ message }}')</script>
-        {% endif %}
-
-        {% endfor %}
-
-        {% endif %}
-        
-        <div class="pxp-preloader"> 
-    <div class="pxp-logo">
-    <a href="index.html" class="pxp-animate" style=" font-size:35px !important;"><span style="color: var(--pxpMainColor);">m</span>power</a>
-</div></div>
-
-<header class="pxp-header fixed-top">
-    <div class="pxp-container">
-        <div class="pxp-header-container">
-            <div class="pxp-logo">
-                <a href="{% url 'main:index' %}" class="pxp-animate"><span style="color: var(--pxpMainColor)">m</span>power</a>
-            </div>
-            
-
-            <!-- Desktop Header Starts -->
-            
-            <nav class="pxp-user-nav d-none d-sm-flex">
-                
-                {% if 'session_id' in request.session %}
-               <div class="dropdown pxp-user-nav-dropdown">
-                    <a href="index.html" class="dropdown-toggle" data-bs-toggle="dropdown">
-                        <div class="pxp-user-nav-avatar pxp-cover" style="background-image: url(/static/images/user.png);"></div>
-                        <div class="pxp-user-nav-name d-none d-md-block">Derek Cotner</div>
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="candidate-dashboard.html">Dashboard</a></li>
-                        <li><a class="dropdown-item" href="candidate-dashboard-profile.html">Edit profile</a></li>
-                        <li><a class="dropdown-item" href="index.html">Logout</a></li>
-                    </ul>
-                </div>
-             
-                {% endif%}
-            </nav>
-        </div>
-    </div>
-</header>
-
-
-        
-
-        
-
-        <section class="pxp-hero vh-100" style="background-color: var(--pxpMainColorLight);">
-            
-            <div class="row align-items-center pxp-sign-hero-container">
-                <div class="col-xl-6 pxp-column">
-                    <div class="pxp-sign-hero-fig text-center pb-100 pt-100">
-                        <img src="{% static 'images/signin-big-fig.png' %}" alt="Sign In">
-                        <h1 class="mt-4 mt-lg-5">Welcome back!</h1>
-                    </div>
-                </div>
-                <div class="col-xl-6 pxp-column pxp-is-light">
-                    <div class="pxp-sign-hero-form pb-100 pt-100">
-                        <div class="row justify-content-center">
-                            <div class="col-lg-6 col-xl-7 col-xxl-5">
-                                <div class="pxp-sign-hero-form-content">
-                                    <h5 class="text-center">Admin Log-In</h5>
-                                    <form class="mt-4" method="post" action="{% url 'main:admin_login' %}">
-                                        {% csrf_token %}
-                                        <div class="form-floating mb-3">
-                                            <input type="email" class="form-control" id="pxp-signin-page-email" name="email" placeholder="Email address">
-                                            <label for="pxp-signin-page-email">Email address</label>
-                                            <span class="fa fa-envelope-o"></span>
-                                        </div>
-                                        <div class="form-floating mb-3">
-                                            <input type="password" class="form-control" id="pxp-signin-page-password" name="pass" placeholder="Password">
-                                            <label for="pxp-signin-page-password">Password</label>
-                                            <span class="fa fa-lock"></span>
-                                        </div>
-                                        <input type="submit" value="Continue" class="btn btn-sign rounded-pill pxp-modal-cta">
-                                        <hr>
-                                        <button class="btn btn-sign rounded-pill pxp-modal-cta google-button" >
-                                            <div class="logo"></div>
-                                            Sign in with Google
-                                          </button>
-                                          
-
-
-                                        <div class="mt-4 text-center pxp-sign-hero-form-small">
-                                            <a href="#" class="pxp-modal-link">Forgot password</a>
-                                        </div>
-
-                                        
-                                        <div class="mt-4 text-center pxp-sign-hero-form-small">
-                                            New to mpower? <a href="{% url 'main:admin_register' %}">Create an account</a>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-
-
-       
-
-       
-
-        <script src="{% static 'js/jquery-3.4.1.min.js' %}"></script>
-        <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
-        <script src="{% static 'js/owl.carousel.min.js' %}"></script>
-        <script src="{% static 'js/nav.js' %}"></script>
-        <script src="{% static 'js/main.js' %}"></script>
-    </body>
+        document.getElementById("google-signin-button").addEventListener("click", handleSignIn);
+    </script>
+</body>
 </html>
-{% endblock %}

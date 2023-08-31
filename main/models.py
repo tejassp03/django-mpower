@@ -36,7 +36,7 @@ class JobSeeker(models.Model):
     Resume = models.FileField(upload_to='resumes/', default=None, null=True)
     photo = models.ImageField(upload_to='photos/', default=None, null=True)
     notice_period = models.CharField(max_length=50, default=None, null=True)
-    role = models.CharField(max_length=750)
+    role = models.CharField(max_length=750, default=None, null=True)
     def pass_to_list(self):
         return self.skills.split(',')
 
@@ -361,7 +361,7 @@ class Feedback(models.Model):
         max_length=500, default=None, blank=True, null=True)
     name = models.CharField(
         max_length=100, default=None, blank=True, null=True)
-    rating = models.IntegerField()
+    rating = models.IntegerField(default=None,null=True,blank=True)
 
     class Meta:
         db_table = "feedback"
@@ -371,7 +371,7 @@ class ResumeFeedback(models.Model):
     job_id = models.ForeignKey(
         Jobs, on_delete=models.CASCADE, blank=True, null=True)
     
-    rating = models.IntegerField()
+    rating = models.IntegerField(default=None,null=True,blank=True)
 
     class Meta:
         db_table = "Resumefeedback"
