@@ -16,8 +16,8 @@ class Migration(migrations.Migration):
             name='Threads',
             fields=[
                 ('msg_id', models.AutoField(primary_key=True, serialize=False)),
-                ('sender', models.CharField(max_length=100000000)),
-                ('receiver', models.CharField(max_length=100000000)),
+                ('sender', models.CharField(max_length=10485759)),
+                ('receiver', models.CharField(max_length=10485759)),
                 ('has_unread', models.BooleanField(default=False)),
             ],
             options={
@@ -28,8 +28,8 @@ class Migration(migrations.Migration):
             name='Messages',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('sender_user', models.CharField(max_length=100000000)),
-                ('receiver_user', models.CharField(max_length=100000000)),
+                ('sender_user', models.CharField(max_length=10485759)),
+                ('receiver_user', models.CharField(max_length=10485759)),
                 ('body', models.CharField(max_length=10000)),
                 ('image', models.ImageField(blank=True, null=True, upload_to='messages/')),
                 ('date', models.DateTimeField(default=django.utils.timezone.now)),
