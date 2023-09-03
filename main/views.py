@@ -219,13 +219,13 @@ def admin_login(request):
         user = Login.objects.filter(email=request.POST['email'])
         if (len(user) == 0):
             return JsonResponse({'message': 'X'})
-        elif (check_password(request.POST['c_pass'], user[0].password)):
-            login(request, user)
+        elif (check_password(request.POST['pass'], user[0].password)):
+            # login(request, user)
             admin = Admin.objects.get(log_id=user[0].log_id)
             request.session['name'] = admin.aname
             request.session['pk'] = admin.aid
             request.session['type'] = "admin"
-            return redirect('main:mpoweradmin', pk=admin.aid)
+            return redirect('mpoweradmin:cdashboard', pk=admin.aid)
         else:
             messages.success(request, 'Invalid username or password')
             return redirect('main:admin_login')
@@ -909,17 +909,13 @@ class JobMatcher:
     
 
     def calculate_match_percentage(self):
-        total_params = 5  # Number of parameters to match: skills, location, notice period, current salary, and expected salary
+        total_params = 5  
         matched_params = 0
 
-        # Check if skills match
         if self.jobseeker.skills and self.job.skills:
             job_skills = set(self.job.skills.lower().split(','))
-            # print(job_skills)
             seeker_skills = set(self.jobseeker.skills.lower().split(','))
-            # print(seeker_skills)
             if job_skills.intersection(seeker_skills):
-                # print(job_skills.intersection(seeker_skills))
                 matched_params += 1
 
         # Check if location matches
@@ -1347,21 +1343,36 @@ def get_job(request):
 
 def give_feedback(request, pk):
     if request.method == "POST":
-        int_val = Interview.objects.get(int_id=pk)
+        int_val = Interview.objects.get(apply_id=pk)
+        applics = Application.objects.get(apply_id = pk)
+        eid_id = applics.eid.eid
+        applics.status = 7
+        applics.save()
         int_val.is_feedgiven = 1
         int_val.save()
-        feedback = Feedback()
-        feedback.int_id = int_val
-        feedback.emp_feedback = request.POST['feedback']
-        feedback.name = request.POST['name']
-        feedback.save()
+        existing_feedback = Feedback.objects.get(int_id=int_val)
+        if existing_feedback:
+            print(existing_feedback)
+            existing_feedback.rating = request.POST['rating']
+            existing_feedback.emp_feedback = request.POST['feedback']
+            existing_feedback.name = request.POST['name']
+            existing_feedback.save()
+            messages.error(request, "Feedback successfully Modified!")
+            return redirect('employer:candidates', pk=eid_id)
+        else:
+            feedback = Feedback()
+            feedback.int_id = int_val
+            feedback.rating = request.POST['rating']
+            feedback.emp_feedback = request.POST['feedback']
+            feedback.name = request.POST['name']
+            feedback.save()
         messages.error(request, "Feedback successfully recorded!")
-        return redirect('main:give_feedback', pk=pk)
-    int_val = Interview.objects.get(int_id=pk)
+        return redirect('employer:candidates', pk=eid_id)
+    int_val = Interview.objects.get(apply_id=pk)
     data = {}
     data['name'] = int_val.user_id.name
     data['location'] = int_val.user_id.location
-    data['title'] = int_val.user_id.title
+    data['title'] = int_val.user_id.role
     if int_val.user_id.photo:
         data['photo'] = int_val.user_id.photo
     return render(request, 'give_feedback.html', {'data': data})

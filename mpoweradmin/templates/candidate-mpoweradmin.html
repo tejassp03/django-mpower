@@ -4,6 +4,32 @@
 
 {% block title %}
 <title>mpower - Company dashboard - Candidates</title>
+<style>
+    .popup {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.popup-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+#close-popup {
+    margin-top: 10px;
+}
+
+</style>
 {% endblock %}
 {% block content %}
 
@@ -23,7 +49,7 @@
             <div class="mt-3 mt-lg-4 pxp-dashboard-inbox-list">
                 <ul class="list-unstyled" id="table">
                     {% for i in employers %}
-                    <li onclick="candifetch({{ i.eid }})" id="{{i.jobid}}" class="acti">
+                    <li onclick="candifetch('{{ i.eid }}')" id="{{i.jobid}}" class="acti">
                         <a href="#" class="pxp-dashboard-inbox-list-item">
                             <div class="pxp-dashboard-inbox-list-item-top">
                                 <div class="pxp-dashboard-inbox-list-item-left">
@@ -179,16 +205,13 @@
                                         {% endif %}
                                     </a>
                                 </td>
-                                {% if i.status == 0 %}
-                                <td><div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-secondary">Applied</span></div></td>
-                                {% elif i.status == 1 %}
-                                <td><div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-success">Portal</span></div></td>
-                                {% elif i.status == 2 %}
-                                <td><div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-danger">Mpower only</span></div></td>
-                                {% elif i.status == 3 %}
-                                <td><div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-info">Both</span></div></td>
-                                {% elif i.status == 4 %}
-                                <td><div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-primary">Test Answered <br> {{ i.results }} %</span></div></td>
+                                {% if i.status == 6 %}
+                                <td><div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-info">Requested</span></div></td>
+                                {% elif i.status == 7 %}
+                                <td><div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-info">Provided</span></div></td>
+                                {%else%}
+                               <td><div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-secondary">Posted</span></div></td>
+                               
                                 {% endif %}
                 
 
@@ -197,29 +220,24 @@
                                 </td>
                                 <td>
                                     <div class="pxp-company-dashboard-jobs-bulk-actions" style="margin-left: auto">
-                                        <select class="form-select randomselect" name="action_but_option_{{ i.eid }}">
+                                        <select class="form-select randomselect" name="action_but_option_{{ i.jobid }}" onchange="tme2({{i.jobid}})">
                                             <option value="a">Select Action</option>
-                                            <option value="b_{{i.eid}}">View Job</option>
-                                            {% if i.status == 3 %}
-                                            <option value="c_{{i.eid}}_{{i.jobid}}">Suggest Candidates</option>
-                                            {% elif i.status == 4 %}
-                                            <option value="h_{{i.eid}}_{{i.test_id}}">Schedule Interview</option>
-                                            {% endif %}
-                                            <option value="d_{{i.eid}}_{{i.log_id}}">Send Message</option>
-                                            <!-- <option value="e_{{i.eid}}_{{i.jobid}}">Approve</option>
-                                            <option value="f_{{i.eid}}_{{i.jobid}}">Reject</option> -->
-                                            <option value="g_{{i.eid}}_{{i.jobid}}">Delete</option>
+                                            <option value="b_{{i.jobid}}">View Job</option>
+                                            <option value="s_{{i.jobid}}">Share</option>
+                                            <!-- {% if i.status == 3 %}
+                                            <option value="c_{{i.eid.eid}}_{{i.jobid}}">Suggest Candidates</option>
+                                            {% endif %} -->
+                                            <!-- <option value="d_{{i.eid.eid}}_{{i.log_id}}">Send Message</option> -->
+                                            <option value="g_{{i.eid.eid}}_{{i.jobid}}">Delete</option>
                                         </select>
                                     </div>
                                     <div class="pxp-dashboard-table-options">
                                         <ul class="list-unstyled">
-                                            <!-- <li><button title="Schedule Interview" id="pxp-interview-modal-button-{{i.eid}}-{{i.test_id}}" data-bs-target="#pxp-results-modal" data-bs-toggle="modal" onclick="resultsmodal('{{i.test_id}}')" style="display: none"></button></li> -->
-                                            <li><button title="View Job" id="pxp-candidate-modal-button-{{i.jobid}}" data-bs-target="#pxp-candidate-modal" data-bs-toggle="modal" onclick="candidatemodal('{{i.jobid}}')" style="display: none"><span class="fa fa-eye"></span></button></li>
-                                            <li><button title="Suggest candidats" id="pxp-schedule-modal-button-{{i.eid}}-{{i.jobid}}" data-bs-target="#pxp-schedule-modal" data-bs-toggle="modal" onclick="setter('{{i.jobid}}')" style="display: none"><span class="fa fa-question"></span></button></li>
-                                            <li><button title="Send message" id="pxp-send-message-button-{{i.jobid}}-{{i.log_id}}" onclick="messageclick({{i.log_id}})" style="display: none"><span class="fa fa-envelope-o"></span></button></li>
-                                            <!-- <li><button title="Approve" id="pxp-approve-button-{{i.eid}}-{{i.jobid}}" onclick="approve({{i.jobid}})" style="display: none"><span class="fa fa-check"></span></button></li> -->
-                                            <!-- <li><button title="Reject" id="pxp-reject-button-{{i.eid}}-{{i.jobid}}" onclick="reject({{i.jobid}})" style="display: none"><span class="fa fa-ban"></span></button></li> -->
-                                            <li><button title="Delete" id="pxp-delete-button-{{i.eid}}-{{i.jobid}}" onclick="delcan({{i.jobid}})" style="display: none"><span class="fa fa-trash-o"></span></button></li>
+                                            <li><button title="View Job" id="pxp-candidate-modal-button-{{i.jobid}}" data-bs-target="#pxp-candidate-modal" data-bs-toggle="modal" onclick="candidatemodal({{i.jobid}})" style="display: none"><span class="fa fa-eye"></span></button></li>
+                                            <li><button title="Suggest candidates" id="pxp-schedule-modal-button-{{i.eid.eid}}-{{i.jobid}}"  onclick="suggest({{i.jobid}})" style="display: none"><span class="fa fa-question"></span></button></li>
+                                            <li><button title="Send message" id="pxp-send-message-button-{{i.jobid}}-{{i.log_id}}" onclick="messageclick({{i.log_id}})" style="display: none"><span class="fa fa-envelope-o"></span></button></li> 
+                                            <li><button title="Delete" id="pxp-delete-button-{{i.eid.eid}}-{{i.jobid}}" onclick="delcan({{i.jobid}})" style="display: none"><span class="fa fa-trash-o"></span></button></li>
+                                            <li><button class="action-button" id="pxp-share-button-{{i.jobid}}" data-action="s" data-job-id="{{ i.jobid }}" style="display: none"></button></li>
                                         </ul>
                                     </div>
                                 </td>
@@ -236,7 +254,7 @@
     </div>
 </div>
 
-<div class="modal fade pxp-user-modal" id="pxp-schedule-modal" aria-hidden="true" aria-labelledby="scheduleModal" tabindex="-1">
+<!-- <div class="modal fade pxp-user-modal" id="pxp-schedule-modal" aria-hidden="true" aria-labelledby="scheduleModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered widthadjuster" style="justify-content: center">
         <div class="modal-content" style="width: 40rem">
             {% if test|length == 0 %}
@@ -274,8 +292,83 @@
             
         </div>
     </div>
+</div> -->
+<!-- <div id="jobDetailsPopup" class="popup" >    
+    <a href="#" id="shareToWhatsapp" class="button">Share on WhatsApp</a>
+    <a href="#" id="shareViaEmail" class="button">Share via Email</a>
+    <button id="copyButton" class="button">Copy Job Details</button>
+</div> -->
+<!-- <div  class="popup" id="jobDetailsPopup">
+    <div class="popup-content">
+        <div class="d-flex justify-content-end">
+            <button id="close-popup" class="btn btn-secondary" onclick="closePopup()"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <div class="container mt-5">
+            <h5 class="text-primary">Share job Details</h5>
+        </div>
+        <div class="modal-body" style="padding: 1rem !important">
+            <div class="pxp-company-dashboard-jobs-bulk-actions" style="margin-left: auto">
+                <a href="#" id="shareToWhatsapp" class="btn btn-primary button">
+                    <i class="fab fa-whatsapp"></i>
+                  </a>
+                  
+                  <a href="#" id="shareViaEmail" class="btn btn-primary button">
+                    <i class="far fa-envelope"></i>
+                  </a>
+                  
+                  <button id="copyButton" class="btn btn-primary button">
+                    <i class="far fa-copy"></i>
+                  </button>
+            </div>
+        </div>
+    </div>
+</div> -->
+<div id="jobDetailsPopup" class="popup">
+    <div class="popup-content">
+        <div class="d-flex justify-content-end">
+            <button id="close-popup" class="btn btn-secondary" onclick="closePopup()"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <div class="container mt-5">
+            <h5 class="text-primary">Share Job Details</h5>
+        </div>
+        <div class="modal-body" style="padding: 1rem !important">
+            <div class="pxp-company-dashboard-jobs-bulk-actions" style="margin-left: auto">
+                <a href="#" id="shareToWhatsapp" class="btn button" style="width: 150px; margin-right: 10px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="1.5em" viewBox="0 0 448 512" fill="#25d366"><path d="M380.9 97.1C339 55.1 283.2 32 223.9 32c-122.4 0-222 99.6-222 222 0 39.1 10.2 77.3 29.6 111L0 480l117.7-30.9c32.4 17.7 68.9 27 106.1 27h.1c122.3 0 224.1-99.6 224.1-222 0-59.3-25.2-115-67.1-157zm-157 341.6c-33.2 0-65.7-8.9-94-25.7l-6.7-4-69.8 18.3L72 359.2l-4.4-7c-18.5-29.4-28.2-63.3-28.2-98.2 0-101.7 82.8-184.5 184.6-184.5 49.3 0 95.6 19.2 130.4 54.1 34.8 34.9 56.2 81.2 56.1 130.5 0 101.8-84.9 184.6-186.6 184.6zm101.2-138.2c-5.5-2.8-32.8-16.2-37.9-18-5.1-1.9-8.8-2.8-12.5 2.8-3.7 5.6-14.3 18-17.6 21.8-3.2 3.7-6.5 4.2-12 1.4-32.6-16.3-54-29.1-75.5-66-5.7-9.8 5.7-9.1 16.3-30.3 1.8-3.7.9-6.9-.5-9.7-1.4-2.8-12.5-30.1-17.1-41.2-4.5-10.8-9.1-9.3-12.5-9.5-3.2-.2-6.9-.2-10.6-.2-3.7 0-9.7 1.4-14.8 6.9-5.1 5.6-19.4 19-19.4 46.3 0 27.3 19.9 53.7 22.6 57.4 2.8 3.7 39.1 59.7 94.8 83.8 35.2 15.2 49 16.5 66.6 13.9 10.7-1.6 32.8-13.4 37.4-26.4 4.6-13 4.6-24.1 3.2-26.4-1.3-2.5-5-3.9-10.5-6.6z"/></svg>
+                  </a>
+                  <a href="#" id="shareViaTelegram" class="btn button" style="width: 150px; margin-right: 10px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="1.5em" viewBox="0 0 496 512" fill="#0088cc"><path d="M248,8C111.033,8,0,119.033,0,256S111.033,504,248,504,496,392.967,496,256,384.967,8,248,8ZM362.952,176.66c-3.732,39.215-19.881,134.378-28.1,178.3-3.476,18.584-10.322,24.816-16.948,25.425-14.4,1.326-25.338-9.517-39.287-18.661-21.827-14.308-34.158-23.215-55.346-37.177-24.485-16.135-8.612-25,5.342-39.5,3.652-3.793,67.107-61.51,68.335-66.746.153-.655.3-3.1-1.154-4.384s-3.59-.849-5.135-.5q-3.283.746-104.608,69.142-14.845,10.194-26.894,9.934c-8.855-.191-25.888-5.006-38.551-9.123-15.531-5.048-27.875-7.717-26.8-16.291q.84-6.7,18.45-13.7,108.446-47.248,144.628-62.3c68.872-28.647,83.183-33.623,92.511-33.789,2.052-.034,6.639.474,9.61,2.885a10.452,10.452,0,0,1,3.53,6.716A43.765,43.765,0,0,1,362.952,176.66Z"/></svg>
+                </a>
+                  
+                  <a href="#" id="shareViaEmail"class="btn button" style="width: 150px; margin-right: 10px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="1.5em" viewBox="0 0 512 512" fill="#007bff"><path d="M48 64C21.5 64 0 85.5 0 112c0 15.1 7.1 29.3 19.2 38.4L236.8 313.6c11.4 8.5 27 8.5 38.4 0L492.8 150.4c12.1-9.1 19.2-23.3 19.2-38.4c0-26.5-21.5-48-48-48H48zM0 176V384c0 35.3 28.7 64 64 64H448c35.3 0 64-28.7 64-64V176L294.4 339.2c-22.8 17.1-54 17.1-76.8 0L0 176z"/></svg>
+                  </a>
+                  
+                  <button id="copyButton" class="btn button" style="width: 150px;" data-bs-toggle="tooltip" data-bs-placement="top" title="Copied!">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="1.5em" viewBox="0 0 448 512"><path d="M384 336H192c-8.8 0-16-7.2-16-16V64c0-8.8 7.2-16 16-16l140.1 0L400 115.9V320c0 8.8-7.2 16-16 16zM192 384H384c35.3 0 64-28.7 64-64V115.9c0-12.7-5.1-24.9-14.1-33.9L366.1 14.1c-9-9-21.2-14.1-33.9-14.1H192c-35.3 0-64 28.7-64 64V320c0 35.3 28.7 64 64 64zM64 128c-35.3 0-64 28.7-64 64V448c0 35.3 28.7 64 64 64H256c35.3 0 64-28.7 64-64V416H272v32c0 8.8-7.2 16-16 16H64c-8.8 0-16-7.2-16-16V192c0-8.8 7.2-16 16-16H96V128H64z"/></svg>
+                  </button>
+            </div>
+        </div>
+    </div>
 </div>
+<script>
+    $(document).ready(function() {
+  $('[data-bs-toggle="tooltip"]').tooltip();
+});
 
+function showPopup() {
+    document.getElementById("jobDetailsPopup").style.display = "flex";
+}
+
+function closePopup() {
+    document.getElementById("jobDetailsPopup").style.display = "none";
+}
+
+
+
+document.getElementById("close-popup").addEventListener("click", closePopup);
+
+</script>
 {% endblock %}
 
 {% block script %}
@@ -304,13 +397,13 @@ $(document).ready(function () {
     $('#qui').removeClass('pxp-active');
     $('#inr').removeClass('pxp-active');
     $('#pen').removeClass('pxp-active');
-    let app_count={{app_count}};
-    if(app_count.length)
-    {
-        {% comment %} $('#cands').text('Candidates: '+app_count[0]); {% endcomment %}
-        let ab='#'+{{ jobs.0.jobid }};
-        $(ab).addClass('pxp-active')
-    }
+   // let app_count={{app_count}};
+    //if(app_count.length)
+    //{
+      //  {% comment %} $('#cands').text('Candidates: '+app_count[0]); {% endcomment %}
+        //let ab='#'+{{ jobs.0.jobid }};
+     //   $(ab).addClass('pxp-active')
+    //}
     let show='{{shower}}';
     if(show)
     {
@@ -320,13 +413,29 @@ $(document).ready(function () {
         candifetch(show);
     }
 })
+function formatDate(inputDate) {
+    const months = [
+      "January", "February", "March", "April",
+      "May", "June", "July", "August",
+      "September", "October", "November", "December"
+    ];
+  
+    const date = new Date(inputDate);
+    const month = months[date.getMonth()];
+    const day = date.getDate();
+    const year = date.getFullYear();
+  
+    const formattedDate = `${month} ${day}, ${year}, midnight`;
+    return formattedDate;
+  }
 function candifetch(id)
 {
-    let app_count={{app_count}};
-    {% comment %} $('#cands').text('Candidates: '+app_count[num-1]); {% endcomment %}
+    //let app_count={{app_count}};
+    //{% comment %} $('#cands').text('Candidates: '+app_count[num-1]); {% endcomment %}
     $('.acti').removeClass('pxp-active');
     let ab='#'+id;
     $(ab).addClass('pxp-active')
+    console.log(id)
     $.ajax(
         {
             type:"GET",
@@ -336,7 +445,7 @@ function candifetch(id)
             },
             success: function( data ) 
             {
-                console.log(data);
+                
                 let datainfo=JSON.parse(data['info']);
                 let idval;
                 $('#childrem tr').remove();
@@ -414,23 +523,38 @@ function candifetch(id)
                     let span3=document.createElement('span');
                     if(datainfo[i].status==1)
                     {
-                        span3.setAttribute('class', 'badge rounded-pill bg-danger');
-                        span3.innerHTML='Portal';
+                        span3.setAttribute('class', 'badge rounded-pill bg-secondary');
+                        span3.innerHTML='Posted';
                     }
                     else if(datainfo[i].status==2)
                     {
-                        span3.setAttribute('class', 'badge rounded-pill bg-success');
-                        span3.innerHTML='Mpower Only';
+                        span3.setAttribute('class', 'badge rounded-pill bg-secondary');
+                        span3.innerHTML='Posted';
                     }
                     else if(datainfo[i].status==3)
                     {
-                        span3.setAttribute('class', 'badge rounded-pill bg-info');
-                        span3.innerHTML='Both';
+                        span3.setAttribute('class', 'badge rounded-pill bg-secondary');
+                        span3.innerHTML='Posted';
                     }
                     else if(datainfo[i].status==4)
                     {
-                        span3.setAttribute('class', 'badge rounded-pill bg-primary');
-                        span3.innerHTML='Test Answered <br> '+datainfo[i].results+" %";
+                        span3.setAttribute('class', 'badge rounded-pill bg-secondary');
+                        span3.innerHTML='Posted';
+                    }
+                    else if(datainfo[i].status==5)
+                    {
+                        span3.setAttribute('class', 'badge rounded-pill bg-secondary');
+                        span3.innerHTML='Posted';
+                    }
+                    else if(datainfo[i].status==6)
+                    {
+                        span3.setAttribute('class', 'badge rounded-pill bg-danger');
+                        span3.innerHTML='Requested';
+                    }
+                    else if(datainfo[i].status==7)
+                    {
+                        span3.setAttribute('class', 'badge rounded-pill bg-success');
+                        span3.innerHTML='Provided';
                     }
                     td3div.append(span3);
                     td3a.append(td3div);
@@ -438,7 +562,7 @@ function candifetch(id)
                     let td4=document.createElement('td');
                     let td4div=document.createElement('div');
                     td4div.setAttribute('class', 'pxp-company-dashboard-job-date');
-                    td4div.innerHTML=datainfo[i].postdate;
+                    td4div.innerHTML=formatDate(datainfo[i].postdate);
                     td4.append(td4div);
                     tr.append(td4);
                     let td5=document.createElement('td');
@@ -450,21 +574,21 @@ function candifetch(id)
 
                     
                     
-                    if(datainfo[i].status==4)
-                    {
-                        let interviewli=document.createElement('li');
-                        let interviewbut=document.createElement('button');
-                        interviewbut.setAttribute('title', 'Schedule Interview');
-                        idval='pxp-interview-modal-button-'+datainfo[i].jobid+'-'+datainfo[0].test_id;
-                        interviewbut.setAttribute('id', idval);
-                        interviewbut.setAttribute('data-bs-target', '#pxp-results-modal');
-                        interviewbut.setAttribute('data-bs-toggle', 'modal');
-                        let interviewans='resultsmodal('+datainfo[i].test_id+')';
-                        interviewbut.setAttribute('onclick', interviewans);
-                        interviewbut.setAttribute('style', 'display: none');
-                        interviewli.append(interviewbut);
-                        ul.append(interviewli);
-                    }
+                    //if(datainfo[i].status==4)
+                    //{
+                     //   let interviewli=document.createElement('li');
+                      //  let interviewbut=document.createElement('button');
+                     //   interviewbut.setAttribute('title', 'Schedule Interview');
+                     //   idval='pxp-interview-modal-button-'+datainfo[i].jobid+'-'+datainfo[0].test_id;
+                     //   interviewbut.setAttribute('id', idval);
+                     //   interviewbut.setAttribute('data-bs-target', '#pxp-results-modal');
+                     //   interviewbut.setAttribute('data-bs-toggle', 'modal');
+                     //   let interviewans='resultsmodal('+datainfo[i].test_id+')';
+                      //  interviewbut.setAttribute('onclick', interviewans);
+                     //   interviewbut.setAttribute('style', 'display: none');
+                     //   interviewli.append(interviewbut);
+                     //   ul.append(interviewli);
+                   // }
                     
                     let li1=document.createElement('li');
                     let but1=document.createElement('button');
@@ -482,39 +606,39 @@ function candifetch(id)
                     li1.append(but1);
                     ul.append(li1);
 
-                    if(datainfo[i].status==0)
-                    {
-                    let li6=document.createElement('li');
-                    let but6=document.createElement('button');
-                    but6.setAttribute('title', 'Schedule Test');
-                    idval='pxp-schedule-modal-button-'+datainfo[i].jobid+'-'+datainfo[0].jobid;
-                    but6.setAttribute('id', idval);
-                    but6.setAttribute('data-bs-target', '#pxp-schedule-modal');
-                    but6.setAttribute('data-bs-toggle', 'modal');
-                    let but6ans='setter('+datainfo[i].jobid+')';
-                    but6.setAttribute('onclick', but6ans);
-                    but6.setAttribute('style', 'display: none');
-                    let but6span=document.createElement('span');
-                    but6span.setAttribute('class', 'fa fa-question');
-                    but6.append(but6span);
-                    li6.append(but6);
-                    ul.append(li6);
-                    }
+                    ///if(datainfo[i].status==0)
+                   // {
+                   // let li6=document.createElement('li');
+                   // let but6=document.createElement('button');
+                    //but6.setAttribute('title', 'Schedule Test');
+                   // idval='pxp-schedule-modal-button-'+datainfo[i].jobid+'-'+datainfo[0].jobid;
+                   // but6.setAttribute('id', idval);
+                   // but6.setAttribute('data-bs-target', '#pxp-schedule-modal');
+                   // but6.setAttribute('data-bs-toggle', 'modal');
+                   // let but6ans='setter('+datainfo[i].jobid+')';
+                   // but6.setAttribute('onclick', but6ans);
+                   // but6.setAttribute('style', 'display: none');
+                   // let but6span=document.createElement('span');
+                   // but6span.setAttribute('class', 'fa fa-question');
+                   // but6.append(but6span);
+                   // li6.append(but6);
+                   // ul.append(li6);
+                   // }
 
 
-                    let li2=document.createElement('li');
-                    let but2=document.createElement('button');
-                    but2.setAttribute('title', 'Send message');
-                    idval='pxp-send-message-button-'+datainfo[i].jobid+'-'+datainfo[i].jobid;
-                    but2.setAttribute('id', idval);
-                    let but2ans='messageclick('+datainfo[i].jobid+')';
-                    but2.setAttribute('onclick', but2ans);
-                    but2.setAttribute('style', 'display: none');
-                    let but2span=document.createElement('span');
-                    but2span.setAttribute('class', 'fa fa-envelope-o');
-                    but2.append(but2span);
-                    li2.append(but2);
-                    ul.append(li2);
+                    //let li2=document.createElement('li');
+                    //let but2=document.createElement('button');
+                    //but2.setAttribute('title', 'Send message');
+                    //idval='pxp-send-message-button-'+datainfo[i].jobid+'-'+datainfo[i].jobid;
+                    //but2.setAttribute('id', idval);
+                    //let but2ans='messageclick('+datainfo[i].jobid+')';
+                    //but2.setAttribute('onclick', but2ans);
+                    //but2.setAttribute('style', 'display: none');
+                    //let but2span=document.createElement('span');
+                    //but2span.setAttribute('class', 'fa fa-envelope-o');
+                    //but2.append(but2span);
+                    //li2.append(but2);
+                    //ul.append(li2);
 
 
                     let li3=document.createElement('li');
@@ -560,6 +684,19 @@ function candifetch(id)
                     li5.append(but5);
                     ul.append(li5);
 
+                    let li6=document.createElement('li');
+                    let but6=document.createElement('button');
+                    but6.setAttribute('class',"action-button");
+                    idval='pxp-share-button-'+datainfo[i].jobid;
+                    but6.setAttribute('id', idval);
+                    but6.setAttribute('data-action','s');
+                    jobidValue = datainfo[i].jobid;
+                    but6.setAttribute('data-job-id',jobidValue);
+                    but6.setAttribute('style', 'display: none');
+                    but6.setAttribute('title', 'Share');
+                    li6.append(but6);
+                    ul.append(li6);
+
 
                     td5div.append(ul);
                     td5.append(td5div);
@@ -582,20 +719,25 @@ function candifetch(id)
                     opt2.setAttribute('value', idval);
                     opt2.innerHTML="View Job";
                     selectorsopt.append(opt2);
-                    if(datainfo[i].status==3)
+                    if(datainfo[i].status==6)
                     {
                         let opt9=document.createElement('option');
-                        idval="h_"+datainfo[i].jobid+"_"+datainfo[i].jobid;
+                        idval="n_"+datainfo[i].jobid+"_"+datainfo[i].jobid;
                         opt9.setAttribute('value', idval);
-                        opt9.innerHTML="Suggest Candidates";
+                        opt9.innerHTML="Provided Candidates";
                         selectorsopt.append(opt9);
                     }
+                    let opt10=document.createElement('option');
+                    idval="s_"+datainfo[i].jobid;
+                    opt10.setAttribute('value', idval);
+                    opt10.innerHTML="Share";
+                    selectorsopt.append(opt10);
 
-                    let opt4=document.createElement('option');
-                    idval="d_"+datainfo[i].jobid+"_"+datainfo[i].jobid;
-                    opt4.setAttribute('value', idval);
-                    opt4.innerHTML="Send Message";
-                    selectorsopt.append(opt4);
+                    //let opt4=document.createElement('option');
+                    //idval="d_"+datainfo[i].jobid+"_"+datainfo[i].jobid;
+                    //opt4.setAttribute('value', idval);
+                    //opt4.innerHTML="Send Message";
+                    //selectorsopt.append(opt4);
                     //let opt5=document.createElement('option');
                     //idval="e_"+datainfo[i].jobid+"_"+datainfo[i].jobid;
                     //opt5.setAttribute('value', idval);
@@ -657,7 +799,22 @@ function reject(id)
             }
     })
 }
-
+function markProvided(id)
+{
+    $.ajax(
+        {
+            type:"POST",
+            url: "{% url 'mpoweradmin:mark_cand_provided' pk %}",
+            data:{
+                    'jobid': id,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function( data ) 
+            {
+                location.reload()
+            }
+    })
+}
 function multiple()
 {
     let action=$("[name='act']").val();
@@ -857,38 +1014,38 @@ function setter(id)
 {
     user=id;
 }
-function scheduletest()
-{
-    let ids=[];
-    $("[name='chek']:checked").map(function () {
-        ids.push(this.value);
-    })
-    $.ajax(
-    {
-        type:"POST",
-        url: "{% url 'employer:schedule' pk %}",
-        data:{
-                id: user,
-                ids: ids,
-                testinfoid: $("[name='testinfo']").val(),
-                csrfmiddlewaretoken: '{{ csrf_token }}'
-        },
-        success: function( data ) 
-        {
-            if(data['message']=="X")
-            {
-                alert('Test already scheduled');
-            }
-            location.reload();
-        }
-    })
-}
-function createtest()
-{
-    var url = "{% url 'employer:test' pk %}?redirect=candidates";
-    window.location.href = url;
+//function scheduletest()
+//{
+ //   let ids=[];
+ //   $("[name='chek']:checked").map(function () {
+  //      ids.push(this.value);
+  //  })
+  //  $.ajax(
+  //  {
+   //     type:"POST",
+   //     url: "{% url 'employer:schedule' pk %}",
+   //     data:{
+   //             id: user,
+   //             ids: ids,
+   //             testinfoid: $("[name='testinfo']").val(),
+   //             csrfmiddlewaretoken: '{{ csrf_token }}'
+   //     },
+    //    success: function( data ) 
+    //    {
+    //        if(data['message']=="X")
+    //        {
+    //            alert('Test already scheduled');
+    //        }
+    //        location.reload();
+   //     }
+   // })
+//}
+//function createtest()
+//{
+  //  var url = "{% url 'employer:test' pk %}?redirect=candidates";
+  //  window.location.href = url;
     
-}
+//}
 function tme2(id)
 {
     let nameval="action_but_option_"+id;
@@ -898,6 +1055,7 @@ function tme2(id)
     if(val_option[0] == "b")
     {
         let temp="#pxp-candidate-modal-button-"+val_option[1];
+        //console.log(temp);
         $(temp).click();
     }
     else if(val_option[0] == "c")
@@ -928,9 +1086,93 @@ function tme2(id)
     else if(val_option[0] == "h")
     {
         let temp="#pxp-interview-modal-button-"+val_option[1]+"-"+val_option[2];
-        $(temp).click();
-    }   
+        suggest(val_option[2]);
+    }
+    else if(val_option[0] == "n")
+    {
+        markProvided(val_option[2]);
+        //let temp="#pxp-interview-modal-button-"+val_option[1]+"-"+val_option[2];
+        //suggest(val_option[2]);
+    }  
+    else if(val_option[0] == "s")
+    {
+        console.log("Hello 0");
+        let temp="#pxp-share-button-"+val_option[1];
+        console.log("Hello 0");
+        console.log(temp);
+        $(temp).click(); 
+    }
 }
 
+$(document).on("click", ".action-button", function() {
+    console.log("Helloooodfs");
+
+    const action = $(this).data("action");
+    const jobId = $(this).data("job-id");
+    console.log("Helloooodfs");
+    if (action === "s") {
+      $.ajax({
+        type: "GET",
+        url: "{% url 'mpoweradmin:get_job' pk=pk %}",
+        data:{
+            user_id: jobId
+        }, 
+        success: function (data) {
+          let datainfo = JSON.parse(data['info']);
+          const jobDetailsPopup = $("#jobDetailsPopup");
+          const jobDetailsContent = $("#jobDetailsContent");
+          const jobDetailsString = `
+Company name: ${datainfo.name}
+Job Role: ${datainfo.title}
+Skills Required: ${datainfo.skills}
+Link: http://localhost:8000/singlejob/${jobId}/
+`;
+
+
+          showPopup();
+          
+          $("#shareToWhatsapp").click(function (e) {
+            e.preventDefault();
+            window.open(`whatsapp://send?text=${encodeURIComponent(jobDetailsString)}`, '_blank');
+          });
+          $("#shareViaTelegram").click(function(e) {
+            const jobDetailsString = `Company name: ${datainfo.name}
+Job Role: ${datainfo.title}
+Skills Required: ${datainfo.skills}
+`;
+            e.preventDefault();
+            window.open(`https://telegram.me/share/url?url=http://localhost:8000/singlejob/${jobId}/&text=${encodeURIComponent(jobDetailsString)}`, '_blank');
+          });
+          
+          $("#shareViaEmail").click(function (e) {
+            e.preventDefault();
+            const emailSubject = encodeURIComponent("Job alert");
+            const emailBody = encodeURIComponent(jobDetailsString);
+            const emailLink = `mailto:?subject=${emailSubject}&body=${emailBody}`;
+            window.location.href = emailLink;
+          });
+
+          $("#copyButton").click(function () {
+            const tempTextarea = document.createElement('textarea');
+            tempTextarea.value = jobDetailsString;
+            document.body.appendChild(tempTextarea);
+            tempTextarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextarea);
+            const tooltip = $("#copyButton").tooltip();
+            tooltip.attr("data-original-title", "Job details copied!");
+            tooltip.tooltip("show");
+            setTimeout(function() {
+              tooltip.tooltip("hide");
+            }, 1500);
+          });
+          
+        },
+        error: function () {
+          console.error("Failed to fetch job details");
+        },
+      });
+    }
+  });
 
 {% endblock %}

@@ -195,8 +195,10 @@
                         {% if matching_details.skills.not_match|length > 0 %}
                             <p style="font-size: 13px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis; font-weight: 100;" >
                                 &emsp;&emsp;&emsp;&emsp;Not Matched: 
-                                <span style="color:red;">{{ matching_details.skills.not_match|join:", " }}</span>
-                                
+                                <span style="color:red;">{{ matching_details.skills.not_match|join:", " }}</span>   
+                            </p>
+                            <p style="font-size: 13px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis; font-weight: 400;" >&emsp;&emsp;&emsp;&emsp;Earn these skills 
+                                            <a target="_blank" href="https://www.udemy.com/courses/search/?src=ukw&q={{ matching_details.skills.not_match|join:'+ ' }}">here</a>       
                             </p>
                             <!-- {{ matching_details.skills.not_match|length }} Skill(s)  -->
                         {% endif %}

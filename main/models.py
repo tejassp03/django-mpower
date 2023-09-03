@@ -36,7 +36,7 @@ class JobSeeker(models.Model):
     Resume = models.FileField(upload_to='resumes/', default=None, null=True)
     photo = models.ImageField(upload_to='photos/', default=None, null=True)
     notice_period = models.CharField(max_length=50, default=None, null=True)
-    role = models.CharField(max_length=750)
+    role = models.CharField(max_length=750, default=None, null=True)
     def pass_to_list(self):
         return self.skills.split(',')
 
@@ -114,6 +114,7 @@ class Jobs(models.Model):
     requirements = models.CharField(max_length=700, default=None, null=True)
     num_of_visits = models.IntegerField(default=0)
     status = models.IntegerField(default=3)
+    suggestions = models.CharField(max_length=2000, default="[]")
 
     class Meta:
         db_table = "jobs"
@@ -270,20 +271,7 @@ class TestQues(models.Model):
         db_table = "testques"
 
 
-class TestUser(models.Model):
-    testuser_id = models.AutoField(primary_key=True)
-    user_id = models.ForeignKey(
-        JobSeeker, on_delete=models.CASCADE, blank=True, null=True)
-    test_id = models.ForeignKey(
-        Test, on_delete=models.CASCADE, blank=True, null=True)
-    correct_answers = models.IntegerField(default=0)
-    total_ques = models.IntegerField(default=0)
-    answers = models.CharField(max_length=100, default=None, null=True)
-    date = models.DateTimeField(default=timezone.now)
-    
 
-    class Meta:
-        db_table = "testuser"
 
 
 class Application(models.Model):
@@ -304,6 +292,25 @@ class Application(models.Model):
     class Meta:
         db_table = "application"
 
+class TestUser(models.Model):
+    testuser_id = models.AutoField(primary_key=True)
+    user_id = models.ForeignKey(
+        JobSeeker, on_delete=models.CASCADE, blank=True, null=True)
+    test_id = models.ForeignKey(
+        Test, on_delete=models.CASCADE, blank=True, null=True)
+    emp_id = models.ForeignKey(
+        Employer, on_delete=models.CASCADE, blank=True, null=True)
+    correct_answers = models.IntegerField(default=0)
+    total_ques = models.IntegerField(default=0)
+    answers = models.CharField(max_length=100, default=None, null=True)
+    date = models.DateTimeField(default=timezone.now)
+    apply_id = models.ForeignKey(
+        Application, on_delete=models.CASCADE, blank=True, null=True)
+    
+    
+
+    class Meta:
+        db_table = "testuser"
 
 class Notifications(models.Model):
     notif_id = models.AutoField(primary_key=True)
@@ -329,6 +336,8 @@ class Interview(models.Model):
         JobSeeker, on_delete=models.CASCADE, blank=True, null=True)
     eid = models.ForeignKey(
         Employer, on_delete=models.CASCADE, blank=True, null=True)
+    apply_id = models.ForeignKey(
+        Application, on_delete=models.CASCADE, blank=True, null=True)
     int_link = models.CharField(
         max_length=300, default=None, blank=True, null=True)
     schedule_date = models.DateTimeField(default=timezone.now)
@@ -338,6 +347,7 @@ class Interview(models.Model):
         max_length=500, default=None, blank=True, null=True)
     testuser_id = models.ForeignKey(
         TestUser, on_delete=models.CASCADE, blank=True, null=True)
+    panel_req = models.IntegerField(default=0)
 
     class Meta:
         db_table = "interview"
@@ -351,9 +361,20 @@ class Feedback(models.Model):
         max_length=500, default=None, blank=True, null=True)
     name = models.CharField(
         max_length=100, default=None, blank=True, null=True)
+    rating = models.IntegerField(default=None,null=True,blank=True)
 
     class Meta:
         db_table = "feedback"
+
+class ResumeFeedback(models.Model):
+    feed_id = models.AutoField(primary_key=True)
+    job_id = models.ForeignKey(
+        Jobs, on_delete=models.CASCADE, blank=True, null=True)
+    
+    rating = models.IntegerField(default=None,null=True,blank=True)
+
+    class Meta:
+        db_table = "Resumefeedback"
 
 
 class Newsletter(models.Model):

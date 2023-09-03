@@ -1,7 +1,7 @@
-from main.models import Notifications, JobSeeker, Employer, Jobs, TestInfo
+from main.models import Notifications, JobSeeker, Employer, Jobs, TestInfo, Admin
 def notifs(request):
     if len(request.session.keys())!=0:
-        if(request.session['type']=="c"):
+        if(request.session.get('type')=="c"):
             emp=JobSeeker.objects.get(user_id=request.session['pk'])
             notifs=Notifications.objects.filter(rece_id=emp.log_id, readed=0).order_by('-datetime')
             request.session['notifnum']=len(notifs)
@@ -18,7 +18,7 @@ def notifs(request):
             return {
                 'notis' : data
             }
-        else:
+        elif(request.session.get('type')=="e"):
             emp=Employer.objects.get(eid=request.session['pk'])
             notifs=Notifications.objects.filter(rece_id=emp.log_id, readed=0).order_by('-datetime')
             request.session['notifnum']=len(notifs)
@@ -43,4 +43,35 @@ def notifs(request):
             return {
                 'notis' : data
             }
+        
+        elif(request.session.get('type')=="a"):
+            emp=Admin.objects.get(aid=request.session['pk'])
+            notifs=Notifications.objects.filter(rece_id=emp.log_id, readed=0).order_by('-datetime')
+            request.session['notifnum']=len(notifs)
+            data=[]
+            for i in notifs:
+                new_data={}
+                cand=JobSeeker.objects.get(log_id=i.send_id)
+                new_data['name']=cand.name
+                new_data['datetime']=i.datetime
+                new_data['user_id']=cand.user_id
+                new_data['notif_type']=i.notif_type
+                new_data['log_id']=cand.log_id.log_id
+                if i.job_id:
+                    jobs = Jobs.objects.get(jobid=i.job_id.jobid)
+                    new_data['title']=jobs.title
+                    new_data['jobid']=jobs.jobid
+                if i.testuser_id:
+                    testinfo=TestInfo.objects.get(test_id=i.testuser_id.test_id)
+                    new_data['test_name']=testinfo.test_name
+                    new_data['test_id']=i.testuser_id.testuser_id
+                data.append(new_data)
+            return {
+                'notis' : data
+            }
+        else:
+            return{
+                'notis':""
+            }
+
     return {}

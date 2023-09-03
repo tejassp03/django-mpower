@@ -16,20 +16,54 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import pyotp
 import base64
-
-
+from nltk.tokenize import word_tokenize
+from nltk.stem import PorterStemmer
 from main.utils import send_emails
-
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+from nltk.corpus import stopwords
+import json
+from django.core.mail import EmailMessage
+from jobster import settings
+from main.utils import send_emails
+from django.db.models import Count
+# def get_registered_counts(model, days):
+#     registered_counts = []
+#     today = date.today()
+#     for i in range(days):
+#         d = today - timedelta(days=i)
+#         count = model.objects.filter(log_id__date_joined__year=d.year, log_id__date_joined__month=d.month, log_id__date_joined__day=d.day).count()
+#         registered_counts.append([d, count])
+#     return registered_counts
 # Create your views here.
 def dashboard(request, pk):
-    context = Employer.objects.get(eid=pk)
-    jobs = Jobs.objects.filter(eid=pk)
-    applics = Application.objects.filter(eid=pk)
-    visits = ProfileVisits.objects.filter(user_type="e", e_id=pk)
+    # employers_registered = get_registered_counts(Employer, 365)
+    # job_seekers_registered = get_registered_counts(JobSeeker, 365)
+    
+    # charts_context = {}
+    # charts_context['employer_counts'] = dumps([item[1] for item in employers_registered])
+    # charts_context['job_seeker_counts'] = dumps([item[1] for item in job_seekers_registered])
+    # charts_context['dates'] = dumps([item[0] for item in employers_registered], default=str)
+    # print(charts_context)
+    # context = Employer.objects.get(eid=pk)
+    # jobs = Jobs.objects.filter(eid=pk)
+    jobs = Jobs.objects.all()
+    context = Admin.objects.get(aid=pk)
+    request.session['email'] = context.email
+    # for obj in context:
+    #     print(obj.__dict__)
+
+
+
+
+
+
+    applics = Application.objects.all()
+    # visits = ProfileVisits.objects.filter(user_type="e", e_id=pk)
     all_notis = []
     count=0
     recent_candidates=[]
-    num_notif = Notifications.objects.filter(rece_id=context.log_id).order_by('-datetime')
+    num_notif = Notifications.objects.filter(rece_id=context.log_id_id).order_by('-datetime')
     for i in num_notif:
         single_notis={}
         single_notis['notif_type']=i.notif_type
@@ -40,14 +74,14 @@ def dashboard(request, pk):
         single_notis['log_id']=user.log_id.log_id
         heapq.heappush(recent_candidates, (i.datetime, user.user_id, user.photo, user.name, user.location, user.log_id.log_id))
         # recent_candidates.put([i.datetime, user.user_id, user.photo, user.name, user.title, user.location])
-        if i.job_id:
-            job=jobs.filter(jobid=i.job_id.jobid)
-            single_notis['title']=job[0].title
-            single_notis['jobid']=job[0].jobid
-        if i.testuser_id:
-            testinfo=TestInfo.objects.get(test_id=i.testuser_id.test_id)
-            single_notis['test_name']=testinfo.test_name
-            single_notis['test_id']=i.testuser_id.testuser_id
+        # if i.job_id:
+        #     job=jobs.filter(jobid=i.job_id.jobid)
+        #     single_notis['title']=job[0].title
+        #     single_notis['jobid']=job[0].jobid
+        # if i.testuser_id:
+        #     testinfo=TestInfo.objects.get(test_id=i.testuser_id.test_id)
+        #     single_notis['test_name']=testinfo.test_name
+        #     single_notis['test_id']=i.testuser_id.testuser_id
         all_notis.append(single_notis)
         count=count+1
         if(count>10):
@@ -96,100 +130,166 @@ def dashboard(request, pk):
     counts=[]
     cou=0
 
-    visits_chart=[]
-    visits_7=[]
-    visits_30=[]
-    visits_60=[]
-    visits_90=[]
-    visits_365=[]
-    countsv=[]
-    couv=0
+    # visits_chart=[]
+    # visits_7=[]
+    # visits_30=[]
+    # visits_60=[]
+    # visits_90=[]
+    # visits_365=[]
+    # countsv=[]
+    # couv=0
+
+    jobs_chart = []
+    jobs_7 = []
+    jobs_30 = []
+    jobs_60 = []
+    jobs_90 = []
+    jobs_365 = []
+    countsj = []
+    couj = 0
     for i in range(0, 365):
         d=date.today()-timedelta(days=i)
         temp = applics.filter(date_applied__year=d.year, date_applied__month=d.month, date_applied__day=d.day)
         n=len(temp)
         heapq.heappush(applics_chart, (-1*(n), n, d))
         cou=cou+n
-        temp = visits.filter(visiting_time__year=d.year, visiting_time__month=d.month, visiting_time__day=d.day)
-        n=len(temp)
-        heapq.heappush(visits_chart, (-1*(n), n, d))
-        couv=couv+n
-        if(len(applics_chart)==7):
+    #     temp = visits.filter(visiting_time__year=d.year, visiting_time__month=d.month, visiting_time__day=d.day)
+    #     n=len(temp)
+    #     heapq.heappush(visits_chart, (-1*(n), n, d))
+    #     couv=couv+n
+        temp = jobs.filter(postdate__year=d.year,postdate__month=d.month, postdate__day=d.day)
+        n = len(temp)
+        heapq.heappush(jobs_chart, (-1*(n), n, d))
+        couj = couj+n
+        if(len(jobs_chart)==7):
             counts.append(cou)
-            countsv.append(couv)
+    #         countsv.append(couv)
+            countsj.append(couj)
             for j in range(0, 7):
                 applics_7.append([applics_chart[j][2], applics_chart[j][1]])
-                visits_7.append([visits_chart[j][2], visits_chart[j][1]])
-        if(len(applics_chart)==30):
+    #             visits_7.append([visits_chart[j][2], visits_chart[j][1]])
+                jobs_7.append([jobs_chart[j][2],jobs_chart[j][1]])
+
+        if(len(jobs_chart)==30):
             counts.append(cou)
-            countsv.append(couv)
+    #         countsv.append(couv)
+            countsj.append(couj)
+
             for j in range(0, 7):
                 applics_30.append([applics_chart[j][2], applics_chart[j][1]])
-                visits_30.append([visits_chart[j][2], visits_chart[j][1]])
-        if(len(applics_chart)==60):
+    #             visits_30.append([visits_chart[j][2], visits_chart[j][1]])
+                jobs_30.append([jobs_chart[j][2],jobs_chart[j][1]])
+
+        if(len(jobs_chart)==60):
             counts.append(cou)
-            countsv.append(couv)
+    #         countsv.append(couv)
+            countsj.append(couj)
+
             for j in range(0, 7):
                 applics_60.append([applics_chart[j][2], applics_chart[j][1]])
-                visits_60.append([visits_chart[j][2], visits_chart[j][1]])
-        if(len(applics_chart)==90):
+    #             visits_60.append([visits_chart[j][2], visits_chart[j][1]])
+                jobs_60.append([jobs_chart[j][2],jobs_chart[j][1]])
+
+        if(len(jobs_chart)==90):
             counts.append(cou)
-            countsv.append(couv)
+    #         countsv.append(couv)
+            countsj.append(couj)
+
             for j in range(0, 7):
                 applics_90.append([applics_chart[j][2], applics_chart[j][1]])
-                visits_90.append([visits_chart[j][2], visits_chart[j][1]])
-        if(len(applics_chart)==364):
+    #             visits_90.append([visits_chart[j][2], visits_chart[j][1]])
+                jobs_90.append([jobs_chart[j][2],jobs_chart[j][1]])
+
+        if(len(jobs_chart)==364):
             counts.append(cou)
-            countsv.append(couv)
+    #         countsv.append(couv)
+            countsj.append(couj)
+
             for j in range(0, 7):
                 applics_365.append([applics_chart[j][2], applics_chart[j][1]])
-                visits_365.append([visits_chart[j][2], visits_chart[j][1]])
+    #             visits_365.append([visits_chart[j][2], visits_chart[j][1]])
+                jobs_365.append([jobs_chart[j][2],jobs_chart[j][1]])
+
     applics_7.sort()
     applics_30.sort()
     applics_60.sort()
     applics_90.sort()
     applics_365.sort()
-    visits_7.sort()
-    visits_30.sort()
-    visits_60.sort()
-    visits_90.sort()
-    visits_365.sort()
-    charts_context={}
-    charts_context['pastsev']=dumps([item[1] for item in applics_7])
-    charts_context['dates']=dumps([item[0] for item in applics_7], default=str)
-    charts_context['count_7']=dumps(counts[0])
-    charts_context['pastthi']=dumps([item[1] for item in applics_30])
-    charts_context['dates30']=dumps([item[0] for item in applics_30], default=str)
-    charts_context['count_30']=dumps(counts[1])
-    charts_context['pastsix']=dumps([item[1] for item in applics_60])
-    charts_context['dates60']=dumps([item[0] for item in applics_60], default=str)
-    charts_context['count_60']=dumps(counts[2])
-    charts_context['pastnin']=dumps([item[1] for item in applics_60])
-    charts_context['dates90']=dumps([item[0] for item in applics_60], default=str)
-    charts_context['count_90']=dumps(counts[3])
-    charts_context['pastyea']=dumps([item[1] for item in applics_365])
-    charts_context['dates365']=dumps([item[0] for item in applics_365], default=str)
-    charts_context['count_365']=dumps(counts[4])
+    # visits_7.sort()
+    # visits_30.sort()
+    # visits_60.sort()
+    # visits_90.sort()
+    # visits_365.sort()
+    # charts_context={}
+    ##################################################################################
+    jobs_7.sort()
+    jobs_30.sort()
+    jobs_60.sort()
+    jobs_90.sort()
+    jobs_365.sort()
+    charts_context = {}
+    charts_context['pastsev'] = dumps([item[1] for item in jobs_7])
+    charts_context['dates'] = dumps(
+        [item[0] for item in jobs_7], default=str)
+    charts_context['count_7'] = dumps(countsj[0])
+    charts_context['pastthi'] = dumps([item[1] for item in jobs_30])
+    charts_context['dates30'] = dumps(
+        [item[0] for item in jobs_30], default=str)
+    charts_context['count_30'] = dumps(countsj[1])
+    charts_context['pastsix'] = dumps([item[1] for item in jobs_60])
+    charts_context['dates60'] = dumps(
+        [item[0] for item in jobs_60], default=str)
+    charts_context['count_60'] = dumps(countsj[2])
+    charts_context['pastnin'] = dumps([item[1] for item in jobs_60])
+    charts_context['dates90'] = dumps(
+        [item[0] for item in jobs_60], default=str)
+    charts_context['count_90'] = dumps(countsj[3])
+    charts_context['pastyea'] = dumps([item[1] for item in jobs_365])
+    charts_context['dates365'] = dumps(
+        [item[0] for item in jobs_365], default=str)
+    charts_context['count_365'] = dumps(countsj[4])
+    
+    ##################################################################################
+    charts_context['vpastsev']=dumps([item[1] for item in applics_7])
+    charts_context['vdates']=dumps([item[0] for item in applics_7], default=str)
+    charts_context['vcount_7']=dumps(counts[0])
+    charts_context['vpastthi']=dumps([item[1] for item in applics_30])
+    charts_context['vdates30']=dumps([item[0] for item in applics_30], default=str)
+    charts_context['vcount_30']=dumps(counts[1])
+    charts_context['vpastsix']=dumps([item[1] for item in applics_60])
+    charts_context['vdates60']=dumps([item[0] for item in applics_60], default=str)
+    charts_context['vcount_60']=dumps(counts[2])
+    charts_context['vpastnin']=dumps([item[1] for item in applics_90])
+    charts_context['vdates90']=dumps([item[0] for item in applics_90], default=str)
+    charts_context['vcount_90']=dumps(counts[3])
+    charts_context['vpastyea']=dumps([item[1] for item in applics_365])
+    charts_context['vdates365']=dumps([item[0] for item in applics_365], default=str)
+    charts_context['vcount_365']=dumps(counts[4])
+    # print(charts_context)
 
-    charts_context['vpastsev']=dumps([item[1] for item in visits_7])
-    charts_context['vdates']=dumps([item[0] for item in visits_7], default=str)
-    charts_context['vcount_7']=dumps(countsv[0])
-    charts_context['vpastthi']=dumps([item[1] for item in visits_30])
-    charts_context['vdates30']=dumps([item[0] for item in visits_30], default=str)
-    charts_context['vcount_30']=dumps(countsv[1])
-    charts_context['vpastsix']=dumps([item[1] for item in visits_60])
-    charts_context['vdates60']=dumps([item[0] for item in visits_60], default=str)
-    charts_context['vcount_60']=dumps(countsv[2])
-    charts_context['vpastnin']=dumps([item[1] for item in visits_90])
-    charts_context['vdates90']=dumps([item[0] for item in visits_90], default=str)
-    charts_context['vcount_90']=dumps(countsv[3])
-    charts_context['vpastyea']=dumps([item[1] for item in visits_365])
-    charts_context['vdates365']=dumps([item[0] for item in visits_365], default=str)
-    charts_context['vcount_365']=dumps(countsv[4])
-    nums=[len(jobs), len(applics), countunmess]
+    # charts_context['pastsev']=dumps([item[1] for item in applics_7])
+    # charts_context['dates']=dumps([item[0] for item in applics_7], default=str)
+    # charts_context['count_7']=dumps(counts[0])
+    # charts_context['pastthi']=dumps([item[1] for item in applics_30])
+    # charts_context['dates30']=dumps([item[0] for item in applics_30], default=str)
+    # charts_context['count_30']=dumps(counts[1])
+    # charts_context['pastsix']=dumps([item[1] for item in applics_60])
+    # charts_context['dates60']=dumps([item[0] for item in applics_60], default=str)
+    # charts_context['count_60']=dumps(counts[2])
+    # charts_context['pastnin']=dumps([item[1] for item in applics_60])
+    # charts_context['dates90']=dumps([item[0] for item in applics_60], default=str)
+    # charts_context['count_90']=dumps(counts[3])
+    # charts_context['pastyea']=dumps([item[1] for item in applics_365])
+    # charts_context['dates365']=dumps([item[0] for item in applics_365], default=str)
+    # charts_context['count_365']=dumps(counts[4])
+
+    
+    # nums=[len(jobs), len(applics), countunmess]
+    #  'nums': nums, 
+    #   'charts': charts_context, 'counts': counts
     if 'shower' in request.session:
         del request.session['shower']
-    return render(request, 'dashboard-mpoweradmin.html', {'pk': pk, 'nums': nums, 'notifics': all_notis, 'recent': recent_mess_temp, 'candi': finalrecent, 'charts': charts_context, 'counts': counts})
+    return render(request, 'dashboard-mpoweradmin.html', {'pk': pk,'notifics': all_notis, 'recent': recent_mess_temp, 'candi': finalrecent,'charts': charts_context,'counts': countsj})
 
 def newjob(request, pk):
     if(request.method=="POST"):
@@ -328,124 +428,130 @@ def candidates(request, pk):
     shower=""
     if 'shower' in request.session:
         shower=request.session['shower']
-    if request.method=="POST":
-        if 'approve' in request.POST:
-            apps=Application.objects.get(apply_id=request.POST['apply_id'])
-            request.session['shower']=apps.job_id.jobid
-            apps.status=1
-            apps.save()
-            subject="Congratulations "+apps.user_id.name+" you are selected!"
-            message="Company: "+apps.job_id.eid.ename+"\nJob: "+apps.job_id.title
-            receipt=[apps.user_id.log_id.email]
-            send_emails(subject, message, receipt)
-            return redirect('employer:candidates', pk=pk)
-        if 'reject' in request.POST:
-            apps=Application.objects.get(apply_id=request.POST['apply_id'])
-            request.session['shower']=apps.job_id.jobid
-            apps.status=2
-            apps.save()
-            return redirect('employer:candidates', pk=pk)
-        if 'act' in request.POST:
-            if(request.POST['act']=="delall"):
-                for i in request.POST.getlist('ids[]'):
-                    ap=Application.objects.filter(apply_id=i)
-                    request.session['shower']=ap[0].job_id.jobid
-                    ap.delete()
-            if(request.POST['act']=="appall"):
-                for i in request.POST.getlist('ids[]'):
-                    apps=Application.objects.get(apply_id=i)
-                    apps.status=1
-                    apps.save()
-                    subject="Congratulations "+apps.user_id.name+" you are selected!"
-                    message="Company: "+apps.job_id.eid.ename+"\nJob: "+apps.job_id.title
-                    receipt=[apps.user_id.log_id.email]
-                    send_emails(subject, message, receipt)
-                    request.session['shower']=apps.job_id.jobid
-            if(request.POST['act']=="rejall"):
-                for i in request.POST.getlist('ids[]'):
-                    apps=Application.objects.get(apply_id=i)
-                    apps.status=2
-                    apps.save()
-                    request.session['shower']=apps.job_id.jobid
-            return redirect('employer:candidates', pk=pk)
-        ap=Application.objects.filter(apply_id=request.POST['apply_id'])
-        request.session['shower']=ap[0].job_id.jobid
-        ap.delete()
-        return redirect('employer:candidates', pk=pk)
-    testinfo=TestInfo.objects.filter(eid=pk)
-    applics=Application.objects.filter(eid=pk)
-    jobs=Jobs.objects.filter(eid=pk).order_by('-postdate')
-    app_count=[]
-    employers = Employer.objects.all()
-    single_apps=[]
-    for i in jobs:
-        app_count.append(len(Application.objects.filter(job_id=i.jobid)))
+    # if request.method=="POST":
+    #     if 'approve' in request.POST:
+    #         apps=Application.objects.get(apply_id=request.POST['apply_id'])
+    #         request.session['shower']=apps.job_id.jobid
+    #         apps.status=1
+    #         apps.save()
+    #         subject="Congratulations "+apps.user_id.name+" you are selected!"
+    #         message="Company: "+apps.job_id.eid.ename+"\nJob: "+apps.job_id.title
+    #         receipt=[apps.user_id.log_id.email]
+    #         send_emails(subject, message, receipt)
+    #         return redirect('employer:candidates', pk=pk)
+    #     if 'reject' in request.POST:
+    #         apps=Application.objects.get(apply_id=request.POST['apply_id'])
+    #         request.session['shower']=apps.job_id.jobid
+    #         apps.status=2
+    #         apps.save()
+    #         return redirect('employer:candidates', pk=pk)
+    #     if 'act' in request.POST:
+    #         if(request.POST['act']=="delall"):
+    #             for i in request.POST.getlist('ids[]'):
+    #                 ap=Application.objects.filter(apply_id=i)
+    #                 request.session['shower']=ap[0].job_id.jobid
+    #                 ap.delete()
+    #         if(request.POST['act']=="appall"):
+    #             for i in request.POST.getlist('ids[]'):
+    #                 apps=Application.objects.get(apply_id=i)
+    #                 apps.status=1
+    #                 apps.save()
+    #                 subject="Congratulations "+apps.user_id.name+" you are selected!"
+    #                 message="Company: "+apps.job_id.eid.ename+"\nJob: "+apps.job_id.title
+    #                 receipt=[apps.user_id.log_id.email]
+    #                 send_emails(subject, message, receipt)
+    #                 request.session['shower']=apps.job_id.jobid
+    #         if(request.POST['act']=="rejall"):
+    #             for i in request.POST.getlist('ids[]'):
+    #                 apps=Application.objects.get(apply_id=i)
+    #                 apps.status=2
+    #                 apps.save()
+    #                 request.session['shower']=apps.job_id.jobid
+    #         return redirect('employer:candidates', pk=pk)
+    #     ap=Application.objects.filter(apply_id=request.POST['apply_id'])
+    #     request.session['shower']=ap[0].job_id.jobid
+    #     ap.delete()
+    #     return redirect('employer:candidates', pk=pk)
+    # testinfo=TestInfo.objects.filter(eid=pk)
+    # applics=Application.objects.filter(eid=pk)
+    # jobs=Jobs.objects.filter(eid=pk).order_by('-postdate')
+    # print(jobs)
+    # app_count=[]
+    employers = Employer.objects.annotate(num_jobs=Count('jobs')).order_by('-num_jobs')
+
+    # print(employers)
+    # single_apps=[]
+    # for i in jobs:
+    #     app_count.append(len(Application.objects.filter(job_id=i.jobid)))
     if(employers):
         e_apps = Jobs.objects.filter(eid_id=employers[0].eid)
-    if(jobs):
-        s_apps=Application.objects.filter(job_id=jobs[0].jobid)
-        for i in s_apps:
-            single_can={}
-            user=JobSeeker.objects.get(user_id=i.user_id.user_id)
-            single_can['user_id']=user.user_id
-            single_can['name']=user.name
-            single_can['location']=user.location
-            single_can['photo']=user.photo
-            job=Jobs.objects.get(jobid=i.job_id.jobid)
-            single_can['jobid']=job.jobid
-            single_can['title']=job.title
-            single_can['status']=i.status
-            single_can['date_applied']=i.date_applied
-            single_can['apply_id']=i.apply_id
-            single_can['log_id']=user.log_id.log_id
-            if i.status == 4:
-                testinfo1=TestInfo.objects.get(testinfoid=i.test.testinfoid)
-                testuser1=TestUser.objects.get(test_id=testinfo1.test_id.test_id, user_id=user.user_id)
-                single_can['results']=(int(testuser1.correct_answers)/int(testuser1.total_ques))*100
-                single_can['test_id']=testuser1.testuser_id
-            else:
-                single_can['results']=0
-            single_apps.append(single_can)
-    all_can=[]
-    for i in applics:
-        single_can={}
-        user=JobSeeker.objects.get(user_id=i.user_id.user_id)
-        single_can['user_id']=user.user_id
-        single_can['name']=user.name
-        single_can['location']=user.location
-        single_can['photo']=user.photo
-        job=Jobs.objects.get(jobid=i.job_id.jobid)
-        single_can['jobid']=job.jobid
-        single_can['title']=job.title
-        single_can['status']=i.status
-        single_can['date_applied']=i.date_applied
-        single_can['apply_id']=i.apply_id
-        single_can['log_id']=user.log_id.log_id
-        if i.status == 4:
-            testinfo1=TestInfo.objects.get(testinfoid=i.test.testinfoid)
-            testuser1=TestUser.objects.get(test_id=testinfo1.test_id.test_id, user_id=user.user_id)
-            single_can['test_id']=testuser1.testuser_id
-            single_can['results']=(int(testuser1.correct_answers)/int(testuser1.total_ques))*100
-        else:
-            single_can['results']=0
-        all_can.append(single_can)
-    count=len(all_can)
-    all_can = sorted(all_can, key=lambda d: d['date_applied'])
-    all_can.reverse()
-    GET_params = request.GET.copy()
-    if('page' in GET_params):
-        last=GET_params['page'][-1]
-        GET_params['page']=last[0]
-    p=Paginator(all_can, 5)
-    page_number = request.GET.get('page')
-    try:
-        page_obj = p.get_page(page_number)
-    except PageNotAnInteger:
-        page_obj = p.page(1)
-    except EmptyPage:
-        page_obj = p.page(p.num_pages)
+        # print(e_apps)
+    # if(jobs):
+    #     s_apps=Application.objects.filter(job_id=jobs[0].jobid)
+    #     for i in s_apps:
+    #         single_can={}
+    #         user=JobSeeker.objects.get(user_id=i.user_id.user_id)
+    #         single_can['user_id']=user.user_id
+    #         single_can['name']=user.name
+    #         single_can['location']=user.location
+    #         single_can['photo']=user.photo
+    #         job=Jobs.objects.get(jobid=i.job_id.jobid)
+    #         single_can['jobid']=job.jobid
+    #         single_can['title']=job.title
+    #         single_can['status']=i.status
+    #         single_can['date_applied']=i.date_applied
+    #         single_can['apply_id']=i.apply_id
+    #         single_can['log_id']=user.log_id.log_id
+    #         if i.status == 4:
+    #             testinfo1=TestInfo.objects.get(testinfoid=i.test.testinfoid)
+    #             testuser1=TestUser.objects.get(test_id=testinfo1.test_id.test_id, user_id=user.user_id)
+    #             single_can['results']=(int(testuser1.correct_answers)/int(testuser1.total_ques))*100
+    #             single_can['test_id']=testuser1.testuser_id
+    #         else:
+    #             single_can['results']=0
+    #         single_apps.append(single_can)
+    # all_can=[]
+    # for i in applics:
+    #     single_can={}
+    #     user=JobSeeker.objects.get(user_id=i.user_id.user_id)
+    #     single_can['user_id']=user.user_id
+    #     single_can['name']=user.name
+    #     single_can['location']=user.location
+    #     single_can['photo']=user.photo
+    #     job=Jobs.objects.get(jobid=i.job_id.jobid)
+    #     single_can['jobid']=job.jobid
+    #     single_can['title']=job.title
+    #     single_can['status']=i.status
+    #     single_can['date_applied']=i.date_applied
+    #     single_can['apply_id']=i.apply_id
+    #     single_can['log_id']=user.log_id.log_id
+    #     if i.status == 4:
+    #         testinfo1=TestInfo.objects.get(testinfoid=i.test.testinfoid)
+    #         testuser1=TestUser.objects.get(test_id=testinfo1.test_id.test_id, user_id=user.user_id)
+    #         single_can['test_id']=testuser1.testuser_id
+    #         single_can['results']=(int(testuser1.correct_answers)/int(testuser1.total_ques))*100
+    #     else:
+    #         single_can['results']=0
+    #     all_can.append(single_can)
+    # count=len(all_can)
+    # all_can = sorted(all_can, key=lambda d: d['date_applied'])
+    # all_can.reverse()
+    # GET_params = request.GET.copy()
+    # if('page' in GET_params):
+    #     last=GET_params['page'][-1]
+    #     GET_params['page']=last[0]
+    # p=Paginator(all_can, 5)
+    # page_number = request.GET.get('page')
+    # try:
+    #     page_obj = p.get_page(page_number)
+    # except PageNotAnInteger:
+    #     page_obj = p.page(1)
+    # except EmptyPage:
+    #     page_obj = p.page(p.num_pages)
+    #  'pe': page_obj, 'count': count, 'jobs': jobs, 'app_count': app_count, 'single': single_apps, 'shower': shower, 'test': testinfo,
+    single_apps = [1,2]
     
-    return render(request, 'candidate-mpoweradmin.html', {'pk': pk, 'pe': page_obj, 'count': count, 'jobs': jobs, 'app_count': app_count, 'single': single_apps, 'shower': shower, 'test': testinfo,'employers':employers,'e_apps':e_apps})
+    return render(request, 'candidate-mpoweradmin.html', {'pk': pk,'employers':employers,'e_apps':e_apps,'single': single_apps, 'shower': shower})
 
 def get_candidate(request, pk):
     candidate = JobSeeker.objects.get(user_id=request.GET['user_id'])
@@ -475,7 +581,6 @@ def get_candidate(request, pk):
     notif.save()
     return JsonResponse({'info': dumps(cand, default=str), 'work': dumps(list(work.values())), 'edu': dumps(list(edu.values()))})
 def get_job(request,pk):
-    print("hello")
     job = Jobs.objects.get(jobid=request.GET['user_id'])
     emp_ = Employer.objects.get(eid=job.eid_id) 
     job_data = {}
@@ -485,16 +590,16 @@ def get_job(request,pk):
     job_data['basicpay'] = job.basicpay
     job_data['fnarea'] = job.fnarea
     job_data['location'] = job.location
+
     job_data['vacno'] = job.vacno
     job_data['postdate'] = job.postdate
     job_data['skills'] = job.skills
-    job_data['location'] = job.notice_period
+    job_data['notice_period'] = job.notice_period
     job_data['requirements'] = job.requirements
 
     job_data['name'] = emp_.ename
-    job_data['email'] = emp_.website
+    job_data['email'] = emp_.log_id.email
     job_data['phone'] = emp_.phone
-    print("hello")
     return JsonResponse({'info': dumps(job_data, default=str)})
 
 def subscriptions(request, pk):
@@ -506,21 +611,21 @@ def change_pass(request, pk):
         if(check_password(request.POST['old'], user.password)):
             if request.POST['new']!=request.POST['cnew']:
                 messages.error(request, "Both your password and your confirmation password must be exactly same")
-                return redirect('employer:change_pass', pk=pk)
+                return redirect('mpoweradmin:change_pass', pk=pk)
             if not re.fullmatch(r'^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$', request.POST['new']):
                 messages.error(request, "Please entere a valid password")
-                return redirect('employer:change_pass', pk=pk)
+                return redirect('mpoweradmin:change_pass', pk=pk)
             if(request.POST['old']==request.POST['new']):
                 messages.error(request, "Old and new password cant be same")
-                return redirect('employer:change_pass', pk=pk)
+                return redirect('mpoweradmin:change_pass', pk=pk)
             user.password=make_password(request.POST['new'])
             user.save()
             request.session['password']=user.password
             messages.success(request, 'Password changed successfully')
-            return redirect('employer:change_pass', pk=pk)
+            return redirect('mpoweradmin:change_pass', pk=pk)
         else:
             messages.error(request, "Please enter correct old password")
-            return redirect('employer:change_pass', pk=pk)
+            return redirect('mpoweradmin:change_pass', pk=pk)
     if 'shower' in request.session:
         del request.session['shower']
     return render(request, 'password-mpoweradmin.html', {'pk': pk})
@@ -649,9 +754,13 @@ def seen(request, pk):
 def inbox_count(request, pk):
     # user=JobSeeker.objects.get(user_id=pk)
     # num_mess=Threads.objects.filter(receiver=user.log_id, has_unread=1)
-    loger=Login.objects.get(email=request.session['email'])
-    countval=len(Messages.objects.filter(receiver_user=loger.log_id, is_read=False))
-    return JsonResponse({'count': countval})
+    if 'email' in request.session:
+        loger=Login.objects.get(email=request.session['email'])
+        countval=len(Messages.objects.filter(receiver_user=loger.log_id, is_read=False))
+        return JsonResponse({'count': countval})
+    else:
+        countval = 0
+        return JsonResponse({'count': countval})
 
 def delete_mess(request, pk):
     if request.method == "POST":
@@ -675,6 +784,9 @@ def createthread(request, pk):
     return JsonResponse({'url': ""})
 
 def cnotifications(request, pk):
+    for key, value in request.session.items():
+        print(f"Key: {key}, Value: {value}")
+
     loger=Login.objects.get(email=request.session['email'])
     notifs=Notifications.objects.filter(rece_id=loger.log_id).order_by('-datetime')
     nots=[]
@@ -753,6 +865,8 @@ def edit_job(request, pk):
 
 def cand_suggest(request, pk):
     job = Jobs.objects.filter(eid=pk)
+    for i in job:
+        print(i.title)
     candid=[]
     sel=""
     if ('job_id' in request.GET and request.GET['job_id']!='a') or 'c_s_id' in request.session:
@@ -885,7 +999,6 @@ def get_jobs(request, pk):
         single_job['status'] = i.status
         single_job['log_id'] = user.log_id.log_id
         single_job['eid'] = user.eid
-        print(user.eid)
         e_apps_list.append(single_job)
     return JsonResponse({'info': dumps(e_apps_list, default=str)})
 
@@ -1115,7 +1228,7 @@ def all_interviews(request, pk):
             return redirect('employer:all_interviews', pk=pk)
         Interview.objects.get(int_id=request.POST['int_id']).delete()
         return redirect('employer:all_interviews', pk=pk)
-    all_ints=Interview.objects.filter(eid=pk).order_by('-schedule_date')
+    all_ints = Interview.objects.exclude(panel_req=0).order_by('-schedule_date')
     final_ints=[]
     for i in all_ints:
         single_int={}
@@ -1126,6 +1239,7 @@ def all_interviews(request, pk):
         single_int['date']=i.schedule_date
         single_int['link']=i.int_link
         single_int['isdone']=i.is_done
+        single_int['panel_req'] = i.panel_req
         final_ints.append(single_int)
     GET_params = request.GET.copy()
     count=len(final_ints)
@@ -1148,6 +1262,28 @@ def done(request, pk):
         int_val.is_done=1
         int_val.save()
         return JsonResponse({'message': 'Y'})
+
+def interview_panel(request, pk):
+    if request.method=="POST":
+        int_val = Interview.objects.get(int_id=request.POST['int_id'])
+        email_panel = [request.POST['email']]
+        
+        email_client = [int_val.eid.log_id.email]
+        email_subject = "Interview Panel Request"
+        message = f"You are assigned as an interview panel. Interview link: {int_val.int_link}. Candidate name: {int_val.user_id.name}. Interview Time: {int_val.schedule_date}"
+        email = EmailMessage(email_subject, message, settings.EMAIL_HOST_USER, email_panel)
+        email.fail_silently = True
+        # # email.content_subtype = "html"
+        email.send()
+        email_subject = "Interview Panel Assigned"
+        message = f"You are assigned a interview panel Email Address: {email_panel[0]}"
+        email = EmailMessage(email_subject, message, settings.EMAIL_HOST_USER, email_client)
+        email.fail_silently = True
+        # # email.content_subtype = "html"
+        email.send()
+        int_val.panel_req=2
+        int_val.save()
+        return JsonResponse({'message': 'Interview Panel assigned'})
 
 def get_link(request, pk):
     int_val=Interview.objects.get(int_id=request.GET['int_id'])
@@ -1210,9 +1346,17 @@ def pending_actions(request, pk):
         page_obj = p.page(p.num_pages)
     return render(request, 'candidate-mpoweradmin.html', {'pk': pk, 'count': count, 'pe': page_obj, 'test': testinfo})
 
+
+def mark_cand_provided(request,pk):
+    if request.method == 'POST':
+        job = Jobs.objects.get(jobid= request.POST['jobid'])
+        job.status = 7
+        job.save()
+        return JsonResponse({'info':'Candidates Provided Marked'})
+    
 def logout(request, pk):
-    employer=Login.objects.get(log_id=Employer.objects.get(eid=pk).log_id.log_id)
-    employer.status=0
-    employer.save()
+    admin=Login.objects.get(log_id=Admin.objects.get(aid=pk).log_id.log_id)
+    admin.status=0
+    admin.save()
     request.session.flush()
     return redirect('main:index')

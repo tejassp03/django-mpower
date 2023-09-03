@@ -4,6 +4,16 @@
 
 {% block title %}
 <title>mpower - Company dashboard - New job offer</title>
+<style>
+    .invalid-field {
+        border: 1px solid red;
+    }
+
+    .invalid-label:after {
+        content: " *";
+        color: red;
+    }
+</style>
 {% endblock %}
 {% block content %}
 
@@ -18,12 +28,12 @@
             <div class="col-xxl-6">
                 <div class="mb-3">
                     <label for="pxp-company-job-title" class="form-label">Job title</label>
-                    <input type="text" id="pxp-company-job-title" class="form-control" placeholder="Add title" name="title" reqiured>
+                    <input type="text" id="pxp-company-job-title" class="form-control" placeholder="Add title" name="title" required minlength="5" maxlength="100">
                 </div>
             </div>
             <div class="col-md-6 col-xxl-3">
                 <label for="pxp-company-job-location" class="form-label">Location</label>
-                <input type="text" id="pxp-company-job-location" class="form-control" placeholder="E.g. San Francisco, CA" name="location" required>
+                <input type="text" id="pxp-company-job-location" class="form-control" placeholder="E.g. San Francisco, CA" name="location" required minlength="5" maxlength="200">
             </div>
             <div class="col-md-6 col-xxl-3">
                 <div class="mb-3">
@@ -39,29 +49,29 @@
 
         <div class="mb-3">
             <label for="pxp-company-job-description" class="form-label">Job description</label>
-            <textarea class="form-control" id="pxp-company-job-description" placeholder="Type the description here..." name="description" minlength=150></textarea>
+            <textarea class="form-control" id="pxp-company-job-description" placeholder="Type the description here..." name="description" minlength=150 required maxlength="700"></textarea>
         </div>
 
         <div class="mb-3">
-            <label for="pxp-company-job-description" class="form-label">Skills</label>
-            <textarea class="form-control" id="pxp-company-job-description" placeholder="Type the skills here..." name="skills" minlength=50></textarea>
+            <label for="pxp-company-job-skills" class="form-label">Skills</label>
+            <textarea class="form-control" id="pxp-company-job-skills" placeholder="Type the skills here..." name="skills" minlength=50 required maxlength="700"></textarea>
         </div>
         
         <div class="mb-3">
-            <label for="pxp-company-job-description" class="form-label">Responsibilities</label>
-            <textarea class="form-control" id="pxp-company-job-description" placeholder="Type the responsibilities here..." name="responsibilities" minlength=150></textarea>
+            <label for="pxp-company-job-Responsibilities" class="form-label">Responsibilities</label>
+            <textarea class="form-control" id="pxp-company-job-Responsibilities" placeholder="Type the responsibilities here..." name="responsibilities" minlength=150 required maxlength="700"></textarea>
         </div>
 
         <div class="mb-3">
-            <label for="pxp-company-job-description" class="form-label">Requirements</label>
-            <textarea class="form-control" id="pxp-company-job-description" placeholder="Type the requirements here..." name="requirements" minlength=150></textarea>
+            <label for="pxp-company-job-Requirements" class="form-label">Requirements</label>
+            <textarea class="form-control" id="pxp-company-job-Requirements" placeholder="Type the requirements here..." name="requirements" minlength=150 required maxlength="700"></textarea>
         </div>
 
         <div class="row">
             <div class="col-md-6 col-xxl-3">
                 <div class="mb-3">
                     <label for="pxp-company-job-experience" class="form-label">Experience</label>
-                    <input type="text" id="pxp-company-job-experience" class="form-control" placeholder="E.g. Minimum 3 years" name="experience">
+                    <input type="text" id="pxp-company-job-experience" class="form-control" placeholder="E.g. Minimum 3 years" name="experience" required minlength="1" maxlength="100">
                 </div>
             </div>
             <div class="col-md-6 col-xxl-3">
@@ -102,16 +112,73 @@
                     </select>
                 </div>
             </div>
+            <div class="col-md-6 col-xxl-3">
+                <div class="mb-3">
+                    <label for="pxp-company-job-salary" title = "Request candidates also from mpower admin"class="form-label">Request candidates</label>
+                    <select id="pxp-company-job-salary" class="form-select" name="reqCand">
+                        <option value="1">No</option>
+                        <option value="2">Yes</option>
+                    </select>
+                </div>
+            </div>
         </div>
 
         <div class="mt-4 mt-lg-5">
-            <button class="btn rounded-pill pxp-section-cta">Publish Job</button>
+            <button class="btn rounded-pill pxp-section-cta" id="submit-button">Publish Job</button>
             {% comment %} <button class="btn rounded-pill pxp-section-cta-o ms-3">Save Draft</button> {% endcomment %}
         </div>
     </form>
 </div>
 
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const form = document.getElementById("job-offer-form");
+        const submitButton = document.getElementById("submit-button");
+    
+        submitButton.addEventListener("click", function (event) {
+            let firstInvalidField = null;
 
+            const fieldsToValidate = [
+                document.getElementById("pxp-company-job-title"),
+                document.getElementById("pxp-company-job-location"),
+                document.getElementById("pxp-company-job-description"),
+                document.getElementById("pxp-company-job-skills"),
+                document.getElementById("pxp-company-job-Responsibilities"),
+                document.getElementById("pxp-company-job-Requirements"),
+                document.getElementById("pxp-company-job-experience"),
+            ];
+            let isValid = true;
+            fieldsToValidate.forEach(function (field) {
+                const minimumWordCount = parseInt(field.getAttribute("minlength"));
+                const maximumWordCount = parseInt(field.getAttribute("maxlength"));
+                const fieldValue = field.value.trim();
+                const wordCount = fieldValue.length;
+                if (wordCount < minimumWordCount || wordCount > maximumWordCount) {
+                    field.classList.add("is-invalid"); 
+                    field.style.borderColor = "red";
+                    isValid = false;
+                    if (!firstInvalidField) {
+                    firstInvalidField = field;
+                    }
+                } else {
+                    field.classList.remove("is-invalid"); 
+                    field.style.borderColor = "";
+                }
+                
+            });
+    
+            if (!isValid) {
+                event.preventDefault(); 
+                if (firstInvalidField) {
+                    firstInvalidField.scrollIntoView({
+                    behavior: "smooth",
+                    block: "start",
+                });
+            }
+            }
+        });
+    });
+    </script>
 {% endblock content%}
 
 {% block script %}

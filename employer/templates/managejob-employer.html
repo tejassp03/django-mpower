@@ -4,6 +4,8 @@
 
 {% block title %}
 <title>mpower - Company dashboard - Manage jobs</title>
+<!-- <script src="https://kit.fontawesome.com/89f2006c37.js" crossorigin="anonymous"></script> -->
+
 {% endblock %}
 {% block content %}
 
@@ -73,6 +75,13 @@
                                     <li><button onclick="loadermodal('{{i.jobid}}')" data-bs-target="#pxp-job-modal" data-bs-toggle="modal" title="Preview"><span class="fa fa-eye"></span></button></li>
                                     <input style="display: none" value={{i.jobid}}>
                                     <li><button title="Delete" onclick="delfav({{i.jobid}})"><span class="fa fa-trash-o"></span></button></li>
+                                    {% if i.status == 5 %}
+                                    <li><button title="Suggestions Pending" ><span class="fa fa-users" style="color:orange;"></span></button></li>
+                                    {% elif i.status == 4 %}
+                                    <li><button title="Suggestions Provided" onclick="redirectToJobPage('{{i.jobid}}')"><span class="fa fa-users" style="color:green"></span></button></li>
+                                    {% else %}
+                                    <li><button title="Get Suggestions" onclick="suggest('{{i.jobid}}')"><span class="fa fa-users" ></span></button></li>
+                                    {% endif %}
                                 </ul>
                             </div>
                         </td>
@@ -308,6 +317,34 @@ $("[name='chek']").change(function(){
         $("[name=all]").prop('checked', false);
     }
 })
+function suggest(id){
+    console.log(id);
+    $.ajax({
+        type:"POST",
+        url:"{% url 'employer:suggest' pk %}",
+        data:{
+            'jobid': id,
+            csrfmiddlewaretoken: '{{ csrf_token }}'
+        },
+        success: function( data ) 
+        {
+            console.log(data);
+            //let datamessage=JSON.parse(data['message']);
+            //console.log(data.message);
+            //alert(data.message);
+            location.reload()
+        }
+    })
+    setTimeout(function() {
+        location.reload();
+    }, 100);
+}
+function redirectToJobPage(id) {
+    if(id){
+        var url = '{% url "employer:cand_suggest" pk%}?job_id=' + id;
+        window.location.href = url;
+    }
+}
 function delfav(id)
 {
     $.ajax(

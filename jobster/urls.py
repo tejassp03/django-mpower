@@ -24,4 +24,4 @@ urlpatterns = [
     path('candidate/<int:pk>/', include('candidate.urls', namespace= 'candidate')),
     path('employer/<int:pk>/', include('employer.urls', namespace= 'employer')),
     path('mpoweradmin/<int:pk>/', include('mpoweradmin.urls', namespace= 'mpoweradmin'))
- ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+ ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

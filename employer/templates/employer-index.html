@@ -12,11 +12,11 @@
         <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600;700&display=swap" rel="stylesheet">
         <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
         <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.3.0/css/datepicker.css" rel="stylesheet" type="text/css" />
-
         <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
-        <link href="https://raw.githack.com/ttskch/select2-bootstrap4-theme/master/dist/select2-bootstrap4.css" rel="stylesheet"> <!-- for live demo page -->
+        <link href="https://raw.githack.com/ttskch/select2-bootstrap4-theme/master/dist/select2-bootstrap4.css" rel="stylesheet"> 
         <link href="select2-bootstrap4.css" rel="stylesheet"> 
-        
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.9/dist/flatpickr.min.css">
+
         <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
         <link rel="stylesheet" href="{% static 'css/font-awesome.min.css' %}">
         <link rel="stylesheet" href="{% static 'css/owl.carousel.min.css' %}">
@@ -54,9 +54,9 @@
                     <li id="cedi"><a href="{% url 'employer:cedit' pk=pk %}"><span class="fa fa-pencil"></span>Edit Profile</a></li>
                     <li id="cnew"><a href="{% url 'employer:newjob' pk=pk %}"><span class="fa fa-file-text-o"></span>New Job Offer</a></li>
                     <li id="cman"><a href="{% url 'employer:manage' pk=pk %}"><span class="fa fa-briefcase"></span>Manage Jobs</a></li>
-                    <li id="ccan"><a href="{% url 'employer:candidates' pk=pk %}"><span class="fa fa-user-circle-o"></span>Candidates</a></li>
+                    <li id="ccan"><a href="{% url 'employer:candidates' pk=pk %}"><span class="fa fa-user-circle-o"></span>Applications</a></li>
                     <li id="csub"><a href="{% url 'employer:subscriptions' pk=pk %}"><span class="fa fa-credit-card"></span>Subscriptions</a></li>
-                    <li id="ccha"><a href="{% url 'employer:change_pass' pk=pk %}"><span class="fa fa-lock"></span>Change Password</a></li>
+                    <!--<li id="ccha"><a href="{% url 'employer:change_pass' pk=pk %}"><span class="fa fa-lock"></span>Change Password</a></li>-->
                     <li id="qui"><a href="{% url 'employer:show_tests' pk=pk %}"><span class="fa fa-question"></span>Create Test</a></li>
                     <li id="inr"><a href="{% url 'employer:all_interviews' pk=pk %}"><span class="fa fa-user"></span>Interviews</a></li>
                 </ul>
@@ -85,8 +85,8 @@
                 <ul class="list-unstyled">
                     <li id="scn">
                         {% comment %} <a href="candidate-dashboard-notifications.html" class="d-flex justify-content-between align-items-center"> {% endcomment %}
-                            <a href="{% url 'employer:cand_suggest' pk=pk %}" class="d-flex justify-content-between align-items-center">
-                            <div><span class="fa fa-file-o"><i class="fa-light fa-lightbulb"></i></span>Suggestions</div>
+                            {% comment %}<a href="{% url 'employer:cand_suggest' pk=pk %}" class="d-flex justify-content-between align-items-center">
+                            <div><span class="fa fa-file-o"><i class="fa-light fa-lightbulb"></i></span>Suggestions</div>{% endcomment %}
                         </a>
                     </li>
                     <li id="pen">
@@ -444,7 +444,8 @@
                     <div class="modal-header" style="padding: 10px">
                         <input type="text" style="display: none" name="user_id_val" />
                         <input type="text" class="form-control" placeholder="Paste interview link" name="intlink" />
-                        <input type="datetime-local" name="interviewDate" id="" class="form-control">
+                        <!--<input type="datetime-local" name="interviewDate" id="" class="form-control">-->
+                        <input type="text" id="datetimeInput" class="form-control">
                         <a class="btn rounded-pill pxp-nav-btn" onclick="sched()">Schedule</a>
                     </div>
                     <div class="modal-header" id="spanadder">
@@ -466,13 +467,15 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.3.0/js/bootstrap-datepicker.js"></script>
         
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.9/dist/flatpickr.min.js"></script>
+    
         <script>
             $(document).ready(function () {
                 $(".profileimage").each(function(i, el) {
                     el.innerHTML = '{{request.session.name}}'[0]
                 })
             })
+            var applyIdForInterview;
 
             setInterval(getCount, 10000);
             function getCount()
@@ -766,15 +769,18 @@
                 })
         }
 
-        function resultsmodal(id)
+        function resultsmodal(id,applyid)
         {
             $('[name=checkdate]').css({'z-index': "1600 !important"})
+            applyIdForInterview = applyid;
+            console.log(id+" hello "+applyIdForInterview)
             $.ajax(
                 {
                     type:"GET",
                     url: "{% url 'employer:get_results' pk %}",
                     data:{
-                        id: id
+                        id: id,
+                        applyid:applyid
                     },
                     success: function( data ) 
                     {
@@ -805,14 +811,33 @@
                     },
             })
         }
+        var currentDateTime = new Date();
+
+       
+            flatpickr("#datetimeInput", {
+                enableTime: true,
+                minDate: currentDateTime,
+                defaultDate: currentDateTime,
+                dateFormat: "Y-m-d H:i",
+            });
 
         function sched()
         {
             let link=$('[name=intlink]').val();
             let user=$('[name=user_id_val]').val();
-            let int_time=$('[name=interviewDate]').val();
-            console.log(int_time);
-            if (!int_time || int_time.length < 16) { // Adjust the length as needed
+            // let int_time=$('[name=interviewDate]').val();
+            // console.log(int_time);
+            
+
+                var datetimeInput = document.getElementById("datetimeInput").value;
+                var selectedDateTime = new Date(datetimeInput);
+
+                var formattedDate = selectedDateTime.toISOString().split('T')[0];
+                var formattedTime = selectedDateTime.toISOString().split('T')[1].substring(0, 5);
+                var int_time = formattedDate + "T" + formattedTime;
+                // console.log(formattedDateTime);
+            // console.log(int_time);
+            if (!int_time || int_time.length < 16) { 
                 alert("Please enter a valid full datetime.");
             }
             if(link=="")
@@ -828,6 +853,7 @@
                         user_id: user,
                         int_link: link,
                         date_time: int_time,
+                        apply_id:applyIdForInterview,
                         csrfmiddlewaretoken: '{{ csrf_token }}'
                     },
                     success: function( data ) 
@@ -861,6 +887,7 @@
                             span.setAttribute('style', 'padding: 10px; background: red; color: white; border-radius: 0rem 0rem 1rem 1rem;');
                         }
                         span.append(span2);
+                        location.reload();
                         
                     },
             })
