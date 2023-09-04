@@ -95,6 +95,7 @@ def dashboard(request, pk):
         com = Employer.objects.get(eid=job.eid.eid)
         singappli['ename'] = com.ename
         singappli['logo'] = com.logo
+        
         all_applics.append(singappli)
 
     visits = ProfileVisits.objects.filter(user_type="c", user_id=pk)
@@ -209,7 +210,8 @@ def dashboard(request, pk):
     charts_context['vdates365'] = dumps(
         [item[0] for item in visits_365], default=str)
     charts_context['vcount_365'] = dumps(countsv[4])
-    return render(request, 'dashboard-candidate.html', {'user': context, 'applications': all_applics, 'pk': pk, 'profile': profile, 'notifics': all_notis, 'messcount': countunmess, 'charts': charts_context, 'recent': recent_mess_temp, 'pending': popupmess})
+    appli = Application.objects.filter(user_id_id = pk)
+    return render(request, 'dashboard-candidate.html', {'user': context, 'applications': all_applics, 'pk': pk, 'profile': profile, 'notifics': all_notis, 'messcount': countunmess, 'charts': charts_context, 'recent': recent_mess_temp, 'pending': popupmess,'appli':appli})
 
 
 def jobapp(request, pk):
@@ -313,10 +315,13 @@ def edit_profile(request, pk):
         request.session['email'] = request.POST['email']
         request.session['name'] = request.POST['name']
         ss_info = JobSeeker.objects.get(user_id=pk)
+        titlerole = RoleDetails.objects.all()
         if (ss_info.photo):
             request.session['photo'] = ss_info.photo.url
         return redirect('candidate:edit', pk=pk)
-    return render(request, 'profile-candidate.html', {'user': context, 'pk': pk, 'log': request.session['email'], 'skills': skills, 'experience': experience, 'education': education})
+    titlerole = RoleDetails.objects.all()
+    skills_ = AllSkills.objects.all()
+    return render(request, 'profile-candidate.html', {'user': context, 'pk': pk, 'log': request.session['email'], 'skills': skills, 'experience': experience, 'education': education,'titlerole':titlerole,'skills_':skills_})
 
 
 def returnvalue(phone):
@@ -656,7 +661,6 @@ def resume(request, pk):
     if jobseek:
         urlval = jobseek[0].Resume.url
     if request.method == "POST":
-        print(request.FILES)
         jobseek[0].Resume.delete()
         filev = request.FILES['resume']
         lst = filev._name.split(".")
@@ -935,9 +939,6 @@ def tests(request, pk):
 
 
 def attempt(request, pk, pk2, pk3):
-    print(pk)
-    print(pk2)
-    print(pk3)
     testinfo = TestInfo.objects.get(test_id=pk2)
     testques = TestQues.objects.filter(testinfoid=testinfo.testinfoid)
     name = testinfo.test_name
@@ -958,12 +959,9 @@ def attempt(request, pk, pk2, pk3):
 
 def submit(request, pk):
     if request.method == "POST":
-        print(request.POST['apply_id'])
         testinfo = TestInfo.objects.get(test_id=request.POST['testid'])
-        print(request.POST['apply_id'])
         usertest = TestUser.objects.get(
             user_id=pk, test_id=request.POST['testid'],emp_id_id = testinfo.eid.eid,apply_id = request.POST['apply_id'])
-        print(request.POST['apply_id'])
         testques = TestQues.objects.filter(testinfoid=testinfo.testinfoid)
         ans = request.POST.getlist('answers[]')
         usertest.total_ques = len(testques)
@@ -1062,11 +1060,8 @@ def job_change(request, pk):
     for ent in doc.ents:
         key.append(ent.label_)
         value.append(ent.text)
-    print("Key:", key)  # Print the value of 'key'
-    print("Value:", value)
     Dict = {key[i]: value[i] for i in range(len(key))}
     SKILLS = Dict["JOB ROLE"].lower().rstrip(",").split(",")
-    print(SKILLS)
     Dict.update(SKILLS=SKILLS)
     text = Dict["JOB ROLE"]
     len_user_list = len(text)
@@ -1076,7 +1071,6 @@ def job_change(request, pk):
     for i in all_jobs:
         if i.skills is not None:
             set2 = set(i.skills.lower().split("\n"))
-            print(set1, " ", set2)
             if set1 & set2:
                 final_jobs.append(i)
 

@@ -80,6 +80,7 @@ def index(request):
                     if ((employer.etype == None or employer.etype == "") and (employer.industry == None or employer.industry == "") and (employer.address == None or employer.address == "") and (employer.pincode == None or employer.pincode == "") and (employer.executive == None or employer.executive == "") and (employer.phone == None or employer.phone == "" or len(employer.phone) <= 4) and (employer.location == None or employer.location == "") and (employer.profile == None or employer.profile == "") and (employer.logo == "" or employer.logo == None)):
                         urlval = "/emp_completion/"+str(user[0].log_id)
                         return JsonResponse({'message': 'Y', 'url': urlval})
+                    
                 else:
                     return JsonResponse({'message': 'X'})
                 request.session['email'] = request.POST['c_email']
@@ -93,9 +94,6 @@ def index(request):
                     request.session['type'] = "c"
                     if (empls.photo):
                         request.session['photo'] = empls.photo.url
-                    
-                    
-                    
                     jobid = request.POST.get('jobid')
                     if jobid:
                         urlval = "/singlejob/"+jobid

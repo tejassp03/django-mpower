@@ -31,9 +31,20 @@
                         <div class="mb-3">
                             <label for="pxp-candidate-title" class="form-label">Title</label>
                             {% if user.title %}
-                                <input type="text" id="pxp-candidate-title" class="form-control" name="title" placeholder="E.g. Web Designer" value="{{ user.title }}">
+                               <!-- <input type="text" id="pxp-candidate-title" class="form-control" name="title" placeholder="E.g. Web Designer" value="{{ user.title }}">-->
+                                <select name="title" id="pxp-candidate-title" selected="{{ user.title }}">
+                                    {% for i in  titlerole %}
+                                       <option value="{{i.role}}">{{i.role}}</option> 
+                                    {% endfor %}
+                                </select>
                             {% else %}
-                                <input type="text" id="pxp-candidate-title" class="form-control" name="title" placeholder="E.g. Web Designer">
+                            <!--<input type="text" id="pxp-candidate-title" class="form-control" name="title" placeholder="E.g. Web Designer">-->
+                                <select name="title" id="pxp-candidate-title" id="pxp-company-job-category" class="form-select notnormal">
+                                    <option value="" disabled selected>~~~Select~~~</option>
+                                    {% for i in  titlerole %}
+                                       <option value="{{i.role}}">{{i.role}}</option>
+                                    {% endfor %} 
+                                </select>
                             {% endif %}
                         </div>
                     </div>
