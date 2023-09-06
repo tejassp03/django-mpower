@@ -30,17 +30,21 @@
                     <div class="col-sm-6">
                         <div class="mb-3">
                             <label for="pxp-candidate-title" class="form-label">Title</label>
-                            {% if user.title %}
+                            {% if user.role %}
                                <!-- <input type="text" id="pxp-candidate-title" class="form-control" name="title" placeholder="E.g. Web Designer" value="{{ user.title }}">-->
-                                <select name="title" id="pxp-candidate-title" selected="{{ user.title }}">
+                                <select name="title" id="pxp-candidate-title"  class="form-select notnormal">
                                     {% for i in  titlerole %}
+                                        {% if i.role == user.role %}
+                                        <option value="{{i.role}}" selected>{{i.role}}</option> 
+                                        {% else %}
                                        <option value="{{i.role}}">{{i.role}}</option> 
+                                       {% endif %}
                                     {% endfor %}
                                 </select>
                             {% else %}
                             <!--<input type="text" id="pxp-candidate-title" class="form-control" name="title" placeholder="E.g. Web Designer">-->
                                 <select name="title" id="pxp-candidate-title" id="pxp-company-job-category" class="form-select notnormal">
-                                    <option value="" disabled selected>~~~Select~~~</option>
+                                    <option value="" disabled selected>Select an option</option>
                                     {% for i in  titlerole %}
                                        <option value="{{i.role}}">{{i.role}}</option>
                                     {% endfor %} 
@@ -103,8 +107,16 @@
                 </ul>
             </div>
             <div class="input-group mb-3">
-                <input type="text" class="form-control" placeholder="Skill" name="skill">
+
+            <select name="skill" id="pxp-candidate-title" id="pxp-company-job-category" class="form-select notnormal">
+                                    <option value="" disabled selected>Select a skill</option>
+                                    {% for i in  skills_ %}
+                                       <option value="{{i.skill}}">{{i.skill}}</option>
+                                    {% endfor %} 
+                                </select>
+                <!--<input type="text" class="form-control" placeholder="Skill" name="skill">-->
                 <button type="submit" class="btn skilladder">Add Skill</button>
+            </div>
         </form>
         </div>
 

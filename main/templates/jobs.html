@@ -21,6 +21,146 @@
     border-color: white;
     background: black
 }
+input::-webkit-calendar-picker-indicator {
+    display: none !important;
+  }
+  {% comment %} ::selection{
+    color: #fff;
+    background: #664AFF;
+  } {% endcomment %}
+  
+  .container{
+    max-width: 450px;
+  }
+  
+  .container .searchInput{
+    background: #fff;
+    width: 100%;
+    border-radius: 5px;
+    position: relative;
+  }
+  
+  .searchInput input{
+    width: 100%;
+    outline: none;
+    border: none;
+    border-radius: 5px;
+    
+    {% comment %} padding: 0 60px 0 20px; {% endcomment %}
+    font-size: 18px;
+  }
+  
+  .searchInput.active input{
+    border-radius: 5px 5px 0 0;
+  }
+  
+  .searchInput .resultBox{
+    padding: 0;
+    opacity: 0;
+    pointer-events: none;
+    max-height: 280px;
+    overflow-y: auto;
+  }
+  
+  .searchInput.active .resultBox{
+    padding: 10px 8px;
+    opacity: 1;
+    pointer-events: auto;
+    position: absolute;
+    background: white;
+  }
+  
+  .resultBox li{
+    list-style: none;
+    padding: 8px 12px;
+    display: none;
+    width: 100%;
+    cursor: default;
+    border-radius: 3px;
+  }
+  
+  .searchInput.active .resultBox li{
+    display: block;
+  }
+  .resultBox li:hover{
+    background: #efefef;
+  }
+  
+  .searchInput .icon{
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    width: 55px;
+    text-align: center;
+    font-size: 20px;
+    color: #644bff;
+    cursor: pointer;
+  }
+
+  .container .searchInput2{
+    background: #fff;
+    width: 100%;
+    border-radius: 5px;
+    
+  }
+  
+  .searchInput2 input{
+    width: 100%;
+    outline: none;
+    border: none;
+    border-radius: 5px;
+   
+    {% comment %} padding: 0 60px 0 20px; {% endcomment %}
+    font-size: 18px;
+  }
+  
+  .searchInput2.active input{
+    border-radius: 5px 5px 0 0;
+  }
+  
+  .searchInput2 .resultBox2{
+    padding: 0;
+    opacity: 0;
+    pointer-events: none;
+    max-height: 280px;
+    overflow-y: auto;
+  }
+  
+  .searchInput2.active .resultBox2{
+    padding: 10px 8px;
+    opacity: 1;
+    pointer-events: auto;
+    position: absolute;
+    background: white;
+  }
+  
+  .resultBox2 li{
+    list-style: none;
+    padding: 8px 12px;
+    display: none;
+    width: 100%;
+    cursor: default;
+    border-radius: 3px;
+  }
+  
+  .searchInput2.active .resultBox2 li{
+    display: block;
+  }
+  .resultBox2 li:hover{
+    background: #efefef;
+  }
+  
+  .searchInput2 .icon{
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    width: 55px;
+    text-align: center;
+    line-height: 55px;
+    font-size: 20px;
+    color: #644bff;
+    cursor: pointer;
+  }
 {% endblock %}
 
 {% block content %}
@@ -35,7 +175,7 @@
                 <div class="col-12 col-lg">
                     <div class="input-group mb-3 mb-lg-0">
                         <span class="input-group-text"><span class="fa fa-search"></span></span>
-                        <select id="select-titles" placeholder="Job titles" class="form-select" name="title">
+                        <!-- <select id="select-titles" placeholder="Job titles" class="form-select" name="title">
                             <option value="all" selected>Job title</option>
                             {% for i in all_titles %}
                                 {% if i.title == context.t %}
@@ -44,13 +184,19 @@
                                     <option value='{{ i.title }}'>{{ i.title }}</option>
                                 {% endif %}
                             {% endfor %}
-                        </select>
+                        </select> -->
+                        <div class="searchInput">
+                            <input type="text" placeholder="Keyword" class="form-select"  name="title" style="background-image: none" id="title">
+                            <div class="resultBox">
+                              <!-- here list are inserted from javascript -->
+                            </div>
+                          </div>
                     </div>
                 </div>
                 <div class="col-12 col-lg pxp-has-left-border">
                     <div class="input-group mb-3 mb-lg-0">
                         <span class="input-group-text"><span class="fa fa-globe"></span></span>
-                        <select id="select-locations" placeholder="Pick a Category..." class="form-select"  name="location">
+                        <!-- <select id="select-locations" placeholder="Pick a Category..." class="form-select"  name="location">
                             <option value="all">All locations</option>
                             {% for i in all_locations %}
                                 {% if i.location == context.l %}
@@ -59,7 +205,15 @@
                                     <option value='{{ i.location }}'>{{ i.location }}</option>
                                 {% endif %}
                             {% endfor %}
-                        </select>
+                        </select> -->
+
+                        
+                        <div class="searchInput2">
+                            <input type="text" placeholder="Location" class="form-select" name="location" style="background-image: none" id="location">
+                            <div class="resultBox2">
+                              <!-- here list are inserted from javascript -->
+                            </div>
+                          </div>
                     </div>
                 </div>
                 <div class="col-12 col-lg pxp-has-left-border">
@@ -95,6 +249,16 @@
                         <a role="button"><span class="fa fa-sliders"></span></a>
                     </div>
                 <form method="GET">
+                    {% if context.t %}
+                    <input type="text" value="{{context.t}}" hidden name="title">
+                    {% endif %}
+                    
+                    {% if context.l %}
+                    <input type="text" value="{{context.l}}" hidden name="location">
+                    {% endif %}
+                    {% if context.c %}
+                    <input type="text" value="{{context.c}}" hidden name="category">
+                    {% endif %}
                     <div class="mt-4 mt-lg-0 d-lg-block pxp-list-side-filter-panel">
                         <h3>Type of Employment</h3>
                         <div class="list-group mt-2 mt-lg-3">
@@ -151,17 +315,17 @@
                                     <span class="d-flex">
                                         <input class="form-check-input me-2 sal" type="checkbox" value={{i.basicpay}} name="sal" checked>
                                         {% if i.basicpay == "1" %}
-                                        $0 - $700
+                                        ₹0 - ₹100000
                                         {% elif i.basicpay == "2" %}
-                                        $700 - $1000
+                                        ₹100000 - ₹300000
                                         {% elif i.basicpay == "3" %}
-                                        $1000 - $1200
+                                        ₹300000 - ₹500000
                                         {% elif i.basicpay == "4" %}
-                                        $1200 - $1400
+                                        ₹500000 - ₹700000
                                         {% elif i.basicpay == "5" %}
-                                        $1500 - $1800
+                                        ₹700000 - ₹1500000
                                         {% elif i.basicpay == "6" %}
-                                        $2000 - $3000
+                                        ₹1500000+
                                         {% endif %}
                                         <input type="submit" style="display: none" class="salbutton">
                                     </span>
@@ -172,17 +336,17 @@
                                     <span class="d-flex">
                                         <input class="form-check-input me-2 sal" type="checkbox" value={{i.basicpay}} name="sal">
                                         {% if i.basicpay == "1" %}
-                                        $0 - $700
+                                        ₹0 - ₹100000
                                         {% elif i.basicpay == "2" %}
-                                        $700 - $1000
+                                        ₹100000 - ₹300000
                                         {% elif i.basicpay == "3" %}
-                                        $1000 - $1200
+                                        ₹300000 - ₹500000
                                         {% elif i.basicpay == "4" %}
-                                        $1200 - $1400
+                                        ₹500000 - ₹700000
                                         {% elif i.basicpay == "5" %}
-                                        $1500 - $1800
+                                        ₹700000 - ₹1500000
                                         {% elif i.basicpay == "6" %}
-                                        $2000 - $3000
+                                        ₹1500000+
                                         {% endif %}
                                         <input type="submit" style="display: none" class="salbutton">
                                     </span>
@@ -302,7 +466,7 @@
                                         <a href="#" class="pxp-jobs-card-3-location">
                                             <span class="fa fa-globe"></span>{{ i.location }}
                                         </a>
-                                        <div class="pxp-jobs-card-3-type">{{ i.experience }}</div>
+                                        <div class="pxp-jobs-card-3-type">{{ i.experience }} Years</div>
                                     </div>
                                 </div>
                                 <div class="col-sm-8 col-xl-6 col-xxl-4 mt-3 mt-xxl-0">
@@ -384,10 +548,160 @@
 </section>
 
 {% include "footer.html" %}
+<script>
+    let suggestions={{ all_titles|safe }};
+    // 
+const searchInput = document.querySelector(".searchInput");
+const input = searchInput.querySelector("input");
+const resultBox = searchInput.querySelector(".resultBox");
+const icon = searchInput.querySelector(".icon");
+let linkTag = searchInput.querySelector("a");
+let webLink;
 
+// if user press any key and release
+input.onkeyup = (e)=>{
+    let userData = e.target.value; //user enetered data
+    let emptyArray = [];
+    if(userData){
+        emptyArray = suggestions.filter((data)=>{
+            //filtering array value and user characters to lowercase and return only those words which are start with user enetered chars
+            return data.toLocaleLowerCase().includes(userData.toLocaleLowerCase()); 
+        });
+        emptyArray = emptyArray.map((data)=>{
+            // passing return data inside li tag
+            return data = '<li>'+ data +'</li>';
+        });
+        searchInput.classList.add("active"); //show autocomplete box
+        showSuggestions(emptyArray);
+        let allList = resultBox.querySelectorAll("li");
+        for (let i = 0; i < allList.length; i++) {
+            //adding onclick attribute in all li tag
+            allList[i].setAttribute("onclick", "select(this)");
+        }
+    }else{
+        searchInput.classList.remove("active"); //hide autocomplete box
+    }
+}
+
+function select(ele)
+{
+    input.value=ele.innerHTML;
+    let userData = ele.innerHTML;
+    let emptyArray = [];
+    if(userData){
+        emptyArray = suggestions.filter((data)=>{
+            //filtering array value and user characters to lowercase and return only those words which are start with user enetered chars
+            return data.toLocaleLowerCase().includes(userData.toLocaleLowerCase()); 
+        });
+        emptyArray = emptyArray.map((data)=>{
+            // passing return data inside li tag
+            return data = '<li>'+ data +'</li>';
+        });
+        searchInput.classList.add("active"); //show autocomplete box
+        showSuggestions(emptyArray);
+        let allList = resultBox.querySelectorAll("li");
+        for (let i = 0; i < allList.length; i++) {
+            //adding onclick attribute in all li tag
+            allList[i].setAttribute("onclick", "select(this)");
+        }
+        $('.resultBox').empty();
+    }else{
+        searchInput.classList.remove("active"); //hide autocomplete box
+    }
+}
+
+function showSuggestions(list) {
+    let listData;
+    if (!list.length) {
+        userValue = input.value;
+        listData = '<div class="suggestion-box"><div class="suggestion">' + userValue + '</div></div>';
+    } else {
+        listData = list.map((data) => {
+            // Create a box-like structure for each suggestion
+            return '<div class="suggestion-box"><div class="suggestion">' + data + '</div></div>';
+        }).join('');
+    }
+    resultBox.innerHTML = listData;
+}
+
+
+
+let suggestions2={{ all_locations|safe }};
+// 
+const searchInput2 = document.querySelector(".searchInput2");
+const input2 = searchInput2.querySelector("input");
+const resultBox2 = searchInput2.querySelector(".resultBox2");
+const icon2 = searchInput2.querySelector(".icon");
+let linkTag2 = searchInput2.querySelector("a");
+let webLink2;
+
+// if user press any key and release
+input2.onkeyup = (e)=>{
+    let userData = e.target.value; //user enetered data
+    let emptyArray = [];
+    if(userData){
+        emptyArray = suggestions2.filter((data)=>{
+            //filtering array value and user characters to lowercase and return only those words which are start with user enetered chars
+            return data.toLocaleLowerCase().includes(userData.toLocaleLowerCase()); 
+        });
+        emptyArray = emptyArray.map((data)=>{
+            // passing return data inside li tag
+            return data = '<li>'+ data +'</li>';
+        });
+        searchInput2.classList.add("active");//show autocomplete box
+        showSuggestions2(emptyArray);
+        let allList = resultBox2.querySelectorAll("li");
+        for (let i = 0; i < allList.length; i++) {
+            //adding onclick attribute in all li tag
+            allList[i].setAttribute("onclick", "select2(this)");
+        }
+    }else{
+        searchInput2.classList.remove("active"); //hide autocomplete box
+    }
+}
+
+function select2(ele)
+{
+    input2.value=ele.innerHTML;
+    let userData = ele.innerHTML;
+    let emptyArray = [];
+    if(userData){
+        emptyArray = suggestions2.filter((data)=>{
+            //filtering array value and user characters to lowercase and return only those words which are start with user enetered chars
+            return data.toLocaleLowerCase().includes(userData.toLocaleLowerCase()); 
+        });
+        emptyArray = emptyArray.map((data)=>{
+            // passing return data inside li tag
+            return data = '<li>'+ data +'</li>';
+        });
+        searchInput2.classList.add("active"); //show autocomplete box
+        showSuggestions2(emptyArray);
+        let allList = resultBox2.querySelectorAll("li");
+        for (let i = 0; i < allList.length; i++) {
+            //adding onclick attribute in all li tag
+            allList[i].setAttribute("onclick", "select(this)");
+        }
+        $('.resultBox2').empty();
+    }else{
+        searchInput2.classList.remove("active"); //hide autocomplete box
+    }
+}
+
+function showSuggestions2(list){
+    let listData;
+    if(!list.length){
+        userValue = input2.value;
+        listData = '<li>'+ userValue +'</li>';
+    }else{
+        listData = list.join('');
+    }
+    resultBox2.innerHTML = listData;
+}
+</script>
 {% endblock %}
 
 {% block script %}
+
 const experienceSlider = document.getElementById('experienceSlider');
     const selectedExperience = document.getElementById('selectedExperience');
 

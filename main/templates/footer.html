@@ -19,40 +19,74 @@
                 </div>
                 <div class="col-lg-6 col-xl-7 col-xxl-8">
                     <div class="row">
+                        {% if request.session.type != "e" %}
                         <div class="col-md-6 col-xl-4 col-xxl-3 mb-4">
                             <div class="pxp-footer-section">
                                 <h3>For Candidates</h3>
                                 <ul class="pxp-footer-list">
                                     <li><a href="{% url 'main:jobs' %}">Find Jobs</a></li>
-                                    
-                                    <li><a href="{% url 'main:candidates' %}">Candidate Dashboard</a></li>
-
-                                    <li><a href="#">My Applications</a></li>
-                                    <li><a href="#">Favourite Jobs</a></li>
-                                    <li><a href="#">My inbox</a></li>
+                                    {% if request.session.name%}
+                                    <li><a href="{% url 'candidate:dashboard' request.session.pk %}">Candidate Dashboard</a></li>
+                                    {% else %}
+                                    <li><a href="#" role="button"  data-bs-toggle="modal" data-bs-target="#pxp-signin-modal" >Login</a></li>
+                                    {% endif %}
+                                    {% if request.session.name%}
+                                    <li><a href="{% url 'candidate:applications' request.session.pk %}">My Applications</a></li>
+                                    {% else %}
+                                    <li><a href="#" role="button"  data-bs-toggle="modal" data-bs-target="#pxp-signin-modal" >My Applications</a></li>
+                                    {% endif %}
+                                    {% if request.session.name%}
+                                    <li><a href="{% url 'candidate:favjobs' request.session.pk %}">Favourite Jobs</a></li>
+                                    {% else %}
+                                    <li><a href="#" role="button"  data-bs-toggle="modal" data-bs-target="#pxp-signin-modal" >Favourite Jobs</a></li>
+                                    {% endif %}
+                                    {% if request.session.name%}
+                                    <li><a href="{% url 'candidate:inbox' request.session.pk %}">My inbox</a></li>
+                                    {% else %}
+                                    <li><a href="#" role="button"  data-bs-toggle="modal" data-bs-target="#pxp-signin-modal" >My inbox</a></li>
+                                    {% endif %}
                                 </ul>
                             </div>
                         </div>
+                        {% endif %}
+                        {% if request.session.type != "c" %}
                         <div class="col-md-6 col-xl-4 col-xxl-3 mb-4">
                             <div class="pxp-footer-section">
                                 <h3>For Employers</h3>
                                 <ul class="pxp-footer-list">
-                                    <li><a href="#">Find Candidates</a></li>
-                                    <li><a href="#">Company Dashboard</a></li>
-                                    <li><a href="#">Post a Job</a></li>
-                                    <li><a href="#">Manage Jobs</a></li>
-                                    <li><a href="#">Candidates</a></li>
+                                    <!-- <li><a href="#">Find Candidates</a></li> -->
+                                    {% if request.session.name%}
+                                    <li><a href="{% url 'employer:cdashboard' request.session.pk %}">Employer Dashboard</a></li>
+                                    {% else %}
+                                    <li><a href="#" role="button"  data-bs-toggle="modal" data-bs-target="#pxp-signin-modal" >Login</a></li>
+                                    {% endif %}
+                                    {% if request.session.name%}
+                                    <li><a href="{% url 'employer:newjob' request.session.pk %}">Post a Job</a></li>
+                                    {% else %}
+                                    <li><a href="#" role="button"  data-bs-toggle="modal" data-bs-target="#pxp-signin-modal" >Post a Job</a></li>
+                                    {% endif %}
+                                    {% if request.session.name%}
+                                    <li><a href="{% url 'employer:manage' request.session.pk %}">Manage Jobs</a></li>
+                                    {% else %}
+                                    <li><a href="#" role="button"  data-bs-toggle="modal" data-bs-target="#pxp-signin-modal" >Manage Jobs</a></li>
+                                    {% endif %}
+                                    {% if request.session.name%}
+                                    <li><a href="{% url 'employer:candidates' request.session.pk %}">Candidates</a></li>
+                                    {% else %}
+                                    <li><a href="#" role="button"  data-bs-toggle="modal" data-bs-target="#pxp-signin-modal" >Candidates</a></li>
+                                    {% endif %}
                                 </ul>
                             </div>
                         </div>
+                        {% endif %}
                         <div class="col-md-6 col-xl-4 col-xxl-3 mb-4">
                             <div class="pxp-footer-section">
                                 <h3>About Us</h3>
                                 <ul class="pxp-footer-list">
-                                    <li><a href="#">About Us</a></li>
-                                    <li><a href="#">Pricing</a></li>
-                                    <li><a href="#">Blog</a></li>
-                                    <li><a href="#">Contact Us</a></li>
+                                    <li><a href="{% url 'main:about_us' %}">About Us</a></li>
+                                    <li><a href="{% url 'main:pricing' %}">Pricing</a></li>
+                                    <li><a href="{% url 'main:blog' %}">Blog</a></li>
+                                    <li><a href="{% url 'main:contact_us' %}">Contact Us</a></li>
                                 </ul>
                             </div>
                         </div>
@@ -60,10 +94,14 @@
                             <div class="pxp-footer-section">
                                 <h3>Helpful Resources</h3>
                                 <ul class="pxp-footer-list">
-                                    <li><a href="#">FAQs</a></li>
-                                    <li><a href="#">Sign In</a></li>
-                                    <li><a href="#">Sign Up</a></li>
-                                    <li><a href="#">404 Page</a></li>
+                                    <li><a href="{% url 'main:faqs' %}">FAQs</a></li>
+                                    {% if not request.session.name %}
+                                    <li><a href="{% url 'main:signin' %}">Sign In</a></li>
+
+                                    <li><a href="{% url 'main:signup' %}">Sign Up</a></li>
+
+                                    {% endif %}
+                                    <!-- <li><a href="#">404 Page</a></li> -->
                                 </ul>
                             </div>
                         </div>

@@ -20,7 +20,7 @@ mimetypes.add_type("text/css", ".css", True)
 pymysql.install_as_MySQLdb()
 load_dotenv()
 import nltk
-nltk.download('punkt')
+# nltk.download('punkt')
 import psycopg2
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
