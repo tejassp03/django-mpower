@@ -182,8 +182,7 @@ def index(request):
         title.append(i['title'])
     for i in locations:
         locate.append(i['location'])
-    for key, value in request.session.items():
-        print(f"Key: {key}, Value: {value}")
+    
     return render(request, 'index.html', {'locations': locations, 'titles': titles, 'title': dumps(title), 'vals': vals, 'jobs': jobs_info, 'coms': coms_info, 'loc': locate, 'total': len(jobs)})
 
 
@@ -500,7 +499,6 @@ def findjobs(request):
     locations_ = []
     for i in all_locations:
         locations_.append(i['location'])
-    print(locations_)
     titles_ = []
     for i in all_titles:
         titles_.append(i['title'])
@@ -790,7 +788,6 @@ def pdf_reader(file):
                                       caching=True,
                                       check_extractable=True):
             page_interpreter.process_page(page)
-            print(page)
         text = fake_file_handle.getvalue()
 
     # close open handles
@@ -1040,12 +1037,10 @@ def singlejob(request, pk2):
         if liked_job:
             # If the job exists, remove it from the LikedJobs table
             liked_job.delete()
-            print("deleted")
         else:
             # If the job doesn't exist, add it to the LikedJobs table
             like = LikedJobs(job_id=job_id, user_id=user_id)
             like.save()
-            print("saved")
         return redirect('main:singlejob', pk2=pk2)
     jobdet = Jobs.objects.get(jobid=pk2)
     jobdet.num_of_visits = jobdet.num_of_visits+1
@@ -1373,7 +1368,6 @@ def give_feedback(request, pk):
         int_val.save()
         existing_feedback = Feedback.objects.get(int_id=int_val)
         if existing_feedback:
-            print(existing_feedback)
             existing_feedback.rating = request.POST['rating']
             existing_feedback.emp_feedback = request.POST['feedback']
             existing_feedback.name = request.POST['name']
@@ -1419,17 +1413,12 @@ class MyTokenGenerator(PasswordResetTokenGenerator):
 
 my_token_generator = MyTokenGenerator()
 def token_is_valid(email_encoded,token, timestamp):
-    print(token,timestamp)
     email_ = urlsafe_base64_decode(email_encoded)
-    print(email_encoded)
-    print(type(email_))
-    print(email_.decode('utf-8'))
 
     try:
         email = urlsafe_base64_decode(email_encoded).decode('utf-8')
         
         user = Login.objects.get(email=email)
-        print(email,user)
         if my_token_generator.check_token(user, token):
             timestamp_datetime = timezone.datetime.fromisoformat(timestamp)
             
@@ -1447,20 +1436,17 @@ def password_reset_request(request):
     if request.method == "POST":
         email = request.POST.get('email')
         user = Login.objects.filter(email=email).first()
-        print(email,user)
         if user:
             email_encoded = urlsafe_base64_encode(email.encode())
-            print(email_encoded)
             token = my_token_generator.make_token(user)
             timestamp = timezone.now().isoformat()
             reset_link = reverse('main:password_reset_confirm', args=[email_encoded,token, timestamp])
             subject = 'Password Reset Request'
-            message = f'Click the following link to reset your password: http://localhost:8000{reset_link}'
+            message = f'Click the following link to reset your password: http://ec2-18-183-77-133.ap-northeast-1.compute.amazonaws.com:8000/{reset_link}'
             from_email = 'your_email@example.com'
             recipient_list = [email]
 
             send_mail(subject, message, from_email, recipient_list)
-            print(subject,message,from_email,recipient_list)
             return JsonResponse({'message': 'Password reset link sent successfully'})
         return JsonResponse({'error': 'User with this email does not exist'}, status=400)
     return JsonResponse({'error': 'Invalid request method'}, status=400)
@@ -1473,15 +1459,11 @@ def password_reset_confirm(request,email_encoded, token, timestamp):
 def password_reset(request):
     if request.method == "POST":
         email_encoded = request.POST['email_encoded']
-        print(len(email_encoded))
         email_ = urlsafe_base64_decode(email_encoded).decode('utf-8')
-        print("hello1")
         user = get_object_or_404(Login, email=email_)
-        print("hello2")
 
         if request.POST['fnew'] != request.POST['cnew']:
             return JsonResponse({'message': 'Both your password and your confirmation password must be exactly the same'})
-        print("hello3")
         
         if not re.fullmatch(r'^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$', request.POST['fnew']):
             return JsonResponse({'message': 'Please enter a valid password'})        
