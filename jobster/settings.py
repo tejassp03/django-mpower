@@ -19,9 +19,9 @@ import mimetypes
 mimetypes.add_type("text/css", ".css", True)
 pymysql.install_as_MySQLdb()
 load_dotenv()
-import nltk
+# import nltk
 # nltk.download('punkt')
-import psycopg2
+# import psycopg2
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -36,7 +36,7 @@ SECRET_KEY = 'django-insecure-b7#088%6h$a0*!lm!5^nc#@3b5mp95*lr13-w4b)+9c$-d!#o&
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['.vercel.app','.now.sh']
+ALLOWED_HOSTS = ['*']
 
 CORS_ORIGIN_WHITELIST = [
     'http://localhost:8000'
@@ -95,16 +95,16 @@ WSGI_APPLICATION = 'jobster.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'mpowertest',
-#         'USER': 'root',
-#         'PASSWORD': '',
-#         'HOST': 'localhost',
-#         'PORT': '3306',
-#     }
-# }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'mpower',
+        'USER': 'tejas',
+        'PASSWORD': 'djangompower',
+        'HOST': 'mpower.c4jlkgtzb4pz.ap-northeast-1.rds.amazonaws.com',
+        'PORT': '3306',
+    }
+}
 
 # DATABASES = {
 #     'default': {
@@ -112,16 +112,16 @@ WSGI_APPLICATION = 'jobster.wsgi.application'
 #         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
 #     }
 # }
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'railway',
-        'USER': 'postgres',
-        'PASSWORD': '10hvNZdmtE8kDlBe662t',
-        'HOST': 'containers-us-west-190.railway.app',
-        'PORT': '5781',
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'railway',
+#         'USER': 'postgres',
+#         'PASSWORD': '10hvNZdmtE8kDlBe662t',
+#         'HOST': 'containers-us-west-190.railway.app',
+#         'PORT': '5781',
+#     }
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
