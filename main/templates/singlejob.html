@@ -276,12 +276,12 @@
                     <div class="pxp-single-job-side-panel mt-5 mt-lg-0">
                         <div>
                             <div class="pxp-single-job-side-info-label pxp-text-light">Experience</div>
-                            <div class="pxp-single-job-side-info-data">{{ job_details.experience }}</div>
+                            <div class="pxp-single-job-side-info-data">{{ job_details.experience }} Years</div>
                         </div>
-                        <div class="mt-4">
+                        <!-- <div class="mt-4">
                             <div class="pxp-single-job-side-info-label pxp-text-light">Work Level</div>
                             <div class="pxp-single-job-side-info-data">{{ job_details.careerlevel }}</div>
-                        </div>
+                        </div> -->
                         <div class="mt-4">
                             <div class="pxp-single-job-side-info-label pxp-text-light">Employment Type</div>
                             <div class="pxp-single-job-side-info-data">{{ job_details.jobtype }}</div>
@@ -289,17 +289,17 @@
                         <div class="mt-4">
                             <div class="pxp-single-job-side-info-label pxp-text-light">Salary</div>
                             {% if job_details.basicpay == "1" %}
-                            <div class="pxp-single-job-side-info-data">$0 - $700</div>
+                            <div class="pxp-single-job-side-info-data">₹0 - ₹100000</div>
                             {% elif job_details.basicpay == "2" %}
-                            <div class="pxp-single-job-side-info-data">$700 - $1000</div>
+                            <div class="pxp-single-job-side-info-data">₹100000 - ₹300000</div>
                             {% elif job_details.basicpay == "3" %}
-                            <div class="pxp-single-job-side-info-data">$1000 - $1200</div>
+                            <div class="pxp-single-job-side-info-data">₹300000 - ₹500000</div>
                             {% elif job_details.basicpay == "4" %}
-                            <div class="pxp-single-job-side-info-data">$1200 - $1400</div>
+                            <div class="pxp-single-job-side-info-data">₹500000 - ₹700000</div>
                             {% elif job_details.basicpay == "5" %}
-                            <div class="pxp-single-job-side-info-data">$1500 - $1800</div>
+                            <div class="pxp-single-job-side-info-data">₹700000 - ₹1500000</div>
                             {% elif job_details.basicpay == "6" %}
-                            <div class="pxp-single-job-side-info-data">$2000 - $3000</div>
+                            <div class="pxp-single-job-side-info-data">₹1500000+</div>
                             {% endif %}
                         </div>
                     </div>

@@ -29,6 +29,14 @@
         {% block style%}
         {% endblock %}
         </style>
+        <style>
+            .custom-center {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+    }
+        </style>
     </head>
     <body>
 
@@ -83,8 +91,9 @@
                             </div>
                             <input type="button" value="Sign in" class="btn rounded-pill pxp-modal-cta signinbut" style="width: 100%">
                             <div class="mt-4 text-center pxp-modal-small">
-                                <a href="#" class="pxp-modal-link">Forgot password</a>
+                                <a href="#" class="pxp-modal-link" id="forgotPasswordLink">Forgot password</a>
                             </div>
+
                             <div class="mt-4 text-center pxp-modal-small">
                                 New to mpower? <a role="button" class="" data-bs-target="#pxp-signup-modal" data-bs-toggle="modal" data-bs-dismiss="modal">Create an account</a>
                             </div>
@@ -162,6 +171,27 @@
                 </div>
             </div>
         </div>
+
+        <div class="modal fade pxp-user-modal" id="forgotPasswordModal" aria-hidden="true" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered ">
+                <div class="modal-content ">
+                    <!--<div class="modal-header">
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>-->
+                    <div class="modal-body text-center">
+                        <h5 class="modal-title mt-4">Forgot Password</h5>
+                            {% csrf_token %}
+                            <div class="form-floating mb-3">
+                                <input type="email" class="form-control" name="email" id="forgotPasswordEmail" placeholder="Email address">
+                                <label for="forgotPasswordEmail">Email address</label>
+                            </div>
+                            <button type="submit" class="btn rounded-pill pxp-modal-cta" style="display: block; margin: 0 auto; margin-bottom: 10px;" onclick="forgotPassword()" >Reset Password</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
 
         <div class="modal fade pxp-user-modal" id="pxp-signup-modal" aria-hidden="true" aria-labelledby="signupModal" tabindex="-1">
             <div class="modal-dialog modal-dialog-centered">
@@ -286,7 +316,11 @@
         <script src="{% static 'js/main.js' %}"></script>
         <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.17.1/moment.min.js"></script>
         <script>
+
             var jobid;
+            
+            
+
             $(document).ready(function () {
                 $('.cancelshow').click(function(){
                     $('.pxp-list-side-filter-panel').slideToggle();
@@ -448,6 +482,18 @@
             $('#signer').css({'display': 'none'})
             $('#signer2').css({'display': 'none'})
         }
+        
+        document.getElementById('forgotPasswordLink').addEventListener('click', function () {
+                $('#pxp-signin-modal').modal('hide');
+                $('#forgotPasswordModal').modal('show');
+        });
+
+        $('#forgotPasswordModal').on('hidden.bs.modal', function () {
+            // Clear the form when the modal is hidden
+            document.getElementById('forgotPasswordForm').reset();
+        });
+
+
         $('#pxp-signin-modal').on('keypress', function (event) {
             var keycode = (event.keyCode ? event.keyCode : event.which);
             if(keycode == '13'){
@@ -494,6 +540,30 @@
                         location.reload();
                     }
                 })
+        }
+        function forgotPassword()
+        {
+                    var email = $("#forgotPasswordEmail").val();
+                    var csrfToken = $("input[name=csrfmiddlewaretoken]").val();
+
+                    var formData = {
+                        email: email,
+                        csrfmiddlewaretoken: csrfToken
+                    };
+
+                    $.ajax({
+                        type: "POST",
+                        url: "{% url 'main:password_reset_request' %}",
+                        data: formData,
+                        success: function(response) {
+                            console.log(response);
+                            alert("Password reset link sent successfully");
+                        },
+                        error: function(xhr, textStatus, errorThrown) {
+                            console.error(xhr.responseText);
+                            alert("Error: " + xhr.responseText);
+                        }
+                    });
         }
 
         {% block script %}

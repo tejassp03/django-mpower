@@ -161,7 +161,7 @@
                         <div class="container">
                             <div class="form-group">
                                 Basic Education<span style="color: red;">*</span> <select placeholder="Select an Option" name="basic" class="notnormal" required>
-                                <option selected disabled>Select an Option</option>
+                              <!--  <option selected disabled>Select an Option</option>-->
                                 {% for i in educat %}
                                 <option>{{ i.course }}</option>
                                 {% endfor %}
@@ -175,7 +175,7 @@
                         <div class="container">
                             <div class="form-group">
                                 Master Education <select placeholder="Select an Option" name="master" class="notnormal">
-                                    <option disabled>Select an Option</option>
+                                    <option selected disabled>Select an Option</option>
                                 {% for i in educat %}
                                 <option>{{ i.course }}</option>
                                 {% endfor %}

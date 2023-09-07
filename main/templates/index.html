@@ -413,10 +413,11 @@ input::-webkit-calendar-picker-indicator {
                 </a>
             </div> {% endcomment %}
         </div>
-
-        <div class="mt-4 mt-md-5 text-center pxp-animate-in pxp-animate-in-top">
-            <a href="#" class="btn rounded-pill pxp-section-cta">All Categories<span class="fa fa-angle-right"></span></a>
-        </div>
+        {% if jobs.count > 5 %}
+            <div class="mt-4 mt-md-5 text-center pxp-animate-in pxp-animate-in-top">
+                <a href="#" class="btn rounded-pill pxp-section-cta">All Categories<span class="fa fa-angle-right"></span></a>
+            </div>
+        {% endif %}
     </div>
 </section>
 
@@ -652,12 +653,14 @@ input::-webkit-calendar-picker-indicator {
             </div> {% endcomment %}
         </div>
 
-        <div class="mt-4 mt-md-5 text-center pxp-animate-in pxp-animate-in-top">
-            <a href="{% url 'main:jobs' %}" class="btn rounded-pill pxp-section-cta">All Job Offers<span class="fa fa-angle-right"></span></a>
-        </div>
+        {% if jobs.count > 5 %}
+            <div class="mt-4 mt-md-5 text-center pxp-animate-in pxp-animate-in-top">
+                <a href="{% url 'main:jobs' %}" class="btn rounded-pill pxp-section-cta">All Job Offers<span class="fa fa-angle-right"></span></a>
+            </div>
+        {% endif %}
     </div>
 </section>
-
+<!--
 <section class="mt-100">
     <div class="pxp-container">
         <h2 class="pxp-section-h2 text-center">Find Best Companies</h2>
@@ -741,7 +744,7 @@ input::-webkit-calendar-picker-indicator {
         </div>
     </div>
 </section>
-
+-->
 {% comment %} <section class="mt-100">
     <div class="pxp-container">
         <h2 class="pxp-section-h2 text-center">Featured Cities</h2>
@@ -868,7 +871,7 @@ input.onkeyup = (e)=>{
     if(userData){
         emptyArray = suggestions.filter((data)=>{
             //filtering array value and user characters to lowercase and return only those words which are start with user enetered chars
-            return data.toLocaleLowerCase().startsWith(userData.toLocaleLowerCase()); 
+            return data.toLocaleLowerCase().includes(userData.toLocaleLowerCase()); 
         });
         emptyArray = emptyArray.map((data)=>{
             // passing return data inside li tag
@@ -894,7 +897,7 @@ function select(ele)
     if(userData){
         emptyArray = suggestions.filter((data)=>{
             //filtering array value and user characters to lowercase and return only those words which are start with user enetered chars
-            return data.toLocaleLowerCase().startsWith(userData.toLocaleLowerCase()); 
+            return data.toLocaleLowerCase().includes(userData.toLocaleLowerCase()); 
         });
         emptyArray = emptyArray.map((data)=>{
             // passing return data inside li tag
@@ -941,7 +944,7 @@ input2.onkeyup = (e)=>{
     if(userData){
         emptyArray = suggestions2.filter((data)=>{
             //filtering array value and user characters to lowercase and return only those words which are start with user enetered chars
-            return data.toLocaleLowerCase().startsWith(userData.toLocaleLowerCase()); 
+            return data.toLocaleLowerCase().includes(userData.toLocaleLowerCase()); 
         });
         emptyArray = emptyArray.map((data)=>{
             // passing return data inside li tag
@@ -967,7 +970,7 @@ function select2(ele)
     if(userData){
         emptyArray = suggestions2.filter((data)=>{
             //filtering array value and user characters to lowercase and return only those words which are start with user enetered chars
-            return data.toLocaleLowerCase().startsWith(userData.toLocaleLowerCase()); 
+            return data.toLocaleLowerCase().includes(userData.toLocaleLowerCase()); 
         });
         emptyArray = emptyArray.map((data)=>{
             // passing return data inside li tag

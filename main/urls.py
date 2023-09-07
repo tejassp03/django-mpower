@@ -8,6 +8,12 @@ app_name = 'main'
 urlpatterns = [
 	path('', views.index, name ='index'),
 	path('blog/', views.blog, name ='blog'),
+	path('about_us/', views.about_us, name ='about_us'),
+	path('pricing/', views.pricing, name ='pricing'),
+	path('contact_us/', views.contact_us, name ='contact_us'),
+	path('faqs/', views.faqs, name ='faqs'),
+	path('signin/', views.signin, name ='signin'),
+	path('signup/', views.signup, name ='signup'),
 	path('user_login/', views.user_login, name ='user_login'),
 	path('admin_login/', views.admin_login, name ='admin_login'),
 	path('register/', views.register, name ='register'),
@@ -30,7 +36,10 @@ urlpatterns = [
 	path('emp_completion/<int:pk>/get_otp/', views.get_otp, name='eget_otp'),
 	path('emp_completion/<int:pk>/post_otp/', views.verify_otp, name='everify_otp'),
 	path('singlejob/<int:pk2>/', views.singlejob, name='singlejob'),
+	path('password_reset_request/', views.password_reset_request, name='password_reset_request'),
+    path('password_reset_confirm/<str:email_encoded>/<str:token>/<str:timestamp>/', views.password_reset_confirm, name='password_reset_confirm'),
     path('singlecompany/<int:pk2>/', views.singlecompany, name='singlecompany'),
+    path('password_reset/', views.password_reset, name='password_reset'),
     path('mpoweradmin/<int:pk>/', include('mpoweradmin.urls', namespace = 'mpoweradmin')),
 ]
 

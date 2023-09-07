@@ -1,3 +1,5 @@
+{% load static %}
+
 <!doctype html>
 <html lang="en" class="pxp-root">
     <head>
@@ -14,18 +16,34 @@
         <link rel="stylesheet" href="css/owl.theme.default.min.css">
         <link rel="stylesheet" href="css/animate.css">
         <link rel="stylesheet" href="css/style.css">
+        <link rel="shortcut icon" href="{% static 'images/favicon.png' %}" type="image/x-icon">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600;700&display=swap" rel="stylesheet">
+        <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/js/standalone/selectize.min.js" integrity="sha256-+C0A5Ilqmu4QcSPxrlGpaZxJ04VjsRjKu+G82kl5UJk=" crossorigin="anonymous"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/css/selectize.bootstrap3.min.css" integrity="sha256-ze/OEYGcFbPRmvCnrSeKbRTtjG4vGLHXgOqsyLFTRjg=" crossorigin="anonymous" />
+        
+
+        <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+        <link rel="stylesheet" href="{% static 'css/font-awesome.min.css' %}">
+        <link rel="stylesheet" href="{% static 'css/owl.carousel.min.css' %}">
+        <link rel="stylesheet" href="{% static 'css/owl.theme.default.min.css' %}">
+        <link rel="stylesheet" href="{% static 'css/animate.css' %}">
+        <link rel="stylesheet" href="{% static 'css/style.css' %}">
 
         <title>mpower - About us</title>
     </head>
     <body>
-        <div class="pxp-preloader"><span>Loading...</span></div>
+        <!-- <div class="pxp-preloader"><span>Loading...</span></div> -->
 
         <header class="pxp-header fixed-top pxp-no-bg">
             <div class="pxp-container">
                 <div class="pxp-header-container">
                     <div class="pxp-logo-nav-container">
                         <div class="pxp-logo pxp-light">
-                            <a href="index.html" class="pxp-animate">mpower</a>
+                            <a href="{% url 'main:index' %}" class="pxp-animate">mpower</a>
                         </div>
                         <div class="pxp-nav-trigger pxp-light navbar d-xl-none flex-fill">
                             <a role="button" data-bs-toggle="offcanvas" data-bs-target="#pxpMobileNav" aria-controls="pxpMobileNav">
@@ -673,7 +691,7 @@
                 <h2 class="pxp-section-h2 text-center">We want to know more about you</h2>
                 <p class="pxp-text-light text-center">Select your profile</p>
 
-                <div class="row justify-content-evenly mt-4 mt-md-5 pxp-animate-in pxp-animate-in-top">
+                <div class="row justify-content-evenly mt-4 mt-md-5 pxp-animate-in pxp-animate-in-top" style="opacity: 1;">
                     <div class="col-lg-4 col-xl-3 pxp-services-1-item-container">
                         <div class="pxp-services-1-item text-center pxp-animate-icon">
                             <div class="pxp-services-1-item-icon">
@@ -682,7 +700,7 @@
                             <div class="pxp-services-1-item-title">I am a candidate</div>
                             <div class="pxp-services-1-item-text pxp-text-light">You don’t want just any job, you want the right fit. Find it here.</div>
                             <div class="pxp-services-1-item-cta">
-                                <a href="about-us.html">Read more<span class="fa fa-angle-right"></span></a>
+                                <a href="#">Read more<span class="fa fa-angle-right"></span></a>
                             </div>
                         </div>
                     </div>
@@ -694,7 +712,7 @@
                             <div class="pxp-services-1-item-title">I am an employer</div>
                             <div class="pxp-services-1-item-text pxp-text-light">You don’t want just any candidate, you want the right fit.</div>
                             <div class="pxp-services-1-item-cta">
-                                <a href="about-us.html">Read more<span class="fa fa-angle-right"></span></a>
+                                <a href="#">Read more<span class="fa fa-angle-right"></span></a>
                             </div>
                         </div>
                     </div>
@@ -706,7 +724,7 @@
                             <div class="pxp-services-1-item-title">I am a member of the press</div>
                             <div class="pxp-services-1-item-text pxp-text-light">See what is happening at mpower.</div>
                             <div class="pxp-services-1-item-cta">
-                                <a href="about-us.html">Read more<span class="fa fa-angle-right"></span></a>
+                                <a href="#">Read more<span class="fa fa-angle-right"></span></a>
                             </div>
                         </div>
                     </div>
@@ -737,7 +755,7 @@
                         </div>
                     </div>
                     <div class="col-lg-5 col-xxl-6">
-                        <div class="pxp-info-caption pxp-animate-in pxp-animate-in-top mt-4 mt-sm-5 mt-lg-0">
+                        <div class="pxp-info-caption pxp-animate-in pxp-animate-in-top mt-4 mt-sm-5 mt-lg-0" style="opacity: 1;">
                             <h2 class="pxp-section-h2">Millions of jobs.<br>Find the one that suits you.</h2>
                             <p class="pxp-text-light">Search all the open positions on the web. Get your own personalized salary estimate. Read reviews on over 600,000 companies worldwide.</p>
                             <div class="pxp-info-caption-list">
@@ -782,7 +800,7 @@
                     <div class="pxp-testimonials-1-carousel-container">
                         <div class="row justify-content-center align-items-center">
                             <div class="col-10 col-md-6 col-lg-6 col-xl-5 col-xxl-4">
-                                <div class="pxp-testimonials-1-carousel pxp-animate-in pxp-animate-in-top">
+                                <div class="pxp-testimonials-1-carousel pxp-animate-in pxp-animate-in-top" style="opacity: 1;">
                                     <div id="pxpTestimonials1Carousel" class="carousel slide" data-bs-ride="carousel">
                                         <div class="carousel-inner">
                                             <div class="carousel-item text-center active">
@@ -825,9 +843,9 @@
 
                 <div class="row mt-4 mt-md-5 justify-content-center">
                     <div class="col-md-9 col-lg-7 col-xl-6 col-xxl-5">
-                        <div class="pxp-subscribe-1-container pxp-animate-in pxp-animate-in-top">
+                        <div class="pxp-subscribe-1-container pxp-animate-in pxp-animate-in-top" style="opacity: 1;">
                             <div class="pxp-subscribe-1-image">
-                                <img src="" alt="Stay Up to Date">
+                                <img src="{% static 'images/subscribe.png' %}" alt="Stay Up to Date">
                             </div>
                             <div class="pxp-subscribe-1-form">
                                 <form>
@@ -843,7 +861,7 @@
             </div>
         </section>
 
-        <footer class="pxp-main-footer mt-100">
+        <!-- <footer class="pxp-main-footer mt-100">
             <div class="pxp-main-footer-top pt-100 pb-100" style="background-color: var(--pxpMainColorLight);">
                 <div class="pxp-container">
                     <div class="row">
@@ -935,8 +953,8 @@
                     </div>
                 </div>
             </div>
-        </footer>
-
+        </footer> -->
+        {% include "footer.html" %}
         <div class="modal fade pxp-user-modal" id="pxp-signin-modal" aria-hidden="true" aria-labelledby="signinModal" tabindex="-1">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
@@ -1004,10 +1022,12 @@
             </div>
         </div>
 
-        <script src="js/jquery-3.4.1.min.js"></script>
-        <script src="js/bootstrap.bundle.min.js"></script>
-        <script src="js/owl.carousel.min.js"></script>
-        <script src="js/nav.js"></script>
-        <script src="js/main.js"></script>
+        <script src="{% static 'js/jquery-3.4.1.min.js' %}"></script>
+        <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+        <script src="{% static 'js/owl.carousel.min.js' %}"></script>
+        <script src="{% static 'js/nav.js' %}"></script>
+        <script src="{% static 'js/main.js' %}"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.17.1/moment.min.js"></script>
+        
     </body>
 </html>
