@@ -44,10 +44,14 @@ from django.core.files.base import ContentFile
 from django.core.files import File
 from django.core.files.base import ContentFile
 from django.contrib.auth.decorators import login_required
-
+from django.shortcuts import render, redirect
+from django.contrib.auth.models import User
+from django.core.mail import send_mail
+from django.utils import timezone
+from django.urls import reverse
+from django.http import HttpResponse
 # import plotly.express as px
 
-from django.utils import timezone
 from datetime import date, timedelta, datetime
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from itertools import chain
@@ -59,7 +63,12 @@ from json import dumps
 import PyPDF2
 import string
 
-
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+import uuid
 @csrf_exempt
 def index(request):
     if request.method == 'POST':
@@ -80,6 +89,7 @@ def index(request):
                     if ((employer.etype == None or employer.etype == "") and (employer.industry == None or employer.industry == "") and (employer.address == None or employer.address == "") and (employer.pincode == None or employer.pincode == "") and (employer.executive == None or employer.executive == "") and (employer.phone == None or employer.phone == "" or len(employer.phone) <= 4) and (employer.location == None or employer.location == "") and (employer.profile == None or employer.profile == "") and (employer.logo == "" or employer.logo == None)):
                         urlval = "/emp_completion/"+str(user[0].log_id)
                         return JsonResponse({'message': 'Y', 'url': urlval})
+                    
                 else:
                     return JsonResponse({'message': 'X'})
                 request.session['email'] = request.POST['c_email']
@@ -93,9 +103,6 @@ def index(request):
                     request.session['type'] = "c"
                     if (empls.photo):
                         request.session['photo'] = empls.photo.url
-                    
-                    
-                    
                     jobid = request.POST.get('jobid')
                     if jobid:
                         urlval = "/singlejob/"+jobid
@@ -175,6 +182,7 @@ def index(request):
         title.append(i['title'])
     for i in locations:
         locate.append(i['location'])
+    
     return render(request, 'index.html', {'locations': locations, 'titles': titles, 'title': dumps(title), 'vals': vals, 'jobs': jobs_info, 'coms': coms_info, 'loc': locate, 'total': len(jobs)})
 
 
@@ -414,9 +422,10 @@ def findjobs(request):
         jobs = jobs.filter(jobtype__in=request.GET.getlist('emp'))
         emp_sel = request.GET.getlist('emp')
     if 'exp' in request.GET:
-        exp = int(request.GET['exp'])
-        jobs = jobs.filter(experience__lte=exp)
-        exp_sel = exp
+        if int(request.GET['exp']) != 0:
+            exp = int(request.GET['exp'])
+            jobs = jobs.filter(experience__lte=exp)
+            exp_sel = exp
         
     if 'sal' in request.GET:
         jobs = jobs.filter(basicpay__in=request.GET.getlist('sal'))
@@ -487,7 +496,13 @@ def findjobs(request):
                'sel': emp_sel, 'eel': exp_sel, 'els': sal_sel,'wls':wt_sel,'cls':cat_sel,'lcs':loc_sel}
     if exp != 0:
         context['exp'] = exp
-    return render(request, 'jobs.html', {'page_obj': page_obj, 'pe': page_obj, 'count': count, 'locations': locations,'countloc':countloc, 'titles': titles, 'categories': categories, 'GET_params': GET_params, 'jobtype': zip(jobtype, countjob), 'emptype': zip(emptype, countemp), 'saltype': zip(salary, countsal), 'context': context,'all_titles':all_titles,'all_locations':all_locations,'all_cats':all_cat})
+    locations_ = []
+    for i in all_locations:
+        locations_.append(i['location'])
+    titles_ = []
+    for i in all_titles:
+        titles_.append(i['title'])
+    return render(request, 'jobs.html', {'page_obj': page_obj, 'pe': page_obj, 'count': count, 'locations': locations,'countloc':countloc, 'titles': titles, 'categories': categories, 'GET_params': GET_params, 'jobtype': zip(jobtype, countjob), 'emptype': zip(emptype, countemp), 'saltype': zip(salary, countsal), 'context': context,'all_titles':titles_,'all_locations':locations_,'all_cats':all_cat})
 
 
 def profile_completion(request, pk):
@@ -555,6 +570,7 @@ def profile_completion(request, pk):
         matching_job_titles = []
         matching_job_locations = []
         matching_company_names = []
+        jobid_list = []
 
         all_jobs = Jobs.objects.all()
 
@@ -569,6 +585,7 @@ def profile_completion(request, pk):
                     matching_job_titles.append(job.title)
             
                     matching_job_locations.append(job.location)
+                    jobid_list.append(job.jobid)
 
        
 
@@ -582,6 +599,7 @@ def profile_completion(request, pk):
         matching_company_names = matching_company_names[:3]
         matching_job_titles = matching_job_titles[:3]
         matching_job_locations = matching_job_locations[:3]
+        
 
         suggestions_match = True
 
@@ -592,8 +610,9 @@ def profile_completion(request, pk):
         email_subject = "Registration Successfull"
         message = render_to_string('email.html', {
             'name': empls.name,
-            'suggestions' :zip(matching_company_names,matching_job_titles,matching_job_locations),
-            'suggestions_match' :suggestions_match
+            'suggestions' :zip(matching_company_names,matching_job_titles,matching_job_locations,jobid_list),
+            'suggestions_match' :suggestions_match,
+            'cand_id':jobseeker.user_id
         })
         
         
@@ -769,7 +788,6 @@ def pdf_reader(file):
                                       caching=True,
                                       check_extractable=True):
             page_interpreter.process_page(page)
-            print(page)
         text = fake_file_handle.getvalue()
 
     # close open handles
@@ -1019,12 +1037,10 @@ def singlejob(request, pk2):
         if liked_job:
             # If the job exists, remove it from the LikedJobs table
             liked_job.delete()
-            print("deleted")
         else:
             # If the job doesn't exist, add it to the LikedJobs table
             like = LikedJobs(job_id=job_id, user_id=user_id)
             like.save()
-            print("saved")
         return redirect('main:singlejob', pk2=pk2)
     jobdet = Jobs.objects.get(jobid=pk2)
     jobdet.num_of_visits = jobdet.num_of_visits+1
@@ -1352,7 +1368,6 @@ def give_feedback(request, pk):
         int_val.save()
         existing_feedback = Feedback.objects.get(int_id=int_val)
         if existing_feedback:
-            print(existing_feedback)
             existing_feedback.rating = request.POST['rating']
             existing_feedback.emp_feedback = request.POST['feedback']
             existing_feedback.name = request.POST['name']
@@ -1392,3 +1407,85 @@ def give_feed(request, pk):
     if int_val.eid.logo:
         data['logo'] = int_val.eid.logo.url
     return render(request, 'give_feed.html', {'data': data})
+class MyTokenGenerator(PasswordResetTokenGenerator):
+    def _make_hash_value(self, user, timestamp):
+        return f"{user.email}-{timestamp}"
+
+my_token_generator = MyTokenGenerator()
+def token_is_valid(email_encoded,token, timestamp):
+    email_ = urlsafe_base64_decode(email_encoded)
+
+    try:
+        email = urlsafe_base64_decode(email_encoded).decode('utf-8')
+        
+        user = Login.objects.get(email=email)
+        if my_token_generator.check_token(user, token):
+            timestamp_datetime = timezone.datetime.fromisoformat(timestamp)
+            
+            time_difference = timezone.now() - timestamp_datetime
+            
+            if time_difference <= timedelta(minutes=10):
+                return True
+    
+    except (TypeError, ValueError, OverflowError, Login.DoesNotExist):
+        pass
+    
+    return False
+
+def password_reset_request(request):
+    if request.method == "POST":
+        email = request.POST.get('email')
+        user = Login.objects.filter(email=email).first()
+        if user:
+            email_encoded = urlsafe_base64_encode(email.encode())
+            token = my_token_generator.make_token(user)
+            timestamp = timezone.now().isoformat()
+            reset_link = reverse('main:password_reset_confirm', args=[email_encoded,token, timestamp])
+            subject = 'Password Reset Request'
+            message = f'Click the following link to reset your password: http://ec2-18-183-77-133.ap-northeast-1.compute.amazonaws.com:8000/{reset_link}'
+            from_email = 'your_email@example.com'
+            recipient_list = [email]
+
+            send_mail(subject, message, from_email, recipient_list)
+            return JsonResponse({'message': 'Password reset link sent successfully'})
+        return JsonResponse({'error': 'User with this email does not exist'}, status=400)
+    return JsonResponse({'error': 'Invalid request method'}, status=400)
+
+def password_reset_confirm(request,email_encoded, token, timestamp):
+    if not token_is_valid(email_encoded,token, timestamp):
+        return HttpResponse('Invalid or expired password reset link.')
+    return render(request, 'password-reset.html',{'email_encoded':email_encoded})
+
+def password_reset(request):
+    if request.method == "POST":
+        email_encoded = request.POST['email_encoded']
+        email_ = urlsafe_base64_decode(email_encoded).decode('utf-8')
+        user = get_object_or_404(Login, email=email_)
+
+        if request.POST['fnew'] != request.POST['cnew']:
+            return JsonResponse({'message': 'Both your password and your confirmation password must be exactly the same'})
+        
+        if not re.fullmatch(r'^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$', request.POST['fnew']):
+            return JsonResponse({'message': 'Please enter a valid password'})        
+        user.password = make_password(request.POST['fnew'])
+        user.save()
+        request.session['password'] = None
+        return JsonResponse({'message': 'Password changed successfully'})
+
+
+
+
+def about_us(request):
+    return render(request,'about-us.html')
+def pricing(request):
+    return render(request,'pricing.html')
+def contact_us(request):
+    return render(request,'contact-us.html')
+def faqs(request):
+    return render(request,'faqs.html')
+def signup(request):
+    return render(request,'sign-up.html')
+def signin(request):
+    return render(request,'sign-in.html')
+def error_404_view(request, exception):
+    return render(request, '404.html')
