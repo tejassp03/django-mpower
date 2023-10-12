@@ -13,7 +13,8 @@ from django.template import RequestContext
 
 from datetime import date, timedelta, datetime
 import heapq
-
+from django.core.mail import EmailMessage
+from django.conf import settings
 import pyotp
 import base64
 import PyPDF2
@@ -233,7 +234,7 @@ def jobapp(request, pk):
                 break
     quality = 0
     try:
-        pdfFileObj = open("media/"+str(cand.Resume), 'rb')
+        pdfFileObj = open("static/media/"+str(cand.Resume), 'rb')
         pdfReader = PyPDF2.PdfFileReader(pdfFileObj)
     except:
         return JsonResponse({'logo': image, 'info': dumps(list(jobinfo.values()), default=str), 'company': dumps(list(employer.values())), 'emai': dumps(email), 'score': "Please submit resume to check eligibility", 'skills_required': skills_required})
@@ -783,6 +784,10 @@ def notifications(request, pk):
         single_notif['eid'] = com.eid
         single_notif['ename'] = com.ename
         single_notif['log_id'] = com.log_id.log_id
+        if i.job_id:
+            jobs = Jobs.objects.get(jobid=i.job_id.jobid)
+            single_notif['title'] = jobs.title
+            single_notif['jobid'] = jobs.jobid
         nots.append(single_notif)
     count = len(notifs)
     GET_params = request.GET.copy()
@@ -944,6 +949,7 @@ def attempt(request, pk, pk2, pk3):
     name = testinfo.test_name
     test_user = TestUser.objects.get(test_id=testinfo.test_id_id,user_id = pk,emp_id_id = testinfo.eid.eid, apply_id = pk3)
     start_time = test_user.date
+    time_limit = testinfo.time_limit
     all_ques = []
     for i in testques:
         single_ques = {}
@@ -953,8 +959,14 @@ def attempt(request, pk, pk2, pk3):
         single_ques['opt2'] = i.option2
         single_ques['opt3'] = i.option3
         single_ques['opt4'] = i.option4
+        try:
+            if(i.images.url != None):
+                single_ques['image'] = i.images.url
+        except:
+            pass
         all_ques.append(single_ques)
-    return render(request, 'attempt-employer.html', {'pk': pk, 'pk2': pk2, 'pk3':pk3, 'test': all_ques, 'name': name,'start_time':start_time})
+    time_length = (time_limit//len(all_ques))*60
+    return render(request, 'attempt-employer.html', {'pk': pk, 'pk2': pk2, 'pk3':pk3, 'test': all_ques, 'name': name,'start_time':start_time,'time_length':time_length})
 
 
 def submit(request, pk):
@@ -986,6 +998,25 @@ def submit(request, pk):
         notif.save()
     return JsonResponse({'message': "submitted"})
 
+def test_reminder():
+    apps = Application.objects.filter(status=3)
+    for i in apps:
+        email_subject = "Test Pending"
+        message = f"You have a test pending from {i.eid.ename} for {i.job_id.title}."
+        email = EmailMessage(email_subject, message, settings.EMAIL_HOST_USER, [i.user_id.log_id.email])
+        email.fail_silently = True
+        email.send()
+
+def feedback(request,pk):
+    inter = Interview.objects.get(int_id=pk)
+    feed = Feedback.objects.get(int_id = pk)
+    data = {}
+    data['ename'] = inter.eid.ename
+    data['title'] = inter.apply_id.job_id.title
+    data['logo'] = inter.eid.logo.url
+    data['feed'] = feed.emp_feedback
+    data['rating'] = feed.rating
+    return render(request,'feedback.html',{'data':data})
 
 def interviews(request, pk):
     inter = Interview.objects.filter(user_id=pk).order_by('schedule_date')
@@ -1021,7 +1052,7 @@ def interviews(request, pk):
 
 
 def get_interview(request, pk):
-    inter = Interview.objects.get(eid=request.GET['eid'], user_id=pk)
+    inter = Interview.objects.filter(eid=request.GET['eid'], user_id=pk).first()
     data = {}
     data['date'] = inter.schedule_date
     data['link'] = inter.int_link

@@ -50,8 +50,15 @@
                 margin-left: 30px;
                 margin-top: 3%;
             }
-
-
+            .que_image {
+                width: auto;
+                max-width: 100%;
+                height: 13.75rem;
+                background-size: contain;
+                background-repeat: no-repeat;
+                background-position: center;
+            }
+            
             @media all and (max-width: 768px) {
               h1 {
                 font-size: calc(1.5rem * var(--smaller));
@@ -101,7 +108,7 @@
     <div class="info_box">
         <div class="info-title"><span>Some Rules of this Test</span></div>
         <div class="info-list">
-            <div class="info">1. You will have only <span>15 seconds</span> per each question.</div>
+            <div class="info">1. You will have only <span>{{time_length}} seconds</span> per each question.</div>
             <div class="info">2. Once you select your answer, it can't be undone.</div>
             <div class="info">3. You can't select any option once time goes off.</div>
             <div class="info">4. You can't exit from the Test while you're playing.</div>
@@ -117,12 +124,14 @@
             <div class="title">{{ name }}</div>
             <div class="timer">
                 <div class="time_left_txt">Time Left</div>
-                <div class="timer_sec">15</div>
+                <div class="timer_sec">{{time_length}}</div>
             </div>
             <div class="time_line"></div>
         </header>
         <section>
             <div class="que_text">
+            </div>
+            <div class="que_image" >
             </div>
             <div class="option_list">
             </div>
@@ -232,7 +241,9 @@ $(document).ready(function () {
     $('#ins').removeClass('pxp-active');
     $('#jch').removeClass('pxp-active');
 })
+let counterLine;
 
+const timeLength = {{time_length}};
 let quest={{test|safe}};
 let questions=[];
 for(let i=0;i<quest.length;i++)
@@ -245,10 +256,17 @@ for(let i=0;i<quest.length;i++)
     obj['options'].push(quest[i].opt2);
     obj['options'].push(quest[i].opt3);
     obj['options'].push(quest[i].opt4);
+    if (quest[i].image !== undefined) {
+        obj['image'] = quest[i].image;
+    }
     obj['answer']=quest[i].opt1;
     questions.push(obj);
 }
+function randomSort() {
+    return 0.5 - Math.random();
+}
 
+questions.sort(randomSort);
 
 const start_btn = document.querySelector(".start_btn button");
 const info_box = document.querySelector(".info_box");
@@ -273,22 +291,21 @@ continue_btn.onclick = ()=>{
     quiz_box.classList.add("activeQuiz");
     showQuetions(0);
     queCounter(1);
-    startTimer(15);
-    startTimerLine(0);
+    startTimer(timeLength);
+    startTimerLine(timeLength);
 }
-let timeValue =  15;
+let timeValue =  timeLength;
 let que_count = 0;
 let que_numb = 1;
 let userScore = 0;
 let counter;
-let counterLine;
 let widthValue = 0;
 const restart_quiz = result_box.querySelector(".buttons .restart");
 const quit_quiz = result_box.querySelector(".buttons .quit");
 restart_quiz.onclick = ()=>{
     quiz_box.classList.add("activeQuiz");
     result_box.classList.remove("activeResult");
-    timeValue = 15; 
+    timeValue = timeLength; 
     que_count = 0;
     que_numb = 1;
     userScore = 0;
@@ -308,6 +325,7 @@ quit_quiz.onclick = ()=>{
 const next_btn = document.querySelector("footer .next_btn");
 const bottom_ques_counter = document.querySelector("footer .total_que");
 next_btn.onclick = ()=>{
+    $('.time_line').css('width', '0px');
     if(que_count < questions.length - 1){ 
         que_count++;
         que_numb++;
@@ -327,6 +345,17 @@ next_btn.onclick = ()=>{
 }
 function showQuetions(index){
     const que_text = document.querySelector(".que_text");
+    const que_image = document.querySelector(".que_image");
+    que_image.style.backgroundImage=null;
+    let imageTag;
+    if (questions[index].image) {
+        que_image.style.height = "13.75rem";
+        const imageUrl = questions[index].image;
+        que_image.style.backgroundImage = `url("${imageUrl}")`;
+    }
+    else{
+        que_image.style.height = "0rem";
+    }
     let que_tag = '<span>'+ questions[index].numb + ". " + questions[index].question +'</span>';
     let option_tag = '<div class="option 1"><span>'+ questions[index].options[0] +'</span></div>'
     + '<div class="option 2"><span>'+ questions[index].options[1] +'</span></div>'
@@ -405,22 +434,34 @@ function startTimer(time){
             {
                 queCounter(currques+1);
                 showQuetions(currques+1);
-                startTimer(15);
-                startTimerLine(0);
+                startTimer(timeLength);
+                startTimerLine(timeLength);
             }
         }
     }
 }
-function startTimerLine(time){
-    counterLine = setInterval(timer, 29);
-    function timer(){
-        time += 1;
-        time_line.style.width = time + "px";
-        if(time > 549){
+function startTimerLine(time_length) {
+    var initialTime = 0; 
+    var widthIncrement = 549 / time_length; 
+
+    var counterLine = setInterval(timer, 100);
+
+    function timer() {
+        if(time_line.style.width == "0px"){
+            initialTime = 0;
+        }
+        initialTime += 0.1; 
+        var time_line_width = initialTime * widthIncrement;
+        
+        time_line.style.width = time_line_width + "px";
+        // console.log(time_line_width + "px");
+
+        if (initialTime >= time_length) {
             clearInterval(counterLine);
         }
     }
 }
+
 function queCounter(index){
     let totalQueCounTag = '<span><p>'+ index +'</p> of <p>'+ questions.length +'</p> Questions</span>';
     bottom_ques_counter.innerHTML = totalQueCounTag;  //adding new span tag inside bottom_ques_counter

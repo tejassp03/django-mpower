@@ -115,6 +115,7 @@ class Jobs(models.Model):
     num_of_visits = models.IntegerField(default=0)
     status = models.IntegerField(default=3)
     suggestions = models.CharField(max_length=2000, default="[]")
+    job_desc = models.FileField(upload_to='job_description/', default=None, null=True)
 
     class Meta:
         db_table = "jobs"
@@ -266,6 +267,8 @@ class TestQues(models.Model):
     option3 = models.CharField(max_length=100, default=None, null=True)
     option4 = models.CharField(max_length=100, default=None, null=True)
     correct = models.IntegerField()
+    images = models.ImageField(upload_to='test_images/', default=None, null=True)
+
 
     class Meta:
         db_table = "testques"

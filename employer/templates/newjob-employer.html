@@ -13,6 +13,57 @@
         content: " *";
         color: red;
     }
+    #pxp-cover-hover {
+    border-radius: 1rem !important;
+    background-color: white;
+    width: 100%;
+    height: 7.3vh !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    cursor: pointer;
+  }
+
+
+  #pxp-cover-hover:hover {
+    border: 1.5px dashed grey;
+  }
+  .popup {
+    /* margin-top: 2rem; */
+    /* margin-bottom: 2rem; */
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    overflow: auto; 
+}
+
+.popup-content {
+    min-width: 900px;
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    max-height: 80%; 
+    overflow-y: auto; 
+}
+
+
+#close-popup {
+    margin-top: 10px;
+}
+.pxp-company-dashboard-job-percent{
+    font-size: 12px;
+    font-weight: 500;
+}
+
 </style>
 {% endblock %}
 {% block content %}
@@ -22,7 +73,7 @@
     <h1>New Job Offer</h1>
     <p class="pxp-text-light">Add a new job to your company's jobs list.</p>
 
-    <form method="post">
+    <form method="post" enctype="multipart/form-data" id="job-offer-form">
         {% csrf_token %}
         <div class="row mt-4 mt-lg-5">
             <div class="col-xxl-6">
@@ -121,6 +172,19 @@
                     </select>
                 </div>
             </div>
+            <div class="col-md-6 col-xxl-3">
+                <div class="mb-3">
+                    <label for="pxp-company-job-match" class="form-label">Match Percentage</label>
+                    <input type="text" id="pxp-company-job-match" class="form-control" placeholder="E.g. 30" name="matchper" required minlength="1" maxlength="100">
+                </div>
+            </div>
+            <div class="col-md-6 col-xxl-3">
+                <div class="mb-3">
+                    <label for="pxp-company-job-salary" title = "Upload Job Description"class="form-label">Job Description</label>
+                    <input type="file" id="pxp-candidate-cover-choose-file2" accept="application/pdf" name="jobDescriptionFile">
+                    <label for="pxp-candidate-cover-choose-file2" id="pxp-cover-hover"class="pxp-cover" ><span>Upload Job Description (size < 2MB)</span></label>
+                </div>
+            </div>
         </div>
 
         <div class="mt-4 mt-lg-5">
@@ -130,9 +194,194 @@
     </form>
 </div>
 
+
+<div id="popup" class="popup">
+    <div class="popup-content" id="popup-content">
+        <div class="d-flex justify-content-end">
+            <button id="close-popup" class="btn btn-secondary" onclick="closePopup()"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <div class="container mt-5">
+            <h5 class="text-primary">Job is posted successfully.</h5>
+            <p class="text-muted">Candidate Suggestions.</p>
+        </div>
+        
+        <div class="modal-body" style="padding: 1rem !important">
+            <div class="pxp-company-dashboard-jobs-bulk-actions" style="margin-left: auto" id="modalOutTable">
+                <table class="table table-hover align-middle" id="table">
+                    <thead>
+                        <tr>
+                            {% comment %} <th class="pxp-is-checkbox" style="width: 1%;"><input type="checkbox" onClick="toggle(this)" class="form-check-input" name="all"></th> {% endcomment %}
+                            <th>&nbsp;</th>
+                            <th style="width: 40%;">Name</th>
+                            <th style="width: 30%;">Percentage Score</th>
+                            {% comment %} <th style="width: 20%;">Applied for</th>
+                            <th style="width: 15%;">Status</th>
+                            <th>Date<span class="fa fa-angle-up ms-3"></span></th> {% endcomment %}
+                            <th style="width: 30%;">&nbsp;</th>
+                        </tr>
+                    </thead>
+                    
+                    
+                    <tbody id="tableBody">
+         
+                    </tbody>
+                </table>
+                
+            </div>
+        </div>
+        <div class="spinner-border text-primary" role="status" id="spinner">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div>
+</div>
+
 <script>
     document.addEventListener("DOMContentLoaded", function () {
+        const modal = document.getElementById("pxp-results-modal");
+        const spinner = document.getElementById("spinner");
+        const closeBtn = document.querySelector(".close");
         const form = document.getElementById("job-offer-form");
+        const matchPer = document.getElementById("pxp-company-job-match");
+        
+        form.addEventListener("submit", function (event) {
+            let i = 0;
+            showPopup();
+            event.preventDefault();
+            $.ajax(
+                {
+                    type:"POST",
+                    url: form.action,
+                    data: new FormData(form),
+                    processData: false,
+                    contentType: false,
+                    success: function( data ) 
+                    {
+                        let candidates=JSON.parse(data['candidates']);
+                        var tbody = document.getElementById("tableBody");
+                        // console.log(matchPer.value+" "+candidates[0].score);
+                        if(matchPer.value>candidates[0].score){
+                            
+                            var modalBody = document.getElementById("popup-content");
+
+                            var h4 = document.createElement("h4");
+                            h4.textContent = "No suitable canddiates found above "+matchPer.value+"%";
+                            var h5 = document.createElement("h5");
+                            h5.textContent = "Highest is "+candidates[0].score+"%, lower the match percentage";
+                            var input = document.createElement("input");
+                            input.setAttribute('name','matchPerAgain');
+                            input.setAttribute('id','matchPerAgain');
+                            input.setAttribute('type','text');
+                            input.setAttribute('class','form-control');
+                            input.setAttribute('placeholder','Eg. 30');
+                            var btn = document.createElement("button");
+                            btn.setAttribute('class','btn btn-primary');
+                            let onfunc='matchPerChange('+data['jobid']+')';
+                            btn.setAttribute('onclick',onfunc);
+                            btn.setAttribute('id','matchBtn');
+                            btn.textContent = 'Submit';
+                            modalBody.appendChild(h4);
+                            modalBody.appendChild(h5);
+                            modalBody.appendChild(input);
+                            modalBody.appendChild(btn);
+                        }else{
+                            while (tbody.firstChild) {
+                                tbody.removeChild(tbody.firstChild);
+                            }
+                        for(i=0;i<10;i++){
+                            if(matchPer.value<candidates[i].score){
+                            var newRow = document.createElement("tr");
+                            var cell1 = document.createElement("td");
+                            cell1.setAttribute("width","3%");
+                            var div1a = document.createElement("div");
+                            div1a.setAttribute('class','pxp-company-dashboard-candidate-avatar pxp-cover');
+                            if(candidates[i].photo)
+                            {
+                                let ans='url(/media/'+candidates[i].photo+')';
+                                div1a.style.backgroundImage=ans;
+                                cell1.append(div1a);
+                            }
+                            else
+                            {   
+                                div1a.style.backgroundImage='url({% static '/images/company-logo-1.png' %})';
+                                cell1.append(div1a);
+                            }
+                            newRow.appendChild(cell1);
+
+                            var cell2 = document.createElement("td");
+                            var anc = document.createElement("a");
+                            anc.setAttribute('href','#');
+                            var div2a = document.createElement("div");
+                            div2a.setAttribute('class','pxp-company-dashboard-job-title');
+                            div2a.textContent = candidates[i].name;
+                            anc.appendChild(div2a);
+                            var div2b = document.createElement("div");
+                            div2b.setAttribute('class','pxp-company-dashboard-job-location');
+                            // div2b.setAttribute('style','var(--pxpTextColor)');
+                            div2b.style.color = 'var(--pxpTextColor)';
+
+                            var spa = document.createElement("span");
+                            spa.setAttribute('class','fa fa-globe me-1');
+                            div2b.appendChild(spa);
+                            // div2b.textContent = candidates[i].location;
+                            var locationText = document.createTextNode(candidates[i].location);
+                            div2b.appendChild(locationText);
+                            anc.appendChild(div2b);
+                            cell2.appendChild(anc);
+                            newRow.appendChild(cell2);
+
+
+                            var cell3 = document.createElement("td");
+                            var div3a = document.createElement("div");
+                            div3a.setAttribute('class','pxp-company-dashboard-job-title');
+                            div3a.textContent = candidates[i].score;
+                            cell3.appendChild(div3a);
+                            newRow.appendChild(cell3);
+
+                            var cell4 = document.createElement("td");
+                            var div4a = document.createElement("div");
+                            div4a.setAttribute('class','pxp-dashboard-table-options');
+                            var ul4a = document.createElement("ul");
+                            ul4a.setAttribute('class','list-unstyled');
+                            var li4a = document.createElement("li");
+                            var btn4a = document.createElement("button");
+                            btn4a.setAttribute('title','View profile');
+                            btn4a.setAttribute('id','pxp-candidate-modal-button');
+                            btn4a.setAttribute('data-bs-target','#pxp-candidate-modal');
+                            btn4a.setAttribute('data-bs-toggle','modal');
+                            let uid='candidatemodal('+candidates[i].user_id+')';
+                            btn4a.setAttribute('onclick',uid);
+                            btn4a.setAttribute('data-bs-target','#pxp-candidate-modal');
+                            var spa4a = document.createElement("span");
+                            spa4a.setAttribute('class','fa fa-eye');
+                            btn4a.appendChild(spa4a);
+                            li4a.appendChild(btn4a);
+                            ul4a.appendChild(li4a);
+                            div4a.appendChild(ul4a);
+                            cell4.appendChild(div4a);
+                            newRow.appendChild(cell4);
+
+                            tbody.appendChild(newRow);
+                        }
+     
+                        }}
+                        spinner.style.display = 'none';
+                    }
+                });
+        });
+        function showPopup() {
+            document.getElementById("popup").style.display = "flex";
+        }
+
+        function closePopup() {
+            var manageJobUrl = "{% url 'employer:manage' pk=pk %}";
+            window.location.href = manageJobUrl;
+            document.getElementById("popup").style.display = "none";  
+        }
+        
+
+        document.getElementById("close-popup").addEventListener("click", closePopup);
+        
+        
         const submitButton = document.getElementById("submit-button");
     
         submitButton.addEventListener("click", function (event) {
@@ -182,6 +431,31 @@
 {% endblock content%}
 
 {% block script %}
+function matchPerChange(id){
+    
+    document.getElementById("matchBtn").disabled = true;
+
+    $.ajax(
+    {
+        type:"POST",
+        url: "{% url 'employer:matchPerChange' pk=pk %}",
+        data:{
+            'job_id': id,
+            csrfmiddlewaretoken: '{{ csrf_token }}'
+        },
+        success: function( data ) 
+        {
+            if(data['message'] === 'Success'){
+                var tbody = document.getElementById("tableBody");
+                var h4 = document.createElement("h4");
+                h4.style.color = "green";
+                h4.textContent = "updated successfully";
+                tbody.appendChild(h4);
+            }
+
+        }
+    });
+}
 $(function () {
     $('.notnormal').each(function () {
       $(this).select2({

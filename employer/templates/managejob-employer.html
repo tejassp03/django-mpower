@@ -8,7 +8,15 @@
 
 {% endblock %}
 {% block content %}
+<style>
+    .file-link {
+    white-space: nowrap; 
+    overflow: hidden;    
+    text-overflow: ellipsis; 
+    max-width: 200px;   
 
+  }
+</style>
 
 <div class="pxp-dashboard-content-details">
     <h1>Manage Jobs</h1>
@@ -63,7 +71,7 @@
                         </td>
                         <td><div class="pxp-company-dashboard-job-category">{{ i.fnarea }}</div></td>
                         <td><div class="pxp-company-dashboard-job-type">{{ i.jobtype }}</div></td>
-                        <td><a href="#" class="pxp-company-dashboard-job-applications">{{ i.num }} Candidates</a></td>
+                        <td><a href="{% url 'employer:candidates' pk %}" class="pxp-company-dashboard-job-applications">{{ i.num }} Candidates</a></td>
                         <td>
                             <div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-success">Published</span></div>
                             <div class="pxp-company-dashboard-job-date mt-1">{{ i.postdate }}</div>
@@ -161,7 +169,7 @@
         <div class="modal-content" style="width: 100vw; display: flex; flex-direction: row; align-items: center">
             <div class="modal-body" style="width: 70vw; padding: 15px 15px !important">
                 <div class="pxp-dashboard-content-details" style="margin-right:0px; box-shadow: none; padding: 0px">
-                    <form>
+                    <form enctype="multipart/form-data">
                         <div class="row mt-4 mt-lg-5">
                             <div class="col-xxl-6">
                                 <div class="mb-3">
@@ -177,18 +185,9 @@
                                 <div class="mb-3">
                                     <label for="pxp-company-job-category" class="form-label">Category</label>
                                     <select id="pxp-company-job-category" class="form-select" name="fnarea">
-                                        <option>Select a category</option>
-                                        <option>Marketing & Communication</option>
-                                        <option>Software Engineering</option>
-                                        <option>Project Management</option>
-                                        <option>Finance</option>
-                                        <option>Retail</option>
-                                        <option>Sales</option>
-                                        <option>Manufacturing</option>
-                                        <option>IT</option>
-                                        <option>Business Development</option>
-                                        <option>Human Resources</option>
-                                        <option>Customer Service</option>
+                                        {% for i in roledetails %}
+                                            <option>{{ i.role }}</option>
+                                        {% endfor %}
                                     </select>
                                 </div>
                             </div>
@@ -250,13 +249,26 @@
                                 <div class="mb-3">
                                     <label for="pxp-company-job-salary" class="form-label">Salary range</label>
                                     <select id="pxp-company-job-salary" class="form-select" name="basicpay">
-                                        <option value="1">$0 - $700</option>
-                                        <option value="2">$700 - $1000</option>
-                                        <option value="3">$1000 - $1200</option>
-                                        <option value="4">$1200 - $1400</option>
-                                        <option value="5">$1500 - $1800</option>
-                                        <option value="6">$2000 - $3000</option>
+                                        <option value="1">₹0 - ₹100000</option>
+                                        <option value="2">₹100000 - ₹300000</option>
+                                        <option value="3">₹300000 - ₹500000</option>
+                                        <option value="4">₹500000 - ₹700000</option>
+                                        <option value="5">₹700000 - ₹1500000</option>
+                                        <option value="6">₹1500000+</option>
                                     </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-xxl-3">
+                                <div class="mb-3">
+                                    <label for="pxp-company-job-salary" title = "Upload Job Description"class="form-label job-label">Job Description</label>
+                                    <input type="file" id="pxp-candidate-cover-choose-file2" accept="application/pdf" name="jobDescriptionFile">
+                                    <label for="pxp-candidate-cover-choose-file2" id="pxp-cover-hover"class="pxp-cover" style="height:7.3vh;"><span class="spanJobDesc">Upload Job Description (size < 2MB)</span></label>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-xxl-3">
+                                <div class="mb-3">
+                                    <label for="pxp-company-job-description" title = "Job Description file"class="form-label preview-label">Previous File</label>
+                                    <a href="#" target="_blank"  id="pxp-company-job-description" class="form-control btn btn-primary file-link pxp-cover"></a>
                                 </div>
                             </div>
                         </div>
@@ -337,7 +349,7 @@ function suggest(id){
     })
     setTimeout(function() {
         location.reload();
-    }, 100);
+    }, 500);
 }
 function redirectToJobPage(id) {
     if(id){
@@ -413,50 +425,72 @@ function toggle(source) {
           },
           success: function( data ) 
           {
-              $('[name="jobidm"]').val(JSON.parse(data['info'])[0].jobid);
-              $('[name="title"]').val(JSON.parse(data['info'])[0].title);
-              $('[name="location"]').val(JSON.parse(data['info'])[0].location);
-              $('[name="fnarea"]').val(JSON.parse(data['info'])[0].fnarea);
-              $('[name="description"]').val(JSON.parse(data['info'])[0].jobdesc);
-              $('[name="experience"]').val(JSON.parse(data['info'])[0].experience);
-              $('[name="careerlevel"]').val(JSON.parse(data['info'])[0].careerlevel);
-              $('[name="jobtype"]').val(JSON.parse(data['info'])[0].jobtype);
-              $('[name="basicpay"]').val(JSON.parse(data['info'])[0].basicpay);
-              $('[name="skills"]').val(JSON.parse(data['info'])[0].skills);
-              $('[name="responsibilities"]').val(JSON.parse(data['info'])[0].responsibilities);
-              $('[name="requirements"]').val(JSON.parse(data['info'])[0].requirements);
+            $('.spanJobDesc').text("Upload Job Description (size < 2MB)");
+          $('[name="jobidm"]').val(JSON.parse(data['info'])[0].jobid);
+          $('[name="title"]').val(JSON.parse(data['info'])[0].title);
+          $('[name="location"]').val(JSON.parse(data['info'])[0].location);
+          $('[name="fnarea"]').val(JSON.parse(data['info'])[0].fnarea);
+          $('[name="fnarea"] option[value="' + JSON.parse(data['info'])[0].fnarea + '"]').prop('selected', true);
+          $('[name="description"]').val(JSON.parse(data['info'])[0].jobdesc);
+          $('[name="experience"]').val(JSON.parse(data['info'])[0].experience);
+          $('[name="careerlevel"]').val(JSON.parse(data['info'])[0].careerlevel);
+          $('[name="jobtype"]').val(JSON.parse(data['info'])[0].jobtype);
+          $('[name="basicpay"]').val(JSON.parse(data['info'])[0].basicpay);
+          $('[name="skills"]').val(JSON.parse(data['info'])[0].skills);
+          $('[name="responsibilities"]').val(JSON.parse(data['info'])[0].responsibilities);
+          $('[name="requirements"]').val(JSON.parse(data['info'])[0].requirements);
+          $('.file-link').attr('href', "/media/"+JSON.parse(data['info'])[0].job_desc);
+          if (JSON.parse(data['info'])[0].job_desc !== null) {
+            var filename = JSON.parse(data['info'])[0].job_desc;
+            var file_name = filename.split('/').pop();
+            var final_file_name = file_name.split('_').pop();
+            $('.file-link').show();
+            $('.preview-label').show();
+            $('.file-link').text(final_file_name);
+            $('.spanJobDesc').text(final_file_name);
+            
+            $('.file-link').attr('href', "/media/"+JSON.parse(data['info'])[0].job_desc); 
+          } else {
+            $('.preview-label').hide();
+            $('.file-link').hide();
           }
+          
+
+      }
       })
   }
   
-  function jobmodalsub()
-  {
-      $.ajax(
-      {
-          type:"POST",
-          url: "{% url 'employer:edit_job' pk=pk %}",
-          data:{
-                  jobid: $('[name="jobidm"]').val(),
-                  title: $('[name="title"]').val(),
-                  location: $('[name="location"]').val(),
-                  fnarea: $('[name="fnarea"]').val(),
-                  description: $('[name="description"]').val(),
-                  experience: $('[name="experience"]').val(),
-                  careerlevel: $('[name="careerlevel"]').val(),
-                  jobtype: $('[name="jobtype"]').val(),
-                  basicpay: $('[name="basicpay"]').val(),
-                  skills: $('[name="skills"]').val(),
-                  responsibilities: $('[name="responsibilities"]').val(),
-                  requirements: $('[name="requirements"]').val(),
-                  csrfmiddlewaretoken: '{{ csrf_token }}'
-          },
-          success: function( data ) 
-          {
-             alert("Data updated successfully");
-             window.location.reload()
-          }
-      })
-  }
+  function jobmodalsub() {
+    var formData = new FormData();
+    var jobDescriptionFileInput = $('[name="jobDescriptionFile"]')[0];
+
+    formData.append('jobid', $('[name="jobidm"]').val());
+    formData.append('title', $('[name="title"]').val());
+    formData.append('location', $('[name="location"]').val());
+    formData.append('fnarea', $('[name="fnarea"]').val());
+    formData.append('description', $('[name="description"]').val());
+    formData.append('experience', $('[name="experience"]').val());
+    formData.append('careerlevel', $('[name="careerlevel"]').val());
+    formData.append('jobtype', $('[name="jobtype"]').val());
+    formData.append('basicpay', $('[name="basicpay"]').val());
+    formData.append('skills', $('[name="skills"]').val());
+    formData.append('responsibilities', $('[name="responsibilities"]').val());
+    formData.append('requirements', $('[name="requirements"]').val());
+    formData.append('jobDescriptionFile', jobDescriptionFileInput.files[0]);
+    formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+
+    $.ajax({
+        type: "POST",
+        url: "{% url 'employer:edit_job' pk=pk %}",
+        data: formData,
+        processData: false,  // Don't process the data
+        contentType: false,  // Don't set content type
+        success: function(data) {
+            alert("Data updated successfully");
+            window.location.reload();
+        }
+    });
+}
   
 
 

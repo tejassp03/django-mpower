@@ -68,6 +68,7 @@ input::-webkit-calendar-picker-indicator {
     pointer-events: auto;
     position: absolute;
     background: white;
+    z-index: 1;
   }
   
   .resultBox li{
@@ -132,6 +133,8 @@ input::-webkit-calendar-picker-indicator {
     pointer-events: auto;
     position: absolute;
     background: white;
+    z-index: 1;
+
   }
   
   .resultBox2 li{
@@ -455,6 +458,7 @@ input::-webkit-calendar-picker-indicator {
                                 <div class="col-sm-3 col-md-2 col-lg-3 col-xl-2 col-xxl-auto">
                                     {% if i.logo %}
                                     <a href="#" class="pxp-jobs-card-3-company-logo" style="background-image: url({{i.logo.url}});"></a>
+                                    
                                     {% else %}
                                     <a href="#" class="pxp-jobs-card-3-company-logo" style="background-image: url();"></a>
                                     {% endif %}
@@ -558,28 +562,25 @@ const icon = searchInput.querySelector(".icon");
 let linkTag = searchInput.querySelector("a");
 let webLink;
 
-// if user press any key and release
+
 input.onkeyup = (e)=>{
-    let userData = e.target.value; //user enetered data
+    let userData = e.target.value; 
     let emptyArray = [];
     if(userData){
         emptyArray = suggestions.filter((data)=>{
-            //filtering array value and user characters to lowercase and return only those words which are start with user enetered chars
             return data.toLocaleLowerCase().includes(userData.toLocaleLowerCase()); 
         });
         emptyArray = emptyArray.map((data)=>{
-            // passing return data inside li tag
             return data = '<li>'+ data +'</li>';
         });
-        searchInput.classList.add("active"); //show autocomplete box
+        searchInput.classList.add("active"); 
         showSuggestions(emptyArray);
         let allList = resultBox.querySelectorAll("li");
         for (let i = 0; i < allList.length; i++) {
-            //adding onclick attribute in all li tag
             allList[i].setAttribute("onclick", "select(this)");
         }
     }else{
-        searchInput.classList.remove("active"); //hide autocomplete box
+        searchInput.classList.remove("active"); 
     }
 }
 
@@ -590,23 +591,20 @@ function select(ele)
     let emptyArray = [];
     if(userData){
         emptyArray = suggestions.filter((data)=>{
-            //filtering array value and user characters to lowercase and return only those words which are start with user enetered chars
             return data.toLocaleLowerCase().includes(userData.toLocaleLowerCase()); 
         });
         emptyArray = emptyArray.map((data)=>{
-            // passing return data inside li tag
             return data = '<li>'+ data +'</li>';
         });
-        searchInput.classList.add("active"); //show autocomplete box
+        searchInput.classList.add("active"); 
         showSuggestions(emptyArray);
         let allList = resultBox.querySelectorAll("li");
         for (let i = 0; i < allList.length; i++) {
-            //adding onclick attribute in all li tag
             allList[i].setAttribute("onclick", "select(this)");
         }
         $('.resultBox').empty();
     }else{
-        searchInput.classList.remove("active"); //hide autocomplete box
+        searchInput.classList.remove("active"); 
     }
 }
 
@@ -617,7 +615,6 @@ function showSuggestions(list) {
         listData = '<div class="suggestion-box"><div class="suggestion">' + userValue + '</div></div>';
     } else {
         listData = list.map((data) => {
-            // Create a box-like structure for each suggestion
             return '<div class="suggestion-box"><div class="suggestion">' + data + '</div></div>';
         }).join('');
     }
@@ -635,28 +632,24 @@ const icon2 = searchInput2.querySelector(".icon");
 let linkTag2 = searchInput2.querySelector("a");
 let webLink2;
 
-// if user press any key and release
 input2.onkeyup = (e)=>{
-    let userData = e.target.value; //user enetered data
+    let userData = e.target.value; 
     let emptyArray = [];
     if(userData){
         emptyArray = suggestions2.filter((data)=>{
-            //filtering array value and user characters to lowercase and return only those words which are start with user enetered chars
             return data.toLocaleLowerCase().includes(userData.toLocaleLowerCase()); 
         });
         emptyArray = emptyArray.map((data)=>{
-            // passing return data inside li tag
             return data = '<li>'+ data +'</li>';
         });
-        searchInput2.classList.add("active");//show autocomplete box
+        searchInput2.classList.add("active");
         showSuggestions2(emptyArray);
         let allList = resultBox2.querySelectorAll("li");
         for (let i = 0; i < allList.length; i++) {
-            //adding onclick attribute in all li tag
             allList[i].setAttribute("onclick", "select2(this)");
         }
     }else{
-        searchInput2.classList.remove("active"); //hide autocomplete box
+        searchInput2.classList.remove("active"); 
     }
 }
 
@@ -667,23 +660,20 @@ function select2(ele)
     let emptyArray = [];
     if(userData){
         emptyArray = suggestions2.filter((data)=>{
-            //filtering array value and user characters to lowercase and return only those words which are start with user enetered chars
             return data.toLocaleLowerCase().includes(userData.toLocaleLowerCase()); 
         });
         emptyArray = emptyArray.map((data)=>{
-            // passing return data inside li tag
             return data = '<li>'+ data +'</li>';
         });
-        searchInput2.classList.add("active"); //show autocomplete box
+        searchInput2.classList.add("active"); 
         showSuggestions2(emptyArray);
         let allList = resultBox2.querySelectorAll("li");
         for (let i = 0; i < allList.length; i++) {
-            //adding onclick attribute in all li tag
             allList[i].setAttribute("onclick", "select(this)");
         }
         $('.resultBox2').empty();
     }else{
-        searchInput2.classList.remove("active"); //hide autocomplete box
+        searchInput2.classList.remove("active"); 
     }
 }
 

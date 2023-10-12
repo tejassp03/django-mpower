@@ -4,6 +4,15 @@
 
 {% block title %}
 <title>mpower - Company dashboard - All tests</title>
+<style>
+.progress {
+    height: 10px;
+}
+
+.progress-bar {
+    border-radius: 0;
+}
+</style>
 {% endblock %}
 {% block content %}
 
@@ -82,7 +91,8 @@
                         <td>
                             <div class="pxp-dashboard-table-options">
                                 <ul class="list-unstyled">
-                                    <li><button title="Edit" id="pxp-test-modal-button" data-bs-target="#pxp-test-modal" data-bs-toggle="modal" onclick="testmodal('{{ i.test_id }}')"><span class="fa fa-eye"></span></button></li>
+                                    <li><button title="View" id="pxp-test-modal-button" data-bs-target="#pxp-test-modal" data-bs-toggle="modal" onclick="testmodal('{{ i.test_id }}')"><span class="fa fa-eye"></span></button></li>
+                                    <li><button title="Edit" id="pxp-test-modal-button-edit" data-bs-target="#pxp-edit-modal" data-bs-toggle="modal" onclick="testeditmodal('{{ i.test_id }}')"><span class="fa fa-pencil"></span></button></li>
                                     <input style="display: none" value={{i.test_id}}>
                                     <li><button title="Delete" onclick="deltest({{i.test_id}})"><span class="fa fa-trash-o"></span></button></li>
                                 </ul>
@@ -198,7 +208,269 @@
         </div>
     </div>
 </div>
+<div class="modal fade pxp-user-modal" id="pxp-edit-modal" aria-hidden="true" aria-labelledby="testEditModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered" style="
+    display: flex;
+    align-items: center;
+    justify-content: center;">
+        <div class="modal-content" style="width: 100vw; display: flex; flex-direction: row; align-items: center">
+            <div class="modal-body" style="width: 70vw; padding: 15px 15px !important">
+                <div class="pxp-dashboard-content-details">
+                    <h1>Edit test</h1>
+                    <p class="pxp-text-light">Create a test for a evaluating candidates.</p>
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mt-4 mt-lg-5">
+                            <div class="row justify-content-between align-content-center">
+                                <div class="col-auto order-1 order-sm-2">
+                                    <div class="pxp-company-dashboard-jobs-search mb-3" style="align-items: flex-start; flex-direction: column">
+                                        <div class="pxp-company-dashboard-jobs-search-search-form" style="display: flex; align-items: center">
+                                            <div style="margin-right: 4px; width: 16rem">
+                                                Name: 
+                                            </div>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" placeholder="Enter name" name="name" id="editname" required>
+                                            </div>
+                                        </div>
+                                        <div style="display: flex; align-items: baseline">
+                                        <div class="pxp-company-dashboard-jobs-search-search-form mt-3" style="display: flex; align-items: center">
+                                            <div style="margin-right: 4px; width: 16rem">
+                                                Time limit (minutes): 
+                                            </div>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" placeholder="Enter time" name="timelimit" id="edittime" required>
+                                            </div>
+                                        </div>
+                        
+                                    </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                            </div>
+                        </div>
+                        <hr />
+                        <div id="quiz">
+                            
+                            
+                        </div>
+    
+                        <div class="pxp-company-dashboard-jobs-bulk-actions mb-3 gap-3 mt-3" id="ext" style="align-items: flex-start">
+                        <!--<button class="btn" onclick="addques()" style="padding: 0.5rem">Add Question</button>
+                    <div class="pxp-company-dashboard-jobs-bulk-actions mb-3">
+                        <button class="btn btn-primary" type="submit" style="padding: 0.5rem">Create Test</button>
+                    </div>-->
+                    </div>
+                </form>
+                </div>
+                <div class="progress" style="display: none;" id="progressBarContainer">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated bg-info" id="progressBar" style="width: 0;"></div>
+                </div>
+                <div id="messageContainer" style="display: none;"></div>
+                <button class="btn rounded-pill pxp-subsection-cta" onclick="editTest()" >Edit Test</button>
+            </div>
+        </div>
+    </div>
+</div>
 
+<script>
+    function editTest() {
+    var testName = $('#editname').val();
+    console.log(testName);
+    var timeLimit = $('#edittime').val();
+    var testInfoId = $('#testinfoidforedit').val(); 
+    
+    var questions = [];
+
+    $('.queswithopt').each(function() {
+        var questionElement = $(this);
+        var question = questionElement.find('input[name="desc"]').val();
+        
+        var options = [];
+        questionElement.find('input[name="optdesc"]').each(function() {
+            options.push($(this).val());
+        });
+        var ques_id = questionElement.find('input[name="ques_id"]').val();
+        var correctAnswer = questionElement.find('select[name="correct"]').val();
+
+        var questionData = {
+            ques_id:ques_id,
+            question: question,
+            options: options,
+            correctAnswer: correctAnswer
+        };
+
+        questions.push(questionData);
+    });
+
+    
+    var requestData = {
+        'test_name': testName,
+        'time_limit': timeLimit,
+        'testinfoid': testInfoId,
+        'questions': JSON.stringify(questions),
+        csrfmiddlewaretoken: '{{ csrf_token }}' 
+    };
+    var messageContainer = $("#messageContainer");
+    messageContainer.text("");
+    messageContainer.hide();
+    var progressBar = $("#progressBar");
+    var progressBarContainer = $("#progressBarContainer");
+    progressBarContainer.show();
+    $.ajax(
+        {
+            type:"POST",
+            url: "{% url 'employer:edit_test' pk %}",
+            data:requestData,
+            xhr: function () {
+                        var xhr = new window.XMLHttpRequest();
+                        xhr.upload.addEventListener("progress", function (e) {
+                            if (e.lengthComputable) {
+                                var percentComplete = (e.loaded / e.total) * 100;
+                                progressBar.css("width", percentComplete + "%");
+                            }
+                        }, false);
+                        return xhr;
+            },
+            success: function( data ) 
+            {
+                progressBar.css("width","0%");
+
+                progressBarContainer.hide();
+                messageContainer.text("Test is edited successfully.").show().css("color", "green");
+                console.log(data);
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                messageContainer.text("Try Again").show().css("color", "red");
+                progressBarContainer.hide();
+            }
+    })
+}
+
+function testeditmodal(id)
+{
+    $.ajax(
+    {
+        type:"GET",
+        url: "{% url 'employer:test_info' pk %}",
+        data:{
+                testinfoid: id
+        },
+        success: function( data ) 
+        {
+            $('#messageContainer').val("").hide();
+            let datainfo=JSON.parse(data['test']);
+            $('#editname').val(datainfo[0].test_name);
+            $('#edittime').val(datainfo[0].time_limit);
+            $('#created_date').text(JSON.parse(data['date']))
+            let ques=JSON.parse(data['ques']);
+            $('#ind').remove();
+            let maindiv=document.createElement('div');
+            maindiv.setAttribute('id', 'ind');
+            $('#quiz').empty();
+            let extern=$('#quiz');
+            for(let i=0;i<ques.length;i++)
+            {
+                let inf=ques[i].correct;
+                let maindiv=document.createElement('div');
+                maindiv.setAttribute('class', 'queswithopt');
+
+                let div=document.createElement('div');
+                div.setAttribute('class', 'singlequestion');
+                    let div1=document.createElement('div');
+                        div1.setAttribute('class', 'questondesc');
+                        div1.setAttribute('style', 'display: flex; align-items: baseline');
+                        // div1.style.display = "flex";
+                        // div1.style.align-items = "baseline";
+                        div1.textContent = "Q. " + (parseInt(i, 10) + 1) + " \u00A0";
+
+                        let input = document.createElement('input');
+                        input.setAttribute('type', 'text');
+                        input.setAttribute('class', 'form-control');
+                        input.setAttribute('name', 'desc');
+                        input.setAttribute('required', 'true');
+                        input.value = ques[i].ques_name;
+                    div1.append(input);
+                div.append(div1);
+                maindiv.append(div);
+                let div2=document.createElement('div');
+                    div2.setAttribute('class', 'options');
+                    div2.setAttribute('style', 'display: flex; flex-wrap: wrap; justify-content:space-around;');
+
+                    // div2.style.display = "flex";
+                    // div2.style.flex-wrap = "wrap";
+                    // div2.style.justify-content = "space-around";
+                    for(let j = 1;j<5;j++){
+                    let div3=document.createElement('div');
+                        div3.setAttribute('class', 'questondesc col-5 mt-1');
+                        div3.setAttribute('style', 'display: flex; align-items: baseline');
+
+                        // div3.style.display = "flex";
+                        // div3.style.align-items = "baseline";
+                        let spanElement = document.createElement("span");
+                                spanElement.style.width = "6rem";
+                                spanElement.textContent = "Option "+j+" \u00A0"; 
+                        var inputElement = document.createElement("input");
+                                inputElement.type = "text";
+                                inputElement.className = "form-control";
+                                inputElement.name = "optdesc";
+                                inputElement.placeholder = "Option";
+                                inputElement.setAttribute("required", true);
+                                var optionPropertyName = 'option' + j;
+                                inputElement.value = ques[i][optionPropertyName];
+                                var container = document.getElementById("container");
+                    div3.appendChild(spanElement);
+                    div3.appendChild(inputElement);
+                    div2.append(div3)
+                    // maindiv.append(div3);
+                    }
+                    maindiv.append(div2);
+                
+                let div4=document.createElement('div');
+                    div4.setAttribute('class', 'pxp-company-dashboard-jobs-bulk-actions mb-3 col-5');
+                    let div4a=document.createElement('div');
+                        div4a.textContent = "Answer: \u00A0 \u00A0";
+                    div4.append(div4a);
+                    let select = document.createElement('select');
+                        select.setAttribute('class', 'form-select');
+                        select.setAttribute('name', 'correct');
+                        select.setAttribute('selected', 'correct');
+
+                        var optionValues = ["Option 1", "Option 2", "Option 3", "Option 4"];
+                        for (var j = 0; j < optionValues.length; j++) {
+                            var option = document.createElement("option");
+                            option.value = j + 1;
+                            option.textContent = optionValues[j];
+                            if (option.value === inf) {
+                                option.selected = true;
+                            }
+                            select.appendChild(option);
+                        }
+                        select.value = inf;
+                    div4.append(select);
+                maindiv.append(div4);
+                var hrElement = document.createElement("hr");
+                maindiv.append(hrElement);
+                
+                var quesid = document.createElement("input");
+                quesid.value = ques[i].ques_id;
+                quesid.hidden = true;
+                quesid.setAttribute('name', 'ques_id');
+                quesid.setAttribute('id', 'ques_id');
+                maindiv.append(quesid);
+                extern.append(maindiv)
+            }
+            var testInput = document.createElement("input");
+                testInput.value = datainfo[0].testinfoid;
+                testInput.hidden = true;
+                testInput.setAttribute('name', 'testinfoidforedit');
+                testInput.setAttribute('id', 'testinfoidforedit');
+                maindiv.append(testInput);
+            extern.append(maindiv)
+        }
+    })
+}
+</script>
 {% endblock %}
 
 {% block script %}
@@ -249,7 +521,102 @@ $("[name='chek']").change(function(){
         $("[name=all]").prop('checked', false);
     }
 })
+function addques()
+{
+    let div=document.createElement('div');
+    div.setAttribute('class', 'queswithopt')
+    let quesdiv=document.createElement('div');
+    quesdiv.setAttribute('class', 'singlequestion');
+    let descdiv=document.createElement('div');
+    descdiv.setAttribute('class', 'questondesc');
+    descdiv.setAttribute('style', 'display: flex; align-items: baseline');
+    descdiv.innerHTML='Q. &nbsp;<input type="text" class="form-control" name="desc" placeholder="Question" required/>';
+    quesdiv.append(descdiv);
+    div.append(quesdiv);
+    let optdiv=document.createElement('div');
+    optdiv.setAttribute('class', 'options');
+    optdiv.setAttribute('style', 'display: flex; flex-wrap: wrap; justify-content: space-around');
+    let optdescdiv=document.createElement('div');
+    optdescdiv.setAttribute('class', 'questondesc col-5 mt-1');
+    optdescdiv.setAttribute('style', 'display: flex; align-items: baseline')
+    optdescdiv.innerHTML='<span style="width: 6rem">Option 1. &nbsp;</span><input type="text" class="form-control" name="optdesc" placeholder="Option" required/>';
+    optdiv.append(optdescdiv);
+    let optdescdiv2=document.createElement('div');
+    optdescdiv2.setAttribute('class', 'questondesc col-5 mt-1');
+    optdescdiv2.setAttribute('style', 'display: flex; align-items: baseline')
+    optdescdiv2.innerHTML='<span style="width: 6rem">Option 2. &nbsp;</span><input type="text" class="form-control" name="optdesc" placeholder="Option" required/>';
+    optdiv.append(optdescdiv2);
+    let optdescdiv3=document.createElement('div');
+    optdescdiv3.setAttribute('class', 'questondesc col-5 mt-1');
+    optdescdiv3.setAttribute('style', 'display: flex; align-items: baseline')
+    optdescdiv3.innerHTML='<span style="width: 6rem">Option 3. &nbsp;</span><input type="text" class="form-control" name="optdesc" placeholder="Option" required/>';
+    optdiv.append(optdescdiv3);
+    let optdescdiv4=document.createElement('div');
+    optdescdiv4.setAttribute('class', 'questondesc col-5 mt-1');
+    optdescdiv4.setAttribute('style', 'display: flex; align-items: baseline')
+    optdescdiv4.innerHTML='<span style="width: 6rem">Option 4. &nbsp;</span><input type="text" class="form-control" name="optdesc" placeholder="Option" required/>';
+    optdiv.append(optdescdiv4);
+    div.append(optdiv);
+    let corrans=document.createElement('div');
+    corrans.setAttribute('class', 'pxp-company-dashboard-jobs-bulk-actions mb-3');
+    corrans.setAttribute('style', 'width: 25rem');
+    let textans=document.createElement('div');
+    textans.setAttribute('style', 'width: 13rem');
+    textans.innerHTML="Correct answer:"
+    corrans.append(textans);
+    let select=document.createElement('select');
+    select.setAttribute('class', 'form-select');
+    select.setAttribute('name', 'correct');
+    let option=document.createElement('option');
+    option.setAttribute('value', 1);
+    option.innerHTML="Option 1";
+    select.append(option);
+    let option2=document.createElement('option');
+    option2.setAttribute('value', 2);
+    option2.innerHTML="Option 2";
+    select.append(option2);
+    let option3=document.createElement('option');
+    option3.setAttribute('value', 3);
+    option3.innerHTML="Option 3";
+    select.append(option3);
+    let option4=document.createElement('option');
+    option4.setAttribute('value', 4);
+    option4.innerHTML="Option 4";
+    select.append(option4);
+    corrans.append(select);
+    div.append(corrans);
+    let hr=document.createElement('hr');
+    let maindiv=document.getElementById('quiz');
+    quiz.append(div);
+    let removediv=document.createElement('div');
+    removediv.setAttribute('class', 'pxp-company-dashboard-jobs-bulk-actions mb-3');
+    removediv.setAttribute('id', 'questremove');
+    let delbut=document.createElement('button');
+    delbut.setAttribute('class', 'btn');
+    delbut.setAttribute('onclick', 'removeques()');
+    delbut.setAttribute('style', 'padding: 0.5rem');
+    delbut.innerHTML="Remove Question";
+    removediv.append(delbut);
+    quiz.append(hr);
+    let externdiv=document.getElementById('ext');
+    let allque=document.getElementsByClassName('queswithopt');
+    console.log(allque.length);
+    if(allque.length==2)
+    {
+        externdiv.append(removediv);
+    }
+}
 
+function removeques()
+{
+    let div=document.getElementsByClassName('queswithopt');
+    $('.queswithopt').last().remove();
+    $('#quiz').children().last().remove();
+    if(div.length==1)
+    {
+        $('#questremove').remove();
+    }
+}
 function toggle(source) {
     checkboxes = document.getElementsByName('chek');
     for(var i=0, n=checkboxes.length;i<n;i++) {
@@ -376,6 +743,7 @@ function testmodal(id)
         }
     })
 }
+
 
 
 {% endblock %}

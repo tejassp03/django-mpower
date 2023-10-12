@@ -243,9 +243,10 @@
                                             <option value="a">Select Action</option>
                                             
                                             <option value="b_{{i.user_id}}">View profile</option>
-                                            {% if i.status == 4 %}
+                                            {% if i.status <= 4 %}
                                             <option value="h_{{i.user_id}}_{{i.test_id}}">Schedule Interview</option>
-                                            {% elif i.status == 3 or i.status == 0 %}
+                                            {% endif %}
+                                            {% if i.status == 3 or i.status == 0 %}
                                             <option value="c_{{i.user_id}}_{{i.apply_id}}">Schedule Test</option>
                                             {% elif i.status == 5 %}
                                             <option value="l_{{i.user_id}}_{{i.apply_id}}">Interview Completed</option>
@@ -537,7 +538,7 @@ function candifetch(id)
                     else if(datainfo[i].status==6)
                     {
                         span3.setAttribute('class', 'badge rounded-pill bg-success');
-                        span3.innerHTML='Interview Marked';
+                        span3.innerHTML='Interview Completed';
                     }
                     else if(datainfo[i].status==7)
                     {
@@ -570,7 +571,7 @@ function candifetch(id)
 
                     
                     
-                    if(datainfo[i].status==4)
+                    if(datainfo[i].status<=4)
                     {
                         let interviewli=document.createElement('li');
                         let interviewbut=document.createElement('button');
@@ -713,14 +714,7 @@ function candifetch(id)
                     opt3.innerHTML="Schedule Test";
                     selectorsopt.append(opt3);
                     }
-                    else if(datainfo[i].status==4)
-                    {
-                        let opt9=document.createElement('option');
-                        idval="h_"+datainfo[i].user_id+"_"+datainfo[i].test_id;
-                        opt9.setAttribute('value', idval);
-                        opt9.innerHTML="Schedule Interview";
-                        selectorsopt.append(opt9);
-                    }
+                    
                     else if(datainfo[i].status==5)
                     {
                         let opt9=document.createElement('option');
@@ -737,7 +731,14 @@ function candifetch(id)
                         opt9.innerHTML="Interview Feedback";
                         selectorsopt.append(opt9);
                     }
-
+                    if(datainfo[i].status<=4)
+                    {
+                        let opt9=document.createElement('option');
+                        idval="h_"+datainfo[i].user_id+"_"+datainfo[i].test_id;
+                        opt9.setAttribute('value', idval);
+                        opt9.innerHTML="Schedule Interview";
+                        selectorsopt.append(opt9);
+                    }
                     let opt4=document.createElement('option');
                     idval="d_"+datainfo[i].user_id+"_"+datainfo[i].log_id;
                     opt4.setAttribute('value', idval);

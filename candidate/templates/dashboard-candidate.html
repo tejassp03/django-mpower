@@ -135,6 +135,16 @@
                     </div>
                     <div class="pxp-candidate-dashboard-notifications-item-right">{{ i.datetime|naturaltime }}</div>
                 </div>
+                {% elif i.notif_type == "A" %}
+                <div class="pxp-candidate-dashboard-notifications-item mb-3">
+                    <div class="pxp-candidate-dashboard-notifications-item-left">
+                        <div class="pxp-candidate-dashboard-notifications-item-type"><span class="fa fa-user"></span></div>
+                        <div class="pxp-candidate-dashboard-notifications-item-message">
+                            <a href="#" >Congratulations🎉 {{ i.ename }}</a>has selected you for {{i.title}} job role.
+                        </div>
+                    </div>
+                    <div class="pxp-candidate-dashboard-notifications-item-right">{{ i.datetime|naturaltime }}</div>
+                </div>
                 {% else %}
                 <div class="pxp-candidate-dashboard-notifications-item mb-3">
                     <div class="pxp-candidate-dashboard-notifications-item-left">

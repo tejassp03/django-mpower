@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
-from .models import Admin, JobSeeker, Login, Employer, ResumeAnalysis, Jobs, LikedJobs, Application, Interview, Feedback, Newsletter, Course, AllSkills, RoleDetails
+from .models import Admin, JobSeeker, Login, Employer, ResumeAnalysis, Jobs, LikedJobs, Application, Interview, Feedback, Newsletter, Course, AllSkills, RoleDetails, Notifications
 import random
 import re
 from django.contrib.auth.hashers import make_password, check_password
@@ -17,6 +17,7 @@ from django.template.loader import render_to_string
 from jobster import settings
 import pandas as pd
 import time
+from urllib.parse import urlparse
 from pyresparser import ResumeParser
 from pdfminer3.layout import LAParams, LTTextBox
 from pdfminer3.pdfpage import PDFPage
@@ -68,7 +69,7 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
-import uuid
+
 @csrf_exempt
 def index(request):
     if request.method == 'POST':
@@ -81,13 +82,13 @@ def index(request):
                 if (request.POST['user'] == 'candidate' and JobSeeker.objects.filter(log_id=user[0].log_id)):
                     jobseeker = JobSeeker.objects.get(log_id=user[0].log_id)
                     if ((jobseeker.phone == None or jobseeker.phone == "" or len(jobseeker.phone) <= 4) and (jobseeker.location == None or jobseeker.location == "") and (jobseeker.experience == None or jobseeker.experience == "") and (jobseeker.skills == None or jobseeker.skills == "") and (jobseeker.basic_edu == None or jobseeker.basic_edu == "") and (jobseeker.master_edu == None or jobseeker.master_edu == "") and (jobseeker.other_qual == None or jobseeker.other_qual == "") and (jobseeker.dob == None or jobseeker.dob == "") and (jobseeker.Resume == "" or jobseeker.Resume == None) and (jobseeker.photo == "" or jobseeker.photo == None)):
-                        urlval = "/profile_completion/"+str(user[0].log_id)
+                        urlval = "/profile_completion/"+str(user[0].log_id)+"/"
                         return JsonResponse({'message': 'Y', 'url': urlval})
                     # return redirect('main:profilecompletion', pk=user[0].log_id)
                 elif (request.POST['user'] == 'employer' and Employer.objects.filter(log_id=user[0].log_id)):
                     employer = Employer.objects.get(log_id=user[0].log_id)
                     if ((employer.etype == None or employer.etype == "") and (employer.industry == None or employer.industry == "") and (employer.address == None or employer.address == "") and (employer.pincode == None or employer.pincode == "") and (employer.executive == None or employer.executive == "") and (employer.phone == None or employer.phone == "" or len(employer.phone) <= 4) and (employer.location == None or employer.location == "") and (employer.profile == None or employer.profile == "") and (employer.logo == "" or employer.logo == None)):
-                        urlval = "/emp_completion/"+str(user[0].log_id)
+                        urlval = "/emp_completion/"+str(user[0].log_id)+"/"
                         return JsonResponse({'message': 'Y', 'url': urlval})
                     
                 else:
@@ -105,9 +106,9 @@ def index(request):
                         request.session['photo'] = empls.photo.url
                     jobid = request.POST.get('jobid')
                     if jobid:
-                        urlval = "/singlejob/"+jobid
+                        urlval = "/singlejob/"+jobid+"/"
                     else:
-                        urlval = "/candidate/"+str(jobseeker.user_id)
+                        urlval = "/candidate/"+str(jobseeker.user_id)+"/"
 
                     # print(request.POST['jobid'])
                     return JsonResponse({'message': 'Y', 'url': urlval})
@@ -118,7 +119,7 @@ def index(request):
                     request.session['type'] = "e"
                     if (emp.logo):
                         request.session['photo'] = emp.logo.url
-                    urlval = "/employer/"+str(emp.eid)
+                    urlval = "/employer/"+str(emp.eid)+"/"
                     
                     return JsonResponse({'message': 'Y', 'url': urlval})
             else:
@@ -830,7 +831,7 @@ def emp_completion(request, pk):
             
             # static_folder_path = settings.STATIC_ROOT
             # images_folder_path = os.path.join(static_folder_path, "logo")
-            images_folder_path = "/Users/aditya/Desktop/mpower/django-mpower/main/static/logo"
+            images_folder_path = "/home/ec2-user/django-mpower/main/static/logo"
             image_files = os.listdir(images_folder_path)
             if image_files:
                 file_bytes = None
@@ -1070,7 +1071,11 @@ def singlejob(request, pk2):
         responsibilities.append(i)
     quality = "Please login to check eligibility"
     if 'pk' in request.session:
-        cand = JobSeeker.objects.get(user_id=request.session['pk'])
+        try:
+            cand = JobSeeker.objects.get(user_id=request.session['pk'])
+        except:
+            cand = Employer.objects.get(eid=request.session['pk'])
+            
         if cand.log_id.user_type == "employer":
             return render(request, 'singlejob.html', {'job_details': jobdet, 'company_details': companydet, 'liked': lik, 'loger': loger, 'skills': skills, 'requirements': requirements, 'responsibilities': responsibilities, 'date': app_date, 'score': 'X'})
         for i in skills:
@@ -1079,7 +1084,7 @@ def singlejob(request, pk2):
                     skills_required.append(i)
                     break
         try:
-            pdfFileObj = open("media/"+str(cand.Resume), 'rb')
+            pdfFileObj = open("static/media/"+str(cand.Resume), 'rb')
             pdfReader = PyPDF2.PdfReader(pdfFileObj)
         except:
             return render(request, 'singlejob.html', {'job_details': jobdet, 'company_details': companydet, 'liked': lik, 'loger': loger, 'skills': skills, 'requirements': requirements, 'responsibilities': responsibilities, 'date': app_date, 'score': 'Please submit your resume', 'skills_required': skills_required})
@@ -1352,38 +1357,49 @@ def get_job(request):
         applic.job_id = Jobs.objects.get(jobid=request.POST['id'])
         applic.eid = applic.job_id.eid
         applic.why_desc = request.POST['whyhire']
-        applic.date_applied = timezone.localtime() + timedelta(hours=5, minutes=30)
+        applic.date_applied = timezone.localtime() 
+        # + timedelta(hours=5, minutes=30)
         applic.save()
         return JsonResponse({'message': 'Y'})
 
 
 def give_feedback(request, pk):
     if request.method == "POST":
-        int_val = Interview.objects.get(apply_id=pk)
-        applics = Application.objects.get(apply_id = pk)
+        int_val = Interview.objects.get(int_id=pk)
+        applics = Application.objects.get(apply_id = int_val.apply_id.apply_id)
         eid_id = applics.eid.eid
         applics.status = 7
         applics.save()
         int_val.is_feedgiven = 1
         int_val.save()
-        existing_feedback = Feedback.objects.get(int_id=int_val)
-        if existing_feedback:
-            existing_feedback.rating = request.POST['rating']
-            existing_feedback.emp_feedback = request.POST['feedback']
-            existing_feedback.name = request.POST['name']
-            existing_feedback.save()
-            messages.error(request, "Feedback successfully Modified!")
-            return redirect('employer:candidates', pk=eid_id)
-        else:
+        try:
+            existing_feedback = Feedback.objects.get(int_id=int_val)
+            if existing_feedback:
+                existing_feedback.rating = request.POST['rating']
+                existing_feedback.emp_feedback = request.POST['feedback']
+                existing_feedback.name = request.POST['name']
+                existing_feedback.save()
+                messages.error(request, "Feedback successfully Modified!")
+                return redirect('employer:all_interviews', pk=eid_id)
+        except:
             feedback = Feedback()
             feedback.int_id = int_val
             feedback.rating = request.POST['rating']
             feedback.emp_feedback = request.POST['feedback']
             feedback.name = request.POST['name']
             feedback.save()
+        notif = Notifications()
+        notif.notif_type = "F"
+        notif.send_id = applics.eid.log_id
+        notif.rece_id = applics.user_id.log_id
+        notif.job_id = applics.job_id
+        notif.save()
         messages.error(request, "Feedback successfully recorded!")
-        return redirect('employer:candidates', pk=eid_id)
-    int_val = Interview.objects.get(apply_id=pk)
+        return redirect('employer:all_interviews', pk=eid_id)
+    try:
+        int_val = Interview.objects.get(int_id=pk)
+    except:
+        int_val = Interview.objects.get(apply_id=pk)
     data = {}
     data['name'] = int_val.user_id.name
     data['location'] = int_val.user_id.location
@@ -1440,9 +1456,11 @@ def password_reset_request(request):
             email_encoded = urlsafe_base64_encode(email.encode())
             token = my_token_generator.make_token(user)
             timestamp = timezone.now().isoformat()
+            parsed_url = urlparse(request.build_absolute_uri())
+            main_url = f"{parsed_url.scheme}://{parsed_url.netloc}" 
             reset_link = reverse('main:password_reset_confirm', args=[email_encoded,token, timestamp])
             subject = 'Password Reset Request'
-            message = f'Click the following link to reset your password: http://ec2-18-183-77-133.ap-northeast-1.compute.amazonaws.com:8000/{reset_link}'
+            message = f'Click the following link to reset your password: {main_url}{reset_link}'
             from_email = 'your_email@example.com'
             recipient_list = [email]
 
