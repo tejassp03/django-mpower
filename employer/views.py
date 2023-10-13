@@ -27,6 +27,10 @@ import json
 from django.core.mail import EmailMessage
 from jobster import settings
 from django.db.models import Subquery
+import os
+from django.views.decorators.csrf import csrf_exempt
+import random
+import threading
 # Create your views here.
 
 
@@ -36,7 +40,7 @@ def dashboard(request, pk):
     jobs = Jobs.objects.filter(eid=pk)
     applics = Application.objects.filter(eid=pk)
     visits = ProfileVisits.objects.filter(user_type="e", e_id=pk)
-    jobs = Jobs.objects.all()
+    # jobs = Jobs.objects.all()
     all_notis = []
     count = 0
     recent_candidates = []
@@ -120,14 +124,14 @@ def dashboard(request, pk):
     countsv = []
     couv = 0
     
-    jobs_chart = []
-    jobs_7 = []
-    jobs_30 = []
-    jobs_60 = []
-    jobs_90 = []
-    jobs_365 = []
-    countsj = []
-    couj = 0
+    # jobs_chart = []
+    # jobs_7 = []
+    # jobs_30 = []
+    # jobs_60 = []
+    # jobs_90 = []
+    # jobs_365 = []
+    # countsj = []
+    # couj = 0
 
     for i in range(0, 365):
         d = date.today()-timedelta(days=i)
@@ -136,16 +140,17 @@ def dashboard(request, pk):
         n = len(temp)
         heapq.heappush(applics_chart, (-1*(n), n, d))
         cou = cou+n
+
         temp = visits.filter(visiting_time__year=d.year,
                              visiting_time__month=d.month, visiting_time__day=d.day)
         n = len(temp)
         heapq.heappush(visits_chart, (-1*(n), n, d))
         couv = couv+n
 
-        temp = jobs.filter(postdate__year=d.year,postdate__month=d.month, postdate__day=d.day)
-        n = len(temp)
-        heapq.heappush(jobs_chart, (-1*(n), n, d))
-        couj = couj+n
+        # temp = jobs.filter(postdate__year=d.year,postdate__month=d.month, postdate__day=d.day)
+        # n = len(temp)
+        # heapq.heappush(jobs_chart, (-1*(n), n, d))
+        # couj = couj+n
         if (len(applics_chart) == 7):
             counts.append(cou)
             countsv.append(couv)
@@ -244,6 +249,7 @@ def dashboard(request, pk):
     return render(request, 'dashboard-employer.html', {'pk': pk, 'nums': nums, 'notifics': all_notis, 'recent': recent_mess_temp, 'candi': finalrecent, 'charts': charts_context, 'counts': counts,'jobs_':jobs_})
 
 
+
 def newjob(request, pk):
     if (request.method == "POST"):
         job = Jobs()
@@ -267,15 +273,119 @@ def newjob(request, pk):
         #############################################
         job.responsibilities = request.POST['responsibilities']
         job.requirements = request.POST['requirements']
+        filev = None
+        try:
+            filev = request.FILES["jobDescriptionFile"]
+            lst = filev._name.split(".")
+            random_integer = random.randint(1, 10000)
+            filev._name = str(pk)+"_"+str(request.POST['title'])+"_job_description"+str(random_integer)+"_"+filev._name
+            job.job_desc = filev
+        except:
+            filev = None
         job.save()
+        job_id = job.jobid
+        candid = []
+        jobid = job_id
+        if (jobid):
+            try:
+                job_ = Jobs.objects.get(jobid=jobid)
+                if job_.status == 1 or job_.status == 3:
+                    send = True
+                job_.status = 5
+                job_.save()
+                matching_percentages = []
+                for job_seeker in JobSeeker.objects.all():
+                    important_data_jobs = f"{job_.title} {job_.jobdesc} {job_.fnarea} {job_.skills} {job_.experience} {job_.basicpay} {job_.location} {job_.industry} {job_.ugqual} {job_.pgqual} {job_.profile} {job_.jobtype} {job_.requirements} {job_.responsibilities} {job_.notice_period}"
+                    job_description = preprocess_text(important_data_jobs)
+
+                    important_data_jobseeker = f"{job_seeker.location} {job_seeker.experience} {job_seeker.skills} {job_seeker.basic_edu} {job_seeker.master_edu} {job_seeker.other_qual} {job_seeker.cursal} {job_seeker.expsal} {job_seeker.notice_period}"
+                    job_seeker_data = preprocess_text(important_data_jobseeker)
+                    try:
+                        resume_pdf_file = job_seeker.Resume.path
+                        resume_text = extract_text_from_pdf(resume_pdf_file)
+                    except:
+                        pass
+                    resume_text = extract_text_from_pdf(resume_pdf_file)
+                    resume_text = preprocess_text(resume_text)
+                    total_job_seeker_data = f"{job_seeker_data}{resume_text}"
+                    vectorizer = CountVectorizer()
+
+                    job_description_vector = vectorizer.fit_transform([job_description])
+                    job_seeker_data_vector = vectorizer.transform([total_job_seeker_data])
+                    cosine_sim_job_seeker = cosine_similarity(job_description_vector, job_seeker_data_vector)
+
+                    job_matching_percentage = round(cosine_sim_job_seeker[0][0] * 100, 2)
+                    job_matcher = JobMatcher(jobseeker=job_seeker, job=job_)
+                    match_percentage = job_matcher.calculate_match_percentage()
+                    total_matching_percentage = round((job_matching_percentage + match_percentage) / 2, 2)
+                    matching_percentages.append((job_seeker.user_id, total_matching_percentage))
+                    matching_percentages.sort(key=lambda x: x[1], reverse=True)
+
+                top_matching_job_seekers = matching_percentages[:20]
+                if(send):
+                    email_thread = threading.Thread(target=send_email_newjob, args=(top_matching_job_seekers,job_.eid.log_id.email))
+                    email_thread.start()
+                    
+                serialized_list = json.dumps(top_matching_job_seekers)
+                job_.suggestions = serialized_list
+                job_.status = 4
+                job_.save()
+            except Jobs.DoesNotExist:
+                pass
+        if (job_):
+            
+            if job_.status == 4:
+                top_matching_job_seekers = job_.suggestions
+                python_list = json.loads(top_matching_job_seekers)
+                for i in python_list:
+                    seek = JobSeeker.objects.get(user_id=i[0])
+                    single_candidate = {}
+                    single_candidate['user_id'] = seek.user_id
+                    single_candidate['name'] = seek.name
+                    if seek.photo:
+                        single_candidate['photo'] = seek.photo
+                    single_candidate['score'] = i[1]
+                    single_candidate['location'] = seek.location
+                    candid.append(single_candidate)
         request.session['c_s_id'] = job.jobid
-        return redirect('employer:cand_suggest', pk=pk)
+        data_ = {'message': 'Success','jobid':job_id}
+        if candid:
+            data_['candidates'] = dumps(candid, default=str)
+        return JsonResponse(data_)
     if 'shower' in request.session:
         del request.session['shower']
     roledetails = RoleDetails.objects.all()
     return render(request, 'newjob-employer.html', {'pk': pk, 'roledetails': roledetails})
 
 
+def send_email_newjob(top_matching_job_seekers,emp_mail):
+    email_list = []
+    for i in top_matching_job_seekers:
+        seek = JobSeeker.objects.get(user_id=i[0])
+        email_list.append(seek.log_id.email)
+    email_subject = "Job Alert"
+    message = "You are among top 20 best profiles for this job"
+    email = EmailMessage(email_subject, message, settings.EMAIL_HOST_USER, email_list)
+    email.fail_silently = True
+    email.send()
+    email_subject = "Candidate suggestions"
+    message = "Suggestions have been provided for {job_.title} job"
+    email = EmailMessage(email_subject, message, settings.EMAIL_HOST_USER, [emp_mail])
+    email.fail_silently = True
+    email.send()
+
+
+
+def matchPerChange(request,pk):
+    if request.method == "POST":
+        if(request.POST['job_id']):
+            job = Jobs.objects.get(jobid = request.POST['job_id'])
+            job.match_per = request.POST['job_id']
+            job.save()
+            return JsonResponse({'message': 'Success'})
+        return JsonResponse({'message': 'An error occured'})
+    return JsonResponse({'message': 'An error occured'})
+  
 def edit(request, pk):
     context = Employer.objects.get(eid=pk)
     if request.method == "POST":
@@ -305,6 +415,8 @@ def edit(request, pk):
             if context.logo:
                 context.logo.delete()
             context.logo = filev
+            # if (context.logo):
+            #     request.session['photo'] = context.logo.url
         except:
             filev = None
         filev = None
@@ -318,6 +430,11 @@ def edit(request, pk):
         except:
             filev = None
         context.save()
+        emp_ = Employer.objects.get(eid=pk)
+        if (emp_.logo):
+            request.session['photo'] = context.logo.url
+        if (emp_.cover):
+            request.session['photo'] = context.cover.url
         return redirect('employer:cedit', pk=pk)
     if 'shower' in request.session:
         del request.session['shower']
@@ -390,7 +507,8 @@ def manage(request, pk):
         page_obj = p.page(p.num_pages)
     if 'shower' in request.session:
         del request.session['shower']
-    return render(request, 'managejob-employer.html', {'pk': pk, 'pe': page_obj, 'count': count})
+    roledetails = RoleDetails.objects.all()
+    return render(request, 'managejob-employer.html', {'pk': pk, 'pe': page_obj, 'count': count,'roledetails':roledetails})
 
 def matchPercent(user,job):
     important_data_jobs = f"{job.title} {job.jobdesc} {job.fnarea} {job.skills} {job.experience} {job.basicpay} {job.location} {job.industry} {job.ugqual} {job.pgqual} {job.profile} {job.jobtype} {job.requirements} {job.responsibilities} {job.notice_period}"
@@ -422,6 +540,12 @@ def candidates(request, pk):
             request.session['shower'] = apps.job_id.jobid
             apps.status = 1
             apps.save()
+            notif = Notifications()
+            notif.notif_type = "A"
+            notif.send_id = apps.eid.log_id
+            notif.rece_id = apps.user_id.log_id
+            notif.job_id = apps.job_id
+            notif.save()
             subject = "Congratulations "+apps.user_id.name+" you are selected!"
             message = "Company: "+apps.job_id.eid.ename+"\nJob: "+apps.job_id.title
             receipt = [apps.user_id.log_id.email]
@@ -779,8 +903,8 @@ def createthread(request, pk):
 
 def cnotifications(request, pk):
     loger = Login.objects.get(email=request.session['email'])
-    for key, value in request.session.items():
-        print(f"Key: {key}, Value: {value}")
+    # for key, value in request.session.items():
+    #     print(f"Key: {key}, Value: {value}")
     notifs = Notifications.objects.filter(
         rece_id=loger.log_id).order_by('-datetime')
     nots = []
@@ -853,6 +977,18 @@ def edit_job(request, pk):
             job[0].skills = request.POST['skills']
             job[0].responsibilities = request.POST['responsibilities']
             job[0].requirements = request.POST['requirements']
+            try:
+                if 'jobDescriptionFile' in request.FILES:
+                    filev = request.FILES['jobDescriptionFile']
+                    print("hi",filev)
+                    lst = filev._name.split(".")
+                    random_integer = random.randint(1, 10000)
+                    filev._name = str(pk)+"_"+str(request.POST['title'])+"_job_description"+str(random_integer)+"_"+filev._name
+                    if job[0].job_desc:
+                        job[0].job_desc.delete()
+                    job[0].job_desc = filev
+            except:
+                filev = None 
             job[0].save()
         return redirect('employer:manage', pk=pk)
     return JsonResponse({'info': dumps(list(job.values()), default=str)})
@@ -1071,7 +1207,7 @@ def cand_suggest(request, pk):
         page_obj = p.page(p.num_pages)
     if 'shower' in request.session:
         del request.session['shower']
-    print(sel)
+    # print(sel)
     return render(request, 'suggestions-employer.html', {'pk': pk, 'jobs': job, 'count': count, 'pe': page_obj, 'sel': sel})
 
 
@@ -1176,7 +1312,30 @@ def show_tests(request, pk):
     except EmptyPage:
         page_obj = p.page(p.num_pages)
     return render(request, 'show-employer.html', {'pk': pk, 'pe': page_obj, 'count': count})
-
+@csrf_exempt
+def edit_test(request,pk):
+    if request.method == "POST":
+        
+        try:
+            testinfoid = request.POST.get('testinfoid')
+            data = json.loads(request.POST.get('questions'))  # Parse the JSON data
+            single_ = TestInfo.objects.get(test_id=testinfoid)
+            single_.test_name = request.POST.get('test_name')
+            single_.time_limit = request.POST.get('time_limit')
+            # print(single_.test_name,single_.time_limit,request.POST.get('test_name'),request.POST.get('time_limit'))
+            for i, question_data in enumerate(data):
+                single = TestQues.objects.get(ques_id=question_data['ques_id'])
+                single.ques_name = question_data['question']
+                single.option1 = question_data['options'][0]
+                single.option2 = question_data['options'][1]
+                single.option3 = question_data['options'][2]
+                single.option4 = "Hello"
+                single.correct = question_data['correctAnswer']
+                single.save()
+            single_.save()
+        except Exception as e:
+            JsonResponse({'message': 'Error updating Test'})
+        return JsonResponse({'message': 'Edited'})
 
 def create_test(request, pk):
     if request.method == "POST":
@@ -1201,6 +1360,15 @@ def create_test(request, pk):
             single.option2 = options[count+1]
             single.option3 = options[count+2]
             single.option4 = options[count+3]
+            filev = None
+            try:
+                filev = request.FILES[f"image_{i+1}"]
+                lst = filev._name.split(".")
+                random_integer = random.randint(1, 10000)
+                filev._name = str(testinfo.testinfoid)+"_test_image"+str(random_integer)+"_"+filev._name
+                single.images = filev
+            except:
+                filev = None
             count = count+4
             single.correct = correct[i]
             single.save()
@@ -1261,10 +1429,10 @@ def schedule(request, pk):
             return JsonResponse({'message': 'scheduled'})
         applics = Application.objects.get(apply_id=request.POST['id'])
         if applics.status == 3:
-            print("status")
+            # print("status")
 
             return JsonResponse({'message': 'X'})
-        print("hello")
+        # print("hello")
         testinfo = TestInfo.objects.get(testinfoid=request.POST['testinfoid'])
         # print(applics.user_id,testinfo.test_id.test_id)
         tuser = TestUser.objects.filter(
@@ -1330,23 +1498,24 @@ def get_results(request, pk):
 def schedule_interview(request, pk):
     if request.method == "POST":
         date_time_str = request.POST['date_time']
-        print(date_time_str)
+        # print(date_time_str)
         desired_datetime = timezone.datetime.strptime(date_time_str, "%Y-%m-%dT%H:%M")
         aware_datetime = timezone.make_aware(desired_datetime)
         ist_datetime = aware_datetime + timezone.timedelta(hours=5, minutes=30)
+        applics = Application.objects.get(apply_id=request.POST['apply_id'])
+
         # + timezone.timedelta(hours=5, minutes=30)
-        print("hello",request.POST['user_id'])
+        # print("hello",request.POST['user_id'])
         check = Interview.objects.filter(
-            user_id=request.POST['user_id'], eid=pk,apply_id=request.POST['apply_id'])
+            user_id=applics.user_id_id, eid=pk,apply_id=request.POST['apply_id'])
         if (len(check) != 0):
             check[0].int_link = request.POST['int_link']
             check[0].schedule_date = ist_datetime
             check[0].save()
             return JsonResponse({'m': 'A'})
         intval = Interview()
-        applics = Application.objects.get(apply_id=request.POST['apply_id'])
         intval.eid = Employer.objects.get(eid=pk)
-        intval.user_id = JobSeeker.objects.get(user_id=request.POST['user_id'])
+        intval.user_id = JobSeeker.objects.get(user_id=applics.user_id_id)
         intval.int_link = request.POST['int_link']
         # print("hello",applics.apply_id)
         intval.apply_id = applics
@@ -1372,7 +1541,7 @@ def schedule_interview(request, pk):
 def panel_request(request,pk):
     if request.method == "POST":
         inter = Interview.objects.get(int_id = request.POST['int_id'])
-        print(inter.int_id,request.POST['int_id'])
+        # print(inter.int_id,request.POST['int_id'])
         inter.panel_req = 1
         inter.save()
         return JsonResponse({'m': 'Interview panel requested'})
@@ -1596,12 +1765,15 @@ def preprocess_text(text):
 
 def extract_text_from_pdf(pdf_file):
     pdf_text = ""
-    with open(pdf_file, 'rb') as file:
-        pdf_reader = PyPDF2.PdfReader(file)
-        num_pages = len(pdf_reader.pages)
-        for page_num in range(num_pages):
-            page = pdf_reader.pages[page_num]
-            pdf_text += page.extract_text()
+    try:
+        with open(pdf_file, 'rb') as file:
+            pdf_reader = PyPDF2.PdfReader(file)
+            num_pages = len(pdf_reader.pages)
+            for page_num in range(num_pages):
+                page = pdf_reader.pages[page_num]
+                pdf_text += page.extract_text()
+    except:
+        pdf_text = ""
     return pdf_text
 def suggest(request, pk):
     if request.method == "POST":
@@ -1616,27 +1788,31 @@ def suggest(request, pk):
                 job_.save()
                 matching_percentages = []
                 for job_seeker in JobSeeker.objects.all():
-                    important_data_jobs = f"{job_.title} {job_.jobdesc} {job_.fnarea} {job_.skills} {job_.experience} {job_.basicpay} {job_.location} {job_.industry} {job_.ugqual} {job_.pgqual} {job_.profile} {job_.jobtype} {job_.requirements} {job_.responsibilities} {job_.notice_period}"
-                    job_description = preprocess_text(important_data_jobs)
+                    if job_seeker.Resume and job_seeker.Resume.path and os.path.exists(job_seeker.Resume.path):
+                        important_data_jobs = f"{job_.title} {job_.jobdesc} {job_.fnarea} {job_.skills} {job_.experience} {job_.basicpay} {job_.location} {job_.industry} {job_.ugqual} {job_.pgqual} {job_.profile} {job_.jobtype} {job_.requirements} {job_.responsibilities} {job_.notice_period}"
+                        job_description = preprocess_text(important_data_jobs)
 
-                    important_data_jobseeker = f"{job_seeker.location} {job_seeker.experience} {job_seeker.skills} {job_seeker.basic_edu} {job_seeker.master_edu} {job_seeker.other_qual} {job_seeker.cursal} {job_seeker.expsal} {job_seeker.notice_period}"
-                    job_seeker_data = preprocess_text(important_data_jobseeker)
-                    resume_pdf_file = job_seeker.Resume.path
-                    resume_text = extract_text_from_pdf(resume_pdf_file)
-                    resume_text = preprocess_text(resume_text)
-                    total_job_seeker_data = f"{job_seeker_data}{resume_text}"
-                    vectorizer = CountVectorizer()
+                        important_data_jobseeker = f"{job_seeker.location} {job_seeker.experience} {job_seeker.skills} {job_seeker.basic_edu} {job_seeker.master_edu} {job_seeker.other_qual} {job_seeker.cursal} {job_seeker.expsal} {job_seeker.notice_period}"
+                        job_seeker_data = preprocess_text(important_data_jobseeker)
+                        try:
+                            resume_pdf_file = job_seeker.Resume.path
+                            resume_text = extract_text_from_pdf(resume_pdf_file)
+                        except:
+                            pass
+                        resume_text = preprocess_text(resume_text)
+                        total_job_seeker_data = f"{job_seeker_data}{resume_text}"
+                        vectorizer = CountVectorizer()
 
-                    job_description_vector = vectorizer.fit_transform([job_description])
-                    job_seeker_data_vector = vectorizer.transform([total_job_seeker_data])
-                    cosine_sim_job_seeker = cosine_similarity(job_description_vector, job_seeker_data_vector)
+                        job_description_vector = vectorizer.fit_transform([job_description])
+                        job_seeker_data_vector = vectorizer.transform([total_job_seeker_data])
+                        cosine_sim_job_seeker = cosine_similarity(job_description_vector, job_seeker_data_vector)
 
-                    job_matching_percentage = round(cosine_sim_job_seeker[0][0] * 100, 2)
-                    job_matcher = JobMatcher(jobseeker=job_seeker, job=job_)
-                    match_percentage = job_matcher.calculate_match_percentage()
-                    total_matching_percentage = round((job_matching_percentage + match_percentage) / 2, 2)
-                    matching_percentages.append((job_seeker.user_id, total_matching_percentage))
-                    matching_percentages.sort(key=lambda x: x[1], reverse=True)
+                        job_matching_percentage = round(cosine_sim_job_seeker[0][0] * 100, 2)
+                        job_matcher = JobMatcher(jobseeker=job_seeker, job=job_)
+                        match_percentage = job_matcher.calculate_match_percentage()
+                        total_matching_percentage = round((job_matching_percentage + match_percentage) / 2, 2)
+                        matching_percentages.append((job_seeker.user_id, total_matching_percentage))
+                        matching_percentages.sort(key=lambda x: x[1], reverse=True)
 
                 top_matching_job_seekers = matching_percentages[:20]
                 if(send):

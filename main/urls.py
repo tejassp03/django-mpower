@@ -2,6 +2,7 @@ from . import views
 from django.urls import path, include 
 from django.conf.urls.static import static
 from django.conf import settings
+# from jobster import settings
 
 app_name = 'main'
 
@@ -41,8 +42,8 @@ urlpatterns = [
     path('singlecompany/<int:pk2>/', views.singlecompany, name='singlecompany'),
     path('password_reset/', views.password_reset, name='password_reset'),
     path('mpoweradmin/<int:pk>/', include('mpoweradmin.urls', namespace = 'mpoweradmin')),
-]
+] 
 
 # if settings.DEBUG:
-# 	urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-# 	urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

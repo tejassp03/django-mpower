@@ -52,10 +52,10 @@
                 <ul class="list-unstyled">
                     <li id="cdas"><a href="{% url 'employer:cdashboard' pk=pk %}"><span class="fa fa-home"></span>Dashboard</a></li>
                     <li id="cedi"><a href="{% url 'employer:cedit' pk=pk %}"><span class="fa fa-pencil"></span>Edit Profile</a></li>
-                    <li id="cnew"><a href="{% url 'employer:newjob' pk=pk %}"><span class="fa fa-file-text-o"></span>New Job Offer</a></li>
+                    <li id="cnew"><a href="{% url 'employer:newjob' pk=pk %}"><span class="fa fa-file-text-o"></span>Post Jobs</a></li>
                     <li id="cman"><a href="{% url 'employer:manage' pk=pk %}"><span class="fa fa-briefcase"></span>Manage Jobs</a></li>
                     <li id="ccan"><a href="{% url 'employer:candidates' pk=pk %}"><span class="fa fa-user-circle-o"></span>Applications</a></li>
-                    <li id="csub"><a href="{% url 'employer:subscriptions' pk=pk %}"><span class="fa fa-credit-card"></span>Subscriptions</a></li>
+                    <!-- <li id="csub"><a href="{% url 'employer:subscriptions' pk=pk %}"><span class="fa fa-credit-card"></span>Subscriptions</a></li> -->
                     <!--<li id="ccha"><a href="{% url 'employer:change_pass' pk=pk %}"><span class="fa fa-lock"></span>Change Password</a></li>-->
                     <li id="qui"><a href="{% url 'employer:show_tests' pk=pk %}"><span class="fa fa-question"></span>Create Test</a></li>
                     <li id="inr"><a href="{% url 'employer:all_interviews' pk=pk %}"><span class="fa fa-user"></span>Interviews</a></li>
@@ -81,21 +81,23 @@
                         </a>
                     </li>
                 </ul>
+                {% comment %}
                 <div class="pxp-dashboard-side-label mt-3 mt-lg-4">AI Tools<sup style="background: var(--pxpMainColor); padding: 3px; color: white; border-radius: 50rem; margin-left: 5px">Beta</sup></div>
                 <ul class="list-unstyled">
                     <li id="scn">
-                        {% comment %} <a href="candidate-dashboard-notifications.html" class="d-flex justify-content-between align-items-center"> {% endcomment %}
-                            {% comment %}<a href="{% url 'employer:cand_suggest' pk=pk %}" class="d-flex justify-content-between align-items-center">
-                            <div><span class="fa fa-file-o"><i class="fa-light fa-lightbulb"></i></span>Suggestions</div>{% endcomment %}
+                         <a href="candidate-dashboard-notifications.html" class="d-flex justify-content-between align-items-center">
+                            <a href="{% url 'employer:cand_suggest' pk=pk %}" class="d-flex justify-content-between align-items-center">
+                            <div><span class="fa fa-file-o"><i class="fa-light fa-lightbulb"></i></span>Suggestions</div>
                         </a>
                     </li>
                     <li id="pen">
-                        {% comment %} <a href="candidate-dashboard-notifications.html" class="d-flex justify-content-between align-items-center"> {% endcomment %}
+                        <a href="candidate-dashboard-notifications.html" class="d-flex justify-content-between align-items-center"> 
                             <a href="{% url 'employer:pending_actions' pk=pk %}" class="d-flex justify-content-between align-items-center">
                             <div><span class="fa fa-tasks"></span>Actions</div>
                         </a>
                     </li>
                 </ul>
+                {% endcomment %}
             </nav>
 
             <nav class="pxp-dashboard-side-user-nav-container">
@@ -140,7 +142,7 @@
                                     <li class="pxp-dropdown-header">Company tools</li>
                                     <li class="nav-item"><a href="{% url 'employer:cdashboard' pk=pk %}"><span class="fa fa-home"></span>Dashboard</a></li>
                                     <li class="nav-item"><a href="{% url 'employer:cedit' pk=pk %}"><span class="fa fa-pencil"></span>Edit Profile</a></li>
-                                    <li class="nav-item"><a href="{% url 'employer:newjob' pk=pk %}"><span class="fa fa-file-text-o"></span>New Job Offer</a></li>
+                                    <li class="nav-item"><a href="{% url 'employer:newjob' pk=pk %}"><span class="fa fa-file-text-o"></span>Post Jobs</a></li>
                                     <li class="nav-item"><a href="{% url 'employer:manage' pk=pk %}"><span class="fa fa-briefcase"></span>Manage Jobs</a></li>
                                     <li class="nav-item"><a href="{% url 'employer:candidates' pk=pk %}"><span class="fa fa-user-circle-o"></span>Candidates</a></li>
                                     <li class="nav-item"><a href="{% url 'employer:subscriptions' pk=pk %}"><span class="fa fa-credit-card"></span>Subscriptions</a></li>
@@ -166,6 +168,7 @@
                                             {% endif %}
                                         </a>
                                     </li>
+                                    
                                     <li class="pxp-dropdown-header mt-4">AI Tools<sup style="background: var(--pxpMainColor); padding: 3px; color: white; border-radius: 50rem; margin-left: 5px">Beta</sup></li>
                                     <li class="nav-item">
                                         {% comment %} <a href="candidate-dashboard-notifications.html" class="d-flex justify-content-between align-items-center"> {% endcomment %}
@@ -179,12 +182,14 @@
                                             <div><span class="fa fa-tasks"></span>Actions</div>
                                         </a>
                                     </li>
+                                    
                                 </ul>
                             </nav>
                         </div>
                     </div>
                 </div>
                 <nav class="pxp-user-nav pxp-on-light">
+                    <div style="cursor:pointer;" ><b><a role="button" class="nav-link"  href="{% url 'main:index' %}">Home</a></b></div>
                     <a href="{% url 'employer:newjob' pk=pk %}" class="btn rounded-pill pxp-nav-btn">Post a Job</a>
                     <div class="dropdown pxp-user-nav-dropdown pxp-user-notifications">
                         <a role="button" class="dropdown-toggle" data-bs-toggle="dropdown">
@@ -773,7 +778,7 @@
         {
             $('[name=checkdate]').css({'z-index': "1600 !important"})
             applyIdForInterview = applyid;
-            console.log(id+" hello "+applyIdForInterview)
+            // console.log(id+" hello "+applyIdForInterview)
             $.ajax(
                 {
                     type:"GET",

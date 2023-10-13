@@ -36,6 +36,14 @@
         align-items: center;
         min-height: 100vh;
     }
+    .progress {
+    height: 10px;
+}
+
+.progress-bar {
+    border-radius: 0;
+}
+
         </style>
     </head>
     <body>
@@ -91,7 +99,7 @@
                             </div>
                             <input type="button" value="Sign in" class="btn rounded-pill pxp-modal-cta signinbut" style="width: 100%">
                             <div class="mt-4 text-center pxp-modal-small">
-                                <a href="#" class="pxp-modal-link" id="forgotPasswordLink">Forgot password</a>
+                                <a href="#" class="pxp-modal-link forgot-password-button" id="forgotPasswordLink">Forgot password</a>
                             </div>
 
                             <div class="mt-4 text-center pxp-modal-small">
@@ -124,7 +132,7 @@
                             </div>
                             <input type="button" value="Log in" class="btn rounded-pill pxp-modal-cta signinbut" style="width: 100%"></input>
                             <div class="mt-4 text-center pxp-modal-small">
-                                <a href="#" class="pxp-modal-link">Forgot password</a>
+                                <a href="#" class="pxp-modal-link forgot-password-button" id="forgotPasswordLink">Forgot password</a>
                             </div>
                             <div class="mt-4 text-center pxp-modal-small">
                                 New to mpower? <a role="button" class="" data-bs-target="#pxp-signup-modal" data-bs-toggle="modal" data-bs-dismiss="modal">Create an account</a>
@@ -172,25 +180,28 @@
             </div>
         </div>
 
-        <div class="modal fade pxp-user-modal" id="forgotPasswordModal" aria-hidden="true" tabindex="-1">
-            <div class="modal-dialog modal-dialog-centered ">
-                <div class="modal-content ">
-                    <!--<div class="modal-header">
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>-->
-                    <div class="modal-body text-center">
-                        <h5 class="modal-title mt-4">Forgot Password</h5>
-                            {% csrf_token %}
-                            <div class="form-floating mb-3">
-                                <input type="email" class="form-control" name="email" id="forgotPasswordEmail" placeholder="Email address">
-                                <label for="forgotPasswordEmail">Email address</label>
-                            </div>
-                            <button type="submit" class="btn rounded-pill pxp-modal-cta" style="display: block; margin: 0 auto; margin-bottom: 10px;" onclick="forgotPassword()" >Reset Password</button>
-                    </div>
-
+        <div class="modal fade pxp-user-modal" id="forgotPasswordModal" aria-hidden="true" tabindex="-1" style="overflow: hidden;">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body text-center" style="overflow: hidden;">
+                <h6 style="opacity:0;"></h6>
+                
+                <h5 class="modal-title mt-4">Forgot Password</h5>
+                {% csrf_token %}
+                <div class="form-floating mb-3">
+                    <input type="email" class="form-control" name="email" id="forgotPasswordEmail" placeholder="Email address">
+                    <label for="forgotPasswordEmail">Email address</label>
                 </div>
+                <div class="progress" style="display: none;" id="progressBarContainer">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated bg-info" id="progressBar" style="width: 0;"></div>
+                </div>
+                <button type="button" class="btn rounded-pill pxp-modal-cta" style="display: block; margin: 0 auto; margin-bottom: 10px; margin-top: 10px;" onclick="forgotPassword()" id="resetButton">Reset Password</button>
+                <div id="messageContainer" style="display: none;"></div>
             </div>
         </div>
+    </div>
+</div>
+
 
 
         <div class="modal fade pxp-user-modal" id="pxp-signup-modal" aria-hidden="true" aria-labelledby="signupModal" tabindex="-1">
@@ -300,7 +311,7 @@
                     </div>
                     <hr style="margin: 0px" />
                     <div class="modal-header" style="padding: 10px">
-                        <a class="btn rounded-pill pxp-nav-btn" onclick="applics()">Apply</a>
+                        <a class="btn rounded-pill pxp-nav-btn" onclick="applics()">Submit</a>
                     </div>
                     <div class="modal-header" id="spanadder">
                     </div>
@@ -315,6 +326,9 @@
         <script src="{% static 'js/nav.js' %}"></script>
         <script src="{% static 'js/main.js' %}"></script>
         <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.17.1/moment.min.js"></script>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
         <script>
 
             var jobid;
@@ -477,94 +491,139 @@
                     }
                 })
             })
-        function inputchanger()
-        {
-            $('#signer').css({'display': 'none'})
-            $('#signer2').css({'display': 'none'})
-        }
-        
-        document.getElementById('forgotPasswordLink').addEventListener('click', function () {
-                $('#pxp-signin-modal').modal('hide');
-                $('#forgotPasswordModal').modal('show');
-        });
-
-        $('#forgotPasswordModal').on('hidden.bs.modal', function () {
-            // Clear the form when the modal is hidden
-            document.getElementById('forgotPasswordForm').reset();
-        });
-
-
-        $('#pxp-signin-modal').on('keypress', function (event) {
-            var keycode = (event.keyCode ? event.keyCode : event.which);
-            if(keycode == '13'){
-              $('#pxp-signin-modal .show .signinbut').click();
-            }
-          });
-
-        function applicmodal(id)
-        {
-            $.ajax(
-                {
-                    type:"GET",
-                    url: "{% url 'main:get_job' %}",
-                    data:{
-                            id: id,
-                    },
-                    success: function( data ) 
-                    {
-                        $('#applyjob').text(data['name']);
-                        $('[name=jobidval]').val(data['id']);
-                    }
-                })
-        }
-
-        function applics()
-        {
-            if($('[name=whyhire]').val()=="")
+            function inputchanger()
             {
-                alert("Please answer the question");
-                return;
+                $('#signer').css({'display': 'none'})
+                $('#signer2').css({'display': 'none'})
             }
-            $.ajax(
+        
+            $('.forgot-password-button').on('click', function () {
+        $('#pxp-signin-modal').modal('hide');
+        $('#forgotPasswordModal').modal('show');
+        progressBarContainer.show();
+    });
+
+            $('#forgotPasswordModal').on('hidden.bs.modal', function () {
+                // Clear the form when the modal is hidden
+                document.getElementById('forgotPasswordForm').reset();
+                $('#forgotPasswordEmail').prop('disabled', false);
+
+
+            });
+
+
+            $('#pxp-signin-modal').on('keypress', function (event) {
+                var keycode = (event.keyCode ? event.keyCode : event.which);
+                if(keycode == '13'){
+                $('#pxp-signin-modal .show .signinbut').click();
+                }
+            });
+
+            function applicmodal(id)
+            {
+                $.ajax(
+                    {
+                        type:"GET",
+                        url: "{% url 'main:get_job' %}",
+                        data:{
+                            id: id,
+                        },
+                        success: function( data ) 
+                        {
+                            $('#applyjob').text(data['name']);
+                            $('[name=jobidval]').val(data['id']);
+                        }
+                    })
+            }
+
+            function applics()
+            {
+                if($('[name=whyhire]').val()=="")
                 {
-                    type:"POST",
-                    url: "{% url 'main:get_job' %}",
-                    data:{
+                    alert("Please answer the question");
+                    return;
+                }
+                $.ajax(
+                    {
+                        type:"POST",
+                        url: "{% url 'main:get_job' %}",
+                        data:{
                             id: $('[name=jobidval]').val(),
                             whyhire: $('[name=whyhire]').val(),
                             csrfmiddlewaretoken: '{{ csrf_token }}'
-                    },
-                    success: function( data ) 
-                    {
-                        alert("Applied successfully track status from the dashboard!!");
-                        location.reload();
-                    }
-                })
-        }
-        function forgotPassword()
-        {
-                    var email = $("#forgotPasswordEmail").val();
-                    var csrfToken = $("input[name=csrfmiddlewaretoken]").val();
-
-                    var formData = {
-                        email: email,
-                        csrfmiddlewaretoken: csrfToken
-                    };
-
-                    $.ajax({
-                        type: "POST",
-                        url: "{% url 'main:password_reset_request' %}",
-                        data: formData,
-                        success: function(response) {
-                            console.log(response);
-                            alert("Password reset link sent successfully");
                         },
-                        error: function(xhr, textStatus, errorThrown) {
-                            console.error(xhr.responseText);
-                            alert("Error: " + xhr.responseText);
+                        success: function( data ) 
+                        {
+                            alert("Applied successfully track status from the dashboard!!");
+                            location.reload();
                         }
-                    });
-        }
+                    })
+            }
+
+
+            function forgotPassword() {
+                var emailField = $("#forgotPasswordEmail");
+                var resetButtonEn = $("#resetButton");
+                var emailFieldCheck = emailField.val();
+                var emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+                if (emailPattern.test(emailFieldCheck)) {
+
+                var progressBar = $("#progressBar");
+                var progressBarContainer = $("#progressBarContainer");
+                var messageContainer = $("#messageContainer");
+                messageContainer.hide();
+
+                var email = emailField.val();
+                var csrfToken = $("input[name=csrfmiddlewaretoken]").val();
+
+                var formData = {
+                    email: email,
+                    csrfmiddlewaretoken: csrfToken
+                };
+
+                emailField.prop('disabled', true);
+                resetButtonEn.prop('disabled', true);
+
+                progressBarContainer.show();
+
+                $.ajax({
+                    type: "POST",
+                    url: "{% url 'main:password_reset_request' %}",
+                    data: formData,
+                    xhr: function () {
+                        var xhr = new window.XMLHttpRequest();
+                        xhr.upload.addEventListener("progress", function (e) {
+                            if (e.lengthComputable) {
+                                var percentComplete = (e.loaded / e.total) * 100;
+                                progressBar.css("width", percentComplete + "%");
+                            }
+                        }, false);
+                        return xhr;
+                    },
+                    success: function (response) {
+                        progressBarContainer.hide();
+                        messageContainer.text("Password reset link sent successfully to your email").show().css("color", "green");
+                    },
+                    error: function (xhr, textStatus, errorThrown) {
+
+                        if( xhr.responseText == '{"error": "User with this email does not exist"}'){
+                            messageContainer.text("User with this email does not exist").show().css("color", "red");
+                        }
+                        emailField.prop('disabled', false);
+                        progressBarContainer.hide();
+                        resetButtonEn.prop('disabled', false);
+                    }
+                });} else {
+                var messageContainer = $("#messageContainer");
+                    resetButtonEn.prop('disabled', true);
+
+                    messageContainer.text("Enter a valid email address").show().css("color", "red");
+                    resetButtonEn.prop('disabled', false);
+
+
+                }
+            }
+
 
         {% block script %}
         {% endblock script %}

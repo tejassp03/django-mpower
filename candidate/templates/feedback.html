@@ -1,0 +1,159 @@
+{% load static %}
+
+
+<!doctype html>
+<html lang="en" class="pxp-root">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <link rel="shortcut icon" href="{% static 'images/favicon.png' %}" type="image/x-icon">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600;700&display=swap" rel="stylesheet">
+        <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/js/standalone/selectize.min.js" integrity="sha256-+C0A5Ilqmu4QcSPxrlGpaZxJ04VjsRjKu+G82kl5UJk=" crossorigin="anonymous"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/css/selectize.bootstrap3.min.css" integrity="sha256-ze/OEYGcFbPRmvCnrSeKbRTtjG4vGLHXgOqsyLFTRjg=" crossorigin="anonymous" />
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.1/mdb.min.css" rel="stylesheet"/>
+        <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+        <link rel="stylesheet" href="{% static 'css/font-awesome.min.css' %}">
+        <link rel="stylesheet" href="{% static 'css/owl.carousel.min.css' %}">
+        <link rel="stylesheet" href="{% static 'css/owl.theme.default.min.css' %}">
+        <link rel="stylesheet" href="{% static 'css/animate.css' %}">
+        <link rel="stylesheet" href="{% static 'css/style.css' %}">
+        <title>mpower - Feedback</title>
+        <style>
+
+            .star-rating {
+  
+                display:flex;
+                flex-direction: row-reverse;
+                font-size:2.0em;
+                justify-content:space-around;
+                padding:0 .2em;
+                text-align:center;
+
+                width:8em;
+                margin-bottom: 20px;
+            }
+
+            .star-rating input {
+                display:none;
+            }
+
+            .star-rating label {
+                color:#ccc;
+                cursor:pointer;
+            }
+
+            .star-rating :checked ~ label {
+                color:#f90;
+            }
+
+            .star-rating label:hover,
+            .star-rating label:hover ~ label {
+                cursor: not-allowed;
+            }
+            .center-button {
+                display: flex;
+                justify-content: center;
+            }
+        </style>
+    </head>
+    <body>
+        {% if messages %}
+            {% for message in messages %}
+            {% if message.tags %}  
+            <script>alert('{{ message }}')</script>
+            {% endif %}
+            {% endfor %}
+        {% endif %}
+        <div class="pxp-preloader"><span>Loading...</span></div>
+
+        <header class="pxp-header fixed-top pxp-no-bg pxp-has-border">
+            <div class="pxp-container">
+                <div class="pxp-header-container">
+                    <div class="pxp-logo-nav-container">
+                        <div class="pxp-logo">
+                            <a href="index.html" class="pxp-animate"><span style="color: var(--pxpMainColor)">m</span>power</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <section class="mt-20 pxp-no-hero" style="margin-bottom: 45px">
+            <div class="pxp-container">
+                <h2 class="pxp-section-h2 text-center">Feedback</h2>
+
+                <div class="row justify-content-center pxp-animate-in pxp-animate-in-top">
+                    <div class="col-lg-4 col-xxl-3 pxp-contact-card-1-container">
+                        <a class="pxp-contact-card-1">
+                            <div class="pxp-contact-card-1-icon-container">
+                                <div class="pxp-contact-card-1-icon" style="background-image: url({{data.logo}}); background-size: contain;">
+                            </div>
+                            </div>
+                            <div class="pxp-contact-card-1-title">{{ data.ename }}</div>
+                            <div class="temp-location">{{ data.title }}</div>
+                            
+                        </a>
+                    </div>
+                </div>
+
+                <div class="row mt-20 justify-content-center pxp-animate-in pxp-animate-in-top">
+                    <div class="col-lg-6 col-xxl-4">
+                        <div class="pxp-contact-us-form pxp-has-animation pxp-animate">
+                                
+                                <div class="mb-3">
+                                    <label for="contact-us-feeback" class="form-label">Feedback</label>
+                                    <textarea type="text" class="form-control" id="contact-us-feedback" placeholder="Please provide feedback" name="feedback" required rows=20 disabled readonly></textarea>
+                                </div>
+                                <div class="container">
+                                    <span id="rateMe1"></span>
+                                </div>
+                                <label for="rating" class="form-label">Overall Performance</label>
+                                <div class="star-rating">
+                                    <input type="radio" id="5-stars" name="rating" value="5" {% if data.rating == 5 %}checked{% endif %} disabled readonly/>
+                                    <label for="5-stars" class="star">&#9733;</label>
+                                    <input type="radio" id="4-stars" name="rating" value="4" {% if data.rating == 4 %}checked{% endif %} disabled readonly/>
+                                    <label for="4-stars" class="star">&#9733;</label>
+                                    <input type="radio" id="3-stars" name="rating" value="3" {% if data.rating == 3 %}checked{% endif %} disabled readonly/>
+                                    <label for="3-stars" class="star">&#9733;</label>
+                                    <input type="radio" id="2-stars" name="rating" value="2" {% if data.rating == 2 %}checked{% endif %} disabled readonly/>
+                                    <label for="2-stars" class="star">&#9733;</label>
+                                    <input type="radio" id="1-star" name="rating" value="1" {% if data.rating == 1 %}checked{% endif %} disabled readonly/>
+                                    <label for="1-star" class="star">&#9733;</label>
+                                </div>
+
+                                <div class="center-button">
+                                    <button class="btn rounded-pill pxp-section-cta" id="goBackButton">Previous page</button>
+                                </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        
+
+        <script src="{% static 'js/jquery-3.4.1.min.js' %}"></script>
+        <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+        <script src="{% static 'js/owl.carousel.min.js' %}"></script>
+        <script src="{% static 'js/nav.js' %}"></script>
+        <script src="{% static 'js/main.js' %}"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.17.1/moment.min.js"></script>
+        <script>
+            console.log("JavaScript is running");
+            console.log("data.feed:", '{{data.feed}}');
+
+            document.getElementById("goBackButton").addEventListener("click", function() {
+                history.back(); 
+            });
+            const textarea = document.getElementById("contact-us-feedback");
+            textarea.value = '{{data.feed}}'; 
+
+        </script>
+       
+    </body>
+</html>

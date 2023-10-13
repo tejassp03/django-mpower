@@ -199,7 +199,8 @@
                 </div>
                 <nav class="pxp-user-nav pxp-on-light d-flex justify-content-between align-items-center">
                     {% if appli.status == 1 %}<div style="cursor:pointer;" ><b>Onboarding Status: </b><span class="badge rounded-pill bg-success">Approved</span></div>
-                    {% else %}<div style="cursor:pointer;" ><b>Welcome</b></div>{% endif %}
+                    {% else %}<div style="cursor:pointer;" ><b><a role="button" class="nav-link"  href="{% url 'main:index' %}">Home</a></b></div>{% endif %}
+
                 <!-- onclick="redirectOnboarding();" -->
                    <div class="nav-right-group d-flex flex-row" >
                     <div class="dropdown pxp-user-nav-dropdown pxp-user-notifications">
@@ -220,6 +221,8 @@
                                 <li><a class="dropdown-item" href="{% url 'candidate:tests' pk %}"><strong>{{ i.ename }}</strong> scheduled a test. <span class="pxp-is-time">{{ i.datetime|naturaltime }}</span></a></li>
                                 {% elif i.notif_type == "I" %}
                                 <li><a class="dropdown-item" href="#" onclick="interviewload({{i.eid}})" data-bs-target="#pxp-interview-modal" data-bs-toggle="modal"><strong>{{ i.ename }}</strong> scheduled a interview. <span class="pxp-is-time">{{ i.datetime|naturaltime }}</span></a></li>
+                                {% elif i.notif_type == "F" %}
+                                <li><a class="dropdown-item" href="#" ><strong> Interview Feedback. {{ i.ename }}</strong> has given interview feedback for {{i.title}} job role. <span class="pxp-is-time">{{ i.datetime|naturaltime }}</span></a></li>
                                 {% else %}
                                 <li><a class="dropdown-item" href="#" onclick="companyload({{i.eid}})" data-bs-target="#pxp-company-modal" data-bs-toggle="modal"><strong>{{ i.ename }}</strong> viewed your profile. <span class="pxp-is-time">{{ i.datetime|naturaltime }}</span></a></li>
                                 {% endif %}
@@ -513,8 +516,8 @@
                         <hr style="margin: 0px" />
                         <div class="modal-body" style="padding: 1rem !important">
                             <div class="pxp-company-dashboard-jobs-bulk-actions" style="margin-left: auto; flex-direction: column">
-                                <div id="link_int">
-                                </div>
+                                <a id="link_int_a"href="" target="_blank"><div id="link_int">
+                                </div></a>
                             </div>
                         </div>
                         <hr style="margin: 0px" />
@@ -918,6 +921,8 @@
                         let info=JSON.parse(data['info']);
                         $('#employer_name').text(info['ename']);
                         $('#link_int').text(info['link']);
+                        $('#link_int_a').attr('href', info['link']);
+
                         $('#dateadder').text("Date: "+moment(info['date'].slice(0, 19)).format("MMM. D, YYYY, h:mm a"));
                     },
                 })

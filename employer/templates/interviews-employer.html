@@ -52,7 +52,9 @@
                         <th style="width: 15%;">Date<span class="fa fa-angle-up ms-3"></span></th>
                         <th style="width: 15%;">Link</th>
                         <th style="width: 15%;">Status</th>
+                        <th style="width: 15%;">Actions</th>
                         <th style="width: 15%;">&nbsp;</th>
+
                     </tr>
                 </thead>
                 <tbody>
@@ -72,15 +74,43 @@
                         <td><div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-secondary">Pending</span></div></td>
                         {% endif %}
                         <td>
+                            <div class="pxp-company-dashboard-jobs-bulk-actions" style="margin-left: auto">
+
+                            <select id="selectAction" class="form-select randomselect" name="action_with_option_{{i.int_id}}" onchange="selectChange({{i.int_id}})">
+                                <option value="" disabled selected>--Select--</option>
+                                <option value="a">Feedback Info</option>
+                                {% if i.isdone == 1%}
+                                    <option value="b">Give Feedback</option>
+                                {% endif %}
+                                <option value="c">Request Interview Panel</option>
+                                <option value="d">Mark Done</option>
+                                <option value="e">Delete Interview</option>
+                            </select>
+                            </div>
+                        </td>
+                        <td>
                             <div class="pxp-dashboard-table-options">
                                 <ul class="list-unstyled">
+                                    {% if i.isdone == 1%}
+                                        <li>
+                                            <a title="Give Feedback" href="{% url 'main:give_feedback' i.int_id %}" target="_blank">
+                                                <button>
+                                                    <span>
+                                                        <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512">
+                                                            <path d="M123.6 391.3c12.9-9.4 29.6-11.8 44.6-6.4c26.5 9.6 56.2 15.1 87.8 15.1c124.7 0 208-80.5 208-160s-83.3-160-208-160S48 160.5 48 240c0 32 12.4 62.8 35.7 89.2c8.6 9.7 12.8 22.5 11.8 35.5c-1.4 18.1-5.7 34.7-11.3 49.4c17-7.9 31.1-16.7 39.4-22.7zM21.2 431.9c1.8-2.7 3.5-5.4 5.1-8.1c10-16.6 19.5-38.4 21.4-62.9C17.7 326.8 0 285.1 0 240C0 125.1 114.6 32 256 32s256 93.1 256 208s-114.6 208-256 208c-37.1 0-72.3-6.4-104.1-17.9c-11.9 8.7-31.3 20.6-54.3 30.6c-15.1 6.6-32.3 12.6-50.1 16.1c-.8 .2-1.6 .3-2.4 .5c-4.4 .8-8.7 1.5-13.2 1.9c-.2 0-.5 .1-.7 .1c-5.1 .5-10.2 .8-15.3 .8c-6.5 0-12.3-3.9-14.8-9.9c-2.5-6-1.1-12.8 3.4-17.4c-4.1-4.2 7.8-8.7 11.3-13.5c1.7-2.3 3.3-4.6 4.8-6.9c.1-.2 .2-.3 .3-.5z"/>
+                                                        </svg>
+                                                    </span>
+                                                </button>
+                                            </a>
+                                        </li>
+                                    {% endif %}
                                     <li><button title="Feedback Info" onclick="feedb({{i.int_id}})" href="#" data-bs-target="#pxp-feedback-modal" data-bs-toggle="modal"><span class="fa fa-eye"></span></button></li>
                                     {% if i.is_req == 0%}
                                     <li><button title="Request Interview Panel From Mpower" onclick="panReq('{{i.int_id}}')"><span><svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 640 512"><path d="M160 64c0-35.3 28.7-64 64-64H576c35.3 0 64 28.7 64 64V352c0 35.3-28.7 64-64 64H336.8c-11.8-25.5-29.9-47.5-52.4-64H384V320c0-17.7 14.3-32 32-32h64c17.7 0 32 14.3 32 32v32h64V64L224 64v49.1C205.2 102.2 183.3 96 160 96V64zm0 64a96 96 0 1 1 0 192 96 96 0 1 1 0-192zM133.3 352h53.3C260.3 352 320 411.7 320 485.3c0 14.7-11.9 26.7-26.7 26.7H26.7C11.9 512 0 500.1 0 485.3C0 411.7 59.7 352 133.3 352z"/></svg></span></button></li>
                                     {% elif i.is_req == 1 %}
                                     <li><button title="Interview panel requested" ><span><svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 640 512" fill="green"><path d="M160 64c0-35.3 28.7-64 64-64H576c35.3 0 64 28.7 64 64V352c0 35.3-28.7 64-64 64H336.8c-11.8-25.5-29.9-47.5-52.4-64H384V320c0-17.7 14.3-32 32-32h64c17.7 0 32 14.3 32 32v32h64V64L224 64v49.1C205.2 102.2 183.3 96 160 96V64zm0 64a96 96 0 1 1 0 192 96 96 0 1 1 0-192zM133.3 352h53.3C260.3 352 320 411.7 320 485.3c0 14.7-11.9 26.7-26.7 26.7H26.7C11.9 512 0 500.1 0 485.3C0 411.7 59.7 352 133.3 352z"/></svg></span></button></li>
                                     {% endif %}
-                                    <li><button title="Done" onclick="done('{{i.int_id}}')"><span class="fa fa-check"></span></button></li>
+                                    <li><button title="Done" onclick="done('{{i.int_id}}')" style="color: {% if i.isdone == 1 %}green{% endif %};"><span class="fa fa-check"></span></button></li>
                                     <input style="display: none" value={{i.int_id}}>
                                     <li><button title="Delete" onclick="delint({{i.int_id}})"><span class="fa fa-trash-o"></span></button></li>
                                 </ul>
@@ -380,8 +410,32 @@ function done(id)
     })
 }
 
+function selectChange(id)
+{
+    let nameval="action_with_option_"+id;
+    let val_option=$(`[name=${nameval}]`).val();
+    
+    if(val_option == "a"){
+        console.log("a");
+        feedb(id);
+        var myModal = new bootstrap.Modal(document.getElementById('pxp-feedback-modal'));
+        myModal.show();
+    }else if(val_option == "b"){
+        var currentURL = window.location.origin;
+        let urlOpen = currentURL+"/give_feedback/"+id+"/";
+        window.open(urlOpen,'_blank');
+    }else if(val_option == "c"){
+        panReq(id);
+    }else if(val_option == "d"){
+        done(id);
+    }else if(val_option == "e"){
+        delint(id);
+    }
+}
+
 function feedb(id)
 {
+    $('#already_feedback').text("");
     $.ajax(
         {
             type:"GET",
@@ -399,9 +453,9 @@ function feedb(id)
                 else
                 {
                     $('#user_name2').text(data['name']);
-                    $('#feedback_link').text("Link: "+data['url']);
+                    $('#feedback_link').html('Link: <a href="' + data['url'] + '" target="_blank">' + data['url'] + '</a>');
                     $('#descri').text("Please share this link with other panel members of the interview for feedback");
-                    $('already_feedback').empty();
+                    $('#already_feedback').text("");
                     let mainsec=document.getElementById('already_feedback');
                     let ul=document.createElement('ul');
                     let info=data['info'];
