@@ -44,7 +44,7 @@ db.sqlite3
 
 # Ignore dependency directories and files
 venv/
-__pycache__/
+**/__pycache__
 node_modules/
 
 # Ignore the production static directory
