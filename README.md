@@ -33,7 +33,3 @@ Now run the project,
 ```bash
   python manage.py runserver 
 ```
-
-
-
-kdsfjf
