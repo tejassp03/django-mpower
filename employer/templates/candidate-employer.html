@@ -327,10 +327,12 @@
 {% if jobs_ %}
 <div id="popup" class="popup">
     <div class="popup-content">
+        {% for i in jobs_ %} 
         <div class="d-flex justify-content-end">
-            <button id="close-popup" class="btn btn-secondary" onclick="closePopup()"><span aria-hidden="true">&times;</span></button>
+           <h4 aria-hidden="true" style="cursor: pointer;" onclick="closePopup({{ i.jobid }})">&times;</h4>
         </div>
-        <div class="container mt-5">
+        {% endfor %}
+        <div class="container p-0" >
             <h5 class="text-primary">Facing difficulty in finding the right profiles?</h5>
             <p class="text-muted">Request candidates from mPower.</p>
         </div>
@@ -401,8 +403,9 @@ function showPopup() {
 }
 
 // Function to close the popup
-function closePopup() {
+function closePopup(jobid) {
     document.getElementById("popup").style.display = "none";
+    candifetch(jobid);
 }
 
 // Show the popup when the page loads
@@ -523,7 +526,7 @@ function candifetch(id)
                     else if(datainfo[i].status==3)
                     {
                         span3.setAttribute('class', 'badge rounded-pill bg-info');
-                        span3.innerHTML='Test Schdeuled';
+                        span3.innerHTML='Test Scheduled';
                     }
                     else if(datainfo[i].status==4)
                     {

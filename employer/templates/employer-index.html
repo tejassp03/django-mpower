@@ -31,7 +31,42 @@
         {% block title %}
         {% endblock %}
 
+        <style>
+            .modal-header {
+                padding: 10px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                
+            }
+            .modal-header>h5
+            {
+                margin-bottom: 0 !important;
+                font-size: 1rem;
+            }
+    
+            .left-pane, .right-pane {
+                flex-basis: 50%;
+                padding: 10px;
+            }
+    
+            .input-label {
+                display: block;
+                margin-bottom: 5px;
+            }
+    
+            #datetimeInput {
+                margin-bottom: 10px;
+            }
+    
+            .footer {
+                text-align: right;
+                margin-right: 20px;
+                margin-top: 10px;
+            }
+        </style>
     </head>
+    
     <body style="background-color: var(--pxpMainColorLight);">
         {% if messages %}
             {% for message in messages %}
@@ -426,12 +461,9 @@
 
         <div class="modal fade pxp-user-modal" id="pxp-results-modal" aria-hidden="true" aria-labelledby="resultsModal" tabindex="-1">
             <div class="modal-dialog modal-dialog-centered widthadjuster" style="justify-content: center">
-                <div class="modal-content" style="width: 35rem">
-                    <div class="modal-header" style="padding: 10px">
-                        <h3 id="user_name"></h3>
-                    </div>
-                    <hr style="margin: 0px" />
-                    <div class="modal-body" style="padding: 1rem !important">
+                <div class="modal-content" style="width: 50rem">
+                
+                    <div class="modal-body" style="padding: 1rem !important;display:none">
                         <div class="pxp-company-dashboard-jobs-bulk-actions" style="margin-left: auto; flex-direction: column">
                             <div id="test_name">
                             </div>
@@ -445,14 +477,35 @@
                             </div>
                         </div>
                     </div>
-                    <hr style="margin: 0px" />
-                    <div class="modal-header" style="padding: 10px">
-                        <input type="text" style="display: none" name="user_id_val" />
-                        <input type="text" class="form-control" placeholder="Paste interview link" name="intlink" />
-                        <!--<input type="datetime-local" name="interviewDate" id="" class="form-control">-->
-                        <input type="text" id="datetimeInput" class="form-control">
-                        <a class="btn rounded-pill pxp-nav-btn" onclick="sched()">Schedule</a>
-                    </div>
+                    
+                    <div class="modal-header">
+                        {% for candidate in single %}
+                        <h5><span class="fa fa-calendar"></span>&nbsp;Schedule Interview with {{candidate.name}}</h5>
+                        {% endfor %}
+                        </div>
+                        <hr style="margin: 0px" />
+                        <div>
+                            <div class="left-pane">
+                                <h6>Details</h6>
+                                <!-- <label class="input-label">Select the format of conferencing:</label>
+                                <select class="form-control" >
+                                    <option value="video">Video</option>
+                                    <option value="phone">Phone</option>
+                                    <option value="inperson">In-Person</option>
+                                </select> -->
+                                <label class="input-label" for="intlink">Third-Party Conferencing Link:</label>
+                                <input type="text" class="form-control" id="intlink" placeholder="Paste interview link" name="intlink" />
+                            </div>
+                            <div class="right-pane">
+                                <h6>Schedule a specific time</h6>
+                                <input type="datetime-local" name="interviewDate" id="datetimeInput" class="form-control">
+                            </div>
+                        </div>
+                        <div class="footer">
+                            
+                            <a class="btn rounded-pill pxp-nav-btn" onclick="sched()">Schedule Interview</a>
+                        </div>
+                   
                     <div class="modal-header" id="spanadder">
                     </div>
                 </div>

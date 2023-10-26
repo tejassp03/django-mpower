@@ -1505,5 +1505,5 @@ def signup(request):
     return render(request,'sign-up.html')
 def signin(request):
     return render(request,'sign-in.html')
-def error_404_view(request, exception):
-    return render(request, '404.html')
+# def error_404_view(request, exception):
+#     return render(request, '404.html')
