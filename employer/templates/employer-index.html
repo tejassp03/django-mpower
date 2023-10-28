@@ -94,6 +94,8 @@
                     <!--<li id="ccha"><a href="{% url 'employer:change_pass' pk=pk %}"><span class="fa fa-lock"></span>Change Password</a></li>-->
                     <li id="qui"><a href="{% url 'employer:show_tests' pk=pk %}"><span class="fa fa-question"></span>Create Test</a></li>
                     <li id="inr"><a href="{% url 'employer:all_interviews' pk=pk %}"><span class="fa fa-user"></span>Interviews</a></li>
+                    <li id="templ"><a href="{% url 'employer:all_templates' pk=pk %}"><span class="fa fa-envelope"></span>Templates</a></li>
+                    <li id="step"><a href="{% url 'employer:all_steps' pk=pk %}"><span class="fa fa-line-chart"></span>Steps</a></li>
                 </ul>
                 <div class="pxp-dashboard-side-label mt-3 mt-lg-4">Insights</div>
                 <ul class="list-unstyled">
@@ -184,6 +186,8 @@
                                     <li class="nav-item"><a href="{% url 'employer:change_pass' pk=pk %}"><span class="fa fa-lock"></span>Change Password</a></li>
                                     <li class="nav-item"><a href="{% url 'employer:show_tests' pk=pk %}"><span class="fa fa-question"></span>Create Test</a></li>
                                     <li class="nav-item"><a href="{% url 'employer:all_interviews' pk=pk %}"><span class="fa fa-user"></span>Interviews</a></li>
+                                    <li class="nav-item"><a href="{% url 'employer:all_templates' pk=pk %}"><span class="fa fa-envelope"></span>Templates</a></li>
+                                    <li class="nav-item"><a href="{% url 'employer:all_steps' pk=pk %}"><span class="fa fa-line-chart"></span>Steps</a></li>
                                     <li class="pxp-dropdown-header mt-4">Insights</li>
                                     <li class="nav-item">
                                         <a href="{% url 'employer:cinbox' pk=pk %}" class="d-flex justify-content-between align-items-center">

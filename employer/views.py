@@ -1875,6 +1875,124 @@ def resume_feedback(request,pk):
         else:
             return JsonResponse({'message': 'Try again'}, status=500)
     return JsonResponse({'message': 'Try again'}, status=500)
+
+
+def all_templates(request, pk):
+    if request.method == "POST":
+        if 'act' in request.POST:
+            for i in request.POST.getlist('ids[]'):
+                Templates.objects.get(template_id=i).delete()
+            return redirect('employer:all_templates', pk=pk)
+        Templates.objects.get(template_id=request.POST['temp_id']).delete()
+        return redirect('employer:all_templates', pk=pk)
+    templates = Templates.objects.filter(emp_id=pk)
+    all_templates = []
+    for i in templates:
+        single_template = {}
+        single_template['temp_id'] = i.template_id
+        single_template['temp_name'] = i.template_name
+        single_template['temp_desc']=i.template_description
+        single_template['created_date'] = i.created_date
+        all_templates.append(single_template)
+    sorted(all_templates, key=lambda i: i['created_date'])
+    all_templates.reverse()
+    GET_params = request.GET.copy()
+    count = len(all_templates)
+    if ('page' in GET_params):
+        last = GET_params['page'][-1]
+        GET_params['page'] = last[0]
+    p = Paginator(all_templates, 10)
+    page_number = request.GET.get('page')
+    try:
+        page_obj = p.get_page(page_number)
+    except PageNotAnInteger:
+        page_obj = p.page(1)
+    except EmptyPage:
+        page_obj = p.page(p.num_pages)
+    return render(request, 'templates-employer.html', {'pk': pk, 'pe': page_obj, 'count': count})
+
+def create_temp(request, pk):
+    if request.method == "POST":
+        template=Templates()
+        template.template_name=request.POST['name']
+        template.template_description=request.POST['desc']
+        template.emp_id=Employer.objects.get(eid=pk)
+        template.save()
+        return JsonResponse({'message': 'saved'})
+
+def get_template(request, pk):
+    template=Templates.objects.get(template_id=request.GET['temp_id'])
+    return JsonResponse({'name': template.template_name, 'desc': template.template_description, 'date': template.created_date})
+
+def edit_template(request, pk, pk2):
+    template=Templates.objects.get(template_id=pk2)
+    return render(request, 'edit-template-employer.html', {'pk': pk, 'pk2': pk2})
+
+def all_steps(request, pk):
+    if request.method == "POST":
+        if 'act' in request.POST:
+            for i in request.POST.getlist('ids[]'):
+                Steps.objects.get(step_id=i).delete()
+            return redirect('employer:all_steps', pk=pk)
+        Steps.objects.get(step_id=request.POST['step_id']).delete()
+        return redirect('employer:all_steps', pk=pk)
+    steps = Steps.objects.filter(emp_id=pk)
+    all_steps = []
+    for i in steps:
+        single_step = {}
+        single_step['step_id'] = i.step_id
+        single_step['step_name'] = i.step_name
+        single_step['step_desc'] = i.step_description
+        single_step['created_date'] = i.created_date
+        single_step['step_reso'] = i.step_resources
+        single_step['step_task'] = i.step_tasks
+        all_steps.append(single_step)
+    sorted(all_steps, key=lambda i: i['created_date'])
+    all_steps.reverse()
+    GET_params = request.GET.copy()
+    count = len(all_steps)
+    if ('page' in GET_params):
+        last = GET_params['page'][-1]
+        GET_params['page'] = last[0]
+    p = Paginator(all_steps, 10)
+    page_number = request.GET.get('page')
+    try:
+        page_obj = p.get_page(page_number)
+    except PageNotAnInteger:
+        page_obj = p.page(1)
+    except EmptyPage:
+        page_obj = p.page(p.num_pages)
+    return render(request, 'steps-employer.html', {'pk': pk, 'pe': page_obj, 'count': count})
+
+def create_step(request, pk):
+    if request.method == "POST":
+        step=Steps()
+        step.step_name=request.POST['name']
+        step.step_description=request.POST['desc']
+        step.step_resources=request.POST['reso']
+        step.step_tasks=request.POST['task']
+        step.emp_id=Employer.objects.get(eid=pk)
+        step.save()
+        return JsonResponse({'message': 'saved'})
+
+def get_step(request, pk):
+    step=Steps.objects.get(step_id=request.GET['step_id'])
+    return JsonResponse({'name': step.step_name, 'desc': step.step_description, 'date': step.created_date, 'resources': step.step_resources, 'tasks': step.step_tasks})
+
+def edit_step(request, pk):
+    step=None
+    if(request.method=="GET"):
+        step=Steps.objects.filter(step_id=request.GET['step_id'])
+    if(request.method=="POST"):
+        step=Steps.objects.get(step_id=request.POST['step_id'])
+        step.step_name=request.POST['name']
+        step.step_description=request.POST['desc']
+        step.step_resources=request.POST['reso']
+        step.step_tasks=request.POST['task']
+        step.save()
+        return JsonResponse({'info': 'done'})
+    return JsonResponse({'info': dumps(list(step.values()), default=str)})
+
 def under_development(request, pk):
     if 'shower' in request.session:
         del request.session['shower']

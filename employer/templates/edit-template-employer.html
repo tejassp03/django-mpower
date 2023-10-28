@@ -3,13 +3,13 @@
 {% load humanize %}
 
 {% block title %}
-<title>mpower - Company dashboard - Edit profile</title>
+<title>mpower - Company dashboard - Edit template</title>
 {% endblock %}
 {% block content %}
 
 <div class="pxp-dashboard-content-details">
-    <h1>Edit Profile</h1>
-    <p class="pxp-text-light">Edit your company profile page info.</p>
+    <h1>Edit template</h1>
+    <p class="pxp-text-light">Edit template according to onboarding procedure.</p>
 
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
@@ -252,10 +252,9 @@
 
 
 {% block script %}
-let ab=0;
 $(document).ready(function () {
     $('#cdas').removeClass('pxp-active');
-    $('#cedi').addClass('pxp-active');
+    $('#cedi').removeClass('pxp-active');
     $('#cnew').removeClass('pxp-active');
     $('#cman').removeClass('pxp-active');
     $('#ccan').removeClass('pxp-active');
@@ -267,97 +266,7 @@ $(document).ready(function () {
     $('#qui').removeClass('pxp-active');
     $('#inr').removeClass('pxp-active');
     $('#pen').removeClass('pxp-active');
-    $('#templ').removeClass('pxp-active');
+    $('#templ').addClass('pxp-active');
     $('#step').removeClass('pxp-active');
-    for(let i=0;i<7;i++)
-    {
-        if($('option')[i].value == {{ context.size }})
-        {
-            $('select').val({{ context.size }});
-        }
-    }
 })
-
-
-
-
-$('.action-but3').click(function(){
-    if(document.getElementById('pxp-company-phone').value=="")
-    {
-        alert("Please enter a valid phone number");
-        $('#pxp-company-phone').val('{{ context.phone }}');
-        return;
-    }
-    let text1 = document.getElementById('pxp-company-phone').value;
-    if(text1=='{{ context.phone }}')
-    {
-        alert("Please enter a different phone number");
-        return;
-    }
-    $.ajax(
-    {
-        type:"GET",
-        url: "{% url 'employer:get_ot' pk=pk %}",
-        data:{
-            'phone': text1,
-            csrfmiddlewaretoken: '{{ csrf_token }}'
-        },
-        success: function( data ) 
-        {
-            alert(`OTP is ${data.OTP}`);
-            $('#pxp-otp-modal').modal('show');
-        }
-     })
-    })
-
-$('.action-but4').click(function(){
-    let text1 = document.getElementById('pxp-company-phone').value;
-    let text2 = document.getElementById('pxp-company-otp').value;
-    if(text2=="")
-    {
-        alert("Please enter OTP to verify");
-        return;
-    }
-    $.ajax(
-    {
-        type:"POST",
-        url: "{% url 'employer:post_ot' pk=pk %}",
-        data:{
-            'phone': text1,
-            'OTP': text2,
-            csrfmiddlewaretoken: '{{ csrf_token }}'
-        },
-        success: function( data ) 
-        {
-            if(data.message=='Please enter correct OTP')
-            {
-                alert('Please enter correct OTP or Generate a new one');
-                ab=ab+1;
-                if(ab>2)
-                {
-                    location.reload();
-                }
-            }
-            else
-            {
-                alert('Phone number verified');
-                $.ajax(
-                {
-                    type:"POST",
-                    url: "{% url 'employer:cupd_phone' pk=pk %}",
-                    data:{
-                        'phone': text1,
-                        csrfmiddlewaretoken: '{{ csrf_token }}'
-                    },
-                    success: function( data ) 
-                    {
-                    }
-                })
-                location.reload();
-            }
-        }
-        })
-    })
-
-
 {% endblock %}

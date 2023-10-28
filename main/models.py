@@ -412,3 +412,30 @@ class Course(models.Model):
 
     class Meta:
         db_table = "course"
+
+
+class Templates(models.Model):
+    template_id = models.AutoField(primary_key=True)
+    template_name = models.CharField(max_length=100)
+    template_description = models.CharField(max_length=512)
+    created_date = models.DateTimeField(default=timezone.now)
+    emp_id = models.ForeignKey(Employer, default=None,
+                            null=True, on_delete=models.CASCADE)
+
+    class Meta:
+        db_table = "templates"
+
+
+class Steps(models.Model):
+    step_id = models.AutoField(primary_key=True)
+    step_name = models.CharField(max_length=512)
+    step_description = models.CharField(max_length=512)
+    created_date = models.DateTimeField(default=timezone.now)
+    step_resources = models.CharField(max_length=512)
+    step_tasks = models.CharField(max_length=512)
+    emp_id = models.ForeignKey(Employer, default=None,
+                            null=True, on_delete=models.CASCADE)
+
+    class Meta:
+        db_table = "steps"
+

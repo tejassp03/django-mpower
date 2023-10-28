@@ -1,0 +1,491 @@
+{% extends 'employer-index.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}
+<title>mpower - Company dashboard - All templates</title>
+<style>
+.progress {
+    height: 10px;
+}
+
+.progress-bar {
+    border-radius: 0;
+}
+</style>
+{% endblock %}
+{% block content %}
+
+<div class="pxp-dashboard-content-details">
+    {% if messages %}
+        {% for message in messages %}
+         {% if message.tags %}  
+         <script>alert('{{ message }}')</script>
+        {% endif %}
+        {% endfor %}
+    {% endif %}
+    <h1>All templates</h1>
+    <p class="pxp-text-light">Templates for onboarding procedures</p>
+
+    <div class="mt-4 mt-lg-5">
+        <div class="row justify-content-between align-content-center">
+            <div class="col-auto order-2 order-sm-1">
+                <div class="pxp-company-dashboard-jobs-bulk-actions mb-3">
+                    <select class="form-select" name="act">
+                        <option value="a">Bulk actions</option>
+                        {% comment %} <option>Edit</option> {% endcomment %}
+                        <option value="b">Delete</option>
+                    </select>
+                    <button class="btn ms-2" onclick="multiple()">Apply</button>
+                </div>
+            </div>
+            <div class="col-auto order-1 order-sm-2">
+                <div class="pxp-company-dashboard-jobs-search mb-3">
+                    <div class="pxp-company-dashboard-jobs-search-results me-3">{{ count }} Templates</div>
+                    <div class="pxp-company-dashboard-jobs-search-search-form">
+                        <div class="input-group">
+                            <span class="input-group-text" style="background: white"><span class="fa fa-search"></span></span>
+                            <input type="text" class="form-control" placeholder="Search templates..." id="search">
+                        </div>
+                    </div>
+                    {% if count > 0 %}
+                        <div class="pxp-company-dashboard-jobs-bulk-actions">
+                            <a class="btn ms-2" data-bs-target="#pxp-template-modal" data-bs-toggle="modal">Create Template</a>
+                        </div>
+                    {% endif %}
+
+                </div>
+            </div>
+        </div>
+        {%  if count == 0 %}
+        <div class="pt-5 d-flex flex-column justify-content-center align-items-center">
+        <h4>No templates to display.</h4>    
+        <div class="pxp-company-dashboard-jobs-bulk-actions"><a class="btn ms-2 mt-2 btn-primary" data-bs-target="#pxp-template-modal" data-bs-toggle="modal">Create Template</a></div>
+        </div>
+        {% else %}
+        <div class="table-responsive">
+            <table class="table table-hover align-middle" id="table">
+                <thead>
+                    <tr>
+                        <th class="pxp-is-checkbox" style="width: 1%;"><input type="checkbox" onClick="toggle(this)" class="form-check-input" name="all"></th>
+                        <th style="width: 15%;">Template Name</th>
+                        <th style="width: 15%;">Created Date<span class="fa fa-angle-up ms-3"></span></th>
+                        <th style="width: 15%;">Number of steps</th>
+                        <th style="width: 15%;">&nbsp;</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+                    {% for i in pe %}
+                    <tr>
+                        <td><input type="checkbox" name="chek" class="form-check-input" value={{ i.temp_id }}></td>
+                        <td>
+                            <a href="#">
+                                <div class="pxp-company-dashboard-job-title" onclick="templatemodal('{{i.temp_id}}')" data-bs-target="#pxp-tempshow-modal" data-bs-toggle="modal">{{ i.temp_name }}</div>
+                            </a>
+                        </td>
+                        <td><div class="pxp-company-dashboard-job-date mt-1">{{ i.created_date }}</div></td>
+                        <td><div class="pxp-company-dashboard-job-category">{{ i.time_limit }} Minutes</div></td>
+                        <td>
+                            <div class="pxp-dashboard-table-options">
+                                <ul class="list-unstyled">
+                                    <li><button title="View" id="pxp-test-modal-button" data-bs-target="#pxp-tempshow-modal" data-bs-toggle="modal" onclick="templatemodal('{{ i.temp_id }}')"><span class="fa fa-eye"></span></button></li>
+                                    <li><a href="{% url 'employer:edit_template' pk=pk pk2=i.temp_id %}"><button title="Edit" id="pxp-test-modal-button-edit"><span class="fa fa-pencil"></span></button></a></li>
+                                    <input style="display: none" value={{i.test_id}}>
+                                    <li><button title="Delete" onclick="deltemplate({{i.temp_id}})"><span class="fa fa-trash-o"></span></button></li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <div class="row mt-4 mt-lg-5 justify-content-between align-items-center">
+                <div class="col-auto">
+                    <nav class="mt-3 mt-sm-0" aria-label="Jobs list pagination">
+                        <ul class="pagination pxp-pagination">
+                            {% if count >= 11 %}
+                            {% if pe.has_previous %}
+                                {% if GET_params %}
+                                <li class="page-item"><a style="padding: 0.7rem" href="?{{GET_params.urlencode}}&amp;page={{pe.previous_page_number}}" class="page-link"><i class="fa fa-chevron-left" aria-hidden="true"></i></a></li>
+                                {% else %}
+                                <li class="page-item"><a style="padding: 0.7rem" href="?page={{pe.previous_page_number}}" class="page-link"><i class="fa fa-chevron-left" aria-hidden="true"></i></a></li>
+                                {% endif %}
+                            {% endif %}
+
+                            {% if pe.number|add:'-4' > 1 %}
+                                {% if GET_params %}
+                                <li class="page-item"><a style="padding: 0.7rem" href="?{{GET_params.urlencode}}&amp;page={{ pe.number|add:'-5' }}" class="page-link">&hellip;</a></li>
+                                {% else %}
+                                <li class="page-item"><a style="padding: 0.7rem" href="?page={{ pe.number|add:'-5' }}" class="page-link">&hellip;</a></li>
+                                {% endif %}
+                            {% endif %}
+
+                            {% for i in pe.paginator.page_range %}
+                                {% if pe.number == i %}
+                                    <li class="page-item active" aria-current="page">
+                                        <span style="padding: 0.7rem" class="page-link">{{pe.number}}</span>
+                                    </li>
+                                {% elif i > pe.number|add:'-5' and i < pe.number|add:'5' %}
+                                    {% if GET_params %}
+                                    <li class="page-item"><a style="padding: 0.7rem" href="?{{GET_params.urlencode}}&amp;page={{ i }}" class="page-link">{{i}}</a></li>
+                                    {% else %}
+                                    <li class="page-item"><a style="padding: 0.7rem" href="?page={{ i }}" class="page-link">{{i}}</a></li>
+                                    {% endif %}
+                                {% endif %}
+                            {% endfor %}
+
+                            {% if pe.paginator.num_pages > pe.number|add:'4' %}
+                                {% if GET_params %}
+                                <li class="page-item"><a style="padding: 0.7rem" href="?{{GET_params.urlencode}}&amp;page={{ pe.number|add:'5' }}" class="page-link">&hellip;</a></li>
+                                {% else %}
+                                <li class="page-item"><a style="padding: 0.7rem" href="?page={{ pe.number|add:'5' }}" class="page-link">&hellip;</a></li>
+                                {% endif %}
+                            {% endif %}
+
+                            {% if pe.has_next %}
+                                {% if GET_params %}
+                                <li class="page-item"><a style="padding: 0.7rem" href="?{{GET_params.urlencode}}&amp;page={{ pe.next_page_number }}" class="page-link"><i class="fa fa-chevron-right" aria-hidden="true"></i></a></li>
+                                {% else %}
+                                <li class="page-item"><a style="padding: 0.7rem" href="?page={{pe.next_page_number}}" class="page-link"><i class="fa fa-chevron-right" aria-hidden="true"></i></a></li>
+                                {% endif %}
+                            {% endif %}
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+                <div class="col-auto">
+                    {% comment %} <a href="#" class="btn rounded-pill pxp-section-cta mt-3 mt-sm-0">Show me more<span class="fa fa-angle-right"></span></a> {% endcomment %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+
+
+<div class="modal fade pxp-user-modal" id="pxp-template-modal" aria-hidden="true" aria-labelledby="expModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered" style="
+    display: flex;
+    align-items: center;
+    justify-content: center;">
+        <div class="modal-content" style="width: 100vw; display: flex; flex-direction: row; align-items: center">
+            <div class="modal-body" style="width: 70vw; padding: 15px 15px !important">
+                <div class="pxp-dashboard-content-details" style="margin-right:0px; box-shadow: none; padding: 0px; min-height: 0px">
+                    <form enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="pxp-company-job-title" class="form-label">Template name</label>
+                            <input type="text" id="pxp-step-name" class="form-control" placeholder="Add title" name="templ_name">
+                        </div>
+                
+                        <div class="mb-3">
+                            <label for="pxp-company-job-description" class="form-label">Description</label>
+                            <textarea class="form-control" id="pxp-step-description" placeholder="Type the description here..." name="templ_description"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <input id="pxp-step-id" style="display: none" name="stepidm">
+                <button class="btn rounded-pill pxp-subsection-cta" onclick="createTemplate()">Create</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% comment %} <div class="modal fade pxp-user-modal" id="pxp-temp-edit-modal" aria-hidden="true" aria-labelledby="expModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered" style="
+    display: flex;
+    align-items: center;
+    justify-content: center;">
+        <div class="modal-content" style="width: 100vw; display: flex; flex-direction: row; align-items: center">
+            <div class="modal-body" style="width: 70vw; padding: 15px 15px !important">
+                <div class="pxp-dashboard-content-details" style="margin-right:0px; box-shadow: none; padding: 0px; min-height: 0px">
+                    <form enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="pxp-company-job-title" class="form-label">Template name</label>
+                            <input type="text" id="pxp-step-name" class="form-control" placeholder="Add title" name="templ_name_edit">
+                        </div>
+                
+                        <div class="mb-3">
+                            <label for="pxp-company-job-description" class="form-label">Description</label>
+                            <textarea class="form-control" id="pxp-step-description" placeholder="Type the description here..." name="templ_description_edit"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <input id="pxp-step-id" style="display: none" name="templateidm">
+                <button class="btn rounded-pill pxp-subsection-cta" onclick="editTemplate()">Create</button>
+            </div>
+        </div>
+    </div>
+</div> {% endcomment %}
+
+{% comment %} <div class="modal fade pxp-user-modal" id="pxp-template-modal" aria-hidden="true" aria-labelledby="testEditModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered" style="
+    display: flex;
+    align-items: center;
+    justify-content: center;">
+        <div class="modal-content" style="width: 100vw; display: flex; flex-direction: row; align-items: center">
+            <div class="modal-body" style="width: 70vw; padding: 15px 15px !important">
+                <div class="pxp-dashboard-content-details">
+                    <h1>Create template</h1>
+                    <p class="pxp-text-light">Create a template forkdfkls onboarding procedures.</p>
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mt-4 mt-lg-5">
+                            <div class="row justify-content-between align-content-center">
+                                <div class="col-auto order-1 order-sm-2">
+                                    <div class="pxp-company-dashboard-jobs-search mb-3" style="align-items: flex-start; flex-direction: column">
+                                        <div class="pxp-company-dashboard-jobs-search-search-form" style="display: flex; align-items: center">
+                                            <div style="margin-right: 4px; width: 16rem">
+                                                Name: 
+                                            </div>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" placeholder="Enter name" name="templ_name" id="editname" required>
+                                            </div>
+                                        </div>
+                                        <div style="display: flex; align-items: baseline">
+                                        <div class="pxp-company-dashboard-jobs-search-search-form mt-3" style="display: flex; align-items: center">
+                                            <div style="margin-right: 4px; width: 16rem">
+                                                Description:
+                                            </div>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" placeholder="Enter description" name="templ_description" id="edittime" required>
+                                            </div>
+                                        </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                </form>
+                </div>
+                <button class="btn rounded-pill pxp-subsection-cta" onclick="createTemplate()" >Create</button>
+            </div>
+        </div>
+    </div>
+</div> {% endcomment %}
+
+
+{% comment %} <div class="modal fade pxp-user-modal" id="pxp-template-modal" aria-hidden="true" aria-labelledby="testEditModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered" style="
+    display: flex;
+    align-items: center;
+    justify-content: center;">
+        <div class="modal-content" style="width: 100vw; display: flex; flex-direction: row; align-items: center">
+            <div class="modal-body" style="width: 70vw; padding: 15px 15px !important">
+                <div class="pxp-dashboard-content-details">
+                    <h1>Create Template</h1>
+                    <p class="pxp-text-light">Create a template for onboarding procedures.</p>
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mt-4 mt-lg-5">
+                            <div class="row justify-content-between align-content-center">
+                                <div class="col-auto order-1 order-sm-2">
+                                    <div class="pxp-company-dashboard-jobs-search mb-3" style="align-items: flex-start; flex-direction: column">
+                                        <div class="pxp-company-dashboard-jobs-search-search-form" style="display: flex; align-items: center">
+                                            <div style="margin-right: 4px; width: 16rem">
+                                                Name: 
+                                            </div>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" placeholder="Enter name" name="templ_name" id="editname" required>
+                                            </div>
+                                        </div>
+                                        <div style="display: flex; align-items: baseline">
+                                        <div class="pxp-company-dashboard-jobs-search-search-form mt-3" style="display: flex; align-items: center">
+                                            <div style="margin-right: 4px; width: 16rem">
+                                                Description:
+                                            </div>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" placeholder="Enter description" name="templ_description" id="edittime" required>
+                                            </div>
+                                        </div>
+                        
+                                    </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                </form>
+                </div>
+                <button class="btn rounded-pill pxp-subsection-cta" onclick="createTemplate()" >Create</button>
+            </div>
+        </div>
+    </div>
+</div> {% endcomment %}
+
+
+<div class="modal fade pxp-user-modal" id="pxp-tempshow-modal" aria-hidden="true" aria-labelledby="feedbackModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered widthadjuster" style="justify-content: center">
+        <div class="modal-content" style="width: 35rem">
+            <div class="modal-header" style="padding: 10px; flex-direction: column">
+                <h5 id="name_of_temp"></h5>
+            </div>
+            <hr style="margin: 0px" />
+            <div class="modal-body" style="padding: 1rem !important">
+                <div class="pxp-company-dashboard-jobs-bulk-actions" style="margin-left: auto; flex-direction: column">
+                    <div id="desc_of_temp">
+                    </div>
+                </div>
+            </div>
+            <hr style="margin: 0px" />
+            <div class="modal-header" style="padding: 10px; flex-direction: column">
+                <p id="date_of_temp"></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    function createTemplate()
+    {
+        let name=$("[name='templ_name']").val();
+        let desc=$("[name='templ_description']").val();
+        $.ajax(
+        {
+            type:"POST",
+            url: "{% url 'employer:create_temp' pk %}",
+            data:{
+                    'name': name,
+                    'desc': desc,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function( data ) 
+            {
+                location.reload()
+            }
+    })
+    }
+    
+    function templatemodal(id)
+    {
+        $.ajax(
+        {
+            type:"GET",
+            url: "{% url 'employer:get_template' pk=pk %}",
+                data:{
+                        temp_id: id
+                },
+            success: function( data ) 
+            {
+                $('#name_of_temp').text("Name : "+data['name']);
+                $('#desc_of_temp').text("Description : "+data['desc']);
+                $('#date_of_temp').text("Date : "+data['date']);
+            }
+        })
+    }
+
+</script>
+{% endblock %}
+
+{% block script %}
+
+$(document).ready(function () {
+    $('#cdas').removeClass('pxp-active');
+    $('#cedi').removeClass('pxp-active');
+    $('#cnew').removeClass('pxp-active');
+    $('#cman').removeClass('pxp-active');
+    $('#ccan').removeClass('pxp-active');
+    $('#csub').removeClass('pxp-active');
+    $('#ccha').removeClass('pxp-active');
+    $('#cinb').removeClass('pxp-active');
+    $('#cnot').removeClass('pxp-active');
+    $('#scn').removeClass('pxp-active');
+    $('#qui').removeClass('pxp-active');
+    $('#inr').removeClass('pxp-active');
+    $('#pen').removeClass('pxp-active');
+    $('#templ').addClass('pxp-active');
+    $('#step').removeClass('pxp-active');
+})
+
+
+var $rows = $('#table tbody tr');
+$('#search').keyup(function() {
+    var val = $.trim($(this).val()).replace(/ +/g, ' ').toLowerCase();
+    
+    $rows.show().filter(function() {
+        var text = $(this).text().replace(/\s+/g, ' ').toLowerCase();
+        return !~text.indexOf(val);
+    }).hide();
+});
+
+$("[name='chek']").change(function(){
+    let a=0;
+    checkboxes = document.getElementsByName('chek');
+    let n=checkboxes.length
+    for(let i=0;i<n;i++) {
+      if(checkboxes[i].checked==false)
+      {
+        a=a+1;
+      }
+    }
+    if(a==0)
+    {
+        $("[name=all]").prop('checked', true);
+    }
+    else
+    {
+        $("[name=all]").prop('checked', false);
+    }
+})
+
+function toggle(source) {
+    checkboxes = document.getElementsByName('chek');
+    for(var i=0, n=checkboxes.length;i<n;i++) {
+      checkboxes[i].checked = source.checked;
+    }
+}
+
+function deltemplate(id)
+{
+    $.ajax(
+        {
+            type:"POST",
+            url: "",
+            data:{
+                    'temp_id': id,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function( data ) 
+            {
+                location.reload()
+            }
+    })
+}
+
+function multiple()
+{
+    let action=$("[name='act']").val();
+    if(action=='a')
+    {
+        alert("Please select an appropriate action")
+        return;
+    }
+    let ids=[];
+    $("[name='chek']:checked").map(function () {
+        ids.push(this.value);
+    })
+    if(ids.length==0)
+    {
+        alert("Please select at least one of the records to apply delete operation")
+        return;
+    }
+    $.ajax(
+        {
+            type:"POST",
+            url: "",
+            data:{
+                    'ids': ids,
+                    'act': "delall",
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function( data ) 
+            {
+                location.reload()
+            }
+    })
+}
+
+{% endblock %}
