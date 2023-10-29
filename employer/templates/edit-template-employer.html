@@ -14,235 +14,65 @@
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         <div class="row mt-4 mt-lg-5">
-            <div class="col-xxl-8">
-                <div class="mb-3">
-                    <label for="pxp-company-name" class="form-label">Company name</label>
-                    <input type="text" id="pxp-company-name" class="form-control" placeholder="Add company name" name="ename" value="{{ request.session.name }}">
-                </div>
-                <div class="row">
-                    <div class="col-sm-6">
-                        <div class="mb-3">
-                            <label for="pxp-company-email" class="form-label">Email</label>
-                            <input type="email" id="pxp-company-email" class="form-control" placeholder="company@email.com" name="email" value="{{ request.session.email }}">
-                        </div>
-                    </div>
-                    <div class="col-sm-6">
-                        <div class="mb-3">
-                            <label for="pxp-company-phone" class="form-label">Phone</label>
-                            <input type="tel" id="pxp-company-phone" class="form-control" placeholder="(+12) 345 6789" name="phone" value="{{ context.phone }}">
-                            <a class="btn rounded-pill pxp-subsection-cta action-but3">Get OTP</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="mb-3">
-                    <label for="pxp-company-website" class="form-label">Website</label>
-                    {% if context.website == None %}
-                    <input type="url" id="pxp-company-website" class="form-control" placeholder="https://" name="website">
-                    {% else %}
-                    <input type="url" id="pxp-company-website" class="form-control" placeholder="https://" name="website" value="{{ context.website }}">
-                    {% endif %}
-                </div>
-            </div>
-            <div class="col-xxl-4">
-                <div class="form-label">&nbsp;</div>
-                <div class="pxp-company-cover mb-3">
-                    <input type="file" id="pxp-company-cover-choose-file" accept="image/*" name="cover">
-                    {% if context.cover %}
-                        <label for="pxp-company-cover-choose-file" class="pxp-cover" style="background-image: url('{{ context.cover.url }}')"><span></span></label>
-                    {% else %}
-                        <label for="pxp-company-cover-choose-file" class="pxp-cover"><span>Upload Cover Image</span></label>
-                    {% endif %}
-                </div>
-                <div class="pxp-company-logo mb-3">
-                    <input type="file" id="pxp-company-logo-choose-file" accept="image/*" name="logo">
-                    {% if request.session.photo %}
-                        <label for="pxp-company-logo-choose-file" class="pxp-cover" style="background-image: url('{{ request.session.photo }}')"></label>
-                    {% else %}
-                        <label for="pxp-company-logo-choose-file" class="pxp-cover"><span>Upload<br>Logo</span></label>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-
-        <div class="mb-3">
-            <label for="pxp-company-about" class="form-label">About the company</label>
-            {% if context.profile == None %}
-            <textarea class="form-control" id="pxp-company-about" placeholder="Type your info here..." name="profile"></textarea>
-            {% else %}
-            <textarea class="form-control" id="pxp-company-about" placeholder="Type your info here..." name="profile">{{ context.profile }}</textarea>
-            {% endif %}
-        </div>
-
-        <div class="row">
-            <div class="col-md-4">
-                <div class="mb-3">
-                    <label for="pxp-company-industry" class="form-label">Industry</label>
-                    {% if context.industry == None %}
-                    <input type="text" id="pxp-company-industry" class="form-control" placeholder="E.g. Software" name="industry">
-                    {% else %}
-                    <input type="text" id="pxp-company-industry" class="form-control" placeholder="E.g. Software" name="industry" value="{{ context.industry }}">
-                    {% endif %}
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="mb-3">
-                    <label for="pxp-company-founded" class="form-label">Founded in</label>
-                    {% if context.yearfounded == None %}
-                    <input type="text" id="pxp-company-founded" class="form-control" placeholder="E.g. 2001" name="yearfounded">
-                    {% else %}
-                    <input type="text" id="pxp-company-founded" class="form-control" placeholder="E.g. 2001" name="yearfounded" value="{{ context.yearfounded }}">
-                    {% endif %}
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="mb-3">
-                    <label for="pxp-company-size" class="form-label">Company size</label>
-                    <select id="pxp-company-size" class="form-select" name="size">
-                        <option value="1">&lt; 50 employees</option>
-                        <option value="2">50 - 100 employees</option>
-                        <option value="3">100 - 150 employees</option>
-                        <option value="4">150 - 200 employees</option>
-                        <option value="5">200 - 250 employees</option>
-                        <option value="6">250 - 300 employees</option>
-                        <option value="7">&gt; 300 employees</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-
-        <div class="mt-4 mt-lg-5">
-            <h2>Company Location</h2>
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="mb-3">
-                        <label for="pxp-company-country" class="form-label">Country/State</label>
-                        {% if context.location == None %}
-                        <input type="text" id="pxp-company-country" class="form-control" placeholder="E.g. United States, CA" name="location">
-                        {% else %}
-                        <input type="text" id="pxp-company-country" class="form-control" placeholder="E.g. United States, CA" name="location" value="{{ context.location }}">
-                        {% endif %}
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="mb-3">
-                        <label for="pxp-company-city" class="form-label">City</label>
-                        {% if context.city == None %}
-                        <input type="text" id="pxp-company-city" class="form-control" placeholder="E.g. San Francisco" name="city">
-                        {% else %}
-                        <input type="text" id="pxp-company-city" class="form-control" placeholder="E.g. San Francisco" name="city" value="{{ context.city }}">
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
             <div class="mb-3">
-                <label for="pxp-company-address" class="form-label">Address</label>
-                {% if context.address == None %}
-                <input type="text" id="pxp-company-address" class="form-control" placeholder="Type full address here..." name="address">
-                {% else %}
-                <input type="text" id="pxp-company-address" class="form-control" placeholder="Type full address here..." name="address" value="{{ context.address }}">
-                {% endif %}
+                <label for="pxp-company-name" class="form-label"><h5>Template name</h5></label>
+                <input type="text" id="pxp-company-name" class="form-control" placeholder="Template name" name="templ_name" value="{{ template.template_name }}">
             </div>
         </div>
-
-        <div class="mt-4 mt-lg-5">
-            <h2>Social Media</h2>
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="mb-3">
-                        <label for="pxp-company-facebook" class="form-label">Facebook</label>
-                        {% if context.fblink == None %}
-                        <input type="url" id="pxp-company-facebook" class="form-control" placeholder="https://" name="fblink">
-                        {% else %}
-                        <input type="url" id="pxp-company-facebook" class="form-control" placeholder="https://" name="fblink" value="{{ context.fblink }}">
-                        {% endif %}
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="mb-3">
-                        <label for="pxp-company-twitter" class="form-label">Twitter</label>
-                        {% if context.twlink == None %}
-                        <input type="url" id="pxp-company-twitter" class="form-control" placeholder="https://" name="twlink">
-                        {% else %}
-                        <input type="url" id="pxp-company-twitter" class="form-control" placeholder="https://" name="twlink" value="{{ context.twlink }}">
-                        {% endif %}
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="mb-3">
-                        <label for="pxp-company-instagram" class="form-label">Instagram</label>
-                        {% if context.inlink == None %}
-                        <input type="url" id="pxp-company-instagram" class="form-control" placeholder="https://" name="inlink">
-                        {% else %}
-                        <input type="url" id="pxp-company-instagram" class="form-control" placeholder="https://" name="inlink" value="{{ context.inlink }}">
-                        {% endif %}
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="mb-3">
-                        <label for="pxp-company-linkedin" class="form-label">Linkedin</label>
-                        {% if context.lnlink == None %}
-                        <input type="url" id="pxp-company-linkedin" class="form-control" placeholder="https://" name="lnlink">
-                        {% else %}
-                        <input type="url" id="pxp-company-linkedin" class="form-control" placeholder="https://" name="lnlink" value="{{ context.lnlink }}">
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
+        <hr/>
+        <div class="mb-3">
+            <label for="pxp-company-about" class="form-label"><h5>Description</h5></label>
+            <textarea class="form-control" id="pxp-company-about" placeholder="Description" name="templ_desc">{{ template.template_description }}</textarea>
         </div>
-
-        <div class="mt-4 mt-lg-5">
-            <button class="btn rounded-pill pxp-section-cta">Save Profile</button>
+        <div class="mt-lg-5">
+            <button class="btn rounded-pill pxp-section-cta">Edit template</button>
         </div>
     </form>
-        
-    
-        <form method="post" action="{% url 'employer:change_pass' pk%}" >
-            {% csrf_token %}
-        <div class="mt-4 mt-lg-5">
-
-            <h2>Change Password</h2>
-            <p class="pxp-text-light">Choose a new account password.</p>
-            <div class="row mt-4 mt-lg-5">
-                <div class="col-md-6">
-                    <div class="mb-3">
-                        <label for="pxp-company-old-password" class="form-label">Old password</label>
-                        <input type="password" id="pxp-company-old-password" class="form-control" placeholder="Enter old password" name="old">
-                    </div>
-                </div>
-            </div>
-    
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="mb-3">
-                        <label for="pxp-company-new-password" class="form-label">New password</label>
-                        <input type="password" id="pxp-company-new-password" class="form-control" placeholder="Enter new password" name="new">
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="mb-3">
-                        <label for="pxp-company-new-password-repeat" class="form-label">New password repeat</label>
-                        <input type="password" id="pxp-company-new-password-repeat" class="form-control" placeholder="Repeat new password" name="cnew">
-                    </div>
-                </div>
-            </div>
-    
-            <div class="mt-4 mt-lg-5">
-                <button class="btn rounded-pill pxp-section-cta">Save New Password</button>
-            </div>
+    <hr/>
+    <div class="mb-3">
+        <label for="pxp-company-about" class="form-label"><h5>All steps</h5></label>
+    </div>
+    <div class="mt-4 mt-lg-5">
+        <div class="table-responsive">
+            <table class="table align-middle">
+                <th style="width: 10%">Order</th>
+                <th style="width: 40%">Name</th>
+                <th style="width: 25%">Description</th>
+                {% for i in steps %}
+                <tr>
+                    <td style="width: 10%;"><div class="pxp-candidate-dashboard-experience-company">{{ forloop.counter }}</div></td>
+                    <td style="width: 40%;"><div class="pxp-candidate-dashboard-experience-company">{{ i.step_id.step_name }}</div></td>
+                    <td style="width: 25%;"><div class="pxp-candidate-dashboard-experience-company">{{ i.step_id.step_description }}</div></td>
+                    <td>
+                        <div class="pxp-dashboard-table-options">
+                            <ul class="list-unstyled">
+                                <li><button title="Delete" class="delete_exp" onclick="delastep({{ i.step_id.step_id }})"><input style="display: none" value={{ i.step_id.step_id }} /><span class="fa fa-trash-o"></span></button></li>
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
         </div>
-        </form>
+    </div>
+    <button class="btn rounded-pill pxp-section-cta" data-bs-target="#pxp-tempshow-modal" data-bs-toggle="modal" onclick="addsteptotemp()">Add step</button>
+    <hr/>
 </div>
 
-<div class="modal fade pxp-otp-modal" id="pxp-otp-modal" aria-hidden="true" aria-labelledby="otpModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-body">
-                <h5 class="modal-title text-center mt-4">Verify OTP</h5>
+
+
+<div class="modal fade pxp-user-modal" id="pxp-tempshow-modal" aria-hidden="true" aria-labelledby="feedbackModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered widthadjuster" style="justify-content: center">
+        <div class="modal-content" style="width: 35rem">
+            <div class="modal-header" style="padding: 10px; flex-direction: column">
+                <h4 id="name_of_temp">Available steps to add</h4>
             </div>
-            <hr>
-            <div style="margin-right: auto; margin-left: auto; margin-bottom: 20px" id="messagesshow">
-                <input class="form-group" placeholder="Enter opt" type="text" name="otpval" id="pxp-company-otp" />
-                <button class="btn rounded-pill pxp-subsection-cta action-but4">Verify</button>
+            <hr style="margin: 0px" />
+            <div class="modal-body" style="padding: 1rem !important">
+                <div class="pxp-company-dashboard-jobs-bulk-actions" style="margin-left: auto; flex-direction: column">
+                    <div id="addstepshere" style="width: 100%; display: flex; flex-direction: column;">
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -269,4 +99,71 @@ $(document).ready(function () {
     $('#templ').addClass('pxp-active');
     $('#step').removeClass('pxp-active');
 })
+
+function addsteptotemp()
+{
+    $.ajax(
+        {
+            type:"GET",
+            url: "{% url 'employer:get_all_steps' pk=pk pk2=pk2 %}",
+                data:{
+                },
+            success: function( data ) 
+            {
+                let final_data=JSON.parse(data['info']);
+                let inserter=document.getElementById('addstepshere');
+                inserter.innerHTML='';
+                for(let i=0;i<final_data.length;i++)
+                {
+                    let div=document.createElement('div');
+                    div.setAttribute('class', 'spacematch mt-4')
+                    div.setAttribute('style', 'display: flex; justify-content: space-between;')
+                    let p=document.createElement('p');
+                    p.innerHTML=final_data[i].step_name;
+                    div.append(p);
+                    let but=document.createElement('button');
+                    but.setAttribute('class', 'btn rounded-pill pxp-section-cta')
+                    let finalstring='finaladd('+final_data[i].step_id+')'
+                    but.setAttribute('onclick', finalstring)
+                    but.innerHTML="Add"
+                    div.append(but);
+                    inserter.append(div);
+                }
+            }
+        })
+}
+
+function finaladd(id)
+{
+    $.ajax(
+        {
+            type:"POST",
+            url: "{% url 'employer:get_all_steps' pk=pk pk2=pk2 %}",
+            data:{
+                    'step_id': id,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function( data ) 
+            {
+                location.reload()
+            }
+    })
+}
+
+function delastep(id)
+{
+    $.ajax(
+        {
+            type:"POST",
+            url: "{% url 'employer:delastep' pk=pk pk2=pk2 %}",
+            data:{
+                    'step_id': id,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function( data ) 
+            {
+                location.reload()
+            }
+    })
+}
 {% endblock %}

@@ -1888,11 +1888,13 @@ def all_templates(request, pk):
     templates = Templates.objects.filter(emp_id=pk)
     all_templates = []
     for i in templates:
+        steps_count=len(TemplateSteps.objects.filter(template_id=i.template_id))
         single_template = {}
         single_template['temp_id'] = i.template_id
         single_template['temp_name'] = i.template_name
         single_template['temp_desc']=i.template_description
         single_template['created_date'] = i.created_date
+        single_template['steps_count']=steps_count
         all_templates.append(single_template)
     sorted(all_templates, key=lambda i: i['created_date'])
     all_templates.reverse()
@@ -1922,11 +1924,46 @@ def create_temp(request, pk):
 
 def get_template(request, pk):
     template=Templates.objects.get(template_id=request.GET['temp_id'])
-    return JsonResponse({'name': template.template_name, 'desc': template.template_description, 'date': template.created_date})
+    step_temp=TemplateSteps.objects.filter(template_id=request.GET['temp_id']).order_by('step_order')
+    final_data=[]
+    for i in step_temp:
+        mid_data=[]
+        mid_data.append(i.step_order)
+        mid_data.append(i.step_id.step_name)
+        final_data.append(mid_data)
+    return JsonResponse({'name': template.template_name, 'desc': template.template_description, 'date': template.created_date, 'info': final_data})
 
 def edit_template(request, pk, pk2):
     template=Templates.objects.get(template_id=pk2)
-    return render(request, 'edit-template-employer.html', {'pk': pk, 'pk2': pk2})
+    steps=TemplateSteps.objects.filter(template_id=pk2)
+    if(request.method=="POST"):
+        template.template_name=request.POST['templ_name']
+        template.template_description=request.POST['templ_desc']
+        template.save()
+        return redirect('employer:edit_template', pk=pk, pk2=pk2)
+    return render(request, 'edit-template-employer.html', {'pk': pk, 'pk2': pk2, 'template': template, 'steps': steps})
+
+def get_all_steps(request, pk, pk2):
+    all_steps=Steps.objects.filter(emp_id=pk)
+    all_temp_steps=TemplateSteps.objects.filter(template_id=pk2)
+    remaining_steps = all_steps.exclude(step_id__in=all_temp_steps.values_list('step_id', flat=True))
+    if(request.method=="POST"):
+        template_step=TemplateSteps()
+        template_step.template_id=Templates.objects.get(template_id=pk2)
+        template_step.step_id=Steps.objects.get(step_id=request.POST['step_id'])
+        template_step.step_order=len(all_temp_steps)+1
+        template_step.save()
+        return JsonResponse({'message': 'added'})
+    return JsonResponse({'info': dumps(list(remaining_steps.values()), default=str)})
+
+def delastep(request, pk, pk2):
+    if(request.method=="POST"):
+        TemplateSteps.objects.get(template_id=pk2, step_id=request.POST['step_id']).delete()
+        all_temp_steps=TemplateSteps.objects.filter(template_id=pk2).order_by('step_order')
+        for i in range(0, len(all_temp_steps)):
+            all_temp_steps[i].step_order=i+1
+            all_temp_steps[i].save()
+        return JsonResponse({'message': 'done'})
 
 def all_steps(request, pk):
     if request.method == "POST":

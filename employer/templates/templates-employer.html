@@ -85,7 +85,7 @@
                             </a>
                         </td>
                         <td><div class="pxp-company-dashboard-job-date mt-1">{{ i.created_date }}</div></td>
-                        <td><div class="pxp-company-dashboard-job-category">{{ i.time_limit }} Minutes</div></td>
+                        <td><div class="pxp-company-dashboard-job-category">{{ i.steps_count }}</div></td>
                         <td>
                             <div class="pxp-dashboard-table-options">
                                 <ul class="list-unstyled">
@@ -331,7 +331,8 @@
             </div>
             <hr style="margin: 0px" />
             <div class="modal-header" style="padding: 10px; flex-direction: column">
-                <p id="date_of_temp"></p>
+                <table id="stepsadder" style="width: 100%">
+                </table>
             </div>
         </div>
     </div>
@@ -372,7 +373,33 @@
             {
                 $('#name_of_temp').text("Name : "+data['name']);
                 $('#desc_of_temp').text("Description : "+data['desc']);
-                $('#date_of_temp').text("Date : "+data['date']);
+
+                let final_data=data['info'];
+                let inserter=document.getElementById('stepsadder');
+                inserter.innerHTML='';
+                let trval=document.createElement('tr')
+                let th1=document.createElement('th')
+                th1.innerHTML="Order"
+                th1.setAttribute('style', 'text-align: center')
+                let th2=document.createElement('th')
+                th2.innerHTML="Step name"
+                th2.setAttribute('style', 'text-align: center')
+                trval.append(th1)
+                trval.append(th2)
+                inserter.append(trval);
+                for(let i=0;i<final_data.length;i++)
+                {
+                    let tr1=document.createElement('tr')
+                    let td=document.createElement('td')
+                    td.setAttribute('style', 'text-align: center')
+                    td.innerHTML=final_data[i][0]
+                    tr1.append(td)
+                    let td1=document.createElement('td')
+                    td1.setAttribute('style', 'text-align: center')
+                    td1.innerHTML=final_data[i][1]
+                    tr1.append(td1)
+                    inserter.append(tr1)
+                }
             }
         })
     }

@@ -439,3 +439,11 @@ class Steps(models.Model):
     class Meta:
         db_table = "steps"
 
+
+class TemplateSteps(models.Model):
+    template_id = models.ForeignKey(Templates, default=None, null=True, on_delete=models.CASCADE)
+    step_id = models.ForeignKey(Steps, default=None, null=True, on_delete=models.CASCADE)
+    step_order = models.IntegerField(default=None, null=True)
+
+    class Meta:
+        db_table = "templatesteps"
