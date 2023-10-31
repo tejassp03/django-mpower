@@ -662,8 +662,8 @@ def candidates(request, pk):
     except EmptyPage:
         page_obj = p.page(p.num_pages)
     jobs_ = Jobs.objects.filter(eid=pk).exclude(status=6)  
-    
-    return render(request, 'candidate-employer.html', {'pk': pk, 'pe': page_obj, 'count': count, 'jobs': jobs, 'app_count': app_count, 'single': single_apps, 'shower': shower, 'test': testinfo,'jobs_':jobs_})
+    templates=Templates.objects.filter(emp_id=pk)
+    return render(request, 'candidate-employer.html', {'pk': pk, 'pe': page_obj, 'count': count, 'jobs': jobs, 'app_count': app_count, 'single': single_apps, 'shower': shower, 'test': testinfo,'jobs_':jobs_, 'templates': templates})
 
 def interview_complete(request,pk):
     inter = Interview.objects.get(apply_id = request.POST['apply_id'])
@@ -1942,6 +1942,13 @@ def edit_template(request, pk, pk2):
         template.save()
         return redirect('employer:edit_template', pk=pk, pk2=pk2)
     return render(request, 'edit-template-employer.html', {'pk': pk, 'pk2': pk2, 'template': template, 'steps': steps})
+
+def schedule_temp(request, pk):
+    if(request.method == "POST"):
+        applics=Application.objects.get(apply_id=request.POST['appl_id'])
+        applics.status=9
+        applics.save()
+        return JsonResponse({'info': 'done'})
 
 def get_all_steps(request, pk, pk2):
     all_steps=Steps.objects.filter(emp_id=pk)

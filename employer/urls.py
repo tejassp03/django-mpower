@@ -42,6 +42,7 @@ urlpatterns = [
 	path('all_templates/', views.all_templates, name='all_templates'),
     path('create_temp/', views.create_temp, name='create_temp'),
     path('get_template/', views.get_template, name='get_template'),
+	path('schedule_temp/', views.schedule_temp, name='schedule_temp'),
     path('edit_template/<int:pk2>/', views.edit_template, name='edit_template'),
     path('get_all_steps/<int:pk2>/', views.get_all_steps, name='get_all_steps'),
     path('delastep/<int:pk2>/', views.delastep, name='delastep'),
