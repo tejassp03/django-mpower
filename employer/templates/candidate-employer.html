@@ -230,7 +230,7 @@
                                 {% elif i.status == 7 %}
                                 <td><div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-success">Feedback Provided</span></div></td>
                                 {% elif i.status == 9 %}
-                                <td><div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-success">Template Assigned</span></div></td>
+                                <td><div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-success">Template Assigned <br> (Steps completed : {{ i.templatesteps }} / {{ i.totalsteps }})</span></div></td>
                                 
                                 {% endif %}
                                 
@@ -651,7 +651,7 @@ function candifetch(id)
                     else if(datainfo[i].status==9)
                     {
                         span3.setAttribute('class', 'badge rounded-pill bg-success');
-                        span3.innerHTML='Template Assigned';
+                        span3.innerHTML='Template Assigned<br>(Steps completed : ' + datainfo[i].templatesteps + ' / ' + datainfo[i].totalsteps + ')';
                     }
                     td3div.append(span3);
                     td3a.append(td3div);
@@ -659,7 +659,7 @@ function candifetch(id)
                     let td4=document.createElement('td');
                     let td4div=document.createElement('div');
                     td4div.setAttribute('class', 'pxp-company-dashboard-job-date');
-                    td4div.innerHTML=moment(datainfo[i].date_applied.slice(0, 19)).format("MMM. D, YYYY, h a");
+                    td4div.innerHTML=moment(datainfo[i].date_applied.slice(0, 19)).format("MMM. D, YYYY, h:m a");
                     td4.append(td4div);
                     tr.append(td4);
                     ////////////

@@ -37,7 +37,7 @@
         {% endfor %}
     {% endif %}
     <h2 class="m-0">Onboarding Status</h2>
-    <p class="pxp-text-light m-0">Complete transparency on the 10-step onboarding process.</p>
+    <p class="pxp-text-light m-0">Complete transparency on the onboarding process.</p>
     <br>
     <div class="pxp-jobs-card-3 active-div" >
         <div class="d-flex align-items-center justify-content-between">
@@ -45,6 +45,9 @@
                 <div class="col-sm-3 col-md-2 col-xxl-auto px-3  text-black rounded-pill">
                    <span class="fa fa-file-text-o" style="font-size:35px"></span>
                 </div>
+                {% if data.not_temp == 1 %}
+                    <p>Nothing to show</p>
+                {% else %}
                 <div class="col-sm-9 col-md-10 col-xxl-6">
                     <a class="pxp-jobs-card-3-title mt-3 mt-sm-0">Document Verification</a>
                     <div class="pxp-jobs-card-3-details">
@@ -66,6 +69,8 @@
             <div class="col-sm-4 col-xxl-auto mt-3 mt-xxl-0 pxp-text-right">
                 <a  id="pxp-exp-modal-button" data-bs-target="#pxp-doc-modal" data-bs-toggle="modal" class="btn rounded-pill btn-dark">In Review</a>
             </div>
+                {% endif %}
+
            
         </div>
     </div>
@@ -222,5 +227,6 @@ $(document).ready(function () {
     $('#tes').removeClass('pxp-active');
     $('#ins').removeClass('pxp-active');
     $('#jch').removeClass('pxp-active');
+    $('#pla').removeClass('pxp-active');
 })
 {% endblock %}

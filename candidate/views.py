@@ -1007,9 +1007,9 @@ def test_reminder():
         email.fail_silently = True
         email.send()
 
-def feedback(request,pk):
-    inter = Interview.objects.get(int_id=pk)
-    feed = Feedback.objects.get(int_id = pk)
+def feedback(request,pk,pk2):
+    inter = Interview.objects.get(int_id = pk2)
+    feed = Feedback.objects.get(int_id = pk2)
     data = {}
     data['ename'] = inter.eid.ename
     data['title'] = inter.apply_id.job_id.title
@@ -1077,6 +1077,27 @@ def feed_get(request, pk):
     for i in feeds:
         data['feed_received'].append(i.emp_feedback)
     return JsonResponse({'info': data})
+
+
+def templates(request, pk):
+    template=CandidateTemplateAssignments.objects.filter(candidate_id=pk)
+    data={}
+    if len(template)>0:
+        data['not_temp']=0
+        steps=[]
+        data['temp_name']=template[0].template_id.template_name
+        data['temp_desc']=template[0].template_id.template_description
+        candass=CandidateTemplateAssignments.objects.get(candidate_id=pk, template_id=template[0].template_id.template_id)
+        all_steps=CandidateStepProgress.objects.filter(assignment_id=candass.assignment_id)
+        for i in all_steps:
+            final_data={}
+            final_data['step_name']=i.step_id.step_name
+            final_data['step_desc']=i.step_id.step_description
+            steps.append(final_data)
+        data['steps']=steps
+    else:
+        data['not_temp']=1
+    return render(request, 'onboarding.html', {'pk': pk, 'data': data})
 
 
 def job_change(request, pk):

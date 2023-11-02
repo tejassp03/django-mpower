@@ -616,6 +616,10 @@ def candidates(request, pk):
                 single_can['results'] = (
                     int(testuser1.correct_answers)/int(testuser1.total_ques))*100
                 single_can['test_id'] = testuser1.testuser_id
+            elif i.status == 9:
+                candidatetemplate=CandidateTemplateAssignments.objects.get(application_id=i.apply_id)
+                single_can['templatesteps']=candidatetemplate.current_step_order-1
+                single_can['totalsteps']=len(TemplateSteps.objects.filter(template_id=candidatetemplate.template_id.template_id))
             else:
                 single_can['results'] = 0
             single_apps.append(single_can)
@@ -1236,6 +1240,10 @@ def get_cands(request, pk):
             single_can['results'] = (
                 int(testuser1.correct_answers)/int(testuser1.total_ques))*100
             single_can['test_id'] = testuser1.testuser_id
+        elif i.status == 9:
+            candidatetemplate=CandidateTemplateAssignments.objects.get(application_id=i.apply_id)
+            single_can['templatesteps']=candidatetemplate.current_step_order-1
+            single_can['totalsteps']=len(TemplateSteps.objects.filter(template_id=candidatetemplate.template_id.template_id))
         else:
             single_can['results'] = 0
         single_can['date_applied'] = i.date_applied
@@ -1948,6 +1956,19 @@ def schedule_temp(request, pk):
         applics=Application.objects.get(apply_id=request.POST['appl_id'])
         applics.status=9
         applics.save()
+        candidateassignment=CandidateTemplateAssignments()
+        candidateassignment.candidate_id=applics.user_id
+        candidateassignment.template_id=Templates.objects.get(template_id=request.POST['templ_id'])
+        candidateassignment.current_step_order=1
+        candidateassignment.application_id=applics
+        candidateassignment.save()
+        all_steps=TemplateSteps.objects.filter(template_id=request.POST['templ_id'])
+        for i in all_steps:
+            single_step=CandidateStepProgress()
+            single_step.assignment_id=candidateassignment
+            single_step.step_id=i.step_id
+            single_step.is_completed=False
+            single_step.save()
         return JsonResponse({'info': 'done'})
 
 def get_all_steps(request, pk, pk2):
