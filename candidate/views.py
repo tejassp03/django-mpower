@@ -1140,6 +1140,53 @@ def job_change(request, pk):
             page_obj = p.page(p.num_pages)
     return render(request, 'jobsuggest-candidate.html', {'pk': pk, 'pe': page_obj, 'count': count})
 
+from django.core import serializers
+
+
+def get_mocks(request, pk):
+    if request.method == "POST":
+        job_id = request.POST.get('jobid')
+
+        if job_id:
+            try:
+                job_ = Jobs.objects.get(jobid=job_id)
+                job_skills = job_.skills
+                job_skills_list = job_skills.split(',')
+                matching_mocktestinfo = MockTestInfo.objects.filter(tech__in=job_skills_list)
+                
+             
+                mocktest_data = serializers.serialize('json', matching_mocktestinfo)
+
+                return JsonResponse({'mocktests': mocktest_data}, safe=False)
+
+            except Jobs.DoesNotExist:
+                return JsonResponse({'error': 'Job not found'}, status=404)
+
+        return JsonResponse({'error': 'Missing or invalid jobid parameter'}, status=400)
+
+def attempt_mock(request, pk,pk2):
+    testinfo = MockTestInfo.objects.get(test_id=pk2)
+    testques = MockTestQues.objects.filter(testinfoid=testinfo.testinfoid)
+    name = testinfo.test_name
+    start_time = timezone.now()
+    time_limit = testinfo.time_limit
+    all_ques = []
+    for i in testques:
+        single_ques = {}
+        single_ques['ques_id'] = i.ques_id
+        single_ques['question'] = i.ques_name
+        single_ques['opt1'] = i.option1
+        single_ques['opt2'] = i.option2
+        single_ques['opt3'] = i.option3
+        single_ques['opt4'] = i.option4
+        try:
+            if(i.images.url != None):
+                single_ques['image'] = i.images.url
+        except:
+            pass
+        all_ques.append(single_ques)
+    time_length = (time_limit//len(all_ques))*60
+    return render(request, 'attempt-employer.html', {'pk': pk, 'pk2': pk2,  'test': all_ques, 'name': name,'start_time':start_time,'time_length':time_length})
 
 def logout(request, pk):
     user = Login.objects.get(

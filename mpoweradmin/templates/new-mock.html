@@ -1,0 +1,768 @@
+{% extends 'mpoweradmin-index.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}
+<title>mpower - Admin dashboard - Mock tests</title>
+<style>
+.progress {
+    height: 10px;
+}
+
+.progress-bar {
+    border-radius: 0;
+}
+</style>
+{% endblock %}
+{% block content %}
+
+<div class="pxp-dashboard-content-details">
+    {% if messages %}
+        {% for message in messages %}
+         {% if message.tags %}  
+         <script>alert('{{ message }}')</script>
+        {% endif %}
+        {% endfor %}
+    {% endif %}
+    <h1>All Mocks</h1>
+    <p class="pxp-text-light">Mock tests that are created to prepare candidates.</p>
+
+    <div class="mt-4 mt-lg-5">
+        <div class="row justify-content-between align-content-center">
+            <div class="col-auto order-2 order-sm-1">
+                <div class="pxp-company-dashboard-jobs-bulk-actions mb-3">
+                    <select class="form-select" name="act">
+                        <option value="a">Bulk actions</option>
+                        {% comment %} <option>Edit</option> {% endcomment %}
+                        <option value="b">Delete</option>
+                    </select>
+                    <button class="btn ms-2" onclick="multiple()">Apply</button>
+                </div>
+            </div>
+            <div class="col-auto order-1 order-sm-2">
+                <div class="pxp-company-dashboard-jobs-search mb-3">
+                    <div class="pxp-company-dashboard-jobs-search-results me-3">{{ count }} Mocks</div>
+                    <div class="pxp-company-dashboard-jobs-search-search-form">
+                        <div class="input-group">
+                            <span class="input-group-text" style="background: white"><span class="fa fa-search"></span></span>
+                            <input type="text" class="form-control" placeholder="Search tests..." id="search">
+                        </div>
+                    </div>
+                    {% if count > 0 %}
+                        <div class="pxp-company-dashboard-jobs-bulk-actions">
+                            <a class="btn ms-2" href="{% url 'mpoweradmin:test' pk %}">Create Mock</a>
+                        </div>
+                    {% endif %}
+
+                </div>
+            </div>
+        </div>
+        {%  if count == 0 %}
+        <div class="pt-5 d-flex flex-column justify-content-center align-items-center">
+        <h4>No Mock Tests to display.</h4>    
+        <div class="pxp-company-dashboard-jobs-bulk-actions"><a class="btn ms-2 mt-2 btn-primary" href="{% url 'mpoweradmin:test' pk %}">Create Mock</a></div>
+        </div>
+        {% else %}
+        <div class="table-responsive">
+            <table class="table table-hover align-middle" id="table">
+                <thead>
+                    <tr>
+                        <th class="pxp-is-checkbox" style="width: 1%;"><input type="checkbox" onClick="toggle(this)" class="form-check-input" name="all"></th>
+                        <th style="width: 15%;">Test Name</th>
+                        <th style="width: 15%;">Created Date<span class="fa fa-angle-up ms-3"></span></th>
+                        <th style="width: 15%;">Time limit</th>
+                        <th style="width: 15%;">Questions</th>
+                        <th style="width: 15%;">Technology</th>
+                        <th style="width: 15%;">&nbsp;</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+                    {% for i in pe %}
+                    <tr>
+                        <td><input type="checkbox" name="chek" class="form-check-input" value={{ i.test_id }}></td>
+                        <td>
+                            <a href="#">
+                                <div class="pxp-company-dashboard-job-title" onclick="testmodal('{{i.testinfoid}}')" data-bs-target="#pxp-test-modal" data-bs-toggle="modal">{{ i.name }}</div>
+                            </a>
+                        </td>
+                        <td><div class="pxp-company-dashboard-job-date mt-1">{{ i.created_date }}</div></td>
+                        <td><div class="pxp-company-dashboard-job-category">{{ i.time_limit }} Minutes</div></td>
+                        <td><a href="#" class="pxp-company-dashboard-job-applications">{{ i.num }}</a></td>
+                        <td><a href="#" class="pxp-company-dashboard-job-applications">{{ i.tech }}</a></td>
+
+                        <td>
+                            <div class="pxp-dashboard-table-options">
+                                <ul class="list-unstyled">
+                                    <li><button title="View" id="pxp-test-modal-button" data-bs-target="#pxp-test-modal" data-bs-toggle="modal" onclick="testmodal('{{ i.testinfoid }}')"><span class="fa fa-eye"></span></button></li>
+                                    <li><button title="Edit" id="pxp-test-modal-button-edit" data-bs-target="#pxp-edit-modal" data-bs-toggle="modal" onclick="testeditmodal('{{ i.testinfoid }}')"><span class="fa fa-pencil"></span></button></li>
+                                    <input style="display: none" value={{i.test_id}}>
+                                    <li><button title="Delete" onclick="delmocktest({{i.test_id.test_id}})"><span class="fa fa-trash-o"></span></button></li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <div class="row mt-4 mt-lg-5 justify-content-between align-items-center">
+                <div class="col-auto">
+                    <nav class="mt-3 mt-sm-0" aria-label="Jobs list pagination">
+                        <ul class="pagination pxp-pagination">
+                            {% if count >= 11 %}
+                            {% if pe.has_previous %}
+                                {% if GET_params %}
+                                <li class="page-item"><a style="padding: 0.7rem" href="?{{GET_params.urlencode}}&amp;page={{pe.previous_page_number}}" class="page-link"><i class="fa fa-chevron-left" aria-hidden="true"></i></a></li>
+                                {% else %}
+                                <li class="page-item"><a style="padding: 0.7rem" href="?page={{pe.previous_page_number}}" class="page-link"><i class="fa fa-chevron-left" aria-hidden="true"></i></a></li>
+                                {% endif %}
+                            {% endif %}
+
+                            {% if pe.number|add:'-4' > 1 %}
+                                {% if GET_params %}
+                                <li class="page-item"><a style="padding: 0.7rem" href="?{{GET_params.urlencode}}&amp;page={{ pe.number|add:'-5' }}" class="page-link">&hellip;</a></li>
+                                {% else %}
+                                <li class="page-item"><a style="padding: 0.7rem" href="?page={{ pe.number|add:'-5' }}" class="page-link">&hellip;</a></li>
+                                {% endif %}
+                            {% endif %}
+
+                            {% for i in pe.paginator.page_range %}
+                                {% if pe.number == i %}
+                                    <li class="page-item active" aria-current="page">
+                                        <span style="padding: 0.7rem" class="page-link">{{pe.number}}</span>
+                                    </li>
+                                {% elif i > pe.number|add:'-5' and i < pe.number|add:'5' %}
+                                    {% if GET_params %}
+                                    <li class="page-item"><a style="padding: 0.7rem" href="?{{GET_params.urlencode}}&amp;page={{ i }}" class="page-link">{{i}}</a></li>
+                                    {% else %}
+                                    <li class="page-item"><a style="padding: 0.7rem" href="?page={{ i }}" class="page-link">{{i}}</a></li>
+                                    {% endif %}
+                                {% endif %}
+                            {% endfor %}
+
+                            {% if pe.paginator.num_pages > pe.number|add:'4' %}
+                                {% if GET_params %}
+                                <li class="page-item"><a style="padding: 0.7rem" href="?{{GET_params.urlencode}}&amp;page={{ pe.number|add:'5' }}" class="page-link">&hellip;</a></li>
+                                {% else %}
+                                <li class="page-item"><a style="padding: 0.7rem" href="?page={{ pe.number|add:'5' }}" class="page-link">&hellip;</a></li>
+                                {% endif %}
+                            {% endif %}
+
+                            {% if pe.has_next %}
+                                {% if GET_params %}
+                                <li class="page-item"><a style="padding: 0.7rem" href="?{{GET_params.urlencode}}&amp;page={{ pe.next_page_number }}" class="page-link"><i class="fa fa-chevron-right" aria-hidden="true"></i></a></li>
+                                {% else %}
+                                <li class="page-item"><a style="padding: 0.7rem" href="?page={{pe.next_page_number}}" class="page-link"><i class="fa fa-chevron-right" aria-hidden="true"></i></a></li>
+                                {% endif %}
+                            {% endif %}
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+                <div class="col-auto">
+                    {% comment %} <a href="#" class="btn rounded-pill pxp-section-cta mt-3 mt-sm-0">Show me more<span class="fa fa-angle-right"></span></a> {% endcomment %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+
+<div class="modal fade pxp-user-modal" id="pxp-test-modal" aria-hidden="true" aria-labelledby="testModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered widthadjuster">
+        <div class="modal-content">
+            <div class="modal-body" style="padding: 1rem !important">
+                <section>
+                    <div class="pxp-container">
+                        <div class="pxp-single-job-content pxp-has-columns" style="margin-top: 0px">
+                            <div class="row">
+                                <div class="col-lg-7 col-xl-8 col-xxl-9">
+                                    <div class="row justify-content-between align-items-center mt-4 mt-lg-5">
+                                        <div class="col-xl-8 col-xxl-6">
+                                            <h1 id="name"></h1>
+                                        </div>
+                                    </div>
+        
+                                    <div class="pxp-single-job-content-details mt-4 mt-lg-5" id="questions">
+                                        <div id="ind">
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-5 col-xl-4 col-xxl-3">
+                                    <div class="pxp-single-job-side-panel mt-5 mt-lg-0">
+                                        <div>
+                                            <div class="pxp-single-job-side-info-label pxp-text-light">Time Limit</div>
+                                            <div class="pxp-single-job-side-info-data" id="timelimit"></div>
+                                        </div>
+                                        <div class="mt-4">
+                                            <div class="pxp-single-job-side-info-label pxp-text-light">Created Date</div>
+                                            <div class="pxp-single-job-side-info-data" id="created_date"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>        
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade pxp-user-modal" id="pxp-edit-modal" aria-hidden="true" aria-labelledby="testEditModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered" style="
+    display: flex;
+    align-items: center;
+    justify-content: center;">
+        <div class="modal-content" style="width: 100vw; display: flex; flex-direction: row; align-items: center">
+            <div class="modal-body" style="width: 70vw; padding: 15px 15px !important">
+                <div class="pxp-dashboard-content-details">
+                    <h1>Edit test</h1>
+                    <p class="pxp-text-light">Create a test for a evaluating candidates.</p>
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mt-4 mt-lg-5">
+                            <div class="row justify-content-between align-content-center">
+                                <div class="col-auto order-1 order-sm-2">
+                                    <div class="pxp-company-dashboard-jobs-search mb-3" style="align-items: flex-start; flex-direction: column">
+                                        <div class="pxp-company-dashboard-jobs-search-search-form" style="display: flex; align-items: center">
+                                            <div style="margin-right: 4px; width: 16rem">
+                                                Name: 
+                                            </div>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" placeholder="Enter name" name="name" id="editname" required>
+                                            </div>
+                                        </div>
+                                        <div class="pxp-company-dashboard-jobs-search-search-form mt-3" style="display: flex; align-items: center">
+                                            <div style="margin-right: 4px; width: 16rem">
+                                                Tech: 
+                                            </div>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" placeholder="Enter Tech" name="tech" id="edittech" required>
+                                            </div>
+                                        </div>
+                                        <div style="display: flex; align-items: baseline">
+                                        <div class="pxp-company-dashboard-jobs-search-search-form mt-3" style="display: flex; align-items: center">
+                                            <div style="margin-right: 4px; width: 16rem">
+                                                Time limit (minutes): 
+                                            </div>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" placeholder="Enter time" name="timelimit" id="edittime" required>
+                                            </div>
+                                        </div>
+                        
+                                    </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                            </div>
+                        </div>
+                        <hr />
+                        <div id="quiz">
+                            
+                            
+                        </div>
+    
+                        <div class="pxp-company-dashboard-jobs-bulk-actions mb-3 gap-3 mt-3" id="ext" style="align-items: flex-start">
+                        <!--<button class="btn" onclick="addques()" style="padding: 0.5rem">Add Question</button>
+                    <div class="pxp-company-dashboard-jobs-bulk-actions mb-3">
+                        <button class="btn btn-primary" type="submit" style="padding: 0.5rem">Create Test</button>
+                    </div>-->
+                    </div>
+                </form>
+                </div>
+                <div class="progress" style="display: none;" id="progressBarContainer">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated bg-info" id="progressBar" style="width: 0;"></div>
+                </div>
+                <div id="messageContainer" style="display: none;"></div>
+                <button class="btn rounded-pill pxp-subsection-cta" onclick="editTest()" >Edit Test</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function editTest() {
+    var testName = $('#editname').val();
+    console.log(testName);
+    var timeLimit = $('#edittime').val();
+    var techstack = $('#edittech').val();
+    var testInfoId = $('#testinfoidforedit').val(); 
+    
+    var questions = [];
+
+    $('.queswithopt').each(function() {
+        var questionElement = $(this);
+        var question = questionElement.find('input[name="desc"]').val();
+        
+        var options = [];
+        questionElement.find('input[name="optdesc"]').each(function() {
+            options.push($(this).val());
+        });
+        var ques_id = questionElement.find('input[name="ques_id"]').val();
+        var correctAnswer = questionElement.find('select[name="correct"]').val();
+
+        var questionData = {
+            ques_id:ques_id,
+            question: question,
+            options: options,
+            correctAnswer: correctAnswer
+        };
+
+        questions.push(questionData);
+    });
+
+    
+    var requestData = {
+        'test_name': testName,
+        'time_limit': timeLimit,
+        'tech':techstack,
+        'testinfoid': testInfoId,
+        'questions': JSON.stringify(questions),
+        csrfmiddlewaretoken: '{{ csrf_token }}' 
+    };
+    var messageContainer = $("#messageContainer");
+    messageContainer.text("");
+    messageContainer.hide();
+    var progressBar = $("#progressBar");
+    var progressBarContainer = $("#progressBarContainer");
+    progressBarContainer.show();
+    $.ajax(
+        {
+            type:"POST",
+            url: "{% url 'mpoweradmin:edit_test' pk %}",
+            data:requestData,
+            xhr: function () {
+                        var xhr = new window.XMLHttpRequest();
+                        xhr.upload.addEventListener("progress", function (e) {
+                            if (e.lengthComputable) {
+                                var percentComplete = (e.loaded / e.total) * 100;
+                                progressBar.css("width", percentComplete + "%");
+                            }
+                        }, false);
+                        return xhr;
+            },
+            success: function( data ) 
+            {
+                progressBar.css("width","0%");
+
+                progressBarContainer.hide();
+                messageContainer.text("Test is edited successfully.").show().css("color", "green");
+                console.log(data);
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                messageContainer.text("Try Again").show().css("color", "red");
+                progressBarContainer.hide();
+            }
+    })
+}
+
+function testeditmodal(id)
+{
+    $.ajax(
+    {
+        type:"GET",
+        url: "{% url 'mpoweradmin:test_info' pk %}",
+        data:{
+                testinfoid: id
+        },
+        success: function( data ) 
+        {
+            $('#messageContainer').val("").hide();
+            let datainfo=JSON.parse(data['test']);
+            $('#editname').val(datainfo[0].test_name);
+            $('#edittime').val(datainfo[0].time_limit);
+            console.log(datainfo[0].tech);
+            $('#edittech').val(datainfo[0].tech);
+            $('#created_date').text(JSON.parse(data['date']))
+            let ques=JSON.parse(data['ques']);
+            $('#ind').remove();
+            let maindiv=document.createElement('div');
+            maindiv.setAttribute('id', 'ind');
+            $('#quiz').empty();
+            let extern=$('#quiz');
+            for(let i=0;i<ques.length;i++)
+            {
+                let inf=ques[i].correct;
+                let maindiv=document.createElement('div');
+                maindiv.setAttribute('class', 'queswithopt');
+
+                let div=document.createElement('div');
+                div.setAttribute('class', 'singlequestion');
+                    let div1=document.createElement('div');
+                        div1.setAttribute('class', 'questondesc');
+                        div1.setAttribute('style', 'display: flex; align-items: baseline');
+                        // div1.style.display = "flex";
+                        // div1.style.align-items = "baseline";
+                        div1.textContent = "Q. " + (parseInt(i, 10) + 1) + " \u00A0";
+
+                        let input = document.createElement('input');
+                        input.setAttribute('type', 'text');
+                        input.setAttribute('class', 'form-control');
+                        input.setAttribute('name', 'desc');
+                        input.setAttribute('required', 'true');
+                        input.value = ques[i].ques_name;
+                    div1.append(input);
+                div.append(div1);
+                maindiv.append(div);
+                let div2=document.createElement('div');
+                    div2.setAttribute('class', 'options');
+                    div2.setAttribute('style', 'display: flex; flex-wrap: wrap; justify-content:space-around;');
+
+                    // div2.style.display = "flex";
+                    // div2.style.flex-wrap = "wrap";
+                    // div2.style.justify-content = "space-around";
+                    for(let j = 1;j<5;j++){
+                    let div3=document.createElement('div');
+                        div3.setAttribute('class', 'questondesc col-5 mt-1');
+                        div3.setAttribute('style', 'display: flex; align-items: baseline');
+
+                        // div3.style.display = "flex";
+                        // div3.style.align-items = "baseline";
+                        let spanElement = document.createElement("span");
+                                spanElement.style.width = "6rem";
+                                spanElement.textContent = "Option "+j+" \u00A0"; 
+                        var inputElement = document.createElement("input");
+                                inputElement.type = "text";
+                                inputElement.className = "form-control";
+                                inputElement.name = "optdesc";
+                                inputElement.placeholder = "Option";
+                                inputElement.setAttribute("required", true);
+                                var optionPropertyName = 'option' + j;
+                                inputElement.value = ques[i][optionPropertyName];
+                                var container = document.getElementById("container");
+                    div3.appendChild(spanElement);
+                    div3.appendChild(inputElement);
+                    div2.append(div3)
+                    // maindiv.append(div3);
+                    }
+                    maindiv.append(div2);
+                
+                let div4=document.createElement('div');
+                    div4.setAttribute('class', 'pxp-company-dashboard-jobs-bulk-actions mb-3 col-5');
+                    let div4a=document.createElement('div');
+                        div4a.textContent = "Answer: \u00A0 \u00A0";
+                    div4.append(div4a);
+                    let select = document.createElement('select');
+                        select.setAttribute('class', 'form-select');
+                        select.setAttribute('name', 'correct');
+                        select.setAttribute('selected', 'correct');
+
+                        var optionValues = ["Option 1", "Option 2", "Option 3", "Option 4"];
+                        for (var j = 0; j < optionValues.length; j++) {
+                            var option = document.createElement("option");
+                            option.value = j + 1;
+                            option.textContent = optionValues[j];
+                            if (option.value === inf) {
+                                option.selected = true;
+                            }
+                            select.appendChild(option);
+                        }
+                        select.value = inf;
+                    div4.append(select);
+                maindiv.append(div4);
+                var hrElement = document.createElement("hr");
+                maindiv.append(hrElement);
+                
+                var quesid = document.createElement("input");
+                quesid.value = ques[i].ques_id;
+                quesid.hidden = true;
+                quesid.setAttribute('name', 'ques_id');
+                quesid.setAttribute('id', 'ques_id');
+                maindiv.append(quesid);
+                extern.append(maindiv)
+            }
+            var testInput = document.createElement("input");
+                testInput.value = datainfo[0].testinfoid;
+                testInput.hidden = true;
+                testInput.setAttribute('name', 'testinfoidforedit');
+                testInput.setAttribute('id', 'testinfoidforedit');
+                maindiv.append(testInput);
+            extern.append(maindiv)
+        }
+    })
+}
+</script>
+{% endblock %}
+
+{% block script %}
+
+$(document).ready(function () {
+    $('#cdas').removeClass('pxp-active');
+    $('#cedi').removeClass('pxp-active');
+    $('#cnew').removeClass('pxp-active');
+    $('#cman').removeClass('pxp-active');
+    $('#ccan').removeClass('pxp-active');
+    $('#csub').removeClass('pxp-active');
+    $('#ccha').removeClass('pxp-active');
+    $('#cinb').removeClass('pxp-active');
+    $('#cnot').removeClass('pxp-active');
+    $('#scn').removeClass('pxp-active');
+    $('#qui').addClass('pxp-active');
+    $('#inr').removeClass('pxp-active');
+    $('#pen').removeClass('pxp-active');
+    $('#templ').removeClass('pxp-active');
+    $('#step').removeClass('pxp-active');
+})
+
+
+var $rows = $('#table tbody tr');
+$('#search').keyup(function() {
+    var val = $.trim($(this).val()).replace(/ +/g, ' ').toLowerCase();
+    
+    $rows.show().filter(function() {
+        var text = $(this).text().replace(/\s+/g, ' ').toLowerCase();
+        return !~text.indexOf(val);
+    }).hide();
+});
+
+$("[name='chek']").change(function(){
+    let a=0;
+    checkboxes = document.getElementsByName('chek');
+    let n=checkboxes.length
+    for(let i=0;i<n;i++) {
+      if(checkboxes[i].checked==false)
+      {
+        a=a+1;
+      }
+    }
+    if(a==0)
+    {
+        $("[name=all]").prop('checked', true);
+    }
+    else
+    {
+        $("[name=all]").prop('checked', false);
+    }
+})
+function addques()
+{
+    let div=document.createElement('div');
+    div.setAttribute('class', 'queswithopt')
+    let quesdiv=document.createElement('div');
+    quesdiv.setAttribute('class', 'singlequestion');
+    let descdiv=document.createElement('div');
+    descdiv.setAttribute('class', 'questondesc');
+    descdiv.setAttribute('style', 'display: flex; align-items: baseline');
+    descdiv.innerHTML='Q. &nbsp;<input type="text" class="form-control" name="desc" placeholder="Question" required/>';
+    quesdiv.append(descdiv);
+    div.append(quesdiv);
+    let optdiv=document.createElement('div');
+    optdiv.setAttribute('class', 'options');
+    optdiv.setAttribute('style', 'display: flex; flex-wrap: wrap; justify-content: space-around');
+    let optdescdiv=document.createElement('div');
+    optdescdiv.setAttribute('class', 'questondesc col-5 mt-1');
+    optdescdiv.setAttribute('style', 'display: flex; align-items: baseline')
+    optdescdiv.innerHTML='<span style="width: 6rem">Option 1. &nbsp;</span><input type="text" class="form-control" name="optdesc" placeholder="Option" required/>';
+    optdiv.append(optdescdiv);
+    let optdescdiv2=document.createElement('div');
+    optdescdiv2.setAttribute('class', 'questondesc col-5 mt-1');
+    optdescdiv2.setAttribute('style', 'display: flex; align-items: baseline')
+    optdescdiv2.innerHTML='<span style="width: 6rem">Option 2. &nbsp;</span><input type="text" class="form-control" name="optdesc" placeholder="Option" required/>';
+    optdiv.append(optdescdiv2);
+    let optdescdiv3=document.createElement('div');
+    optdescdiv3.setAttribute('class', 'questondesc col-5 mt-1');
+    optdescdiv3.setAttribute('style', 'display: flex; align-items: baseline')
+    optdescdiv3.innerHTML='<span style="width: 6rem">Option 3. &nbsp;</span><input type="text" class="form-control" name="optdesc" placeholder="Option" required/>';
+    optdiv.append(optdescdiv3);
+    let optdescdiv4=document.createElement('div');
+    optdescdiv4.setAttribute('class', 'questondesc col-5 mt-1');
+    optdescdiv4.setAttribute('style', 'display: flex; align-items: baseline')
+    optdescdiv4.innerHTML='<span style="width: 6rem">Option 4. &nbsp;</span><input type="text" class="form-control" name="optdesc" placeholder="Option" required/>';
+    optdiv.append(optdescdiv4);
+    div.append(optdiv);
+    let corrans=document.createElement('div');
+    corrans.setAttribute('class', 'pxp-company-dashboard-jobs-bulk-actions mb-3');
+    corrans.setAttribute('style', 'width: 25rem');
+    let textans=document.createElement('div');
+    textans.setAttribute('style', 'width: 13rem');
+    textans.innerHTML="Correct answer:"
+    corrans.append(textans);
+    let select=document.createElement('select');
+    select.setAttribute('class', 'form-select');
+    select.setAttribute('name', 'correct');
+    let option=document.createElement('option');
+    option.setAttribute('value', 1);
+    option.innerHTML="Option 1";
+    select.append(option);
+    let option2=document.createElement('option');
+    option2.setAttribute('value', 2);
+    option2.innerHTML="Option 2";
+    select.append(option2);
+    let option3=document.createElement('option');
+    option3.setAttribute('value', 3);
+    option3.innerHTML="Option 3";
+    select.append(option3);
+    let option4=document.createElement('option');
+    option4.setAttribute('value', 4);
+    option4.innerHTML="Option 4";
+    select.append(option4);
+    corrans.append(select);
+    div.append(corrans);
+    let hr=document.createElement('hr');
+    let maindiv=document.getElementById('quiz');
+    quiz.append(div);
+    let removediv=document.createElement('div');
+    removediv.setAttribute('class', 'pxp-company-dashboard-jobs-bulk-actions mb-3');
+    removediv.setAttribute('id', 'questremove');
+    let delbut=document.createElement('button');
+    delbut.setAttribute('class', 'btn');
+    delbut.setAttribute('onclick', 'removeques()');
+    delbut.setAttribute('style', 'padding: 0.5rem');
+    delbut.innerHTML="Remove Question";
+    removediv.append(delbut);
+    quiz.append(hr);
+    let externdiv=document.getElementById('ext');
+    let allque=document.getElementsByClassName('queswithopt');
+    console.log(allque.length);
+    if(allque.length==2)
+    {
+        externdiv.append(removediv);
+    }
+}
+
+function removeques()
+{
+    let div=document.getElementsByClassName('queswithopt');
+    $('.queswithopt').last().remove();
+    $('#quiz').children().last().remove();
+    if(div.length==1)
+    {
+        $('#questremove').remove();
+    }
+}
+function toggle(source) {
+    checkboxes = document.getElementsByName('chek');
+    for(var i=0, n=checkboxes.length;i<n;i++) {
+      checkboxes[i].checked = source.checked;
+    }
+}
+
+function delmocktest(id)
+{
+    $.ajax(
+        {
+            type:"POST",
+            url: "",
+            data:{
+                    'test_id': id,
+                    'del':'Y',
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function( data ) 
+            {
+                location.reload()
+            }
+    })
+}
+
+function multiple()
+{
+    let action=$("[name='act']").val();
+    if(action=='a')
+    {
+        alert("Please select an appropriate action")
+        return;
+    }
+    let ids=[];
+    $("[name='chek']:checked").map(function () {
+        ids.push(this.value);
+    })
+    if(ids.length==0)
+    {
+        alert("Please select at least one of the records to apply delete operation")
+        return;
+    }
+    $.ajax(
+        {
+            type:"POST",
+            url: "",
+            data:{
+                    'ids': ids,
+                    'act': "delall",
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function( data ) 
+            {
+                location.reload()
+            }
+    })
+}
+
+
+function testmodal(id)
+{
+    $.ajax(
+    {
+        type:"GET",
+        url: "{% url 'mpoweradmin:mock_info' pk %}",
+        data:{
+                testinfoid: id
+        },
+        success: function( data ) 
+        {
+            let datainfo=JSON.parse(data['test']);
+            $('#name').text(datainfo[0].test_name);
+            $('#timelimit').text(datainfo[0].time_limit);
+            
+            $('#created_date').text(JSON.parse(data['date']))
+            let ques=JSON.parse(data['ques']);
+            $('#ind').remove();
+            let maindiv=document.createElement('div');
+            maindiv.setAttribute('id', 'ind');
+            let extern=$('#questions');
+            for(let i=0;i<ques.length;i++)
+            {
+                let div=document.createElement('div');
+                let h4=document.createElement('h4');
+                h4.innerText="Q. "+ques[i].ques_name;
+                div.append(h4);
+                maindiv.append(div);
+                let options=document.createElement('div');
+                let op1=document.createElement('p');
+                op1.innerText="A. "+ques[i].option1;
+                options.append(op1);
+                let op2=document.createElement('p');
+                op2.innerText="B. "+ques[i].option2;
+                options.append(op2);
+                let op3=document.createElement('p');
+                op3.innerText="C. "+ques[i].option3;
+                options.append(op3);
+                let op4=document.createElement('p');
+                op4.innerText="D. "+ques[i].option4;
+                options.append(op4);
+                maindiv.append(options);
+                let corr=document.createElement('h4');
+                let inf=ques[i].correct;
+                let ans="";
+                if(inf==1)
+                {
+                    ans="A";
+                }
+                else if(inf==2)
+                {
+                    ans="B";
+                }
+                else if(inf==3)
+                {
+                    ans="C";
+                }
+                else
+                {
+                    ans="D";
+                }
+                corr.innerText="Correct answer: "+ans;
+                maindiv.append(corr);
+                extern.append(maindiv)
+            }
+            extern.append(maindiv)
+        }
+    })
+}
+
+
+
+{% endblock %}

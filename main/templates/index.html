@@ -148,6 +148,28 @@ input::-webkit-calendar-picker-indicator {
     color: #644bff;
     cursor: pointer;
   }
+  .pxp-seminar-card{
+    padding: 30px;
+    background-color: white;
+    text-align: center;
+    border-radius: 30px;
+    text-decoration: none;
+    transition: var(--pxpHoverTransition);
+    transition-property: background-color;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+  }
+  .pxp-seminar-card:hover{
+    background-color:rgb(12,38,67);
+  }
+  .pxp-seminar-card:hover .pxp-categories-card-1-title{
+      color:white;
+  }
+  .pxp-seminar-card:hover .pxp-categories-card-1-subtitle{
+    color:white;
+}
 {% endblock %}
 {% block content %}
 {% if messages %}
@@ -333,7 +355,7 @@ input::-webkit-calendar-picker-indicator {
         <p class="pxp-text-light text-center">Search your career opportunity with our categories</p>
 
         <div class="row mt-4 mt-md-5 pxp-animate-in pxp-animate-in-top" style="justify-content: center">
-            {% for i in vals %}
+            {% for i in vals|slice:":5" %}
             <div class="col-12 col-md-4 col-lg-3 col-xxl-2 pxp-categories-card-1-container">
                 <a href="#" class="pxp-categories-card-1">
                     <div class="pxp-categories-card-1-icon-container">
@@ -346,74 +368,9 @@ input::-webkit-calendar-picker-indicator {
                 </a>
             </div>
             {% endfor %}
-            {% comment %} <div class="col-12 col-md-4 col-lg-3 col-xxl-2 pxp-categories-card-1-container">
-                <a href="#" class="pxp-categories-card-1">
-                    <div class="pxp-categories-card-1-icon-container">
-                        <div class="pxp-categories-card-1-icon">
-                            <span class="fa fa-pie-chart"></span>
-                        </div>
-                    </div>
-                    <div class="pxp-categories-card-1-title">Business Development</div>
-                    <div class="pxp-categories-card-1-subtitle">139 open positions</div>
-                </a>
-            </div>
-            <div class="col-12 col-md-4 col-lg-3 col-xxl-2 pxp-categories-card-1-container">
-                <a href="#" class="pxp-categories-card-1">
-                    <div class="pxp-categories-card-1-icon-container">
-                        <div class="pxp-categories-card-1-icon">
-                            <span class="fa fa-bullhorn"></span>
-                        </div>
-                    </div>
-                    <div class="pxp-categories-card-1-title">Marketing & Communication</div>
-                    <div class="pxp-categories-card-1-subtitle">366 open positions</div>
-                </a>
-            </div>
-            <div class="col-12 col-md-4 col-lg-3 col-xxl-2 pxp-categories-card-1-container">
-                <a href="#" class="pxp-categories-card-1">
-                    <div class="pxp-categories-card-1-icon-container">
-                        <div class="pxp-categories-card-1-icon">
-                            <span class="fa fa-address-card-o"></span>
-                        </div>
-                    </div>
-                    <div class="pxp-categories-card-1-title">Human Resources</div>
-                    <div class="pxp-categories-card-1-subtitle">435 open positions</div>
-                </a>
-            </div>
-            <div class="col-12 col-md-4 col-lg-3 col-xxl-2 pxp-categories-card-1-container">
-                <a href="#" class="pxp-categories-card-1">
-                    <div class="pxp-categories-card-1-icon-container">
-                        <div class="pxp-categories-card-1-icon">
-                            <span class="fa fa-calendar-o"></span>
-                        </div>
-                    </div>
-                    <div class="pxp-categories-card-1-title">Project Management</div>
-                    <div class="pxp-categories-card-1-subtitle">324 open positions</div>
-                </a>
-            </div>
-            <div class="col-12 col-md-4 col-lg-3 col-xxl-2 pxp-categories-card-1-container">
-                <a href="#" class="pxp-categories-card-1">
-                    <div class="pxp-categories-card-1-icon-container">
-                        <div class="pxp-categories-card-1-icon">
-                            <span class="fa fa-comments-o"></span>
-                        </div>
-                    </div>
-                    <div class="pxp-categories-card-1-title">Customer Service</div>
-                    <div class="pxp-categories-card-1-subtitle">39 open positions</div>
-                </a>
-            </div>
-            <div class="col-12 col-md-4 col-lg-3 col-xxl-2 pxp-categories-card-1-container">
-                <a href="#" class="pxp-categories-card-1">
-                    <div class="pxp-categories-card-1-icon-container">
-                        <div class="pxp-categories-card-1-icon">
-                            <span class="fa fa-terminal"></span>
-                        </div>
-                    </div>
-                    <div class="pxp-categories-card-1-title">Software Engineering</div>
-                    <div class="pxp-categories-card-1-subtitle">439 open positions</div>
-                </a>
-            </div> {% endcomment %}
+            
         </div>
-        {% if jobs.count > 5 %}
+        {% if vals|length > 5 %}
             <div class="mt-4 mt-md-5 text-center pxp-animate-in pxp-animate-in-top">
                 <a href="#" class="btn rounded-pill pxp-section-cta">All Categories<span class="fa fa-angle-right"></span></a>
             </div>
@@ -459,201 +416,40 @@ input::-webkit-calendar-picker-indicator {
                 </div>
             </div>
             {% endfor %}
-            {% comment %} <div class="col-md-6 col-xl-4 col-xxl-3 pxp-jobs-card-1-container">
-                <div class="pxp-jobs-card-1 pxp-has-shadow">
-                    <div class="pxp-jobs-card-1-top">
-                        <a href="#" class="pxp-jobs-card-1-category">
-                            <div class="pxp-jobs-card-1-category-icon"><span class="fa fa-bullhorn"></span></div>
-                            <div class="pxp-jobs-card-1-category-label">Marketing & Communication</div>
-                        </a>
-                        <a href="#" class="pxp-jobs-card-1-title">Senior Editor</a>
-                        <div class="pxp-jobs-card-1-details">
-                            <a href="#" class="pxp-jobs-card-1-location">
-                                <span class="fa fa-globe"></span>San Francisco, CA
-                            </a>
-                            <div class="pxp-jobs-card-1-type">Full-time</div>
-                        </div>
-                    </div>
-                    <div class="pxp-jobs-card-1-bottom">
-                        <div class="pxp-jobs-card-1-bottom-left">
-                            <div class="pxp-jobs-card-1-date pxp-text-light">3 days ago by</div>
-                            <a href="#" class="pxp-jobs-card-1-company">Artistre Studio</a>
-                        </div>
-                        <a href="#" class="pxp-jobs-card-1-company-logo" style="background-image: url(/static/images/company-logo-1.png);"></a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6 col-xl-4 col-xxl-3 pxp-jobs-card-1-container">
-                <div class="pxp-jobs-card-1 pxp-has-shadow">
-                    <div class="pxp-jobs-card-1-top">
-                        <a href="#" class="pxp-jobs-card-1-category">
-                            <div class="pxp-jobs-card-1-category-icon"><span class="fa fa-calendar-o"></span></div>
-                            <div class="pxp-jobs-card-1-category-label">Project Management</div>
-                        </a>
-                        <a href="#" class="pxp-jobs-card-1-title">Software Engineering Team Leader</a>
-                        <div class="pxp-jobs-card-1-details">
-                            <a href="#" class="pxp-jobs-card-1-location">
-                                <span class="fa fa-globe"></span>Los Angeles, CA
-                            </a>
-                            <div class="pxp-jobs-card-1-type">Full-time</div>
-                        </div>
-                    </div>
-                    <div class="pxp-jobs-card-1-bottom">
-                        <div class="pxp-jobs-card-1-bottom-left">
-                            <div class="pxp-jobs-card-1-date pxp-text-light">3 days ago by</div>
-                            <a href="#" class="pxp-jobs-card-1-company">Craftgenics</a>
-                        </div>
-                        <a href="#" class="pxp-jobs-card-1-company-logo" style="background-image: url(/static/images/company-logo-2.png);"></a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6 col-xl-4 col-xxl-3 pxp-jobs-card-1-container">
-                <div class="pxp-jobs-card-1 pxp-has-shadow">
-                    <div class="pxp-jobs-card-1-top">
-                        <a href="#" class="pxp-jobs-card-1-category">
-                            <div class="pxp-jobs-card-1-category-icon"><span class="fa fa-comments-o"></span></div>
-                            <div class="pxp-jobs-card-1-category-label">Customer Service</div>
-                        </a>
-                        <a href="#" class="pxp-jobs-card-1-title">Techincal Support Engineer</a>
-                        <div class="pxp-jobs-card-1-details">
-                            <a href="#" class="pxp-jobs-card-1-location">
-                                <span class="fa fa-globe"></span>Paris, France
-                            </a>
-                            <div class="pxp-jobs-card-1-type">Full-time</div>
-                        </div>
-                    </div>
-                    <div class="pxp-jobs-card-1-bottom">
-                        <div class="pxp-jobs-card-1-bottom-left">
-                            <div class="pxp-jobs-card-1-date pxp-text-light">3 days ago by</div>
-                            <a href="#" class="pxp-jobs-card-1-company">Illuminate Studio</a>
-                        </div>
-                        <a href="#" class="pxp-jobs-card-1-company-logo" style="background-image: url(/static/images/company-logo-3.png);"></a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6 col-xl-4 col-xxl-3 pxp-jobs-card-1-container">
-                <div class="pxp-jobs-card-1 pxp-has-shadow">
-                    <div class="pxp-jobs-card-1-top">
-                        <a href="#" class="pxp-jobs-card-1-category">
-                            <div class="pxp-jobs-card-1-category-icon"><span class="fa fa-terminal"></span></div>
-                            <div class="pxp-jobs-card-1-category-label">Software Engineering</div>
-                        </a>
-                        <a href="#" class="pxp-jobs-card-1-title">Javascript Developer</a>
-                        <div class="pxp-jobs-card-1-details">
-                            <a href="#" class="pxp-jobs-card-1-location">
-                                <span class="fa fa-globe"></span>London, UK
-                            </a>
-                            <div class="pxp-jobs-card-1-type">Full-time</div>
-                        </div>
-                    </div>
-                    <div class="pxp-jobs-card-1-bottom">
-                        <div class="pxp-jobs-card-1-bottom-left">
-                            <div class="pxp-jobs-card-1-date pxp-text-light">3 days ago by</div>
-                            <a href="#" class="pxp-jobs-card-1-company">Syspresoft</a>
-                        </div>
-                        <a href="#" class="pxp-jobs-card-1-company-logo" style="background-image: url(/static/images/company-logo-4.png);"></a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6 col-xl-4 col-xxl-3 pxp-jobs-card-1-container">
-                <div class="pxp-jobs-card-1 pxp-has-shadow">
-                    <div class="pxp-jobs-card-1-top">
-                        <a href="#" class="pxp-jobs-card-1-category">
-                            <div class="pxp-jobs-card-1-category-icon"><span class="fa fa-pie-chart"></span></div>
-                            <div class="pxp-jobs-card-1-category-label">Business Development</div>
-                        </a>
-                        <a href="#" class="pxp-jobs-card-1-title">Technical Writer</a>
-                        <div class="pxp-jobs-card-1-details">
-                            <a href="#" class="pxp-jobs-card-1-location">
-                                <span class="fa fa-globe"></span>London, UK
-                            </a>
-                            <div class="pxp-jobs-card-1-type">Full-time</div>
-                        </div>
-                    </div>
-                    <div class="pxp-jobs-card-1-bottom">
-                        <div class="pxp-jobs-card-1-bottom-left">
-                            <div class="pxp-jobs-card-1-date pxp-text-light">3 days ago by</div>
-                            <a href="#" class="pxp-jobs-card-1-company">Gramware</a>
-                        </div>
-                        <a href="single-company-1.html" class="pxp-jobs-card-1-company-logo" style="background-image: url(/static/images/company-logo-5.png);"></a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6 col-xl-4 col-xxl-3 pxp-jobs-card-1-container">
-                <div class="pxp-jobs-card-1 pxp-has-shadow">
-                    <div class="pxp-jobs-card-1-top">
-                        <a href="#" class="pxp-jobs-card-1-category">
-                            <div class="pxp-jobs-card-1-category-icon"><span class="fa fa-address-card-o"></span></div>
-                            <div class="pxp-jobs-card-1-category-label">Human Resources</div>
-                        </a>
-                        <a href="single-job-1.html" class="pxp-jobs-card-1-title">Human Resources Coordinator</a>
-                        <div class="pxp-jobs-card-1-details">
-                            <a href="#" class="pxp-jobs-card-1-location">
-                                <span class="fa fa-globe"></span>San Francisco, CA
-                            </a>
-                            <div class="pxp-jobs-card-1-type">Full-time</div>
-                        </div>
-                    </div>
-                    <div class="pxp-jobs-card-1-bottom">
-                        <div class="pxp-jobs-card-1-bottom-left">
-                            <div class="pxp-jobs-card-1-date pxp-text-light">3 days ago by</div>
-                            <a href="#" class="pxp-jobs-card-1-company">Bitbytech</a>
-                        </div>
-                        <a href="#" class="pxp-jobs-card-1-company-logo" style="background-image: url(/static/images/company-logo-6.png);"></a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6 col-xl-4 col-xxl-3 pxp-jobs-card-1-container">
-                <div class="pxp-jobs-card-1 pxp-has-shadow">
-                    <div class="pxp-jobs-card-1-top">
-                        <a href="#" class="pxp-jobs-card-1-category">
-                            <div class="pxp-jobs-card-1-category-icon"><span class="fa fa-terminal"></span></div>
-                            <div class="pxp-jobs-card-1-category-label">Software Engineering</div>
-                        </a>
-                        <a href="#" class="pxp-jobs-card-1-title">Fullstack Web Developer</a>
-                        <div class="pxp-jobs-card-1-details">
-                            <a href="#" class="pxp-jobs-card-1-location">
-                                <span class="fa fa-globe"></span>New York, NY
-                            </a>
-                            <div class="pxp-jobs-card-1-type">Full-time</div>
-                        </div>
-                    </div>
-                    <div class="pxp-jobs-card-1-bottom">
-                        <div class="pxp-jobs-card-1-bottom-left">
-                            <div class="pxp-jobs-card-1-date pxp-text-light">3 days ago by</div>
-                            <a href="#" class="pxp-jobs-card-1-company">CoderBotics</a>
-                        </div>
-                        <a href="#" class="pxp-jobs-card-1-company-logo" style="background-image: url(/static/images/company-logo-7.png);"></a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6 col-xl-4 col-xxl-3 pxp-jobs-card-1-container">
-                <div class="pxp-jobs-card-1 pxp-has-shadow">
-                    <div class="pxp-jobs-card-1-top">
-                        <a href="#" class="pxp-jobs-card-1-category">
-                            <div class="pxp-jobs-card-1-category-icon"><span class="fa fa-bullhorn"></span></div>
-                            <div class="pxp-jobs-card-1-category-label">Marketing & Communication</div>
-                        </a>
-                        <a href="#" class="pxp-jobs-card-1-title">Social Media Expert</a>
-                        <div class="pxp-jobs-card-1-details">
-                            <a href="#" class="pxp-jobs-card-1-location">
-                                <span class="fa fa-globe"></span>San Francisco, CA
-                            </a>
-                            <div class="pxp-jobs-card-1-type">Full-time</div>
-                        </div>
-                    </div>
-                    <div class="pxp-jobs-card-1-bottom">
-                        <div class="pxp-jobs-card-1-bottom-left">
-                            <div class="pxp-jobs-card-1-date pxp-text-light">3 days ago by</div>
-                            <a href="#" class="pxp-jobs-card-1-company">Artistre Studio</a>
-                        </div>
-                        <a href="#" class="pxp-jobs-card-1-company-logo" style="background-image: url(/static/images/company-logo-1.png);"></a>
-                    </div>
-                </div>
-            </div> {% endcomment %}
+            
         </div>
 
-        {% if jobs.count > 5 %}
+        {% if jobs|length > 5 %}
+            <div class="mt-4 mt-md-5 text-center pxp-animate-in pxp-animate-in-top">
+                <a href="{% url 'main:jobs' %}" class="btn rounded-pill pxp-section-cta">All Job Offers<span class="fa fa-angle-right"></span></a>
+            </div>
+        {% endif %}
+    </div>
+</section>
+<section class="mt-100 pt-100 pb-100" style="background-color: rgb(232, 240, 248); margin-top: 0px; ">
+    <div class="pxp-container">
+        <h2 class="pxp-section-h2 text-center">Featured Seminars</h2>
+        <p class="pxp-text-light text-center">Attend Seminars to learn something new</p>
+
+        <div class="row mt-4 mt-md-5 pxp-animate-in pxp-animate-in-top" style="justify-content: center">
+            {% for i in seminars|slice:":4" %}
+            <div class="col-12 col-md-4 col-lg-3 col-xxl-2 pxp-categories-card-1-container">
+                <a href="#" class=" pxp-seminar-card" >
+                    <div class="pxp-categories-card-1-icon-container">
+                        <div class="pxp-categories-card-1-icon" style="background-image: url({{ i.image.url }});background-size: cover;">
+                        
+                        </div>
+                    </div>
+                    <div class="pxp-categories-card-1-title">{{ i.title }}</div>
+                    <div class="pxp-categories-card-1-subtitle">{{ i.city }}</div>
+                </a>
+            </div>
+            
+            {% endfor %}
+            
+        </div>
+
+        {% if seminars|length > 5 %}
             <div class="mt-4 mt-md-5 text-center pxp-animate-in pxp-animate-in-top">
                 <a href="{% url 'main:jobs' %}" class="btn rounded-pill pxp-section-cta">All Job Offers<span class="fa fa-angle-right"></span></a>
             </div>
@@ -661,7 +457,7 @@ input::-webkit-calendar-picker-indicator {
     </div>
 </section>
 <!--
-<section class="mt-100">
+<section class="mt-100" style="background-color: white;">
     <div class="pxp-container">
         <h2 class="pxp-section-h2 text-center">Find Best Companies</h2>
         <p class="pxp-text-light text-center">Work for the best companies in the world</p>
@@ -826,8 +622,8 @@ input::-webkit-calendar-picker-indicator {
     </div>
 </section> {% endcomment %}
 
-<section class="mt-100">
-    <div class="pxp-container">
+<section class="mt-100" >
+    <div class="pxp-container" style="margin-top:100px">
         <h2 class="pxp-section-h2 text-center">Stay Up to Date</h2>
         <p class="pxp-text-light text-center">Subscribe to our newsletter to receive our weekly feed.</p>
 

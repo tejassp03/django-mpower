@@ -273,10 +273,6 @@ class TestQues(models.Model):
     class Meta:
         db_table = "testques"
 
-
-
-
-
 class Application(models.Model):
     apply_id = models.AutoField(primary_key=True)
     user_id = models.ForeignKey(
@@ -421,7 +417,6 @@ class Templates(models.Model):
     created_date = models.DateTimeField(default=timezone.now)
     emp_id = models.ForeignKey(Employer, default=None,
                             null=True, on_delete=models.CASCADE)
-
     class Meta:
         db_table = "templates"
 
@@ -447,3 +442,55 @@ class TemplateSteps(models.Model):
 
     class Meta:
         db_table = "templatesteps"
+
+
+class Seminars(models.Model):
+    seminar_id = models.AutoField(primary_key=True)
+    title = models.CharField(max_length=100)
+    description = models.CharField(max_length=512)
+    date = models.DateTimeField()
+    city = models.CharField(max_length=100)
+    address = models.CharField(max_length=512)
+    is_online = models.IntegerField(default=None, null=True)
+    web_link = models.CharField(max_length=200)
+    image = models.ImageField(upload_to='seminar/', default=None, null=True)
+    speaker = models.CharField(max_length=200)
+    created_date = models.DateTimeField(default=timezone.now)
+    class Meta:
+        db_table = "seminars"
+
+
+
+class MockTest(models.Model):
+    test_id = models.AutoField(primary_key=True)
+    created_date = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        db_table = "mocktest"
+        
+class MockTestInfo(models.Model):
+    testinfoid = models.AutoField(primary_key=True)
+    test_id = models.ForeignKey(
+        MockTest, on_delete=models.CASCADE, blank=True, null=True)
+    test_name = models.CharField(max_length=100, default=None, null=True)
+    tech = models.CharField(max_length=100, default=None, null=True)
+    time_limit = models.IntegerField(default=0)
+
+    class Meta:
+        db_table = "mocktestinfo"
+
+class MockTestQues(models.Model):
+    ques_id = models.AutoField(primary_key=True)
+    testinfoid = models.ForeignKey(
+        MockTestInfo, on_delete=models.CASCADE, blank=True, null=True)
+    ques_name = models.CharField(max_length=200, default=None, null=True)
+    option1 = models.CharField(max_length=100, default=None, null=True)
+    option2 = models.CharField(max_length=100, default=None, null=True)
+    option3 = models.CharField(max_length=100, default=None, null=True)
+    option4 = models.CharField(max_length=100, default=None, null=True)
+    correct = models.IntegerField()
+    images = models.ImageField(upload_to='test_images/', default=None, null=True)
+
+
+    class Meta:
+        db_table = "mocktestques"

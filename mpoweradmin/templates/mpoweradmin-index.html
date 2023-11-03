@@ -52,14 +52,14 @@
                 <div class="pxp-dashboard-side-label">admin tools</div>
                 <ul class="list-unstyled">
                     <li id="cdas"><a href="{% url 'mpoweradmin:cdashboard' pk=pk %}"><span class="fa fa-home"></span>Dashboard</a></li>
-                    <!--<li id="cedi"><a href="{% url 'mpoweradmin:cedit' pk=pk %}"><span class="fa fa-pencil"></span>Edit Profile</a></li>
-                    <li id="cnew"><a href="{% url 'mpoweradmin:newjob' pk=pk %}"><span class="fa fa-file-text-o"></span>New Job Offer</a></li>
-                    <li id="cman"><a href="{% url 'mpoweradmin:all_interviews' pk=pk %}"><span class="fa fa-briefcase"></span>Interviews</a></li>-->
+                    <!--<li id="cedi"><a href="{% url 'mpoweradmin:seminars' pk=pk %}"><span class="fa fa-pencil"></span>Seminars</a></li>-->
+                    <li id="cnew"><a href="{% url 'mpoweradmin:seminars' pk=pk %}"><span class="fa fa-file-text-o"></span>Seminars</a></li>
+                    <!--<li id="cman"><a href="{% url 'mpoweradmin:all_interviews' pk=pk %}"><span class="fa fa-briefcase"></span>Interviews</a></li>-->
                     <li id="ccan"><a href="{% url 'mpoweradmin:candidates' pk=pk %}"><span class="fa fa-user-circle-o"></span>Employers</a></li>
-                    <!--<li id="csub"><a href="{% url 'mpoweradmin:subscriptions' pk=pk %}"><span class="fa fa-credit-card"></span>Subscriptions</a></li>-->
+                    <!--<li id="csub"><a href="{% url 'mpoweradmin:mocks' pk=pk %}"><span class="fa fa-credit-card"></span>Mocks</a></li>-->
                     <li id="ccha"><a href="{% url 'mpoweradmin:change_pass' pk=pk %}"><span class="fa fa-lock"></span>Change Password</a></li>
-                   <!-- <li id="qui"><a href="{% url 'mpoweradmin:show_tests' pk=pk %}"><span class="fa fa-question"></span>Create Test</a></li>-->
-                    <li id="inr"><a href="{% url 'mpoweradmin:all_interviews' pk=pk %}"><span class="fa fa-user"></span>Interviews</a></li>
+                    <!--<li id="qui"><a href="{% url 'mpoweradmin:seminars' pk=pk %}"><span class="fa-solid fa-person-chalkboard"></span>Seminars</a></li>-->
+                    <li id="inr"><a href="{% url 'mpoweradmin:mocks' pk=pk %}"><span class="fa fa-question"></span>Mocks</a></li>
                 </ul>
                 <div class="pxp-dashboard-side-label mt-3 mt-lg-4">Insights</div>
                 <ul class="list-unstyled">
@@ -501,7 +501,7 @@
                 })
             }
 
-            function loadermodal(id)
+        function loadermodal(id)
         {
             $.ajax(
             {

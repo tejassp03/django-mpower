@@ -1,9 +1,10 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
-from .models import Admin, JobSeeker, Login, Employer, ResumeAnalysis, Jobs, LikedJobs, Application, Interview, Feedback, Newsletter, Course, AllSkills, RoleDetails, Notifications
+from .models import Admin, JobSeeker, Login, Employer, ResumeAnalysis, Jobs, LikedJobs, Application, Interview, Feedback, Newsletter, Course, AllSkills, RoleDetails, Notifications, Seminars
 import random
 import re
+import requests
 from django.contrib.auth.hashers import make_password, check_password
 from django.core.mail import EmailMessage
 from datetime import datetime
@@ -69,6 +70,7 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from ip2geotools.databases.noncommercial import DbIpCity
 
 @csrf_exempt
 def index(request):
@@ -132,6 +134,20 @@ def index(request):
     coms = jobs.values('eid').annotate(Count('eid')).order_by('-eid__count')
     vals = []
     co = 0
+    try:
+        user_ip = request.META.get('REMOTE_ADDR')
+        url = f"https://ipinfo.io/{user_ip}/json"
+        response = requests.get(url)
+
+        data = response.json()
+        user_city = data.get('city', 'City Not Found')
+    except:
+        pass
+    seminars = Seminars.objects.all()
+    seminar_distances = [(seminar, calculate_distance(seminar.city, user_city)) for seminar in seminars]
+    seminar_distances.sort(key=lambda x: x[1])
+    seminars_in_ascending_order = [seminar for seminar, _ in seminar_distances]
+
     for i in typ:
         if (co > 5):
             break
@@ -184,7 +200,7 @@ def index(request):
     for i in locations:
         locate.append(i['location'])
     
-    return render(request, 'index.html', {'locations': locations, 'titles': titles, 'title': dumps(title), 'vals': vals, 'jobs': jobs_info, 'coms': coms_info, 'loc': locate, 'total': len(jobs)})
+    return render(request, 'index.html', {'locations': locations, 'titles': titles, 'title': dumps(title), 'vals': vals, 'jobs': jobs_info, 'coms': coms_info, 'loc': locate, 'total': len(jobs),'seminars':seminars_in_ascending_order})
 
 
 def view_function(request):
@@ -1490,7 +1506,39 @@ def password_reset(request):
         request.session['password'] = None
         return JsonResponse({'message': 'Password changed successfully'})
 
+def calculate_distance(origin,destination):
 
+    try:
+        url = f"https://nominatim.openstreetmap.org/search?format=json&q={origin}"
+        response = requests.get(url)
+        data = response.json()
+        origin_coords = (float(data[0]['lat']), float(data[0]['lon']))
+
+        url = f"https://nominatim.openstreetmap.org/search?format=json&q={destination}"
+        response = requests.get(url)
+        data = response.json()
+        destination_coords = (float(data[0]['lat']), float(data[0]['lon']))
+
+        from math import radians, sin, cos, sqrt, atan2
+        lat1, lon1 = map(radians, origin_coords)
+        lat2, lon2 = map(radians, destination_coords)
+
+        dlon = lon2 - lon1
+        dlat = lat2 - lat1
+
+        a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
+        c = 2 * atan2(sqrt(a), sqrt(1 - a))
+
+        radius = 6371
+
+        distance = round(radius * c, 2)
+        # print(distance, "km")
+
+        return distance
+    except Exception as e:
+        # return JsonResponse({'error': str(e)})
+        
+        return "Error"
 
 
 def about_us(request):
