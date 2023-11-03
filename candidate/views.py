@@ -1089,15 +1089,43 @@ def templates(request, pk):
         data['temp_desc']=template[0].template_id.template_description
         candass=CandidateTemplateAssignments.objects.get(candidate_id=pk, template_id=template[0].template_id.template_id)
         all_steps=CandidateStepProgress.objects.filter(assignment_id=candass.assignment_id)
+        date_from_db=candass.date_assigned
         for i in all_steps:
             final_data={}
+            final_data['prog_id']=i.progress_id
             final_data['step_name']=i.step_id.step_name
             final_data['step_desc']=i.step_id.step_description
+            final_data['is_done']=i.is_completed
+            final_data['date']=i.completion_date
+            final_data['assigned']=date_from_db
+            date_from_db=date_from_db + timedelta(days=1)
             steps.append(final_data)
         data['steps']=steps
     else:
         data['not_temp']=1
     return render(request, 'onboarding.html', {'pk': pk, 'data': data})
+
+
+def get_template(request, pk):
+    progress_val=CandidateStepProgress.objects.get(progress_id=request.GET['progr_id'])
+    final_data={}
+    final_data['name']=progress_val.step_id.step_name
+    final_data['desc']=progress_val.step_id.step_description
+    final_data['reso']=progress_val.step_id.step_resources
+    final_data['tasks']=progress_val.step_id.step_tasks
+    return JsonResponse({'info': final_data})
+
+def set_step(request, pk):
+    if request.method == "POST":
+        progress_val=CandidateStepProgress.objects.get(progress_id=request.POST['progr_id'])
+        progress_val.is_completed=1
+        progress_val.completion_date=timezone.now()
+        progress_val.save()
+        temp=progress_val.assignment_id
+        temp.current_step_order=temp.current_step_order+1
+        temp.save()
+        return JsonResponse({'info': 'done'})
+
 
 
 def job_change(request, pk):

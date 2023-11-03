@@ -1962,7 +1962,7 @@ def schedule_temp(request, pk):
         candidateassignment.current_step_order=1
         candidateassignment.application_id=applics
         candidateassignment.save()
-        all_steps=TemplateSteps.objects.filter(template_id=request.POST['templ_id'])
+        all_steps=TemplateSteps.objects.filter(template_id=request.POST['templ_id']).order_by('step_order')
         for i in all_steps:
             single_step=CandidateStepProgress()
             single_step.assignment_id=candidateassignment

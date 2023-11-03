@@ -14,8 +14,8 @@
     .inactive-div {
   filter: grayscale(100%);
   opacity: 0.5;
-  pointer-events: none; /* Prevents mouse clicks and hover events */
-  cursor: not-allowed; /* Changes cursor to indicate it's not clickable */
+  {% comment %} pointer-events: none; /* Prevents mouse clicks and hover events */
+  cursor: not-allowed; /* Changes cursor to indicate it's not clickable */ {% endcomment %}
 }
 .active-div
 {
@@ -39,111 +39,81 @@
     <h2 class="m-0">Onboarding Status</h2>
     <p class="pxp-text-light m-0">Complete transparency on the onboarding process.</p>
     <br>
-    <div class="pxp-jobs-card-3 active-div" >
+    {% if data.not_temp == 1 %}
+        <img src="{% static 'images/nojobs.jpeg' %}" style="height: 100%; width: 100%" alt="Nothing to show" />
+    {% else %}
+    {% for i in data.steps %}
+        {% if i.is_done == 1 %}
+        <div class="pxp-jobs-card-3 active-div" >
+            <div class="d-flex align-items-center justify-content-between">
+                <div class="d-flex gap-5 align-items-center">
+                    <div class="col-sm-3 col-md-2 col-xxl-auto px-3  text-black rounded-pill">
+                       <span class="fa fa-file-text-o" style="font-size:35px"></span>
+                    </div>
+                    <div class="col-sm-9 col-md-10 col-xxl-8">
+                        <a class="pxp-jobs-card-3-title mt-3 mt-sm-0">{{ i.step_name }}</a>
+                        <div class="pxp-jobs-card-3-details">
+                            <a href="jobs-list-1.html" class="pxp-jobs-card-3-location">
+                                <span class="fa fa-road"></span>Completion date: {{ i.date }}
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-sm-8 col-xxl-6 mt-3 mt-xxl-0">
+                        {% comment %} <a  class="pxp-jobs-card-3-category m-0">
+                            <div class="pxp-jobs-card-3-category-label">{{ i.step_desc }}</div>
+                        </a> {% endcomment %}
+                        {% comment %} <div class="pxp-jobs-card-3-date-company">
+                            <b  class="pxp-jobs-card-3-company">Remarks by Employer</b>
+                        </div> {% endcomment %}
+                    </div>
+                </div>
+                
+                <div class="col-sm-4 col-xxl-auto mt-3 mt-xxl-0 pxp-text-right" style="margin-left: auto">
+                    <a  id="pxp-exp-modal-button" data-bs-target="#pxp-doc-modal" data-bs-toggle="modal" class="btn rounded-pill btn-dark"  onclick="getdata({{i.prog_id}})">Details</a>
+                </div>
+                <div class="col-sm-4 col-xxl-auto mt-3 mt-xxl-0 pxp-text-right" style="margin-left: 1%">
+                    <a  id="pxp-exp-modal-button" class="btn rounded-pill btn-success"><span class="fa fa-check"></span></a>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="pxp-jobs-card-3 pxp-has-border inactive-div" style="background-color: #f9d29d;
+    background-image: linear-gradient(315deg, #f9d29d 0%, #ffd8cb 74%);">
         <div class="d-flex align-items-center justify-content-between">
             <div class="d-flex gap-5 align-items-center">
                 <div class="col-sm-3 col-md-2 col-xxl-auto px-3  text-black rounded-pill">
                    <span class="fa fa-file-text-o" style="font-size:35px"></span>
                 </div>
-                {% if data.not_temp == 1 %}
-                    <p>Nothing to show</p>
-                {% else %}
-                <div class="col-sm-9 col-md-10 col-xxl-6">
-                    <a class="pxp-jobs-card-3-title mt-3 mt-sm-0">Document Verification</a>
+                <div class="col-sm-9 col-md-10 col-xxl-8">
+                    <a class="pxp-jobs-card-3-title mt-3 mt-sm-0">{{ i.step_name }}</a>
                     <div class="pxp-jobs-card-3-details">
                         <a href="jobs-list-1.html" class="pxp-jobs-card-3-location">
-                            <span class="fa fa-road"></span>5 days till onboarding
+                            <span class="fa fa-road"></span>Due date: {{ i.assigned }}
                         </a>
                     </div>
                 </div>
                 <div class="col-sm-8 col-xxl-6 mt-3 mt-xxl-0">
-                    <a  class="pxp-jobs-card-3-category m-0">
-                        <div class="pxp-jobs-card-3-category-label">Pending Document Approval</div>
-                    </a>
-                    <div class="pxp-jobs-card-3-date-company">
-                        <b  class="pxp-jobs-card-3-company">Remarks by Employer</b>
-                    </div>
+                    {% comment %} <a  class="pxp-jobs-card-3-category m-0">
+                        <div class="pxp-jobs-card-3-category-label">{{ i.step_desc }}</div>
+                    </a> {% endcomment %}
+                    {% comment %} <div class="pxp-jobs-card-3-date-company">
+                        <b  class="pxp-jobs-card-3-company">{{ i.step_desc }}</b>
+                    </div> {% endcomment %}
                 </div>
             </div>
             
-            <div class="col-sm-4 col-xxl-auto mt-3 mt-xxl-0 pxp-text-right">
-                <a  id="pxp-exp-modal-button" data-bs-target="#pxp-doc-modal" data-bs-toggle="modal" class="btn rounded-pill btn-dark">In Review</a>
+            <div class="col-sm-4 col-xxl-auto mt-3 mt-xxl-0 pxp-text-right" style="margin-left: auto">
+                <a  id="pxp-exp-modal-button" data-bs-target="#pxp-doc-modal" data-bs-toggle="modal" class="btn rounded-pill btn-dark" onclick="getdata({{i.prog_id}})">Details</a>
             </div>
-                {% endif %}
-
-           
-        </div>
-    </div>
-
-
-    <div class="pxp-jobs-card-3 pxp-has-border inactive-div" style="background-color: #f9d29d;
-    background-image: linear-gradient(315deg, #f9d29d 0%, #ffd8cb 74%);
-    
-    ">
-        <div class="d-flex align-items-center justify-content-between">
-            <div class="d-flex gap-5 align-items-center">
-                <div class="col-sm-3 col-md-2 col-xxl-auto px-3  text-black rounded-pill">
-                   <span class="fa fa-file-text-o" style="font-size:35px"></span>
-                </div>
-                <div class="col-sm-9 col-md-10 col-xxl-6">
-                    <a class="pxp-jobs-card-3-title mt-3 mt-sm-0">Document Verification</a>
-                    <div class="pxp-jobs-card-3-details">
-                        <a href="jobs-list-1.html" class="pxp-jobs-card-3-location">
-                            <span class="fa fa-road"></span>5 days till onboarding
-                        </a>
-                    </div>
-                </div>
-                <div class="col-sm-8 col-xxl-6 mt-3 mt-xxl-0">
-                    <a  class="pxp-jobs-card-3-category m-0">
-                        <div class="pxp-jobs-card-3-category-label">Pending Document Approval</div>
-                    </a>
-                    <div class="pxp-jobs-card-3-date-company">
-                        <b  class="pxp-jobs-card-3-company">Remarks by Employer</b>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="col-sm-4 col-xxl-auto mt-3 mt-xxl-0 pxp-text-right">
-                <a  id="pxp-exp-modal-button" data-bs-target="#pxp-doc-modal" data-bs-toggle="modal" class="btn rounded-pill btn-light">Details</a>
+            <div class="col-sm-4 col-xxl-auto mt-3 mt-xxl-0 pxp-text-right" style="margin-left: 1%">
+                <a  id="pxp-exp-modal-button" class="btn rounded-pill btn-success" onclick="markitdone({{i.prog_id}})"><span class="fa fa-check"></span></a>
             </div>
            
         </div>
     </div>
-
-
-    <div class="pxp-jobs-card-3 pxp-has-border inactive-div" style="background-color: #f9d29d;
-    background-image: linear-gradient(315deg, #f9d29d 0%, #ffd8cb 74%);
-    
-    ">
-        <div class="d-flex align-items-center justify-content-between">
-            <div class="d-flex gap-5 align-items-center">
-                <div class="col-sm-3 col-md-2 col-xxl-auto px-3  text-black rounded-pill">
-                   <span class="fa fa-file-text-o" style="font-size:35px"></span>
-                </div>
-                <div class="col-sm-9 col-md-10 col-xxl-6">
-                    <a class="pxp-jobs-card-3-title mt-3 mt-sm-0">Document Verification</a>
-                    <div class="pxp-jobs-card-3-details">
-                        <a href="jobs-list-1.html" class="pxp-jobs-card-3-location">
-                            <span class="fa fa-road"></span>5 days till onboarding
-                        </a>
-                    </div>
-                </div>
-                <div class="col-sm-8 col-xxl-6 mt-3 mt-xxl-0">
-                    <a  class="pxp-jobs-card-3-category m-0">
-                        <div class="pxp-jobs-card-3-category-label">Pending Document Approval</div>
-                    </a>
-                    <div class="pxp-jobs-card-3-date-company">
-                        <b  class="pxp-jobs-card-3-company">Remarks by Employer</b>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="col-sm-4 col-xxl-auto mt-3 mt-xxl-0 pxp-text-right">
-                <a  id="pxp-exp-modal-button" data-bs-target="#pxp-doc-modal" data-bs-toggle="modal" class="btn rounded-pill btn-light">Details</a>
-            </div>
-           
-        </div>
-    </div>
+        {% endif %}
+    {% endfor %}
+    {% endif %}
 
    
 
@@ -156,14 +126,18 @@
         align-items: center;
         justify-content: center;">
             <div class="modal-content" style="width: 100vw;">
-                <div class="modal-header" style="margin-top: 20px;font-weight: bold;">
-                    Upload Documents
+                <div class="modal-header" id="steptitle" style="margin-top: 20px;font-weight: bold;">
+                    
+                </div>
+                <hr>
+                <div class="modal-header" id="stepdesc" style="margin-top: 20px;font-weight: bold;">
+                    
                 </div>
                 <hr>
                 <div class="modal-body" style="width: 50vw; padding: 20px !important;">
                     <div class="pxp-dashboard-content-details" style="margin-right:0px; box-shadow: none; padding: 0px">
                         <form>
-                            <div class="row ">
+                            {% comment %} <div class="row ">
                                 <div class="col-xxl-6">
                                     <div class="mb-3">
                                         <label for="pxp-company-job-title" class="form-label">Job title</label>
@@ -177,32 +151,33 @@
                                 
                             </div>
                             
-                            <hr>
-                            <br>
+                            <hr> {% endcomment %}
+                            {% comment %} <br> {% endcomment %}
                             <div class="col-md-12  d-flex flex-row gap-5 align-items-start">
                                 <div class=" col-md-5">
-                                    <label for="pxp-company-job-level" class="form-label">Document Type</label>
+                                    <div id="stepreso">
+                                    </div>
+                                    <div id="steptask">
+                                    </div>
+                                    {% comment %} <label for="pxp-company-job-level" class="form-label">Document Type</label>
                                     <select id="pxp-company-job-level" class="form-select" name="careerlevel" required>
                                         <option>Aadhar Card</option>
                                         <option>Driver's License</option>
                                         <option>PAN Card</option>
                                         <option>Voter's ID</option>
-                                    </select>
+                                    </select> {% endcomment %}
                                 </div>
 
-                                <div class="pxp-company-cover col-md-5">
+                                {% comment %} <div class="pxp-company-cover col-md-5">
                                     <input type="file" id="pxp-company-cover-choose-file" accept="image/*">
                                     <label for="pxp-company-cover-choose-file" class="pxp-cover"><span>Upload Document Image (less than 1MB JPG,PNG only)</span></label>
-                                </div>
+                                </div> {% endcomment %}
 
                             </div>
-                            
-
                             </div>
                         </form>
                     </div>
-                   
-                    <button class="btn rounded-pill pxp-subsection-cta" onclick="jobmodalsub()">Submit</button>
+                    {% comment %} <button class="btn rounded-pill pxp-subsection-cta" onclick="jobmodalsub()">Submit</button> {% endcomment %}
                 </div>
             </div>
         </div>
@@ -229,4 +204,39 @@ $(document).ready(function () {
     $('#jch').removeClass('pxp-active');
     $('#pla').removeClass('pxp-active');
 })
+function getdata(id)
+{
+    $.ajax(
+        {
+            type:"GET",
+            url: "{% url 'candidate:get_template' pk=pk %}",
+            data:{
+                    'progr_id': id
+            },
+            success: function( data ) 
+            {
+                $('#steptitle').text(data['info'].name);
+                $('#stepdesc').text("Description: "+data['info'].desc);
+                $('#stepreso').text("Resources: "+data['info'].reso);
+                $('#steptask').text("Tasks: "+data['info'].tasks);
+            }
+    })
+}
+
+function markitdone(id)
+{
+    $.ajax(
+        {
+            type:"POST",
+            url: "{% url 'candidate:set_step' pk=pk %}",
+            data:{
+                    'progr_id': id,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function( data ) 
+            {
+                location.reload();
+            }
+    })
+}
 {% endblock %}
