@@ -7,10 +7,12 @@ import re
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from queue import PriorityQueue
 import heapq
+from django.views.decorators.csrf import csrf_exempt
 from datetime import date, timedelta, datetime
 from django.http import JsonResponse
 import PyPDF2
 import textract
+import random
 import string
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -1070,38 +1072,6 @@ def show_tests(request, pk):
         page_obj = p.page(p.num_pages)
     return render(request, 'show-mpoweradmin.html', {'pk': pk, 'pe': page_obj, 'count': count})
 
-def create_test(request, pk):
-    if request.method=="POST":
-        test=Test()
-        test.save()
-        testinfo=TestInfo()
-        testinfo.test_id=test
-        testinfo.test_name=request.POST['name']
-        testinfo.eid=Employer.objects.get(eid=pk)
-        testinfo.time_limit=request.POST['timelimit']
-        testinfo.save()
-        info=request.POST.getlist('desc')
-        options=request.POST.getlist('optdesc')
-        correct=request.POST.getlist('correct')
-        n=len(info)
-        count=0
-        for i in range(0, n):
-            single=TestQues()
-            single.testinfoid=testinfo
-            single.ques_name=info[i]
-            single.option1=options[count]
-            single.option2=options[count+1]
-            single.option3=options[count+2]
-            single.option4=options[count+3]
-            count=count+4
-            single.correct=correct[i]
-            single.save()
-        if request.GET.get('redirect'):
-            return redirect('employer:candidates', pk=pk)
-        else:
-            return redirect('employer:show_tests', pk=pk)
-  
-    return render(request, 'create_quiz-mpoweradmin.html', {'pk':pk})
 
 def schedule(request, pk):
     if request.method=="POST":
@@ -1163,12 +1133,6 @@ def schedule(request, pk):
         send_emails(subject, message, receipt)
     return JsonResponse({'message': 'scheduled'})
 
-def test_info(request, pk):
-    testinfo=TestInfo.objects.filter(testinfoid=request.GET['testinfoid'])
-    testdate=str(testinfo[0].test_id.created_date)
-    testquest=TestQues.objects.filter(testinfoid=testinfo[0].testinfoid)
-    testdate=testdate[0:11]
-    return JsonResponse({'message': 'x', 'test': dumps(list(testinfo.values()), default=str), 'date': dumps(testdate, default=str), 'ques': dumps(list(testquest.values()))})
 
 def get_results(request, pk):
     testuser=TestUser.objects.get(testuser_id=request.GET['id'])
@@ -1353,10 +1317,186 @@ def mark_cand_provided(request,pk):
         job.status = 7
         job.save()
         return JsonResponse({'info':'Candidates Provided Marked'})
-    
+
+def seminars(request, pk):
+    if request.method == "POST":
+        if 'act' in request.POST:
+            for i in request.POST.getlist('ids[]'):
+                Seminars.objects.get(seminar_id=i).delete()
+            return redirect('mpoweradmin:seminars', pk=pk)
+        Seminars.objects.get(seminar_id=request.POST['sem_id']).delete()
+        return redirect('mpoweradmin:seminars', pk=pk)
+    seminars = Seminars.objects.all()
+    all_seminars = []
+    for i in seminars:
+        single_seminar = {}
+        single_seminar['seminar_id'] = i.seminar_id
+        single_seminar['title'] = i.title
+        single_seminar['desc']=i.description
+        single_seminar['city']=i.city
+        single_seminar['date']=i.date
+        single_seminar['created_date'] = i.created_date
+        if(i.image):
+            single_seminar['image'] = i.image.url
+        all_seminars.append(single_seminar)
+    sorted(all_seminars, key=lambda i: i['created_date'])
+    all_seminars.reverse()
+    GET_params = request.GET.copy()
+    count = len(all_seminars)
+    if ('page' in GET_params):
+        last = GET_params['page'][-1]
+        GET_params['page'] = last[0]
+    p = Paginator(all_seminars, 10)
+    page_number = request.GET.get('page')
+    try:
+        page_obj = p.get_page(page_number)
+    except PageNotAnInteger:
+        page_obj = p.page(1)
+    except EmptyPage:
+        page_obj = p.page(p.num_pages)
+    return render(request, 'new-seminar.html', {'pk': pk, 'pe': page_obj, 'count': count})
+
+
+def create_seminar(request, pk):
+    if request.method == "POST":
+        seminar=Seminars()
+        seminar.title=request.POST['name']
+        datetime_str = f"{request.POST['date']} {request.POST['time']}"
+        combined_datetime = datetime.strptime(datetime_str, "%Y-%m-%d %H:%M")
+        seminar.date = combined_datetime
+        seminar.city=request.POST['city']
+        seminar.speaker=request.POST['speakers']
+        seminar.address=request.POST['address']
+        seminar.description=request.POST['desc']
+        filev = None
+        if 'image' in request.FILES:
+            filev = request.FILES['image']
+            lst = filev._name.split(".")
+            rand_num = random.randint(0, 1000000000)
+            filev._name = str(pk)+"_"+str(rand_num)+"_poster_"+filev._name
+            seminar.image = filev
+        seminar.save()
+        return JsonResponse({'message': 'saved'}) 
+
+def mocks(request, pk):
+    if request.method == "POST":
+        if 'act' in request.POST:
+            for i in request.POST.getlist('ids[]'):
+                MockTest.objects.get(test_id=i).delete()
+            return redirect('mpoweradmin:mocks', pk=pk)
+        if 'del' in request.POST:
+            if request.POST['del'] == 'Y':   
+                MockTest.objects.get(test_id=request.POST['test_id']).delete()
+                return redirect('mpoweradmin:mocks', pk=pk)
+    mocks = MockTest.objects.all()
+    all_mocks = []
+    for i in mocks:
+
+        mock_info = MockTestInfo.objects.get(test_id = i.test_id)
+        single_mock = {}
+        single_mock['test_id'] = mock_info.test_id
+        single_mock['testinfoid'] = mock_info.testinfoid
+        single_mock['name'] = mock_info.test_name
+        single_mock['tech']=mock_info.tech
+        single_mock['time_limit']=mock_info.time_limit
+        single_mock['created_date'] = i.created_date
+        questions=MockTestQues.objects.filter(testinfoid=mock_info.testinfoid)
+        single_mock['num']=len(questions)
+        all_mocks.append(single_mock)
+    sorted(all_mocks, key=lambda i: i['created_date'])
+    all_mocks.reverse()
+    GET_params = request.GET.copy()
+    count = len(all_mocks)
+    if ('page' in GET_params):
+        last = GET_params['page'][-1]
+        GET_params['page'] = last[0]
+    p = Paginator(all_mocks, 10)
+    page_number = request.GET.get('page')
+    try:
+        page_obj = p.get_page(page_number)
+    except PageNotAnInteger:
+        page_obj = p.page(1)
+    except EmptyPage:
+        page_obj = p.page(p.num_pages)
+    return render(request, 'new-mock.html', {'pk': pk, 'pe': page_obj, 'count': count})
+
+def mock_info(request, pk):
+    testinfo = MockTestInfo.objects.filter(testinfoid=request.GET['testinfoid'])
+    testdate = str(testinfo[0].test_id.created_date)
+    testquest = MockTestQues.objects.filter(testinfoid=testinfo[0].testinfoid)
+    testdate = testdate[0:11]
+    return JsonResponse({'message': 'x', 'test': dumps(list(testinfo.values()), default=str), 'date': dumps(testdate, default=str), 'ques': dumps(list(testquest.values()))})
+
+def create_test(request, pk):
+    if request.method=="POST":
+        test = MockTest()
+        test.save()
+
+        testinfo = MockTestInfo()
+        testinfo.test_id = test
+        testinfo.test_name=request.POST['name']
+        testinfo.tech=request.POST['tech']
+        testinfo.time_limit=request.POST['timelimit']
+        testinfo.save()
+        info=request.POST.getlist('desc')
+        options=request.POST.getlist('optdesc')
+        correct=request.POST.getlist('correct')
+        n=len(info)
+        count=0
+        for i in range(0, n):
+            single=MockTestQues()
+            single.testinfoid=testinfo
+            single.ques_name=info[i]
+            single.option1=options[count]
+            single.option2=options[count+1]
+            single.option3=options[count+2]
+            single.option4=options[count+3]
+            count=count+4
+            single.correct=correct[i]
+            single.save()
+        if request.GET.get('redirect'):
+            return redirect('mpoweradmin:mocks', pk=pk)
+        else:
+            return redirect('mpoweradmin:mocks', pk=pk)
+  
+    return render(request, 'create_quiz-mpoweradmin.html', {'pk':pk})
+
+def test_info(request, pk):
+    testinfo=MockTestInfo.objects.filter(testinfoid=request.GET['testinfoid'])
+    testdate=str(testinfo[0].test_id.created_date)
+    testquest=MockTestQues.objects.filter(testinfoid=testinfo[0].testinfoid)
+    testdate=testdate[0:11]
+    return JsonResponse({'message': 'x', 'test': dumps(list(testinfo.values()), default=str), 'date': dumps(testdate, default=str), 'ques': dumps(list(testquest.values()))})
+@csrf_exempt
+def edit_test(request,pk):
+    if request.method == "POST":
+        
+        try:
+            testinfoid = request.POST.get('testinfoid')
+            data = json.loads(request.POST.get('questions'))  
+            single_ = MockTestInfo.objects.get(testinfoid=testinfoid)
+            single_.test_name = request.POST.get('test_name')
+            single_.time_limit = request.POST.get('time_limit')
+            single_.tech = request.POST.get('tech')
+            # print(single_.test_name,single_.time_limit,request.POST.get('test_name'),request.POST.get('time_limit'))
+            for i, question_data in enumerate(data):
+                single = MockTestQues.objects.get(ques_id=question_data['ques_id'])
+                single.ques_name = question_data['question']
+                single.option1 = question_data['options'][0]
+                single.option2 = question_data['options'][1]
+                single.option3 = question_data['options'][2]
+                single.option4 = "Hello"
+                single.correct = question_data['correctAnswer']
+                single.save()
+            single_.save()
+        except Exception as e:
+            JsonResponse({'message': 'Error updating Test'})
+        return JsonResponse({'message': 'Edited'})
+
 def logout(request, pk):
     admin=Login.objects.get(log_id=Admin.objects.get(aid=pk).log_id.log_id)
     admin.status=0
     admin.save()
     request.session.flush()
     return redirect('main:index')
+

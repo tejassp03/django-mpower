@@ -52,7 +52,11 @@ urlpatterns = [
     path('set_step/', views.set_step, name='set_step'),
     path('job_change/', views.job_change, name='job_change'),
     path('job_change/jobapp/', views.jobapp, name='jobapp'),
+
     path('feedback/<int:pk2>/', views.feedback, name='feedback'),
+	path('get_mocks/', views.get_mocks, name='get_mocks'),
+	path('attempt_mock/<int:pk2>/', views.attempt_mock, name='attempt_mock'),
+
 	path('logout/', views.logout, name='logout')
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

@@ -2058,6 +2058,24 @@ def edit_step(request, pk):
         return JsonResponse({'info': 'done'})
     return JsonResponse({'info': dumps(list(step.values()), default=str)})
 
+def get_mocks(request):
+    if request.method == "POST":
+        job_id = request.POST.get('jobid') 
+
+        if job_id:
+            try:
+                job_ = Jobs.objects.get(jobid=job_id)
+                job_skills = job_.skills
+                job_skills_list = job_skills.split(',')
+                matching_mocktestinfo = MockTestInfo.objects.filter(tech__in=job_skills_list)
+                print(matching_mocktestinfo)
+                return JsonResponse({'mocktests': matching_mocktestinfo.values()})
+
+            except Jobs.DoesNotExist:
+                return JsonResponse({'error': 'Job not found'}, status=404)
+
+        return JsonResponse({'error': 'Missing or invalid jobid parameter'}, status=400)
+
 def under_development(request, pk):
     if 'shower' in request.session:
         del request.session['shower']
