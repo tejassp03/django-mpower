@@ -51,7 +51,8 @@ urlpatterns = [
     path('job_change/jobapp/', views.jobapp, name='jobapp'),
     path('feedback/', views.feedback, name='feedback'),
 	path('get_mocks/', views.get_mocks, name='get_mocks'),
-	path('attempt_mock/<int:pk2>/', views.attempt_mock, name='attempt_mock'),
+	path('applications/attempt_mock/<int:pk1>', views.attempt_mock, name='attempt_mock'),
+	path('submit_mock/', views.submit_mock, name='submit_mock'),
 	path('logout/', views.logout, name='logout')
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

@@ -327,11 +327,11 @@
 {% if jobs_ %}
 <div id="popup" class="popup">
     <div class="popup-content">
-        {% for i in jobs_ %} 
+         
         <div class="d-flex justify-content-end">
-           <h4 aria-hidden="true" style="cursor: pointer;" onclick="closePopup({{ i.jobid }})">&times;</h4>
+           <h4 aria-hidden="true" style="cursor: pointer;" onclick="closePopup()">&times;</h4>
         </div>
-        {% endfor %}
+        
         <div class="container p-0" >
             <h5 class="text-primary">Facing difficulty in finding the right profiles?</h5>
             <p class="text-muted">Request candidates from mPower.</p>
@@ -405,7 +405,7 @@ function showPopup() {
 }
 
 // Function to close the popup
-function closePopup(jobid) {
+function closePopup() {
     document.getElementById("popup").style.display = "none";
     candifetch(jobid);
 }

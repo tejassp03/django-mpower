@@ -661,7 +661,7 @@ def candidates(request, pk):
         page_obj = p.page(1)
     except EmptyPage:
         page_obj = p.page(p.num_pages)
-    jobs_ = Jobs.objects.filter(eid=pk).exclude(status=6)  
+    jobs_ = Jobs.objects.filter(eid=pk).exclude(status=4)  
     
     return render(request, 'candidate-employer.html', {'pk': pk, 'pe': page_obj, 'count': count, 'jobs': jobs, 'app_count': app_count, 'single': single_apps, 'shower': shower, 'test': testinfo,'jobs_':jobs_})
 
