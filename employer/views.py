@@ -616,6 +616,10 @@ def candidates(request, pk):
                 single_can['results'] = (
                     int(testuser1.correct_answers)/int(testuser1.total_ques))*100
                 single_can['test_id'] = testuser1.testuser_id
+            elif i.status == 9:
+                candidatetemplate=CandidateTemplateAssignments.objects.get(application_id=i.apply_id)
+                single_can['templatesteps']=candidatetemplate.current_step_order-1
+                single_can['totalsteps']=len(TemplateSteps.objects.filter(template_id=candidatetemplate.template_id.template_id))
             else:
                 single_can['results'] = 0
             single_apps.append(single_can)
@@ -662,8 +666,8 @@ def candidates(request, pk):
     except EmptyPage:
         page_obj = p.page(p.num_pages)
     jobs_ = Jobs.objects.filter(eid=pk).exclude(status=6)  
-    
-    return render(request, 'candidate-employer.html', {'pk': pk, 'pe': page_obj, 'count': count, 'jobs': jobs, 'app_count': app_count, 'single': single_apps, 'shower': shower, 'test': testinfo,'jobs_':jobs_})
+    templates=Templates.objects.filter(emp_id=pk)
+    return render(request, 'candidate-employer.html', {'pk': pk, 'pe': page_obj, 'count': count, 'jobs': jobs, 'app_count': app_count, 'single': single_apps, 'shower': shower, 'test': testinfo,'jobs_':jobs_, 'templates': templates})
 
 def interview_complete(request,pk):
     inter = Interview.objects.get(apply_id = request.POST['apply_id'])
@@ -1236,6 +1240,10 @@ def get_cands(request, pk):
             single_can['results'] = (
                 int(testuser1.correct_answers)/int(testuser1.total_ques))*100
             single_can['test_id'] = testuser1.testuser_id
+        elif i.status == 9:
+            candidatetemplate=CandidateTemplateAssignments.objects.get(application_id=i.apply_id)
+            single_can['templatesteps']=candidatetemplate.current_step_order-1
+            single_can['totalsteps']=len(TemplateSteps.objects.filter(template_id=candidatetemplate.template_id.template_id))
         else:
             single_can['results'] = 0
         single_can['date_applied'] = i.date_applied
@@ -1942,6 +1950,26 @@ def edit_template(request, pk, pk2):
         template.save()
         return redirect('employer:edit_template', pk=pk, pk2=pk2)
     return render(request, 'edit-template-employer.html', {'pk': pk, 'pk2': pk2, 'template': template, 'steps': steps})
+
+def schedule_temp(request, pk):
+    if(request.method == "POST"):
+        applics=Application.objects.get(apply_id=request.POST['appl_id'])
+        applics.status=9
+        applics.save()
+        candidateassignment=CandidateTemplateAssignments()
+        candidateassignment.candidate_id=applics.user_id
+        candidateassignment.template_id=Templates.objects.get(template_id=request.POST['templ_id'])
+        candidateassignment.current_step_order=1
+        candidateassignment.application_id=applics
+        candidateassignment.save()
+        all_steps=TemplateSteps.objects.filter(template_id=request.POST['templ_id']).order_by('step_order')
+        for i in all_steps:
+            single_step=CandidateStepProgress()
+            single_step.assignment_id=candidateassignment
+            single_step.step_id=i.step_id
+            single_step.is_completed=False
+            single_step.save()
+        return JsonResponse({'info': 'done'})
 
 def get_all_steps(request, pk, pk2):
     all_steps=Steps.objects.filter(emp_id=pk)

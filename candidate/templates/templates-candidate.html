@@ -1,7 +1,7 @@
 {% extends 'candidate-index.html' %}
 
 {% block title %}
-<title>mpower - Candidate dashboard - Interviews</title>
+<title>mpower - Candidate dashboard - Templates</title>
 {% endblock %}
 
 {% block content %}
@@ -17,8 +17,8 @@
         {% endif %}
         {% endfor %}
     {% endif %}
-    <h1>Interviews</h1>
-    <p class="pxp-text-light">Detailed list of your interviews scheduled.</p>
+    <h1>Templates</h1>
+    <p class="pxp-text-light">Detailed list of templates assigned to you.</p>
 
     <div class="mt-4 mt-lg-5">
         <div class="row justify-content-between align-content-center">
@@ -33,11 +33,11 @@
             </div>
             <div class="col-auto order-1 order-sm-2">
                 <div class="pxp-candidate-dashboard-jobs-search mb-3">
-                    <div class="pxp-candidate-dashboard-jobs-search-results me-3">{{ count }} Interviews</div>
+                    <div class="pxp-candidate-dashboard-jobs-search-results me-3">{{ count }} Templates</div>
                     <div class="pxp-candidate-dashboard-jobs-search-search-form">
                         <div class="input-group">
                             <span class="input-group-text" style="background: white"><span class="fa fa-search"></span></span>
-                            <input type="text" class="form-control" placeholder="Search interviews..." id="search">
+                            <input type="text" class="form-control" placeholder="Search templates..." id="search">
                         </div>
                     </div>
                 </div>
@@ -181,9 +181,9 @@ $(document).ready(function () {
     $('#fee').removeClass('pxp-active');
     $('#sug').removeClass('pxp-active');
     $('#tes').removeClass('pxp-active');
-    $('#ins').addClass('pxp-active');
+    $('#ins').removeClass('pxp-active');
     $('#jch').removeClass('pxp-active');
-    $('#pla').removeClass('pxp-active');
+    $('#pla').addClass('pxp-active');
 })
 
 function feedbackload(id)
