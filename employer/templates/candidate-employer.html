@@ -229,6 +229,9 @@
                                 <td><div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-success">Interview Completed</span></div></td>
                                 {% elif i.status == 7 %}
                                 <td><div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-success">Feedback Provided</span></div></td>
+                                {% elif i.status == 9 %}
+                                <td><div class="pxp-company-dashboard-job-status"><span class="badge rounded-pill bg-success">Template Assigned <br> (Steps completed : {{ i.templatesteps }} / {{ i.totalsteps }})</span></div></td>
+                                
                                 {% endif %}
                                 
                                 <td>
@@ -252,11 +255,18 @@
                                             <option value="l_{{i.user_id}}_{{i.apply_id}}">Interview Completed</option>
                                             {% elif i.status == 6 %}
                                             <option value="m_{{i.user_id}}_{{i.apply_id}}">Interview Feedback</option>
+                                            {% elif i.status == 1 %}
+                                            <option value="t_{{i.user_id}}_{{i.apply_id}}">Assign Template</option>
                                             {% endif %}
+                                            {% if i.status == 9 %}
+                                            <option value="d_{{i.user_id}}_{{i.log_id}}">Send Message</option>
+                                            <option value="g_{{i.user_id}}_{{i.apply_id}}">Delete</option>
+                                            {%else %}
                                             <option value="d_{{i.user_id}}_{{i.log_id}}">Send Message</option>
                                             <option value="e_{{i.user_id}}_{{i.apply_id}}">Approve</option>
                                             <option value="f_{{i.user_id}}_{{i.apply_id}}">Reject</option>
                                             <option value="g_{{i.user_id}}_{{i.apply_id}}">Delete</option>
+                                            {% endif %}
                                         </select>
                                     </div>
                                     <div class="pxp-dashboard-table-options">
@@ -264,6 +274,7 @@
                                             <li><button title="Interview Completed" id="pxp-feedback-modal-button-{{i.user_id}}-{{i.apply}}" onclick="interviewComplete('{{i.user_id}}','{{i.apply_id}}')" style="display: none"></button></li>
                                             <li><button title="Schedule Interview" id="pxp-interview-modal-button-{{i.user_id}}-{{i.test_id}}" data-bs-target="#pxp-results-modal" data-bs-toggle="modal" onclick="resultsmodal('{{i.test_id}}','{{i.apply_id}}')" style="display: none"></button></li>
                                             <li><button title="View profile" id="pxp-candidate-modal-button-{{i.user_id}}" data-bs-target="#pxp-candidate-modal" data-bs-toggle="modal" onclick="candidatemodal('{{i.user_id}}')" style="display: none"><span class="fa fa-eye"></span></button></li>
+                                            <li><button title="Assign Template" id="pxp-template-modal-button-{{i.user_id}}-{{i.apply_id}}" data-bs-target="#pxp-template-modal" data-bs-toggle="modal" onclick="templatemodal('{{i.user_id}}','{{i.apply_id}}')" style="display: none"><span class="fa fa-eye"></span></button></li>
                                             <li><button title="Schedule Test" id="pxp-schedule-modal-button-{{i.user_id}}-{{i.apply_id}}" data-bs-target="#pxp-schedule-modal" data-bs-toggle="modal" onclick="setter('{{i.apply_id}}')" style="display: none"><span class="fa fa-question"></span></button></li>
                                             <li><button title="Send message" id="pxp-send-message-button-{{i.user_id}}-{{i.log_id}}" onclick="messageclick('{{i.log_id}}')" style="display: none"><span class="fa fa-envelope-o"></span></button></li>
                                             <li><button title="Approve" id="pxp-approve-button-{{i.user_id}}-{{i.apply_id}}" onclick="approve('{{i.apply_id}}')" style="display: none"><span class="fa fa-check"></span></button></li>
@@ -324,6 +335,48 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade pxp-user-modal" id="pxp-template-modal" aria-hidden="true" aria-labelledby="scheduleModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered widthadjuster" style="justify-content: center">
+        <div class="modal-content" style="width: 40rem">
+            {% if templates|length == 0 %}
+            <div class="modal-header" style="padding: 10px">
+                You must create template first!
+            </div>
+            <hr style="margin: 0px" />
+            <div class="modal-body" style="padding: 1rem !important">
+                <div class="pxp-company-dashboard-jobs-bulk-actions d-flex flex-row align-items-center justify-content-center" style="margin-left: auto">
+                   <p class="m-0">Click here to create templates.</p>
+                    <button class="btn ms-2" onclick="createtemplate()">Create Template</button>
+                </div>
+            </div>
+            {% else %}
+            <div class="modal-header" style="padding: 10px">
+                Please select the template
+            </div>
+            <hr style="margin: 0px" />
+            <div class="modal-body" style="padding: 1rem !important">
+                <div class="pxp-company-dashboard-jobs-bulk-actions" style="margin-left: auto">
+                    <select class="form-select" name="templateinfo">
+                            {% for i in templates %}
+                            <option value="{{ i.template_id }}">
+                            {{ i.template_name }}
+                            </option>
+                            {% endfor %}
+                    </select>
+                    <input name="first_id_cand" style="display: none" />
+                    <input name="first_id_apply" style="display: none" />
+                    <button class="btn ms-2" onclick="scheduletemplate()">Assign</button>
+                </div>
+            </div>
+            <div style="position: relative;left: 35%;bottom: 0.5rem;width: 34.5%;">
+            </div>
+            {% endif %}
+            
+        </div>
+    </div>
+</div>
+
 {% if jobs_ %}
 <div id="popup" class="popup">
     <div class="popup-content">
@@ -397,6 +450,52 @@ $(document).ready(function () {
         $(ab).addClass('pxp-active')
         candifetch(show);
     }
+
+    $(".randomselect").change(function(){
+        let nameval=$(this).prop('name');
+        let val_option=$(`[name=${nameval}]`).val();
+        val_option=val_option.split("_");
+        if(val_option[0] == "b")
+        {
+            let temp="#pxp-candidate-modal-button-"+val_option[1];
+            $(temp).click();
+        }
+        else if(val_option[0] == "c")
+        {
+            let temp="#pxp-schedule-modal-button-"+val_option[1]+"-"+val_option[2];
+            $(temp).click();
+        }
+        else if(val_option[0] == "d")
+        {
+            let temp="#pxp-send-message-button-"+val_option[1]+"-"+val_option[2];
+            $(temp).click();
+        }
+        else if(val_option[0] == "e")
+        {
+            let temp="#pxp-approve-button-"+val_option[1]+"-"+val_option[2];
+            $(temp).click();
+        }
+        else if(val_option[0] == "f")
+        {
+            let temp="#pxp-reject-button-"+val_option[1]+"-"+val_option[2];
+            $(temp).click();
+        }
+        else if(val_option[0] == "g")
+        {
+            let temp="#pxp-delete-button-"+val_option[1]+"-"+val_option[2];
+            $(temp).click();
+        }
+        else if(val_option[0] == "h")
+        {
+            let temp="#pxp-interview-modal-button-"+val_option[1]+"-"+val_option[2];
+            $(temp).click();
+        }
+        else if(val_option[0] == "t")
+        {
+            let temp="#pxp-template-modal-button-"+val_option[1]+"-"+val_option[2];
+            $(temp).click();
+        }
+    })
 })
 
 // Function to show the popup
@@ -434,7 +533,6 @@ function candifetch(id)
             },
             success: function( data ) 
             {
-                console.log(data)
                 let datainfo=JSON.parse(data['info']);
                 let idval;
                 $('#childrem tr').remove();
@@ -550,13 +648,18 @@ function candifetch(id)
                         span3.setAttribute('class', 'badge rounded-pill bg-success');
                         span3.innerHTML='Feedback Provided';
                     }
+                    else if(datainfo[i].status==9)
+                    {
+                        span3.setAttribute('class', 'badge rounded-pill bg-success');
+                        span3.innerHTML='Template Assigned<br>(Steps completed : ' + datainfo[i].templatesteps + ' / ' + datainfo[i].totalsteps + ')';
+                    }
                     td3div.append(span3);
                     td3a.append(td3div);
                     tr.append(td3a);
                     let td4=document.createElement('td');
                     let td4div=document.createElement('div');
                     td4div.setAttribute('class', 'pxp-company-dashboard-job-date');
-                    td4div.innerHTML=moment(datainfo[i].date_applied.slice(0, 19)).format("MMM. D, YYYY, h a");
+                    td4div.innerHTML=moment(datainfo[i].date_applied.slice(0, 19)).format("MMM. D, YYYY, h:m a");
                     td4.append(td4div);
                     tr.append(td4);
                     ////////////
@@ -689,6 +792,24 @@ function candifetch(id)
                     li5.append(but5);
                     ul.append(li5);
 
+                    
+
+                    let li9=document.createElement('li');
+                    let but9=document.createElement('button');
+                    but9.setAttribute('title', 'Assign Template');
+                    idval='pxp-template-modal-button-'+datainfo[i].user_id+'-'+datainfo[i].apply_id;
+                    but9.setAttribute('id', idval);
+                    but9.setAttribute('data-bs-target', '#pxp-template-modal');
+                    but9.setAttribute('data-bs-toggle', 'modal');
+                    let but9ans='templatemodal('+datainfo[i].user_id+','+datainfo[i].apply_id+')';
+                    but9.setAttribute('onclick', but9ans);
+                    but9.setAttribute('style', 'display: none');
+                    let but9span=document.createElement('span');
+                    but9span.setAttribute('class', 'fa fa-question');
+                    but9.append(but9span);
+                    li9.append(but9);
+                    ul.append(li9);
+
 
                     td5div.append(ul);
                     td5.append(td5div);
@@ -744,30 +865,58 @@ function candifetch(id)
                         opt9.innerHTML="Schedule Interview";
                         selectorsopt.append(opt9);
                     }
-                    let opt4=document.createElement('option');
-                    idval="d_"+datainfo[i].user_id+"_"+datainfo[i].log_id;
-                    opt4.setAttribute('value', idval);
-                    opt4.innerHTML="Send Message";
-                    selectorsopt.append(opt4);
-                    let opt5=document.createElement('option');
-                    idval="e_"+datainfo[i].user_id+"_"+datainfo[i].apply_id;
-                    opt5.setAttribute('value', idval);
-                    opt5.innerHTML="Approve";
-                    selectorsopt.append(opt5);
-                    let opt6=document.createElement('option');
-                    idval="f_"+datainfo[i].user_id+"_"+datainfo[i].apply_id;
-                    opt6.setAttribute('value', idval);
-                    opt6.innerHTML="Reject";
-                    selectorsopt.append(opt6);
-                    let opt7=document.createElement('option');
-                    idval="g_"+datainfo[i].user_id+"_"+datainfo[i].apply_id;
-                    opt7.setAttribute('value', idval);
-                    opt7.innerHTML="Delete";
-                    selectorsopt.append(opt7);
-                    seloptdiv.append(selectorsopt);
-                    td5.append(seloptdiv);
-                    tr.append(td5);
-                    finalinsert.append(tr);
+                    if(datainfo[i].status==1)
+                    {
+                        let opt3=document.createElement('option');
+                        idval="t_"+datainfo[i].user_id+"_"+datainfo[i].apply_id;
+                        opt3.setAttribute('value', idval);
+                        opt3.innerHTML="Assign Template";
+                        selectorsopt.append(opt3);
+                    }
+                    if(datainfo[i].status==9)
+                    {
+                        let opt4=document.createElement('option');
+                        idval="d_"+datainfo[i].user_id+"_"+datainfo[i].log_id;
+                        opt4.setAttribute('value', idval);
+                        opt4.innerHTML="Send Message";
+                        selectorsopt.append(opt4);
+                        let opt7=document.createElement('option');
+                        idval="g_"+datainfo[i].user_id+"_"+datainfo[i].apply_id;
+                        opt7.setAttribute('value', idval);
+                        opt7.innerHTML="Delete";
+                        selectorsopt.append(opt7);
+                        seloptdiv.append(selectorsopt);
+                        td5.append(seloptdiv);
+                        tr.append(td5);
+                        finalinsert.append(tr);
+                    }
+                    else
+                    {
+                        let opt4=document.createElement('option');
+                        idval="d_"+datainfo[i].user_id+"_"+datainfo[i].log_id;
+                        opt4.setAttribute('value', idval);
+                        opt4.innerHTML="Send Message";
+                        selectorsopt.append(opt4);
+                        let opt5=document.createElement('option');
+                        idval="e_"+datainfo[i].user_id+"_"+datainfo[i].apply_id;
+                        opt5.setAttribute('value', idval);
+                        opt5.innerHTML="Approve";
+                        selectorsopt.append(opt5);
+                        let opt6=document.createElement('option');
+                        idval="f_"+datainfo[i].user_id+"_"+datainfo[i].apply_id;
+                        opt6.setAttribute('value', idval);
+                        opt6.innerHTML="Reject";
+                        selectorsopt.append(opt6);
+                        let opt7=document.createElement('option');
+                        idval="g_"+datainfo[i].user_id+"_"+datainfo[i].apply_id;
+                        opt7.setAttribute('value', idval);
+                        opt7.innerHTML="Delete";
+                        selectorsopt.append(opt7);
+                        seloptdiv.append(selectorsopt);
+                        td5.append(seloptdiv);
+                        tr.append(td5);
+                        finalinsert.append(tr);
+                    }
                 }
             }
     })
@@ -791,7 +940,6 @@ function interviewComplete(user_id,apply_id){
 }
 function requestCand(){
     let jobidRequest=$("[name='jobidReq']").val();
-    console.log(jobidRequest);
     $.ajax(
         {
             type:"POST",
@@ -975,6 +1123,11 @@ $(".randomselect").change(function(){
         let temp="#pxp-interview-modal-button-"+val_option[1]+"-"+val_option[2];
         $(temp).click();
     }
+    else if(val_option[0] == "t")
+    {
+        let temp="#pxp-template-modal-button-"+val_option[1]+"-"+val_option[2];
+        $(temp).click();
+    }
 })
 
 $("[name='chek']").change(function(){
@@ -1085,6 +1238,12 @@ function createtest()
     window.location.href = url;
     
 }
+function createtemplate()
+{
+    var url = "{% url 'employer:create_temp' pk %}?redirect=candidates";
+    window.location.href = url;
+    
+}
 function tme2(id)
 {
     let nameval="action_but_option_"+id;
@@ -1141,7 +1300,35 @@ function tme2(id)
         var redirectUrl = "/give_feedback/" + pka;
         window.location.href = redirectUrl;
     }
+    else if (val_option[0] == "t") {
+        let temp="#pxp-template-modal-button-"+val_option[1]+"-"+val_option[2];
+        $(temp).click();
+    }
 }
 
+function templatemodal(id, appid)
+{
+    $('[name="first_id_cand"]').val(id);
+    $('[name="first_id_apply"]').val(appid);
+}
+
+function scheduletemplate()
+{
+    $.ajax(
+        {
+            type:"POST",
+            url: "{% url 'employer:schedule_temp' pk %}",
+            data:{
+                    'cand_id': $('[name="first_id_cand"]').val(),
+                    'appl_id': $('[name="first_id_apply"]').val(),
+                    'templ_id': $('[name="templateinfo"]').val(),
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function( data ) 
+            {
+                location.reload()
+            }
+    })
+}
 
 {% endblock %}

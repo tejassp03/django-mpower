@@ -443,7 +443,6 @@ class TemplateSteps(models.Model):
     class Meta:
         db_table = "templatesteps"
 
-
 class Seminars(models.Model):
     seminar_id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=100)
@@ -494,3 +493,25 @@ class MockTestQues(models.Model):
 
     class Meta:
         db_table = "mocktestques"
+
+class CandidateTemplateAssignments(models.Model):
+    assignment_id = models.AutoField(primary_key=True)
+    candidate_id = models.ForeignKey(JobSeeker, default=None, null=True, on_delete=models.CASCADE)
+    template_id = models.ForeignKey(Templates, default=None, null=True, on_delete=models.CASCADE)
+    current_step_order = models.IntegerField(default=None, null=True)
+    application_id = models.ForeignKey(Application, default=None, null=True, on_delete=models.CASCADE)
+    date_assigned = models.DateTimeField(default=timezone.now)
+    class Meta:
+        db_table = "candidatetemplateassignments"
+
+
+class CandidateStepProgress(models.Model):
+    progress_id = models.AutoField(primary_key=True)
+    assignment_id = models.ForeignKey(CandidateTemplateAssignments, default=None, null=True, on_delete=models.CASCADE)
+    step_id = models.ForeignKey(Steps, default=None, null=True, on_delete=models.CASCADE)
+    is_completed = models.BooleanField()
+    completion_date = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        db_table = "candidatestepprogress"
+
