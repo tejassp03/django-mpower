@@ -249,7 +249,8 @@ function mockmodal(id) {
         mockTestData.forEach(function (mockTest) {
         var mockTestElement = document.createElement('div');
         mockTestElement.className = 'row align-items-center justify-content-between';
-            console.log(mockTest);
+        let testid  = parseInt(mockTest.fields.test_id, 10);
+        console.log(testid);
         mockTestElement.innerHTML = `
         <div class="pxp-jobs-card-3 pxp-has-border">
             <div class="row align-items-center justify-content-between">
@@ -267,7 +268,7 @@ function mockmodal(id) {
                     </div>
                 </div>
                 <div class="col-sm-4 col-xl-2 col-xxl-auto mt-3 mt-xxl-0 pxp-text-right">
-                    <a href="#" class="btn rounded-pill pxp-card-btn">Attempt</a>
+                    <a href="attempt_mock/${testid}" target="_blank" class="btn rounded-pill pxp-card-btn">Attempt</a>
                 </div>
             </div>
         </div>

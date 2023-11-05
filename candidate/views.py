@@ -1213,8 +1213,10 @@ def get_mocks(request, pk):
 
         return JsonResponse({'error': 'Missing or invalid jobid parameter'}, status=400)
 
-def attempt_mock(request, pk,pk2):
-    testinfo = MockTestInfo.objects.get(test_id=pk2)
+
+
+def attempt_mock(request,pk, pk1):
+    testinfo = MockTestInfo.objects.get(test_id=pk1)
     testques = MockTestQues.objects.filter(testinfoid=testinfo.testinfoid)
     name = testinfo.test_name
     start_time = timezone.now()
@@ -1235,7 +1237,27 @@ def attempt_mock(request, pk,pk2):
             pass
         all_ques.append(single_ques)
     time_length = (time_limit//len(all_ques))*60
-    return render(request, 'attempt-employer.html', {'pk': pk, 'pk2': pk2,  'test': all_ques, 'name': name,'start_time':start_time,'time_length':time_length})
+    return render(request, 'attempt-mock.html', {'pk': pk, 'pk2': pk1,  'test': all_ques, 'name': name,'start_time':start_time,'time_length':time_length})
+
+def submit_mock(request, pk):
+    if request.method == "POST":
+        testinfo = MockTestInfo.objects.get(test_id=request.POST['testid'])
+        testques = MockTestQues.objects.filter(testinfoid=testinfo.testinfoid)
+        ans = request.POST.getlist('answers[]')
+        count = 0
+        str_ans = ""
+        for i, j in zip(testques, ans):
+            str_ans = str_ans+str(j)+','
+            if i.correct == int(j):
+                count = count+1
+
+        
+        
+        total = len(testques)
+        print(total,count)
+        
+        
+    return JsonResponse({'message': "submitted",'total':total,'right':count})
 
 def logout(request, pk):
     user = Login.objects.get(
