@@ -111,7 +111,7 @@ WSGI_APPLICATION = 'jobster.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'mpo',
+        'NAME': 'mpower',
         'USER': 'root',
         'HOST': 'localhost',
         'PORT': '3306',

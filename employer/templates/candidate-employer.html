@@ -35,6 +35,25 @@
     font-weight: 500;
 }
 
+.pxp-jobs-card-3 {
+    padding: 15px;
+    margin-top: 10px;
+}
+.pxp-jobs-card-3-company-logo {
+    width: 49px;
+    height: 50px;
+}
+.inactive-div {
+filter: grayscale(100%);
+opacity: 0.5;
+}
+.active-div
+{
+background-color: #f9d29d;
+background-image: linear-gradient(315deg, #f9d29d 0%, #ffd8cb 74%);
+}
+
+
 </style>
 {% endblock header %}
 {% block content %}
@@ -260,6 +279,7 @@
                                             {% endif %}
                                             {% if i.status == 9 %}
                                             <option value="d_{{i.user_id}}_{{i.log_id}}">Send Message</option>
+                                            <option value="o_{{i.user_id}}_{{i.apply_id}}">View onboarding status</option>
                                             <option value="g_{{i.user_id}}_{{i.apply_id}}">Delete</option>
                                             {%else %}
                                             <option value="d_{{i.user_id}}_{{i.log_id}}">Send Message</option>
@@ -275,6 +295,7 @@
                                             <li><button title="Schedule Interview" id="pxp-interview-modal-button-{{i.user_id}}-{{i.test_id}}" data-bs-target="#pxp-results-modal" data-bs-toggle="modal" onclick="resultsmodal('{{i.test_id}}','{{i.apply_id}}')" style="display: none"></button></li>
                                             <li><button title="View profile" id="pxp-candidate-modal-button-{{i.user_id}}" data-bs-target="#pxp-candidate-modal" data-bs-toggle="modal" onclick="candidatemodal('{{i.user_id}}')" style="display: none"><span class="fa fa-eye"></span></button></li>
                                             <li><button title="Assign Template" id="pxp-template-modal-button-{{i.user_id}}-{{i.apply_id}}" data-bs-target="#pxp-template-modal" data-bs-toggle="modal" onclick="templatemodal('{{i.user_id}}','{{i.apply_id}}')" style="display: none"><span class="fa fa-eye"></span></button></li>
+                                            <li><button title="Onboarding status" id="pxp-showtemp-modal-button-{{i.user_id}}-{{i.apply_id}}" data-bs-target="#pxp-showtemp-modal" data-bs-toggle="modal" onclick="tempshowm('{{i.user_id}}','{{i.apply_id}}')" style="display: none"><span class="fa fa-eye"></span></button></li>
                                             <li><button title="Schedule Test" id="pxp-schedule-modal-button-{{i.user_id}}-{{i.apply_id}}" data-bs-target="#pxp-schedule-modal" data-bs-toggle="modal" onclick="setter('{{i.apply_id}}')" style="display: none"><span class="fa fa-question"></span></button></li>
                                             <li><button title="Send message" id="pxp-send-message-button-{{i.user_id}}-{{i.log_id}}" onclick="messageclick('{{i.log_id}}')" style="display: none"><span class="fa fa-envelope-o"></span></button></li>
                                             <li><button title="Approve" id="pxp-approve-button-{{i.user_id}}-{{i.apply_id}}" onclick="approve('{{i.apply_id}}')" style="display: none"><span class="fa fa-check"></span></button></li>
@@ -327,8 +348,8 @@
                     <button class="btn ms-2" onclick="scheduletest()">Schedule</button>
                 </div>
             </div>
-            <div style="position: relative;left: 35%;bottom: 0.5rem;width: 34.5%;">
-                <input type="text" id="datetimeInput" class="form-control">
+            <div style="position: relative;left: 35%;bottom: 0.5rem;width: 37.5%; display: flex; align-items: baseline">
+                Deadline: <input type="text" id="datetimeInput" class="form-control">
             </div>
             {% endif %}
             
@@ -373,6 +394,21 @@
             </div>
             {% endif %}
             
+        </div>
+    </div>
+</div>
+
+<div class="modal fade pxp-user-modal" id="pxp-showtemp-modal" aria-hidden="true" aria-labelledby="scheduleModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered widthadjuster" style="justify-content: center">
+        <div class="modal-content" style="width: 65rem">
+            <div class="modal-header" style="padding: 10px">
+                <h2 class="m-0">Onboarding Status</h2>
+            </div>
+            <hr style="margin: 0px" />
+            <div class="modal-body" style="padding: 1rem !important">
+                <div class="pxp-company-dashboard-jobs-bulk-actions" id="appenderdiv" style="margin-left: auto; display: flex; flex-direction: column; align-items: stretch">
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -493,6 +529,11 @@ $(document).ready(function () {
         else if(val_option[0] == "t")
         {
             let temp="#pxp-template-modal-button-"+val_option[1]+"-"+val_option[2];
+            $(temp).click();
+        }
+        else if(val_option[0] == "o")
+        {
+            let temp="#pxp-showtemp-modal-button-"+val_option[1]+"-"+val_option[2];
             $(temp).click();
         }
     })
@@ -811,6 +852,23 @@ function candifetch(id)
                     ul.append(li9);
 
 
+                    let li15=document.createElement('li');
+                    let but15=document.createElement('button');
+                    but15.setAttribute('title', 'Onboarding status');
+                    idval='pxp-showtemp-modal-button-'+datainfo[i].user_id+'-'+datainfo[i].apply_id;
+                    but15.setAttribute('id', idval);
+                    but15.setAttribute('data-bs-target', '#pxp-showtemp-modal');
+                    but15.setAttribute('data-bs-toggle', 'modal');
+                    let but15ans='tempshowm('+datainfo[i].user_id+','+datainfo[i].apply_id+')';
+                    but15.setAttribute('onclick', but15ans);
+                    but15.setAttribute('style', 'display: none');
+                    let but15span=document.createElement('span');
+                    but15span.setAttribute('class', 'fa fa-question');
+                    but15.append(but15span);
+                    li15.append(but15);
+                    ul.append(li15);
+
+
                     td5div.append(ul);
                     td5.append(td5div);
                     let seloptdiv=document.createElement('div');
@@ -875,6 +933,11 @@ function candifetch(id)
                     }
                     if(datainfo[i].status==9)
                     {
+                        let opt15=document.createElement('option');
+                        idval="o_"+datainfo[i].user_id+"_"+datainfo[i].apply_id;
+                        opt15.setAttribute('value', idval);
+                        opt15.innerHTML="View onboarding status";
+                        selectorsopt.append(opt15);
                         let opt4=document.createElement('option');
                         idval="d_"+datainfo[i].user_id+"_"+datainfo[i].log_id;
                         opt4.setAttribute('value', idval);
@@ -1128,6 +1191,11 @@ $(".randomselect").change(function(){
         let temp="#pxp-template-modal-button-"+val_option[1]+"-"+val_option[2];
         $(temp).click();
     }
+    else if(val_option[0] == "o")
+    {
+        let temp="#pxp-showtemp-modal-button-"+val_option[1]+"-"+val_option[2];
+        $(temp).click();
+    }
 })
 
 $("[name='chek']").change(function(){
@@ -1304,12 +1372,107 @@ function tme2(id)
         let temp="#pxp-template-modal-button-"+val_option[1]+"-"+val_option[2];
         $(temp).click();
     }
+    else if (val_option[0] == "o") {
+        let temp="#pxp-showtemp-modal-button-"+val_option[1]+"-"+val_option[2];
+        $(temp).click();
+    }
 }
 
 function templatemodal(id, appid)
 {
     $('[name="first_id_cand"]').val(id);
     $('[name="first_id_apply"]').val(appid);
+}
+
+function tempshowm(id, appid)
+{
+    $.ajax(
+        {
+            type:"GET",
+            url: "{% url 'employer:get_temp_details' pk=pk %}",
+            data:{
+                    'user_id': id,
+                    'apply_id': appid,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function( data ) 
+            {
+                data=data['temp_data'];
+                let appender=document.getElementById('appenderdiv');
+                appender.innerHTML="";
+                for(let i=0;i<data.length;i++)
+                {
+                    if(data[i][1] == 1)
+                    {
+                        let firstdiv=document.createElement('div');
+                        firstdiv.setAttribute('class', 'pxp-jobs-card-3 pxp-has-border active-div');
+                        firstdiv.setAttribute('style', 'background-color: #f9d29d; background-image: linear-gradient(315deg, #f9d29d 0%, #ffd8cb 74%); margin-top: 10px');
+                        let seconddiv=document.createElement('div');
+                        seconddiv.setAttribute('class', 'd-flex align-items-center justify-content-between');
+                        let thirddiv=document.createElement('div');
+                        thirddiv.setAttribute('class', 'd-flex gap-5 align-items-center');
+                        let fourthdiv=document.createElement('div');
+                        fourthdiv.setAttribute('class', 'col-sm-3 col-md-2 col-xxl-auto px-3  text-black rounded-pill');
+                        fourthdiv.setAttribute('style', 'display: flex; align-items: center;')
+                        let firstspan=document.createElement('span');
+                        firstspan.setAttribute('class', 'fa fa-file-text-o');
+                        firstspan.setAttribute('style', 'font-size:35px');
+                        fourthdiv.append(firstspan);
+                        let fifthdiv=document.createElement('div');
+                        fifthdiv.setAttribute('class', 'col-sm-9 col-md-10 col-xxl-12');
+                        let firstanchor=document.createElement('a');
+                        firstanchor.setAttribute('class', 'pxp-jobs-card-3-title mt-3 mt-sm-0');
+                        firstanchor.setAttribute('style', 'margin-left: 15px');
+                        firstanchor.innerHTML=data[i][0];
+                        fifthdiv.append(firstanchor);
+                        let secondanchor=document.createElement('a');
+                        secondanchor.setAttribute('class', 'pxp-jobs-card-3-title mt-3 mt-sm-0');
+                        secondanchor.setAttribute('style', 'margin-left: 15px');
+                        secondanchor.innerHTML="Completion date : "+moment(data[i][2].slice(0, 19)).format("MMM. D, YYYY, h:mm a");
+                        fifthdiv.append(secondanchor);
+                        fourthdiv.append(fifthdiv);
+                        thirddiv.append(fourthdiv);
+                        seconddiv.append(thirddiv);
+                        firstdiv.append(seconddiv);
+                        appender.append(firstdiv);
+                    }
+                    else
+                    {
+                        let firstdiv=document.createElement('div');
+                        firstdiv.setAttribute('class', 'pxp-jobs-card-3 pxp-has-border inactive-div');
+                        firstdiv.setAttribute('style', 'background-color: #f9d29d; background-image: linear-gradient(315deg, #f9d29d 0%, #ffd8cb 74%); margin-top: 10px');
+                        let seconddiv=document.createElement('div');
+                        seconddiv.setAttribute('class', 'd-flex align-items-center justify-content-between');
+                        let thirddiv=document.createElement('div');
+                        thirddiv.setAttribute('class', 'd-flex gap-5 align-items-center');
+                        let fourthdiv=document.createElement('div');
+                        fourthdiv.setAttribute('class', 'col-sm-3 col-md-2 col-xxl-auto px-3  text-black rounded-pill');
+                        fourthdiv.setAttribute('style', 'display: flex; align-items: center;')
+                        let firstspan=document.createElement('span');
+                        firstspan.setAttribute('class', 'fa fa-file-text-o');
+                        firstspan.setAttribute('style', 'font-size:35px');
+                        fourthdiv.append(firstspan);
+                        let fifthdiv=document.createElement('div');
+                        fifthdiv.setAttribute('class', 'col-sm-9 col-md-10 col-xxl-12');
+                        let firstanchor=document.createElement('a');
+                        firstanchor.setAttribute('class', 'pxp-jobs-card-3-title mt-3 mt-sm-0');
+                        firstanchor.setAttribute('style', 'margin-left: 15px');
+                        firstanchor.innerHTML=data[i][0];
+                        fifthdiv.append(firstanchor);
+                        let secondanchor=document.createElement('a');
+                        secondanchor.setAttribute('class', 'pxp-jobs-card-3-title mt-3 mt-sm-0');
+                        secondanchor.setAttribute('style', 'margin-left: 15px');
+                        secondanchor.innerHTML="Due date : "+moment(data[i][3].slice(0, 19)).format("MMM. D, YYYY, h:mm a");
+                        fifthdiv.append(secondanchor);
+                        fourthdiv.append(fifthdiv);
+                        thirddiv.append(fourthdiv);
+                        seconddiv.append(thirddiv);
+                        firstdiv.append(seconddiv);
+                        appender.append(firstdiv);
+                    }
+                }
+            }
+    })
 }
 
 function scheduletemplate()
@@ -1332,3 +1495,4 @@ function scheduletemplate()
 }
 
 {% endblock %}
+

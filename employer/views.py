@@ -1970,6 +1970,21 @@ def schedule_temp(request, pk):
             single_step.is_completed=False
             single_step.save()
         return JsonResponse({'info': 'done'})
+    
+def get_temp_details(request, pk):
+    cand_assign=CandidateTemplateAssignments.objects.get(candidate_id=request.GET['user_id'], application_id=request.GET['apply_id'])
+    all_steps=CandidateStepProgress.objects.filter(assignment_id=cand_assign.assignment_id).order_by('progress_id')
+    temp_data=[]
+    curr_date=cand_assign.date_assigned
+    for i in all_steps:
+        single_data=[]
+        single_data.append(i.step_id.step_name)
+        single_data.append(i.is_completed)
+        single_data.append(i.completion_date)
+        single_data.append(curr_date)
+        curr_date=curr_date+timedelta(days=1)
+        temp_data.append(single_data)
+    return JsonResponse({'temp_data': temp_data})
 
 def get_all_steps(request, pk, pk2):
     all_steps=Steps.objects.filter(emp_id=pk)

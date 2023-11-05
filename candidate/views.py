@@ -1009,17 +1009,22 @@ def test_reminder():
 
 def feedback(request,pk,pk2):
     inter = Interview.objects.get(int_id = pk2)
-    feed = Feedback.objects.get(int_id = pk2)
+    feed = Feedback.objects.filter(int_id = pk2)
     data = {}
-    data['ename'] = inter.eid.ename
-    data['title'] = inter.apply_id.job_id.title
-    data['logo'] = inter.eid.logo.url
-    data['feed'] = feed.emp_feedback
-    data['rating'] = feed.rating
+    if len(feed)>0:
+        data['ename'] = inter.eid.ename
+        data['title'] = inter.apply_id.job_id.title
+        data['logo'] = inter.eid.logo.url
+        data['feed'] = feed[0].emp_feedback
+        data['rating'] = feed[0].rating
+    else:
+        data['inter']="n"
+        messages.success(request, "Feedback not given")
+        return redirect('candidate:interviews', pk=pk)
     return render(request,'feedback.html',{'data':data})
 
 def interviews(request, pk):
-    inter = Interview.objects.filter(user_id=pk).order_by('schedule_date')
+    inter = Interview.objects.filter(user_id=pk).order_by('-schedule_date')
     all_inters = []
     for i in inter:
         single_inter = {}
