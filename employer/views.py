@@ -665,9 +665,11 @@ def candidates(request, pk):
         page_obj = p.page(1)
     except EmptyPage:
         page_obj = p.page(p.num_pages)
-    jobs_ = Jobs.objects.filter(eid=pk).exclude(status=6)  
+
+    jobs_ = Jobs.objects.filter(eid=pk).exclude(status=4)  
     templates=Templates.objects.filter(emp_id=pk)
     return render(request, 'candidate-employer.html', {'pk': pk, 'pe': page_obj, 'count': count, 'jobs': jobs, 'app_count': app_count, 'single': single_apps, 'shower': shower, 'test': testinfo,'jobs_':jobs_, 'templates': templates})
+
 
 def interview_complete(request,pk):
     inter = Interview.objects.get(apply_id = request.POST['apply_id'])
@@ -1985,6 +1987,7 @@ def get_temp_details(request, pk):
         curr_date=curr_date+timedelta(days=1)
         temp_data.append(single_data)
     return JsonResponse({'temp_data': temp_data})
+
 
 def get_all_steps(request, pk, pk2):
     all_steps=Steps.objects.filter(emp_id=pk)

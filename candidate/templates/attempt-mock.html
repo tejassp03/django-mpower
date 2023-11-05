@@ -1,0 +1,529 @@
+{% load static %}
+{% load humanize %}
+<!doctype html>
+<html lang="en" class="pxp-root">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <link rel="shortcut icon" href="{% static 'images/favicon.png' %}" type="image/x-icon">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600;700&display=swap" rel="stylesheet">
+        <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+
+        <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+        <link rel="stylesheet" href="{% static 'css/font-awesome.min.css' %}">
+        <link rel="stylesheet" href="{% static 'css/owl.carousel.min.css' %}">
+        <link rel="stylesheet" href="{% static 'css/owl.theme.default.min.css' %}">
+        <link rel="stylesheet" href="{% static 'css/animate.css' %}">
+        <link rel="stylesheet" href="{% static 'css/main.css' %}">
+        <link rel="stylesheet" href="{% static 'css/style.css' %}">
+        <title>mpower - Candidate dashboard - Attempt Test</title>
+        <style>
+            :root {
+                --smaller: .75;
+            }
+            .container {
+                color: #333;
+                margin: 0 auto;
+                text-align: center;
+                background-color: yellow;
+                border-radius:30px;
+            }
+            
+            
+            
+            li {
+              display: inline-block;
+              font-size: 1.5em;
+              list-style-type: none;
+              padding: 1em;
+              text-transform: uppercase;
+            }
+
+            li span {
+              display: block;
+              font-size: 4.5rem;
+            }
+            .main-div-attempt{
+                margin-left: 30px;
+                margin-top: 3%;
+            }
+            .que_image {
+                width: auto;
+                max-width: 100%;
+                height: 13.75rem;
+                background-size: contain;
+                background-repeat: no-repeat;
+                background-position: center;
+            }
+            
+            @media all and (max-width: 768px) {
+              h1 {
+                font-size: calc(1.5rem * var(--smaller));
+              }
+              
+              li {
+                font-size: calc(1.125rem * var(--smaller));
+              }
+              
+              li span {
+                font-size: calc(3.375rem * var(--smaller));
+              }
+            }
+            .popup {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+}
+
+.popup-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    text-align: center;
+}
+
+#closePopupButton {
+    display: block;
+    margin-top: 10px;
+    padding: 5px 10px;
+    background: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+        </style>
+    </head>
+<div class="pxp-dashboard-content-details main-div-attempt">
+    {% if messages %}
+        {% for message in messages %}
+         {% if message.tags %}  
+         <script>alert('{{ message }}')</script>
+        {% endif %}
+        {% endfor %}
+    {% endif %}
+    <h1 >Test</h1>
+    <p class="pxp-text-light">Please answer all the questions.</p>
+    <div id="start_btn" class="start_btn" style="display: none;">
+        <button>Start Test</button>
+    </div>
+    <div class="start_btn" id="start_btn_count" style="background-color: yellow; border-radius:30px;display: none;">
+        <div class="container">
+        <h4 id="countdown_timer">Test Time : <SPAN style="color: green;">{{start_time}}</SPAN></h4>
+
+            <h4 id="headline">Remaining Time</h4>
+            <div id="countdown">
+                <ul>
+                    <li><span id="days"></span>days</li>
+                    <li><span id="hours"></span>Hours</li>
+                    <li><span id="minutes"></span>Minutes</li>
+                    <li><span id="seconds"></span>Seconds</li>
+                </ul>
+            </div>
+        </div>
+        <input type="hidden" id="start_timestamp" value="{{ start_time|date:"U" }}">
+
+    </div>
+    <!-- Info Box -->
+    <div class="info_box">
+        <div class="info-title"><span>Some Rules of this Test</span></div>
+        <div class="info-list">
+            <div class="info">1. You will have only <span>{{time_length}} seconds</span> per each question.</div>
+            <div class="info">2. Once you select your answer, it can't be undone.</div>
+            <div class="info">3. You can't select any option once time goes off.</div>
+            <div class="info">4. You can't exit from the Test while you're playing.</div>
+            <div class="info">5. You'll get points on the basis of your correct answers.</div>
+        </div>
+        <div class="buttons">
+            <button class="quit">Exit Test</button>
+            <button class="restart">Continue</button>
+        </div>
+    </div>
+    <div class="quiz_box">
+        <header>
+            <div class="title">{{ name }}</div>
+            <div class="timer">
+                <div class="time_left_txt">Time Left</div>
+                <div class="timer_sec">{{time_length}}</div>
+            </div>
+            <div class="time_line"></div>
+        </header>
+        <section>
+            <div class="que_text">
+            </div>
+            <div class="que_image" >
+            </div>
+            <div class="option_list">
+            </div>
+        </section>
+        <footer style="margin-right: 0px; padding: 10px">
+            <div class="total_que">
+            </div>
+            <button class="next_btn">Next Que</button>
+        </footer>
+    </div>
+    <div class="result_box">
+        <div class="icon">
+            <i class="fas fa-crown"></i>
+        </div>
+        <div class="complete_text">You've completed the Quiz!</div>
+        <div class="score_text">
+        </div>
+        <div class="buttons">
+            <button class="restart" style="display: none">Replay Quiz</button>
+            <button class="quit" style="display: none">Quit Quiz</button>
+        </div>
+    </div>
+</div>
+<div class="popup" id="resultPopup">
+    <div class="popup-content">
+        <p id="resultText">Right: <span id="right" style="color:green;"></span>,      Total: <span id="total"></span></p>
+        <button id="closePopupButton">Close</button>
+    </div>
+</div>
+
+
+<script src="{% static 'js/jquery-3.4.1.min.js' %}"></script>
+<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'js/owl.carousel.min.js' %}"></script>
+<script src="{% static 'js/nav.js' %}"></script>
+<script src="{% static 'js/Chart.min.js' %}"></script>
+<script>
+
+        const countdownTimer = document.getElementById('countdown_timer');
+        const startTimestamp = parseInt(document.getElementById('start_timestamp').value) * 1000;
+        const cLog = document.getElementById('start_timestamp').value 
+
+        console.log(cLog)
+        
+        
+        // Function to update the countdown timer
+        function updateCountdown() {
+            const now = new Date()
+            // .toLocaleString('en-US', { timeZone: 'Asia/Kolkata' });
+            now.setHours(now.getHours() + 5); 
+            now.setMinutes(now.getMinutes() + 30);
+            const timezoneNow = new Date('{{ timezone.now|date:"U" }}') * 1000; // Convert to milliseconds
+            console.log(now)
+            // console.log(document.getElementById('start_timestamp').value)
+
+            const nowTimestamp = new Date(now).getTime();
+            const difference = startTimestamp - nowTimestamp;
+
+            
+
+            if (difference > 0) {
+                document.getElementById('start_btn').style.display = 'none';
+                document.getElementById('start_btn_count').style.display = 'block';
+                const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+                document.getElementById('days').innerHTML = `${days}`;
+                document.getElementById('hours').innerHTML = `${hours}`;
+
+                document.getElementById('minutes').innerHTML = `${minutes}`;
+
+                document.getElementById('seconds').innerHTML = `${seconds}`;
+
+
+            } else {
+                countdownTimer.innerHTML = 'Test is starting...';
+                document.getElementById('start_btn').style.display = 'block';
+                document.getElementById('start_btn_count').style.display = 'none';
+
+
+                clearInterval(interval);
+            }
+        }
+
+        // Update the countdown timer every second
+        
+        const interval = setInterval(updateCountdown, 1000);
+    
+</script>
+
+
+
+
+
+
+
+
+
+
+<script>
+$(document).ready(function () {
+    $('#das').removeClass('pxp-active');
+    $('#edi').removeClass('pxp-active');
+    $('#app').removeClass('pxp-active');
+    $('#fav').removeClass('pxp-active');
+    $('#cha').removeClass('pxp-active');
+    $('#inb').removeClass('pxp-active');
+    $('#not').removeClass('pxp-active');
+    $('#res').removeClass('pxp-active');
+    $('#fee').removeClass('pxp-active');
+    $('#sug').removeClass('pxp-active');
+    $('#tes').addClass('pxp-active');
+    $('#ins').removeClass('pxp-active');
+    $('#jch').removeClass('pxp-active');
+})
+let counterLine;
+
+const timeLength = {{time_length}};
+let quest={{test|safe}};
+let questions=[];
+for(let i=0;i<quest.length;i++)
+{
+    let obj={};
+    obj['numb']=i+1;
+    obj['question']=quest[i].question;
+    obj['options']=[];
+    obj['options'].push(quest[i].opt1);
+    obj['options'].push(quest[i].opt2);
+    obj['options'].push(quest[i].opt3);
+    obj['options'].push(quest[i].opt4);
+    if (quest[i].image !== undefined) {
+        obj['image'] = quest[i].image;
+    }
+    obj['answer']=quest[i].opt1;
+    questions.push(obj);
+}
+function randomSort() {
+    return 0.5 - Math.random();
+}
+
+questions.sort(randomSort);
+
+const start_btn = document.querySelector(".start_btn button");
+const info_box = document.querySelector(".info_box");
+const exit_btn = info_box.querySelector(".buttons .quit");
+const continue_btn = info_box.querySelector(".buttons .restart");
+const quiz_box = document.querySelector(".quiz_box");
+const result_box = document.querySelector(".result_box");
+const option_list = document.querySelector(".option_list");
+const time_line = document.querySelector("header .time_line");
+const timeText = document.querySelector(".timer .time_left_txt");
+const timeCount = document.querySelector(".timer .timer_sec");
+let ans=[];
+let currques;
+start_btn.onclick = ()=>{
+    info_box.classList.add("activeInfo"); 
+}
+exit_btn.onclick = ()=>{
+    info_box.classList.remove("activeInfo");
+}
+continue_btn.onclick = ()=>{
+    info_box.classList.remove("activeInfo");
+    quiz_box.classList.add("activeQuiz");
+    showQuetions(0);
+    queCounter(1);
+    startTimer(timeLength);
+    startTimerLine(timeLength);
+}
+let timeValue =  timeLength;
+let que_count = 0;
+let que_numb = 1;
+let userScore = 0;
+let counter;
+let widthValue = 0;
+const restart_quiz = result_box.querySelector(".buttons .restart");
+const quit_quiz = result_box.querySelector(".buttons .quit");
+restart_quiz.onclick = ()=>{
+    quiz_box.classList.add("activeQuiz");
+    result_box.classList.remove("activeResult");
+    timeValue = timeLength; 
+    que_count = 0;
+    que_numb = 1;
+    userScore = 0;
+    widthValue = 0;
+    showQuetions(que_count);
+    queCounter(que_numb);
+    clearInterval(counter);
+    clearInterval(counterLine);
+    startTimer(timeValue);
+    startTimerLine(widthValue);
+    timeText.textContent = "Time Left";
+    next_btn.classList.remove("show");
+}
+quit_quiz.onclick = ()=>{
+    window.location="{% url 'candidate:tests' pk %}"
+}
+const next_btn = document.querySelector("footer .next_btn");
+const bottom_ques_counter = document.querySelector("footer .total_que");
+next_btn.onclick = ()=>{
+    $('.time_line').css('width', '0px');
+    if(que_count < questions.length - 1){ 
+        que_count++;
+        que_numb++;
+        showQuetions(que_count);
+        queCounter(que_numb);
+        clearInterval(counter);
+        clearInterval(counterLine);
+        startTimer(timeValue);
+        startTimerLine(widthValue);
+        timeText.textContent = "Time Left";
+        next_btn.classList.remove("show");
+    }else{
+        clearInterval(counter);
+        clearInterval(counterLine);
+        showResult();
+    }
+}
+function showQuetions(index){
+    const que_text = document.querySelector(".que_text");
+    const que_image = document.querySelector(".que_image");
+    que_image.style.backgroundImage=null;
+    let imageTag;
+    if (questions[index].image) {
+        que_image.style.height = "13.75rem";
+        const imageUrl = questions[index].image;
+        que_image.style.backgroundImage = `url("${imageUrl}")`;
+    }
+    else{
+        que_image.style.height = "0rem";
+    }
+    let que_tag = '<span>'+ questions[index].numb + ". " + questions[index].question +'</span>';
+    let option_tag = '<div class="option 1"><span>'+ questions[index].options[0] +'</span></div>'
+    + '<div class="option 2"><span>'+ questions[index].options[1] +'</span></div>'
+    + '<div class="option 3"><span>'+ questions[index].options[2] +'</span></div>'
+    + '<div class="option 4"><span>'+ questions[index].options[3] +'</span></div>';
+    que_text.innerHTML = que_tag;
+    option_list.innerHTML = option_tag;
+    currques=index;
+    
+    const option = option_list.querySelectorAll(".option");
+    for(i=0; i < option.length; i++){
+        option[i].setAttribute("onclick", "optionSelected(this)");
+    }
+}
+let tickIconTag = '<div class="icon tick"><i class="fas fa-check"></i></div>';
+let crossIconTag = '<div class="icon cross"><i class="fas fa-times"></i></div>';
+function optionSelected(answer){
+    ans.push(answer.classList[1]);
+    clearInterval(counter);
+    clearInterval(counterLine);
+    let userAns = answer.textContent;
+    let correcAns = questions[que_count].answer;
+    const allOptions = option_list.children.length;
+    
+    for(i=0; i < allOptions; i++){
+        option_list.children[i].classList.add("disabled")
+    }
+    next_btn.classList.add("show");
+}
+function showResult(){
+    let pk2='{{pk2}}';
+    info_box.classList.remove("activeInfo");
+    quiz_box.classList.remove("activeQuiz");
+    //result_box.classList.add("activeResult");
+    const scoreText = result_box.querySelector(".score_text");
+    $.ajax(
+    {
+        type:"POST",
+        url: "{% url 'candidate:submit_mock' pk %}",
+        data:{
+                answers: ans,
+                testid: pk2,
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+        },
+        success: function(data) {
+            
+            showPopup(data.total,data.right);
+        }
+
+    })
+}
+function startTimer(time){
+    counter = setInterval(timer, 1000);
+    function timer(){
+        timeCount.textContent = time;
+        time--;
+        if(time < 9){
+            let addZero = timeCount.textContent; 
+            timeCount.textContent = "0" + addZero;
+        }
+        if(time < 0){
+            clearInterval(counter);
+            timeText.textContent = "Time Off";
+            const allOptions = option_list.children.length;
+            let correcAns = questions[que_count].answer;
+            next_btn.classList.add("show");
+            ans.push("X");
+            if(currques+1>questions.length)
+            {
+                clearInterval(counter);
+                clearInterval(counterLine);
+                showResult();
+            }
+            else
+            {
+                queCounter(currques+1);
+                showQuetions(currques+1);
+                startTimer(timeLength);
+                startTimerLine(timeLength);
+            }
+        }
+    }
+}
+function startTimerLine(time_length) {
+    var initialTime = 0; 
+    var widthIncrement = 549 / time_length; 
+
+    var counterLine = setInterval(timer, 100);
+
+    function timer() {
+        if(time_line.style.width == "0px"){
+            initialTime = 0;
+        }
+        initialTime += 0.1; 
+        var time_line_width = initialTime * widthIncrement;
+        
+        time_line.style.width = time_line_width + "px";
+        // console.log(time_line_width + "px");
+
+        if (initialTime >= time_length) {
+            clearInterval(counterLine);
+        }
+    }
+}
+function showPopup(total, right) {
+    var resultPopup = document.getElementById('resultPopup');
+    var totalElement = document.getElementById('total');
+    var rightElement = document.getElementById('right');
+
+    totalElement.textContent = total;
+    rightElement.textContent = right;
+
+    resultPopup.style.display = 'block';
+
+    var closePopupButton = document.getElementById('closePopupButton');
+    closePopupButton.addEventListener('click', function () {
+        resultPopup.style.display = 'none';
+        window.close();
+    });
+}
+
+
+
+
+function queCounter(index){
+    let totalQueCounTag = '<span><p>'+ index +'</p> of <p>'+ questions.length +'</p> Questions</span>';
+    bottom_ques_counter.innerHTML = totalQueCounTag;  //adding new span tag inside bottom_ques_counter
+}
+</script>
+</body>
+</html>
