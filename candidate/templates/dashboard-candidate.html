@@ -415,6 +415,7 @@ $(document).ready(function () {
     let data={{ pending| safe }}
     if(data.length>0)
     {
+        console.log(data);
         $('#pxp-popup-modal').modal('show');
         let ul=document.createElement('ul');
         ul.setAttribute('id', 'popup');
@@ -430,6 +431,10 @@ $(document).ready(function () {
                 li.innerHTML = `${text} <a href="${link}">Link</a>`;
                 console.log(link+" "+text);
                 ul.appendChild(li);
+            }else{
+                let li=document.createElement('li');
+                li.innerHTML=data[i];
+                ul.append(li);
             }
 
         }

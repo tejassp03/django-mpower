@@ -85,7 +85,7 @@ def dashboard(request, pk):
         if (count > 10):
             break
     all_applics = []
-    is_approved = 1
+    is_approved = 0
     approved_company_name = "NA"
     approved_role = "NA"
     for i in applics:
