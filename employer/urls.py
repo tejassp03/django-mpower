@@ -44,6 +44,7 @@ urlpatterns = [
     path('get_template/', views.get_template, name='get_template'),
 	path('schedule_temp/', views.schedule_temp, name='schedule_temp'),
     path('edit_template/<int:pk2>/', views.edit_template, name='edit_template'),
+    path('get_temp_details/', views.get_temp_details, name='get_temp_details'),
     path('get_all_steps/<int:pk2>/', views.get_all_steps, name='get_all_steps'),
     path('delastep/<int:pk2>/', views.delastep, name='delastep'),
     path('all_steps/', views.all_steps, name='all_steps'),

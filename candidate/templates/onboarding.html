@@ -125,61 +125,33 @@
         display: flex;
         align-items: center;
         justify-content: center;">
-            <div class="modal-content" style="width: 100vw;">
-                <div class="modal-header" id="steptitle" style="margin-top: 20px;font-weight: bold;">
-                    
-                </div>
-                <hr>
-                <div class="modal-header" id="stepdesc" style="margin-top: 20px;font-weight: bold;">
-                    
-                </div>
-                <hr>
-                <div class="modal-body" style="width: 50vw; padding: 20px !important;">
-                    <div class="pxp-dashboard-content-details" style="margin-right:0px; box-shadow: none; padding: 0px">
-                        <form>
-                            {% comment %} <div class="row ">
-                                <div class="col-xxl-6">
-                                    <div class="mb-3">
-                                        <label for="pxp-company-job-title" class="form-label">Job title</label>
-                                        <h5>Network Engineer</h5>
-                                    </div>
+                <div class="modal-content" style="width: 100vw; display: flex; flex-direction: row; align-items: center">
+                    <div class="modal-body" style="width: 70vw; padding: 15px 15px !important">
+                        <div class="pxp-dashboard-content-details" style="margin-right:0px; box-shadow: none; padding: 0px">
+                            <form enctype="multipart/form-data">
+                                <div class="mb-3">
+                                    <label for="pxp-company-job-title" class="form-label">Step name</label>
+                                    <input type="text" id="name_of_temp" class="form-control" placeholder="Add title" readonly>
                                 </div>
-                                <div class="col-md-6 col-xxl-6">
-                                    <label for="pxp-company-job-location" class="form-label">Location</label>
-                                    <h5>Bengaluru, Karnataka</h5>
+                        
+                                <div class="mb-3">
+                                    <label for="pxp-company-job-description" class="form-label">Description</label>
+                                    <textarea class="form-control" id="desc_of_temp" placeholder="Type the description here..." readonly></textarea>
                                 </div>
-                                
-                            </div>
-                            
-                            <hr> {% endcomment %}
-                            {% comment %} <br> {% endcomment %}
-                            <div class="col-md-12  d-flex flex-row gap-5 align-items-start">
-                                <div class=" col-md-5">
-                                    <div id="stepreso">
-                                    </div>
-                                    <div id="steptask">
-                                    </div>
-                                    {% comment %} <label for="pxp-company-job-level" class="form-label">Document Type</label>
-                                    <select id="pxp-company-job-level" class="form-select" name="careerlevel" required>
-                                        <option>Aadhar Card</option>
-                                        <option>Driver's License</option>
-                                        <option>PAN Card</option>
-                                        <option>Voter's ID</option>
-                                    </select> {% endcomment %}
+        
+                                <div class="mb-3">
+                                    <label for="pxp-company-job-description" class="form-label">Resources</label>
+                                    <textarea class="form-control" id="reso_of_temp" placeholder="Type the resources here..." readonly></textarea>
                                 </div>
-
-                                {% comment %} <div class="pxp-company-cover col-md-5">
-                                    <input type="file" id="pxp-company-cover-choose-file" accept="image/*">
-                                    <label for="pxp-company-cover-choose-file" class="pxp-cover"><span>Upload Document Image (less than 1MB JPG,PNG only)</span></label>
-                                </div> {% endcomment %}
-
-                            </div>
-                            </div>
-                        </form>
+        
+                                <div class="mb-3">
+                                    <label for="pxp-company-job-description" class="form-label">Tasks</label>
+                                    <textarea class="form-control" id="task_of_temp" placeholder="Type the tasks here..." readonly></textarea>
+                                </div>
+                            </form>
+                        </div>
                     </div>
-                    {% comment %} <button class="btn rounded-pill pxp-subsection-cta" onclick="jobmodalsub()">Submit</button> {% endcomment %}
                 </div>
-            </div>
         </div>
     </div>
     
@@ -215,10 +187,10 @@ function getdata(id)
             },
             success: function( data ) 
             {
-                $('#steptitle').text(data['info'].name);
-                $('#stepdesc').text("Description: "+data['info'].desc);
-                $('#stepreso').text("Resources: "+data['info'].reso);
-                $('#steptask').text("Tasks: "+data['info'].tasks);
+                $('#name_of_temp').val(data['info'].name);
+                $('#desc_of_temp').text(data['info'].desc);
+                $('#reso_of_temp').text(data['info'].reso);
+                $('#task_of_temp').text(data['info'].tasks);
             }
     })
 }

@@ -163,7 +163,48 @@
 </div>
 
 
-<div class="modal fade pxp-user-modal" id="pxp-template-modal" aria-hidden="true" aria-labelledby="testEditModal" tabindex="-1">
+
+
+<div class="modal fade pxp-user-modal" id="pxp-template-modal" aria-hidden="true" aria-labelledby="expModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered" style="
+    display: flex;
+    align-items: center;
+    justify-content: center;">
+        <div class="modal-content" style="width: 100vw; display: flex; flex-direction: row; align-items: center">
+            <div class="modal-body" style="width: 70vw; padding: 15px 15px !important">
+                <div class="pxp-dashboard-content-details" style="margin-right:0px; box-shadow: none; padding: 0px">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="pxp-company-job-title" class="form-label">Step name</label>
+                            <input type="text" name="step_name" id="editname" class="form-control" placeholder="Add title" required>
+                        </div>
+                
+                        <div class="mb-3">
+                            <label for="pxp-company-job-description" class="form-label">Description</label>
+                            <textarea class="form-control" id="edittime" placeholder="Type the description here..." name="step_description" required></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="pxp-company-job-description" class="form-label">Resources</label>
+                            <textarea class="form-control" id="edittime" placeholder="Type the resources here..." name="step_resour" required></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="pxp-company-job-description" class="form-label">Tasks</label>
+                            <textarea class="form-control" name="step_tasks" id="edittime" placeholder="Type the tasks here..." required></textarea>
+                        </div>
+                    </form>
+                </div>
+                <input id="pxp-step-id" style="display: none" name="stepidm">
+                <button class="btn rounded-pill pxp-subsection-cta" onclick="createStep()" >Create</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% comment %} <div class="modal fade pxp-user-modal" id="pxp-template-modal" aria-hidden="true" aria-labelledby="testEditModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered" style="
     display: flex;
     align-items: center;
@@ -226,11 +267,10 @@
                 <button class="btn rounded-pill pxp-subsection-cta" onclick="createStep()" >Create</button>
             </div>
         </div>
-    </div>
-</div>
+    </div> {% endcomment %}
+{% comment %} </div> {% endcomment %}
 
-
-<div class="modal fade pxp-user-modal" id="pxp-tempshow-modal" aria-hidden="true" aria-labelledby="feedbackModal" tabindex="-1">
+{% comment %} <div class="modal fade pxp-user-modal" id="pxp-tempshow-modal" aria-hidden="true" aria-labelledby="feedbackModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered widthadjuster" style="justify-content: center">
         <div class="modal-content" style="width: 35rem">
             <div class="modal-header" style="padding: 10px; flex-direction: column">
@@ -263,7 +303,44 @@
             </div>
         </div>
     </div>
+</div> {% endcomment %}
+
+
+<div class="modal fade pxp-user-modal" id="pxp-tempshow-modal" aria-hidden="true" aria-labelledby="expModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered" style="
+    display: flex;
+    align-items: center;
+    justify-content: center;">
+        <div class="modal-content" style="width: 100vw; display: flex; flex-direction: row; align-items: center">
+            <div class="modal-body" style="width: 70vw; padding: 15px 15px !important">
+                <div class="pxp-dashboard-content-details" style="margin-right:0px; box-shadow: none; padding: 0px">
+                    <form enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="pxp-company-job-title" class="form-label">Step name</label>
+                            <input type="text" id="name_of_temp" class="form-control" placeholder="Add title" readonly>
+                        </div>
+                
+                        <div class="mb-3">
+                            <label for="pxp-company-job-description" class="form-label">Description</label>
+                            <textarea class="form-control" id="desc_of_temp" placeholder="Type the description here..." readonly></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="pxp-company-job-description" class="form-label">Resources</label>
+                            <textarea class="form-control" id="reso_of_temp" placeholder="Type the resources here..." readonly></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="pxp-company-job-description" class="form-label">Tasks</label>
+                            <textarea class="form-control" id="task_of_temp" placeholder="Type the tasks here..." readonly></textarea>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
 
 
 
@@ -288,12 +365,12 @@
 
                         <div class="mb-3">
                             <label for="pxp-company-job-description" class="form-label">Resources</label>
-                            <textarea class="form-control" id="pxp-step-resources" placeholder="Type the skills here..." name="pxp-step-resources"></textarea>
+                            <textarea class="form-control" id="pxp-step-resources" placeholder="Type the resources here..." name="pxp-step-resources"></textarea>
                         </div>
 
                         <div class="mb-3">
                             <label for="pxp-company-job-description" class="form-label">Tasks</label>
-                            <textarea class="form-control" id="pxp-step-task" placeholder="Type the responsibilities here..." name="pxp-step-task"></textarea>
+                            <textarea class="form-control" id="pxp-step-task" placeholder="Type the tasks here..." name="pxp-step-task"></textarea>
                         </div>
                     </form>
                 </div>
@@ -341,11 +418,11 @@
                 },
             success: function( data ) 
             {
-                $('#name_of_temp').text("Name : "+data['name']);
-                $('#desc_of_temp').text("Description : "+data['desc']);
-                $('#reso_of_temp').text("Resources : "+data['resources']);
-                $('#task_of_temp').text("Tasks : "+data['tasks']);
-                $('#date_of_temp').text("Date : "+data['date']);
+                $('#name_of_temp').val(data['name']);
+                $('#desc_of_temp').text(data['desc']);
+                $('#reso_of_temp').text(data['resources']);
+                $('#task_of_temp').text(data['tasks']);
+                $('#date_of_temp').text(data['date']);
             }
         })
     }
