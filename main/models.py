@@ -482,13 +482,14 @@ class MockTestQues(models.Model):
     ques_id = models.AutoField(primary_key=True)
     testinfoid = models.ForeignKey(
         MockTestInfo, on_delete=models.CASCADE, blank=True, null=True)
-    ques_name = models.CharField(max_length=200, default=None, null=True)
-    option1 = models.CharField(max_length=100, default=None, null=True)
-    option2 = models.CharField(max_length=100, default=None, null=True)
-    option3 = models.CharField(max_length=100, default=None, null=True)
-    option4 = models.CharField(max_length=100, default=None, null=True)
+    ques_name = models.CharField(max_length=700, default=None, null=True)
+    option1 = models.CharField(max_length=300, default=None, null=True)
+    option2 = models.CharField(max_length=300, default=None, null=True)
+    option3 = models.CharField(max_length=300, default=None, null=True)
+    option4 = models.CharField(max_length=300, default=None, null=True)
     correct = models.IntegerField()
     images = models.ImageField(upload_to='test_images/', default=None, null=True)
+    body = models.TextField(default=None,null=True)
 
 
     class Meta:

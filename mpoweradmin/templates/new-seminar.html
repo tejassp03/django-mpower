@@ -85,7 +85,7 @@
                         </td>
                         <td>
                             <a href="#">
-                                <div class="pxp-company-dashboard-job-title" onclick="templatemodal('{{i.seminar_id}}')" data-bs-target="#pxp-tempshow-modal" data-bs-toggle="modal">{{ i.title }}</div>
+                                <div class="pxp-company-dashboard-job-title" onclick="seminarmodal('{{i.seminar_id}}')" data-bs-target="#pxp-seminar-modal" data-bs-toggle="modal">{{ i.title }}</div>
                             </a>
                         </td>
                         <td><div class="pxp-company-dashboard-job-date mt-1">{{ i.date }}</div></td>
@@ -93,7 +93,7 @@
                         <td>
                             <div class="pxp-dashboard-table-options">
                                 <ul class="list-unstyled">
-                                    <li><button title="View" id="pxp-test-modal-button" data-bs-target="#pxp-tempshow-modal" data-bs-toggle="modal" onclick="templatemodal('{{ i.seminar_id }}')"><span class="fa fa-eye"></span></button></li>
+                                    <li><button title="View" id="pxp-test-modal-button" data-bs-target="#pxp-seminar-modal" data-bs-toggle="modal" onclick="seminarmodal('{{ i.seminar_id }}')"><span class="fa fa-eye"></span></button></li>
                                     <input style="display: none" value={{i.seminar_id}}>
                                     <li><button title="Delete" onclick="delseminar({{i.seminar_id}})"><span class="fa fa-trash-o"></span></button></li>
                                 </ul>
@@ -366,8 +366,122 @@
     </div>
 </div>
 
-
+<div class="modal fade pxp-user-modal" id="pxp-candidate-modal" aria-hidden="true" aria-labelledby="seminarModal" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered widthadjuster">
+                <div class="modal-content">
+                    <div class="modal-body" style="padding: 1rem !important">
+                        <section class="pxp-single-candidate-hero pxp-cover" style="background-image: url(); border-radius: 30px;">
+                            <div class="pxp-hero-opacity" style="border-radius: 30px;"></div>
+                            <div class="pxp-single-candidate-hero-caption">
+                                <div class="pxp-container">
+                                    <div class="pxp-single-candidate-hero-content">
+                                        <div class="" id="photoimage"></div>
+                                        <div class="pxp-single-candidate-hero-name">
+                                            <h1 id="name"></h1>
+                                            <div class="pxp-single-candidate-hero-title" id="title"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                
+                        <section class="mt-100">
+                            <div class="pxp-container">
+                                <div class="row">
+                                    <div class="col-lg-7 col-xl-8 col-xxl-9">
+                                        <div class="pxp-single-candidate-content">
+                                            <div style="display: flex"><h2>About</h2> <h2 style="margin-left: 10px" id="name2"></h2></div>
+                                            <p id="about"></p>
+                
+                                            <div class="mt-4 mt-lg-5">
+                                                <h2>Speakers</h2>
+                                                <div class="pxp-single-candidate-skills">
+                                                    <ul class="list-unstyled" id="skillsadder">
+                                                    </ul>
+                                                </div>
+                                            </div>
+                
+                                            <!--<div class="mt-4 mt-lg-5">
+                                                <h2>Work Experience</h2>
+                                                <div class="pxp-single-candidate-timeline" id="expadder">
+                                                    
+                                                </div>
+                                            </div>
+                
+                                            <div class="mt-4 mt-lg-5">
+                                                <h2>Education & Training</h2>
+                                                <div class="pxp-single-candidate-timeline" id="eduadder">
+                                                    
+                                                </div>
+                                            </div>-->
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-5 col-xl-4 col-xxl-3">
+                                        <div class="pxp-single-candidate-side-panel mt-5 mt-lg-0">
+                                            <div>
+                                                <div class="pxp-single-candidate-side-info-label pxp-text-light">Date</div>
+                                                <div class="pxp-single-candidate-side-info-data" id="dateSeminar"></div>
+                                            </div>
+                                            <div class="mt-4">
+                                                <div class="pxp-single-candidate-side-info-label pxp-text-light">Location</div>
+                                                <div class="pxp-single-candidate-side-info-data" id="locationSeminar"></div>
+                                            </div>
+                                            <div class="mt-4">
+                                                <div class="pxp-single-candidate-side-info-label pxp-text-light">City</div>
+                                                <div class="pxp-single-candidate-side-info-data" id="citySeminar"></div>
+                                            </div>
+                                        </div>
+                
+                                        <!--<div class="pxp-single-candidate-side-panel mt-4 mt-lg-5">
+                                            <h3>Contact</h3>
+                                            <form class="mt-4">
+                                                <div class="mb-3">
+                                                    <label for="contact-candidate-name" class="form-label">Name</label>
+                                                    <input type="text" class="form-control" id="contact-candidate-name" placeholder="Enter your name">
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="contact-candidate-email" class="form-label">Email</label>
+                                                    <input type="text" class="form-control" id="contact-candidate-email" placeholder="Enter your email address">
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="contact-candidate-message" class="form-label">Message</label>
+                                                    <textarea class="form-control" id="contact-candidate-message" placeholder="Type your message here..."></textarea>
+                                                </div>
+                                                <a href="#" class="btn rounded-pill pxp-section-cta d-block">Send Message</a>
+                                            </form>
+                                        </div>-->
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            </div>
+        </div>
 <script>
+    function getImageBrightness(imageUrl, callback) {
+    var img = new Image();
+    img.src = imageUrl;
+
+    img.onload = function() {
+        var canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        var ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, img.width, img.height);
+
+        var imageData = ctx.getImageData(0, 0, img.width, img.height).data;
+        var brightness = 0;
+
+        for (var i = 0; i < imageData.length; i += 4) {
+            brightness += (0.299 * imageData[i] + 0.587 * imageData[i + 1] + 0.114 * imageData[i + 2]);
+        }
+
+        brightness /= (img.width * img.height);
+
+        callback(brightness);
+    };
+}
     function createSeminar() {
     let name = $("[name='seminar_title']").val();
     let date = $("[name='seminar_date']").val();
@@ -402,46 +516,62 @@
 }
 
     
-    function templatemodal(id)
+    function seminarmodal(id)
     {
         $.ajax(
         {
-            type:"GET",
-            url: "{% url 'employer:get_template' pk=pk %}",
+            type:"POST",
+            url: "{% url 'mpoweradmin:get_seminar' pk=pk %}",
                 data:{
-                        temp_id: id
+                        sem_id: id,
+                        csrfmiddlewaretoken: '{{ csrf_token }}'
                 },
             success: function( data ) 
             {
-                $('#name_of_temp').text("Name : "+data['name']);
-                $('#desc_of_temp').text("Description : "+data['desc']);
-
-                let final_data=data['info'];
-                let inserter=document.getElementById('stepsadder');
-                inserter.innerHTML='';
-                let trval=document.createElement('tr')
-                let th1=document.createElement('th')
-                th1.innerHTML="Order"
-                th1.setAttribute('style', 'text-align: center')
-                let th2=document.createElement('th')
-                th2.innerHTML="Step name"
-                th2.setAttribute('style', 'text-align: center')
-                trval.append(th1)
-                trval.append(th2)
-                inserter.append(trval);
-                for(let i=0;i<final_data.length;i++)
-                {
-                    let tr1=document.createElement('tr')
-                    let td=document.createElement('td')
-                    td.setAttribute('style', 'text-align: center')
-                    td.innerHTML=final_data[i][0]
-                    tr1.append(td)
-                    let td1=document.createElement('td')
-                    td1.setAttribute('style', 'text-align: center')
-                    td1.innerHTML=final_data[i][1]
-                    tr1.append(td1)
-                    inserter.append(tr1)
+                $('.pxp-hero-opacity').css({
+                    'background-image': 'url(' + data.image + ')',
+                    'background-size': 'cover',
+                    'background-position': 'center',
+                    'background-repeat': 'no-repeat'
+                });
+                $('#name').text(data.title);
+                $('.pxp-single-candidate-hero-title').text(data.city);
+                $('#about').text(data.desc);
+                
+                var speakers = data.speakers;
+                var speakerList = speakers.split(',');
+                $('#skillsadder').empty();
+                for (var i = 0; i < speakerList.length; i++) {
+                    var li = document.createElement('li');
+                    li.textContent = speakerList[i]; 
+                    $('#skillsadder').append(li);
                 }
+
+                
+                var date = new Date(data.date);
+                date.setHours(date.getHours() - 5);
+                date.setMinutes(date.getMinutes() - 30);
+
+                var naturalFormat = date.toLocaleString(undefined, {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                var imageUrl = data.image; 
+                getImageBrightness(imageUrl, function(brightness) {
+                    var textColor = brightness < 128 ? 'white' : 'black'; 
+                    $('#name').css('color', textColor);
+                    $('.pxp-single-candidate-hero-title').css('color', textColor);
+                });
+                $('#dateSeminar').text(naturalFormat);
+                $('#locationSeminar').text(data.address);
+                
+                $('#citySeminar').text(data.city);
+
+                $('#pxp-candidate-modal').modal('show');
+
             }
         })
     }

@@ -7,6 +7,7 @@ import re
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from queue import PriorityQueue
 import heapq
+from django.core.serializers import serialize
 from django.views.decorators.csrf import csrf_exempt
 from datetime import date, timedelta, datetime
 from django.http import JsonResponse
@@ -52,6 +53,8 @@ def dashboard(request, pk):
     jobs = Jobs.objects.all()
     context = Admin.objects.get(aid=pk)
     request.session['email'] = context.email
+    nums = []
+    nums.append(len(jobs))
     # for obj in context:
     #     print(obj.__dict__)
 
@@ -61,6 +64,7 @@ def dashboard(request, pk):
 
 
     applics = Application.objects.all()
+    nums.append(len(applics))
     # visits = ProfileVisits.objects.filter(user_type="e", e_id=pk)
     all_notis = []
     count=0
@@ -291,7 +295,7 @@ def dashboard(request, pk):
     #   'charts': charts_context, 'counts': counts
     if 'shower' in request.session:
         del request.session['shower']
-    return render(request, 'dashboard-mpoweradmin.html', {'pk': pk,'notifics': all_notis, 'recent': recent_mess_temp, 'candi': finalrecent,'charts': charts_context,'counts': countsj})
+    return render(request, 'dashboard-mpoweradmin.html', {'pk': pk,'notifics': all_notis, 'recent': recent_mess_temp, 'candi': finalrecent,'charts': charts_context,'counts': countsj,'nums':nums})
 
 def newjob(request, pk):
     if(request.method=="POST"):
@@ -555,33 +559,24 @@ def candidates(request, pk):
     
     return render(request, 'candidate-mpoweradmin.html', {'pk': pk,'employers':employers,'e_apps':e_apps,'single': single_apps, 'shower': shower})
 
-def get_candidate(request, pk):
-    candidate = JobSeeker.objects.get(user_id=request.GET['user_id'])
-    loger = Login.objects.get(log_id=candidate.log_id.log_id)
-    cand={}
-    emp=Employer.objects.get(eid=pk)
-    if(candidate.photo):
-        cand['photo']=candidate.photo.url
-    cand['name']=candidate.name
-    cand['email']=loger.email
-    cand['location']=candidate.location
-    cand['phone']=candidate.phone
-    cand['title']=candidate.title
-    if(candidate.skills):
-        cand['skills']=candidate.skills.split(",")
-    work=ExperienceJob.objects.filter(user_id=candidate.user_id)
-    edu=Education.objects.filter(user_id=candidate.user_id)
-    visit=ProfileVisits()
-    visit.e_id=emp
-    visit.user_id=candidate
-    visit.user_type="c"
-    visit.save()
-    notif=Notifications()
-    notif.notif_type="V"
-    notif.send_id=Login.objects.get(email=request.session['email'])
-    notif.rece_id=loger
-    notif.save()
-    return JsonResponse({'info': dumps(cand, default=str), 'work': dumps(list(work.values())), 'edu': dumps(list(edu.values()))})
+def get_candidate(request,pk):
+    if request.method == "POST":
+        candidate = JobSeeker.objects.get(user_id=request.POST['user_id'])
+        loger = Login.objects.get(log_id=candidate.log_id.log_id)
+        cand={}
+        if(candidate.photo):
+            cand['photo']=candidate.photo.url
+        cand['name']=candidate.name
+        cand['email']=loger.email
+        cand['location']=candidate.location
+        cand['phone']=candidate.phone
+        # cand['title']=candidate.title
+        if(candidate.skills):
+            cand['skills']=candidate.skills.split(",")
+        work=ExperienceJob.objects.filter(user_id=candidate.user_id)
+        edu=Education.objects.filter(user_id=candidate.user_id)
+        return JsonResponse({'info': dumps(cand, default=str), 'work': dumps(list(work.values())), 'edu': dumps(list(edu.values()))})
+
 def get_job(request,pk):
     job = Jobs.objects.get(jobid=request.GET['user_id'])
     emp_ = Employer.objects.get(eid=job.eid_id) 
@@ -834,13 +829,6 @@ def under_development(request, pk):
         del request.session['shower']
     return render(request, 'under_develop.html', {'pk': pk})
 
-def jobapp(request, pk):
-    jobinfo = Jobs.objects.filter(jobid=request.GET['jobid'])
-    employer = Employer.objects.filter(eid=pk)
-    image=""
-    if(employer[0].logo):
-        image = str(employer[0].logo.url)
-    return JsonResponse({'logo': image, 'info': dumps(list(jobinfo.values()), default=str), 'company': dumps(list(employer.values()))})
 
 def edit_job(request, pk):
     job=None
@@ -1194,17 +1182,24 @@ def all_interviews(request, pk):
         return redirect('employer:all_interviews', pk=pk)
     all_ints = Interview.objects.exclude(panel_req=0).order_by('-schedule_date')
     final_ints=[]
-    for i in all_ints:
-        single_int={}
-        single_int['int_id']=i.int_id
-        single_int['user_id']=i.user_id.user_id
-        single_int['name']=i.user_id.name
-        single_int['location']=i.user_id.location
-        single_int['date']=i.schedule_date
-        single_int['link']=i.int_link
-        single_int['isdone']=i.is_done
-        single_int['panel_req'] = i.panel_req
-        final_ints.append(single_int)
+    try:
+        for i in all_ints:
+            single_int={}
+            single_int['int_id']=i.int_id
+            single_int['user_id']=i.user_id.user_id
+            single_int['emp_id']=i.eid.eid
+            single_int['name']=i.user_id.name
+            single_int['ename']=i.eid.ename
+            single_int['location']=i.user_id.location
+            single_int['date']=i.schedule_date
+            single_int['link']=i.int_link
+            single_int['isdone']=i.is_done
+            single_int['jobtitle']=i.apply_id.job_id.title
+            single_int['job_id']=i.apply_id.job_id.jobid
+            single_int['panel_req'] = i.panel_req
+            final_ints.append(single_int)
+    except:
+        pass
     GET_params = request.GET.copy()
     count=len(final_ints)
     if('page' in GET_params):
@@ -1378,6 +1373,30 @@ def create_seminar(request, pk):
         seminar.save()
         return JsonResponse({'message': 'saved'}) 
 
+def get_seminar(request, pk):
+    if request.method == "POST":
+        try:
+            sem_id = request.POST.get('sem_id')
+            sem = Seminars.objects.get(seminar_id=sem_id)
+            seminar_data = {
+                'seminar_id': sem.seminar_id,
+                'title': sem.title,
+                'date':sem.date,
+                'desc':sem.description,
+                'city':sem.city,
+                'address':sem.address, 
+                'speakers':sem.speaker
+            }
+            try:
+                seminar_data['image']=sem.image.url
+            except:
+                pass
+            return JsonResponse(seminar_data)
+        except Seminars.DoesNotExist:
+            return JsonResponse({'error': 'Seminar not found'}, status=404)
+    return JsonResponse({'message': 'Method is not right, try POST'}, status=400)
+
+
 def mocks(request, pk):
     if request.method == "POST":
         if 'act' in request.POST:
@@ -1434,6 +1453,8 @@ def create_test(request, pk):
 
         testinfo = MockTestInfo()
         testinfo.test_id = test
+        print(request.POST.get(f"code-editor_{1}"))
+        print(len(request.POST['name']))
         testinfo.test_name=request.POST['name']
         testinfo.tech=request.POST['tech']
         testinfo.time_limit=request.POST['timelimit']
@@ -1446,6 +1467,7 @@ def create_test(request, pk):
         for i in range(0, n):
             single=MockTestQues()
             single.testinfoid=testinfo
+            print(len(info[i]))
             single.ques_name=info[i]
             single.option1=options[count]
             single.option2=options[count+1]
@@ -1453,7 +1475,16 @@ def create_test(request, pk):
             single.option4=options[count+3]
             count=count+4
             single.correct=correct[i]
+            try:
+
+                single.body = request.POST.get(f"code-editor_{i+1}")
+            except:
+                pass
             single.save()
+            # print(request.POST(f"code-editor_{i+1}"))
+            print(request.POST.get(f"code-editor_{i+1}"))
+
+
         if request.GET.get('redirect'):
             return redirect('mpoweradmin:mocks', pk=pk)
         else:
@@ -1492,6 +1523,38 @@ def edit_test(request,pk):
         except Exception as e:
             JsonResponse({'message': 'Error updating Test'})
         return JsonResponse({'message': 'Edited'})
+
+def company(request, pk):
+    cominfo = Employer.objects.filter(eid=request.GET['eid'])
+    email = Login.objects.get(log_id=cominfo[0].log_id.log_id)
+    email = {'email': email.email}
+    image = ""
+    if (cominfo[0].logo):
+        image = str(cominfo[0].logo.url)
+    cover = ""
+    if (cominfo[0].cover):
+        cover = str(cominfo[0].cover.url)
+   
+    return JsonResponse({'info': dumps(list(cominfo.values()), default=str), 'emai': dumps(email), 'logo': image, 'cover': cover})
+
+
+def jobapp(request, pk):
+    try:
+        job_info = Jobs.objects.get(jobid=request.GET['jobid'])
+        employer = Employer.objects.get(eid=job_info.eid.eid)
+        employer_details = serialize('json', [employer])
+        logo_url = str(employer.logo.url) if employer.logo else ""
+
+        return JsonResponse({
+            'logo': logo_url,
+            'info': serialize('json', [job_info]),
+            'company': employer_details
+        })
+
+    except Jobs.DoesNotExist:
+        return JsonResponse({'error': 'Job not found'}, status=404)
+    except Employer.DoesNotExist:
+        return JsonResponse({'error': 'Employer not found'}, status=404)
 
 def logout(request, pk):
     admin=Login.objects.get(log_id=Admin.objects.get(aid=pk).log_id.log_id)

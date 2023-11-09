@@ -1014,9 +1014,9 @@ def test_reminder():
         email.fail_silently = True
         email.send()
 
-def feedback(request,pk,pk2):
-    inter = Interview.objects.get(int_id = pk2)
-    feed = Feedback.objects.get(int_id = pk2)
+def feedback(request,pk,pk1):
+    inter = Interview.objects.get(int_id = pk1)
+    feed = Feedback.objects.get(int_id = pk1)
     data = {}
     data['ename'] = inter.eid.ename
     data['title'] = inter.apply_id.job_id.title
@@ -1238,8 +1238,8 @@ def attempt_mock(request,pk, pk1):
         single_ques['opt3'] = i.option3
         single_ques['opt4'] = i.option4
         try:
-            if(i.images.url != None):
-                single_ques['image'] = i.images.url
+            if(i.body != None):
+                single_ques['body'] = i.body
         except:
             pass
         all_ques.append(single_ques)

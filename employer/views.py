@@ -262,15 +262,17 @@ def newjob(request, pk):
         job.careerlevel = request.POST['careerlevel']
         job.jobtype = request.POST['jobtype']
         job.basicpay = request.POST['basicpay']
-        sta = request.POST['reqCand']
-        if(int(sta) == 2):
-            job.status = 6
-        #############################################
-        # job.skills = request.POST['skills']
-        raw_skills = request.POST['skills']
-        normalized_skills = ','.join(skill.strip() for skill in raw_skills.split(','))
-        job.skills = normalized_skills
-        #############################################
+        skills = request.POST.getlist('skills')
+        all_skills = ""
+        for i in skills:
+            all_skills = all_skills+i+","
+        #sta = request.POST['reqCand']
+        #if(int(sta) == 2):
+            #job.status = 6
+        # raw_skills = request.POST['skills']
+        # normalized_skills = ','.join(skill.strip() for skill in raw_skills.split(','))
+
+        job.skills = all_skills
         job.responsibilities = request.POST['responsibilities']
         job.requirements = request.POST['requirements']
         filev = None
@@ -297,7 +299,13 @@ def newjob(request, pk):
                 for job_seeker in JobSeeker.objects.all():
                     important_data_jobs = f"{job_.title} {job_.jobdesc} {job_.fnarea} {job_.skills} {job_.experience} {job_.basicpay} {job_.location} {job_.industry} {job_.ugqual} {job_.pgqual} {job_.profile} {job_.jobtype} {job_.requirements} {job_.responsibilities} {job_.notice_period}"
                     job_description = preprocess_text(important_data_jobs)
-
+                    total_job_desc_data = f"{job_description}"
+                    try:
+                        job_desc_file = job_.job_desc.path
+                        job_text = extract_text_from_pdf(job_desc_file)
+                        total_job_desc_data = f"{job_description}{job_text}"
+                    except:
+                        pass
                     important_data_jobseeker = f"{job_seeker.location} {job_seeker.experience} {job_seeker.skills} {job_seeker.basic_edu} {job_seeker.master_edu} {job_seeker.other_qual} {job_seeker.cursal} {job_seeker.expsal} {job_seeker.notice_period}"
                     job_seeker_data = preprocess_text(important_data_jobseeker)
                     try:
@@ -305,12 +313,11 @@ def newjob(request, pk):
                         resume_text = extract_text_from_pdf(resume_pdf_file)
                     except:
                         pass
-                    resume_text = extract_text_from_pdf(resume_pdf_file)
                     resume_text = preprocess_text(resume_text)
                     total_job_seeker_data = f"{job_seeker_data}{resume_text}"
                     vectorizer = CountVectorizer()
 
-                    job_description_vector = vectorizer.fit_transform([job_description])
+                    job_description_vector = vectorizer.fit_transform([total_job_desc_data])
                     job_seeker_data_vector = vectorizer.transform([total_job_seeker_data])
                     cosine_sim_job_seeker = cosine_similarity(job_description_vector, job_seeker_data_vector)
 
@@ -355,7 +362,8 @@ def newjob(request, pk):
     if 'shower' in request.session:
         del request.session['shower']
     roledetails = RoleDetails.objects.all()
-    return render(request, 'newjob-employer.html', {'pk': pk, 'roledetails': roledetails})
+    allskills = AllSkills.objects.all()
+    return render(request, 'newjob-employer.html', {'pk': pk, 'roledetails': roledetails,'allskills':allskills})
 
 
 def send_email_newjob(top_matching_job_seekers,emp_mail):
@@ -556,6 +564,10 @@ def candidates(request, pk):
             request.session['shower'] = apps.job_id.jobid
             apps.status = 2
             apps.save()
+            subject = ""+apps.job_id.title+" Application update"
+            message = ""+apps.job_id.eid.ename+"has rejected your application for role of"+apps.job_id.title
+            receipt = [apps.user_id.log_id.email]
+            send_emails(subject, message, receipt)
             return redirect('employer:candidates', pk=pk)
         if 'act' in request.POST:
             if (request.POST['act'] == "delall"):
@@ -1555,6 +1567,7 @@ def panel_request(request,pk):
         inter.panel_req = 1
         inter.save()
         return JsonResponse({'m': 'Interview panel requested'})
+        
 def all_interviews(request, pk):
     if request.method == "POST":
         if 'act' in request.POST:

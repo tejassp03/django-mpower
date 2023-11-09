@@ -1,0 +1,701 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+<title>mpower - Seminars</title>
+{% endblock %}
+
+{% block style %}
+#blackcolor{
+    color: black;
+}
+.pxp-user-nav-dropdown > .dropdown-toggle::after {
+    border-top-color: black;
+}
+.pxp-user-nav-trigger{
+    color: black;
+    border-color: black;
+}
+.pxp-user-nav-trigger:hover{
+    color: white;
+    border-color: white;
+    background: black
+}
+input::-webkit-calendar-picker-indicator {
+    display: none !important;
+  }
+  {% comment %} ::selection{
+    color: #fff;
+    background: #664AFF;
+  } {% endcomment %}
+  
+  .container{
+    max-width: 450px;
+  }
+  
+  .container .searchInput{
+    background: #fff;
+    width: 100%;
+    border-radius: 5px;
+    position: relative;
+  }
+  
+  .searchInput input{
+    width: 100%;
+    outline: none;
+    border: none;
+    border-radius: 5px;
+    
+    {% comment %} padding: 0 60px 0 20px; {% endcomment %}
+    font-size: 18px;
+  }
+  
+  .searchInput.active input{
+    border-radius: 5px 5px 0 0;
+  }
+  
+  .searchInput .resultBox{
+    padding: 0;
+    opacity: 0;
+    pointer-events: none;
+    max-height: 280px;
+    overflow-y: auto;
+  }
+  
+  .searchInput.active .resultBox{
+    padding: 10px 8px;
+    opacity: 1;
+    pointer-events: auto;
+    position: absolute;
+    background: white;
+    z-index: 1;
+  }
+  
+  .resultBox li{
+    list-style: none;
+    padding: 8px 12px;
+    display: none;
+    width: 100%;
+    cursor: default;
+    border-radius: 3px;
+  }
+  
+  .searchInput.active .resultBox li{
+    display: block;
+  }
+  .resultBox li:hover{
+    background: #efefef;
+  }
+  
+  .searchInput .icon{
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    width: 55px;
+    text-align: center;
+    font-size: 20px;
+    color: #644bff;
+    cursor: pointer;
+  }
+
+  .container .searchInput2{
+    background: #fff;
+    width: 100%;
+    border-radius: 5px;
+    
+  }
+  
+  .searchInput2 input{
+    width: 100%;
+    outline: none;
+    border: none;
+    border-radius: 5px;
+   
+    {% comment %} padding: 0 60px 0 20px; {% endcomment %}
+    font-size: 18px;
+  }
+  
+  .searchInput2.active input{
+    border-radius: 5px 5px 0 0;
+  }
+  
+  .searchInput2 .resultBox2{
+    padding: 0;
+    opacity: 0;
+    pointer-events: none;
+    max-height: 280px;
+    overflow-y: auto;
+  }
+  
+  .searchInput2.active .resultBox2{
+    padding: 10px 8px;
+    opacity: 1;
+    pointer-events: auto;
+    position: absolute;
+    background: white;
+    z-index: 1;
+
+  }
+  
+  .resultBox2 li{
+    list-style: none;
+    padding: 8px 12px;
+    display: none;
+    width: 100%;
+    cursor: default;
+    border-radius: 3px;
+  }
+  
+  .searchInput2.active .resultBox2 li{
+    display: block;
+  }
+  .resultBox2 li:hover{
+    background: #efefef;
+  }
+  
+  .searchInput2 .icon{
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    width: 55px;
+    text-align: center;
+    line-height: 55px;
+    font-size: 20px;
+    color: #644bff;
+    cursor: pointer;
+  }
+{% endblock %}
+
+{% block content %}
+
+
+<section class="pxp-page-header-simple" style="background-color: var(--pxpMainColorLight);">
+    <div class="pxp-container">
+        <h1>Search Seminars</h1>
+        <div class="pxp-hero-subtitle pxp-text-light">Find your nearest seminar in <strong>{{count}}</strong> seminars</div>
+        <div class="pxp-hero-form pxp-hero-form-round pxp-large mt-3 mt-lg-4">
+            <form class="row gx-3 align-items-center" method="GET">
+                <div class="col-12 col-lg">
+                    <div class="input-group mb-3 mb-lg-0">
+                        <span class="input-group-text"><span class="fa fa-search"></span></span>
+                        <!-- <select id="select-titles" placeholder="Job titles" class="form-select" name="title">
+                            <option value="all" selected>Job title</option>
+                            {% for i in all_titles %}
+                                {% if i.title == context.t %}
+                                    <option value='{{ i.title }}' selected>{{ i.title }}</option>
+                                {% else %}
+                                    <option value='{{ i.title }}'>{{ i.title }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select> -->
+                        <div class="searchInput">
+                            <input type="text" placeholder="Keyword" class="form-select"  name="title" style="background-image: none" id="title">
+                            <div class="resultBox">
+                              <!-- here list are inserted from javascript -->
+                            </div>
+                          </div>
+                    </div>
+                </div>
+                <div class="col-12 col-lg pxp-has-left-border">
+                    <div class="input-group mb-3 mb-lg-0">
+                        <span class="input-group-text"><span class="fa fa-globe"></span></span>
+                        <!-- <select id="select-locations" placeholder="Pick a Category..." class="form-select"  name="location">
+                            <option value="all">All locations</option>
+                            {% for i in all_locations %}
+                                {% if i.location == context.l %}
+                                    <option value='{{ i.location }}' selected>{{ i.location }}</option>
+                                {% else %}
+                                    <option value='{{ i.location }}'>{{ i.location }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select> -->
+
+                        
+                        <div class="searchInput2">
+                            <input type="text" placeholder="Location" class="form-select" name="location" style="background-image: none" id="location">
+                            <div class="resultBox2">
+                              <!-- here list are inserted from javascript -->
+                            </div>
+                          </div>
+                    </div>
+                </div>
+                <!-- <div class="col-12 col-lg pxp-has-left-border">
+                    <div class="input-group mb-3 mb-lg-0">
+                        <span class="input-group-text"><span class="fa fa-folder-o"></span></span>
+                        <select id="select-categories" placeholder="Pick a Category..." class="form-select"  name="category">
+                            <option value="all">All categories</option>
+                            {% for i in all_cats %}
+                                {% if i.fnarea == context.c %}
+                                <option value='{{ i.fnarea }}' selected>{{ i.fnarea }}</option>
+                                {% else %}
+                                <option value='{{ i.fnarea }}'>{{ i.fnarea }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div> -->
+                <div class="col-12 col-lg-auto">
+                    <button>Find Seminars</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+<section class="mt-100">
+    <div class="pxp-container">
+        <div class="row" style="justify-content: center">
+            <div class="col-lg-5 col-xl-4 col-xxl-3">
+                <div class="pxp-jobs-list-side-filter">
+                    <div class="pxp-list-side-filter-header d-flex d-lg-none">
+                        <div class="pxp-list-side-filter-header-label">Filter Jobs</div>
+                        <a role="button"><span class="fa fa-sliders"></span></a>
+                    </div>
+                <form method="GET">
+                    {% if context.t %}
+                    <input type="text" value="{{context.t}}" hidden name="title">
+                    {% endif %}
+                    
+                    {% if context.l %}
+                    <input type="text" value="{{context.l}}" hidden name="location">
+                    {% endif %}
+                    {% if context.c %}
+                    <input type="text" value="{{context.c}}" hidden name="category">
+                    {% endif %}
+                    <div class="mt-4 mt-lg-0 d-lg-block pxp-list-side-filter-panel">
+                        <!-- <h3>Type of Employment</h3> -->
+                        <!--<div class="list-group mt-2 mt-lg-3">
+                            {% comment %} <form method="GET"> {% endcomment %}
+                            {% for i, j in jobtype %}
+                            {% if i.jobtype in context.sel %}
+                            <label class="list-group-item d-flex justify-content-between align-items-center pxp-checked">
+                                <span class="d-flex">
+                                    <input class="form-check-input me-2 emp" type="checkbox" value='{{i.jobtype}}' name="emp" checked>
+                                    {{i.jobtype}}
+                                    <input type="submit" style="display: none" class="empbutton">
+                                </span>
+                                <span class="badge rounded-pill">{{j}}</span>
+                            </label>
+                            {% else %}
+                            <label class="list-group-item d-flex justify-content-between align-items-center mt-2 mt-lg-3">
+                                <span class="d-flex">
+                                    <input class="form-check-input me-2 emp" type="checkbox" value='{{i.jobtype}}' name="emp">
+                                    {{i.jobtype}}
+                                    <input type="submit" style="display: none" class="empbutton">
+                                </span>
+                                <span class="badge rounded-pill">{{j}}</span>
+                            </label>
+                            {% endif %}
+                            {% endfor %}
+                            {% comment %} </form> {% endcomment %}
+                        </div>-->
+
+                        <!--<h3 class="mt-3 mt-lg-4">Experience Level</h3>
+                        <div class="list-group mt-2 mt-lg-3">
+                            {% comment %} <form method="GET"> {% endcomment %}
+                                <h3 class="mt-3 mt-lg-4">Experience Level</h3> 
+                                {% if 'exp' in context%}
+                                <div class="mt-2 mt-lg-3">
+                                    <input type="range" class="form-range" min="0" max="9" step="1" id="experienceSlider" name="exp" value="{{context.exp}}">
+                                    <span id="selectedExperience">{{context.exp}}</span> years
+                                </div>
+                                {% else %}
+                                <div class="mt-2 mt-lg-3">
+                                    <input type="range" class="form-range" min="0" max="9" step="1" id="experienceSlider" name="exp" value="0">
+                                    <span id="selectedExperience">0</span> years
+                                </div>
+                                {% endif %}
+                                {% comment %} </form> {% endcomment %}  
+                        </div>
+                    
+                        <h3 class="mt-3 mt-lg-4">Salary Range</h3>
+                        <div class="list-group mt-2 mt-lg-3">
+                            {% comment %} <form method="GET"> {% endcomment %}
+                            {% for i, j in saltype %}
+                                {% if i.basicpay in context.els %}
+                                <label class="list-group-item d-flex justify-content-between align-items-center pxp-checked">
+                                    <span class="d-flex">
+                                        <input class="form-check-input me-2 sal" type="checkbox" value={{i.basicpay}} name="sal" checked>
+                                        {% if i.basicpay == "1" %}
+                                        ₹0 - ₹100000
+                                        {% elif i.basicpay == "2" %}
+                                        ₹100000 - ₹300000
+                                        {% elif i.basicpay == "3" %}
+                                        ₹300000 - ₹500000
+                                        {% elif i.basicpay == "4" %}
+                                        ₹500000 - ₹700000
+                                        {% elif i.basicpay == "5" %}
+                                        ₹700000 - ₹1500000
+                                        {% elif i.basicpay == "6" %}
+                                        ₹1500000+
+                                        {% endif %}
+                                        <input type="submit" style="display: none" class="salbutton">
+                                    </span>
+                                    <span class="badge rounded-pill">{{j}}</span>
+                                </label>
+                                {% else %}
+                                <label class="list-group-item d-flex justify-content-between align-items-center mt-2 mt-lg-3">
+                                    <span class="d-flex">
+                                        <input class="form-check-input me-2 sal" type="checkbox" value={{i.basicpay}} name="sal">
+                                        {% if i.basicpay == "1" %}
+                                        ₹0 - ₹100000
+                                        {% elif i.basicpay == "2" %}
+                                        ₹100000 - ₹300000
+                                        {% elif i.basicpay == "3" %}
+                                        ₹300000 - ₹500000
+                                        {% elif i.basicpay == "4" %}
+                                        ₹500000 - ₹700000
+                                        {% elif i.basicpay == "5" %}
+                                        ₹700000 - ₹1500000
+                                        {% elif i.basicpay == "6" %}
+                                        ₹1500000+
+                                        {% endif %}
+                                        <input type="submit" style="display: none" class="salbutton">
+                                    </span>
+                                    <span class="badge rounded-pill">{{j}}</span>
+                                </label>
+                                {% endif %}
+                                {% endfor %}
+                                {% comment %} </form> {% endcomment %}
+                        </div>-->
+                        <!--<h3 class="mt-3 mt-lg-4">Work Type</h3>
+                        <div class="list-group mt-2 mt-lg-3">
+                            {% comment %} <form method="GET"> {% endcomment %}
+                                <label class="list-group-item d-flex justify-content-between align-items-center pxp-checked">
+                                    <span class="d-flex">
+                                        <input class="form-check-input me-2 wt" type="checkbox" value="Work From Home" name="wt">
+                                        Work From Home
+                                    </span>
+                                </label>
+                                <label class="list-group-item d-flex justify-content-between align-items-center pxp-checked">
+                                    <span class="d-flex">
+                                        <input class="form-check-input me-2 wt" type="checkbox" value="Office" name="wt">
+                                        Office
+                                    </span>
+                                </label>
+                                <label class="list-group-item d-flex justify-content-between align-items-center pxp-checked">
+                                    <span class="d-flex">
+                                        <input class="form-check-input me-2 wt" type="checkbox" value="Hybrid" name="wt">
+                                        Hybrid
+                                    </span>
+                                </label>
+
+                            {% comment %} </form> {% endcomment %}
+                        </div>
+                        <h3 class="mt-3 mt-lg-4">Category</h3>
+                        <div class="list-group mt-2 mt-lg-3">
+                            {% comment %} <form method="GET"> {% endcomment %}
+                                {% for i in categories%}
+                                <label class="list-group-item d-flex justify-content-between align-items-center pxp-checked">
+                                    <span class="d-flex">
+                                        <input class="form-check-input me-2 cat" type="checkbox" value="{{i.fnarea}}" name="cat">
+                                        {{i.fnarea}}
+                                    </span>
+                                </label>
+                                {% endfor %}
+                            {% comment %} </form> {% endcomment %}
+                        </div>-->
+                        <h3 class="mt-3 mt-lg-4">Location</h3>
+                        <div class="list-group mt-2 mt-lg-3">
+                            {% comment %} <form method="GET"> {% endcomment %}
+                                {% for i in locations%}
+                                <label class="list-group-item d-flex justify-content-between align-items-center pxp-checked">
+                                    <span class="d-flex">
+                                        <input class="form-check-input me-2 cat" type="checkbox" value="{{i.location}}" name="loc">
+                                        {{i.location}}
+                                    </span>
+                                </label>
+                                {% endfor %}
+                            {% comment %} </form> {% endcomment %}
+                        </div>
+                        <div class="filterbuttons">
+                        <input type="submit" value="Apply Filters" class="btn rounded-pill pxp-card-btn">
+                        <a role="button" class="btn rounded-pill pxp-card-btn cancelshow">Cancel</a>
+                        </div>
+                    
+                    </div>
+                    </form>
+                </div>
+            </div>
+            <div class="col-lg-6 col-xl-7 col-xxl-8">
+                <div class="pxp-jobs-list-top mt-4 mt-lg-0">
+                    <div class="row justify-content-between align-items-center">
+                        <div class="col-auto">
+                            <h2><span class="pxp-text-light">Showing</span>&nbsp; {{ count }} &nbsp;<span class="pxp-text-light">seminars</span></h2>
+                        </div>
+                        <div class="col-auto">
+                            <select class="form-select" name="datesort">
+                                {% if "0" == context.d %}
+                                <option value="0" selected>Most relevant</option>
+                                {% else %}
+                                <option value="0">Most relevant</option>
+                                {% endif %}
+                                {% if "1" == context.d %}
+                                <option value="1" selected>Newest</option>
+                                {% else %}
+                                <option value="1">Newest</option>
+                                {% endif %}
+                                {% if "2" == context.d %}
+                                <option value="2" selected>Oldest</option>
+                                {% else %}
+                                <option value="2">Oldest</option>
+                                {% endif %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </form>
+                <div>
+                    {% if page_obj|length == 0%}
+                    <div style="width: 100%; height: 100%">
+                        <img src="{% static 'images/nojobs.jpeg' %}" alt="no jobs" style="width: 100%; height: 100%"/>
+                    </div>
+                    {% else %}
+                    {% for i in page_obj %}
+                        <div class="pxp-jobs-card-3 pxp-has-border">
+                            <div class="row align-items-center justify-content-between">
+                                <div class="col-sm-3 col-md-2 col-lg-3 col-xl-2 col-xxl-auto">
+                                    {% if i.poster %}
+                                    <a href="{% url 'main:singleseminar' i.id %}" class="pxp-jobs-card-3-company-logo" style="background-image: url({{i.poster}});"></a>
+                                    
+                                    {% else %}
+                                    <a href="{% url 'main:singleseminar' i.id %}" class="pxp-jobs-card-3-company-logo" style="background-image: url();"></a>
+                                    {% endif %}
+                                </div>
+                                <div class="col-sm-9 col-md-10 col-lg-9 col-xl-10 col-xxl-4">
+                                    <a href="{% url 'main:singleseminar' i.id %}" class="pxp-jobs-card-3-title mt-3 mt-sm-0">{{ i.title }}</a>
+
+                                    <div class="pxp-jobs-card-3-details">
+                                        <a href="{% url 'main:singleseminar' i.id %}" class="pxp-jobs-card-3-location">
+                                            <span class="fa fa-globe"></span>{{ i.city }}
+                                        </a>
+                                        <!-- <div class="pxp-jobs-card-3-type">{{ i.experience }} Years</div> -->
+                                    </div>
+                                </div>
+                                <div class="col-sm-8 col-xl-6 col-xxl-4 mt-3 mt-xxl-0">
+                                    <a href="{% url 'main:singleseminar' i.id %}" class="pxp-jobs-card-3-category">
+                                        <div class="pxp-jobs-card-3-category-label">{{ i.fnarea }}</div>
+                                    </a>
+                                    <div class="pxp-jobs-card-3-date-company">
+                                        <span class="pxp-jobs-card-3-date pxp-text-light"></span> <a href="#" class="pxp-jobs-card-3-company">{{ i.date }}</a>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4 col-xl-2 col-xxl-auto mt-3 mt-xxl-0 pxp-text-right">
+                                        <a href="{% url 'main:singleseminar' i.id %}" class="btn rounded-pill pxp-card-btn">View Details</a>
+                                </div>
+                                
+                            </div>
+                        </div>
+                    {% endfor %}
+                    {% endif %}
+                </div>
+
+                <div class="row mt-4 mt-lg-5 justify-content-between align-items-center">
+                    <div class="col-auto">
+                        <nav class="mt-3 mt-sm-0" aria-label="Jobs list pagination">
+                            <ul class="pagination pxp-pagination">
+                                {% if count >= 6 %}
+                                {% if pe.has_previous %}
+                                    {% if GET_params %}
+                                    <li class="page-item"><a href="?{{GET_params.urlencode}}&amp;page={{pe.previous_page_number}}" class="page-link" style="padding: 0.7rem"><i class="fa fa-chevron-left" aria-hidden="true"></i></a></li>
+                                    {% else %}
+                                    <li class="page-item"><a href="?page={{pe.previous_page_number}}" class="page-link" style="padding: 0.7rem"><i class="fa fa-chevron-left" aria-hidden="true"></i></a></li>
+                                    {% endif %}
+                                {% endif %}
+
+                                {% if pe.number|add:'-4' > 1 %}
+                                    {% if GET_params %}
+                                    <li class="page-item"><a href="?{{GET_params.urlencode}}&amp;page={{ pe.number|add:'-5' }}" class="page-link" style="padding: 0.7rem">&hellip;</a></li>
+                                    {% else %}
+                                    <li class="page-item"><a href="?page={{ pe.number|add:'-5' }}" class="page-link" style="padding: 0.7rem">&hellip;</a></li>
+                                    {% endif %}
+                                {% endif %}
+
+                                {% for i in pe.paginator.page_range %}
+                                    {% if pe.number == i %}
+                                        <li class="page-item active" aria-current="page">
+                                            <span class="page-link" style="padding: 0.7rem">{{pe.number}}</span>
+                                        </li>
+                                    {% elif i > pe.number|add:'-5' and i < pe.number|add:'5' %}
+                                        {% if GET_params %}
+                                        <li class="page-item"><a href="?{{GET_params.urlencode}}&amp;page={{ i }}" class="page-link" style="padding: 0.7rem">{{i}}</a></li>
+                                        {% else %}
+                                        <li class="page-item"><a href="?page={{ i }}" class="page-link" style="padding: 0.7rem">{{i}}</a></li>
+                                        {% endif %}
+                                    {% endif %}
+                                {% endfor %}
+
+                                {% if pe.paginator.num_pages > pe.number|add:'4' %}
+                                    {% if GET_params %}
+                                    <li class="page-item"><a href="?{{GET_params.urlencode}}&amp;page={{ pe.number|add:'5' }}" class="page-link" style="padding: 0.7rem">&hellip;</a></li>
+                                    {% else %}
+                                    <li class="page-item"><a href="?page={{ pe.number|add:'5' }}" class="page-link" style="padding: 0.7rem">&hellip;</a></li>
+                                    {% endif %}
+                                {% endif %}
+
+                                {% if pe.has_next %}
+                                    {% if GET_params %}
+                                    <li class="page-item"><a href="?{{GET_params.urlencode}}&amp;page={{ pe.next_page_number }}" class="page-link" style="padding: 0.7rem"><i class="fa fa-chevron-right" aria-hidden="true"></i></a></li>
+                                    {% else %}
+                                    <li class="page-item"><a href="?page={{pe.next_page_number}}" class="page-link" style="padding: 0.7rem"><i class="fa fa-chevron-right" aria-hidden="true"></i></a></li>
+                                    {% endif %}
+                                {% endif %}
+                                {% endif %}
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% include "footer.html" %}
+<script>
+    let suggestions={{ all_titles|safe }};
+    console.log(suggestions);
+    // 
+const searchInput = document.querySelector(".searchInput");
+const input = searchInput.querySelector("input");
+const resultBox = searchInput.querySelector(".resultBox");
+const icon = searchInput.querySelector(".icon");
+let linkTag = searchInput.querySelector("a");
+let webLink;
+
+
+input.onkeyup = (e)=>{
+    let userData = e.target.value; 
+    let emptyArray = [];
+    if(userData){
+        emptyArray = suggestions.filter((data)=>{
+            return data.toLocaleLowerCase().includes(userData.toLocaleLowerCase()); 
+        });
+        emptyArray = emptyArray.map((data)=>{
+            return data = '<li>'+ data +'</li>';
+        });
+        searchInput.classList.add("active"); 
+        showSuggestions(emptyArray);
+        let allList = resultBox.querySelectorAll("li");
+        for (let i = 0; i < allList.length; i++) {
+            allList[i].setAttribute("onclick", "select(this)");
+        }
+    }else{
+        searchInput.classList.remove("active"); 
+    }
+}
+
+function select(ele)
+{
+    input.value=ele.innerHTML;
+    let userData = ele.innerHTML;
+    let emptyArray = [];
+    if(userData){
+        emptyArray = suggestions.filter((data)=>{
+            return data.toLocaleLowerCase().includes(userData.toLocaleLowerCase()); 
+        });
+        emptyArray = emptyArray.map((data)=>{
+            return data = '<li>'+ data +'</li>';
+        });
+        searchInput.classList.add("active"); 
+        showSuggestions(emptyArray);
+        let allList = resultBox.querySelectorAll("li");
+        for (let i = 0; i < allList.length; i++) {
+            allList[i].setAttribute("onclick", "select(this)");
+        }
+        $('.resultBox').empty();
+    }else{
+        searchInput.classList.remove("active"); 
+    }
+}
+
+function showSuggestions(list) {
+    let listData;
+    if (!list.length) {
+        userValue = input.value;
+        listData = '<div class="suggestion-box"><div class="suggestion">' + userValue + '</div></div>';
+    } else {
+        listData = list.map((data) => {
+            return '<div class="suggestion-box"><div class="suggestion">' + data + '</div></div>';
+        }).join('');
+    }
+    resultBox.innerHTML = listData;
+}
+
+
+
+let suggestions2={{ all_locations|safe }};
+// 
+const searchInput2 = document.querySelector(".searchInput2");
+const input2 = searchInput2.querySelector("input");
+const resultBox2 = searchInput2.querySelector(".resultBox2");
+const icon2 = searchInput2.querySelector(".icon");
+let linkTag2 = searchInput2.querySelector("a");
+let webLink2;
+
+input2.onkeyup = (e)=>{
+    let userData = e.target.value; 
+    let emptyArray = [];
+    if(userData){
+        emptyArray = suggestions2.filter((data)=>{
+            return data.toLocaleLowerCase().includes(userData.toLocaleLowerCase()); 
+        });
+        emptyArray = emptyArray.map((data)=>{
+            return data = '<li>'+ data +'</li>';
+        });
+        searchInput2.classList.add("active");
+        showSuggestions2(emptyArray);
+        let allList = resultBox2.querySelectorAll("li");
+        for (let i = 0; i < allList.length; i++) {
+            allList[i].setAttribute("onclick", "select2(this)");
+        }
+    }else{
+        searchInput2.classList.remove("active"); 
+    }
+}
+
+function select2(ele)
+{
+    input2.value=ele.innerHTML;
+    let userData = ele.innerHTML;
+    let emptyArray = [];
+    if(userData){
+        emptyArray = suggestions2.filter((data)=>{
+            return data.toLocaleLowerCase().includes(userData.toLocaleLowerCase()); 
+        });
+        emptyArray = emptyArray.map((data)=>{
+            return data = '<li>'+ data +'</li>';
+        });
+        searchInput2.classList.add("active"); 
+        showSuggestions2(emptyArray);
+        let allList = resultBox2.querySelectorAll("li");
+        for (let i = 0; i < allList.length; i++) {
+            allList[i].setAttribute("onclick", "select(this)");
+        }
+        $('.resultBox2').empty();
+    }else{
+        searchInput2.classList.remove("active"); 
+    }
+}
+
+function showSuggestions2(list){
+    let listData;
+    if(!list.length){
+        userValue = input2.value;
+        listData = '<li>'+ userValue +'</li>';
+    }else{
+        listData = list.join('');
+    }
+    resultBox2.innerHTML = listData;
+}
+</script>
+{% endblock %}
+
+{% block script %}
+
+const experienceSlider = document.getElementById('experienceSlider');
+    const selectedExperience = document.getElementById('selectedExperience');
+
+    experienceSlider.addEventListener('input', () => {
+        selectedExperience.textContent = experienceSlider.value;
+    });
+{% endblock script %}

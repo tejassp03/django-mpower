@@ -58,7 +58,7 @@
                     <li id="ccan"><a href="{% url 'mpoweradmin:candidates' pk=pk %}"><span class="fa fa-user-circle-o"></span>Employers</a></li>
                     <!--<li id="csub"><a href="{% url 'mpoweradmin:mocks' pk=pk %}"><span class="fa fa-credit-card"></span>Mocks</a></li>-->
                     <li id="ccha"><a href="{% url 'mpoweradmin:change_pass' pk=pk %}"><span class="fa fa-lock"></span>Change Password</a></li>
-                    <!--<li id="qui"><a href="{% url 'mpoweradmin:seminars' pk=pk %}"><span class="fa-solid fa-person-chalkboard"></span>Seminars</a></li>-->
+                    <li id="inr"><a href="{% url 'mpoweradmin:all_interviews' pk=pk %}"><span class="fa fa-user"></span>Interviews</a></li>
                     <li id="inr"><a href="{% url 'mpoweradmin:mocks' pk=pk %}"><span class="fa fa-question"></span>Mocks</a></li>
                 </ul>
                 <div class="pxp-dashboard-side-label mt-3 mt-lg-4">Insights</div>
@@ -242,6 +242,8 @@
         </div>
 
 
+       
+
         <div class="modal fade pxp-user-modal" id="pxp-job-modal" aria-hidden="true" aria-labelledby="jobModal" tabindex="-1">
             <div class="modal-dialog modal-dialog-centered widthadjuster">
                 <div class="modal-content">
@@ -362,7 +364,7 @@
                                             </div>
                 
                                             <div class="mt-4 mt-lg-5">
-                                                <h2>Experience Required</h2>
+                                                <h2>Experience</h2>
                                                 <div class="pxp-single-candidate-timeline" id="expadder">
                                                     
                                                 </div>
@@ -392,7 +394,7 @@
                                             </div>
                                         </div>
                 
-                                        <div class="pxp-single-candidate-side-panel mt-4 mt-lg-5">
+                                        <!--<div class="pxp-single-candidate-side-panel mt-4 mt-lg-5">
                                             <h3>Contact</h3>
                                             <form class="mt-4">
                                                 <div class="mb-3">
@@ -409,7 +411,7 @@
                                                 </div>
                                                 <a href="#" class="btn rounded-pill pxp-section-cta d-block">Send Message</a>
                                             </form>
-                                        </div>
+                                        </div>-->
                                     </div>
                                 </div>
                             </div>
@@ -452,8 +454,257 @@
                 </div>
             </div>
         </div>
+        <div class="modal fade pxp-user-modal" id="pxp-company-modal" aria-hidden="true" aria-labelledby="companyModal" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered widthadjuster">
+                    <div class="modal-content">
+                        <div class="modal-body" style="padding: 1rem !important">
+                            <section>
+                                <div class="pxp-container">
+                                    <div class="pxp-single-company-container pxp-has-columns">
+                                        <div class="row">
+                                            <div class="col-lg-7 col-xl-8 col-xxl-9">
+                                                <div class="pxp-single-company-hero pxp-cover pxp-boxed" style="background-image: url();" id="comcov">
+                                                    <div class="pxp-hero-opacity"></div>
+                                                    <div class="pxp-single-company-hero-caption">
+                                                        <div class="pxp-container">
+                                                            <div class="pxp-single-company-hero-content">
+                                                                <div class="pxp-single-company-hero-logo" id="coverimage2"></div>
+                                                                <div class="pxp-single-company-hero-title">
+                                                                    <h1 id="comnam"></h1>
+                                                                    <div class="pxp-single-company-hero-location" id="comloc">Not Specified</div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                    
+                                                <section class="mt-4 mt-lg-5">
+                                                    <div class="pxp-single-company-content">
+                                                        <div style="display: flex"><h2>About</h2> <h2 style="margin-left: 10px" id="comna2"></h2></div>
+                                                        <p id="comabo">Not Specified</p>
+                                                    </div>
+                                                </section>
+                                            </div>
+                                            <div class="col-lg-5 col-xl-4 col-xxl-3">
+                                                <div class="pxp-single-company-side-panel mt-5 mt-lg-0">
+                                                    <div class="mt-4">
+                                                        <div class="pxp-single-company-side-info-label pxp-text-light">Industry</div>
+                                                        <div class="pxp-single-company-side-info-data" id="comind">Not Specified</div>
+                                                    </div>
+                                                    <div class="mt-4">
+                                                        <div class="pxp-single-company-side-info-label pxp-text-light">Company size</div>
+                                                        <div class="pxp-single-company-side-info-data" id="comsiz">Not Specified</div>
+                                                    </div>
+                                                    <div class="mt-4">
+                                                        <div class="pxp-single-company-side-info-label pxp-text-light">Founded in</div>
+                                                        <div class="pxp-single-company-side-info-data" id="comyea">Not Specified</div>
+                                                    </div>
+                                                    <div class="mt-4">
+                                                        <div class="pxp-single-company-side-info-label pxp-text-light">Phone</div>
+                                                        <div class="pxp-single-company-side-info-data" id="compho">Not Specified</div>
+                                                    </div>
+                                                    <div class="mt-4">
+                                                        <div class="pxp-single-company-side-info-label pxp-text-light">Email</div>
+                                                        <div class="pxp-single-company-side-info-data" id="comema"></div>
+                                                    </div>
+                                                    <div class="mt-4">
+                                                        <div class="pxp-single-company-side-info-label pxp-text-light">Location</div>
+                                                        <div class="pxp-single-company-side-info-data" id="comlo2"></div>
+                                                    </div>
+                                                    <div class="mt-4">
+                                                        <div class="pxp-single-company-side-info-label pxp-text-light">Website</div>
+                                                        <div class="pxp-single-company-side-info-data" id="comweb"><a href="#" id="comlin"></a></div>
+                                                    </div>
+                                                    <div class="mt-4">
+                                                        <div class="pxp-single-company-side-info-data">
+                                                            <ul class="list-unstyled pxp-single-company-side-info-social">
+                                                                <li><a href="#" id="comfac"><span class="fa fa-facebook"></span></a></li>
+                                                                <li><a href="#" id="comtwi"><span class="fa fa-twitter"></span></a></li>
+                                                                <li><a href="#" id="comins"><span class="fa fa-instagram"></span></a></li>
+                                                                <li><a href="#" id="comlin"><span class="fa fa-linkedin"></span></a></li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                        
+                                                <!--<div class="pxp-single-company-side-panel mt-3 mt-lg-4">
+                                                    <h3>Contact Company</h3>
+                                                    <form class="mt-4">
+                                                        <div class="mb-3">
+                                                            <label for="contact-company-name" class="form-label">Name</label>
+                                                            <input type="text" class="form-control" id="contact-company-name" placeholder="Enter your name">
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label for="contact-company-email" class="form-label">Email</label>
+                                                            <input type="text" class="form-control" id="contact-company-email" placeholder="Enter your email address">
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label for="contact-company-message" class="form-label">Message</label>
+                                                            <textarea class="form-control" id="contact-company-message" placeholder="Type your message here..."></textarea>
+                                                        </div>
+                                                        <a href="#" class="btn rounded-pill pxp-section-cta d-block">Send Message</a>
+                                                    </form>
+                                                </div>-->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
 
+            <div class="modal fade pxp-user-modal" id="pxp-job-modal" aria-hidden="true" aria-labelledby="jobModal" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered widthadjuster">
+                    <div class="modal-content">
+                        <div class="modal-body" style="padding: 1rem !important">
+                            <section>
+                                <div class="pxp-container">
+                                    <div class="pxp-single-job-content pxp-has-columns" style="margin-top: 0px">
+                                        <div class="row">
+                                            <div class="col-lg-7 col-xl-8 col-xxl-9">
+                    
+                                                <div class="row justify-content-between align-items-center mt-4 mt-lg-5">
+                                                    <div class="col-xl-8 col-xxl-6">
+                                                        <h1 id="jobtitle"></h1>
+                                                        <div class="pxp-single-job-company-location">
+                                                            by <a href="#" data-bs-target="#pxp-company-modal" data-bs-toggle="modal" class="pxp-single-job-company" id="comname"></a> in 
+                                                            <a href="jobs-list-1.html" class="pxp-single-job-location" id="loca"></a>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-auto">
+                                                        <div class="pxp-single-job-options mt-4 col-xl-0">
+                                                            <div class="dropdown ms-2">
+                                                                <button class="btn pxp-single-job-share-btn dropdown-toggle" type="button" id="socialShareBtn" data-bs-toggle="dropdown" aria-expanded="false">
+                                                                    <span class="fa fa-share-alt">
+                                                                </span></button>
+                                                                <ul class="dropdown-menu pxp-single-job-share-dropdown" aria-labelledby="socialShareBtn">
+                                                                    <li><a class="dropdown-item" href="#" id="fb"><span class="fa fa-facebook"></span> Facebook</a></li>
+                                                                    <li><a class="dropdown-item" href="#" id="tw"><span class="fa fa-twitter"></span> Twitter</a></li>
+                                                                    <li><a class="dropdown-item" href="#" id="in"><span class="fa fa-instagram"></span> Instagram</a></li>
+                                                                    <li><a class="dropdown-item" href="#" id="ln"><span class="fa fa-linkedin"></span> LinkedIn</a></li>
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                    
+                                                <div class="row mt-4 justify-content-between align-items-center">
+                                                    <div class="col-6">
+                                                        <a href="jobs-list-1.html" class="pxp-single-job-category">
+                                                            <div class="pxp-single-job-category-icon"><span class="fa fa-calendar-o"></span></div>
+                                                            <div class="pxp-single-job-category-label" id="jobtit"></div>
+                                                        </a>
+                                                    </div>
+                                                    <div class="col-auto">
+                                                        <div class="pxp-single-job-date pxp-text-light" id="datesh"></div>
+                                                    </div>
+                                                </div>
+                                                <div class="pxp-single-job-content-details mt-4 mt-lg-5">
+                                                    <p id="qualityshower"></p>
+                                                </div>
+
+                                                <div class="pxp-single-job-content-details mt-4 mt-lg-5">
+                                                    <h4>Required Skills</h4>
+                                                    <ul id="reqskillsshower">
+                                                    </ul>
+                                                </div>
+                    
+                                                <div class="pxp-single-job-content-details mt-4 mt-lg-5">
+                                                    <h4>Overview</h4>
+                                                    <p id="desc"></p>
+                                                    <div class="mt-4">
+                                                        <h4>Responsibilities</h4>
+                                                        <ul id="resp">
+                                                        </ul>
+                                                    </div>
+                                                    <div class="mt-4">
+                                                        <h4>Requirements</h4>
+                                                        <ul id="requ"></ul>
+                                                    </div>
+                                                    <div class="mt-4">
+                                                        <h4>Skills</h4>
+                                                        <ul id="skil"></ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-5 col-xl-4 col-xxl-3">
+                                                <div class="pxp-single-job-side-panel mt-5 mt-lg-0">
+                                                    <div>
+                                                        <div class="pxp-single-job-side-info-label pxp-text-light">Experience</div>
+                                                        <div class="pxp-single-job-side-info-data" id="exp"></div>
+                                                    </div>
+                                                    <div class="mt-4">
+                                                        <div class="pxp-single-job-side-info-label pxp-text-light">Work Level</div>
+                                                        <div class="pxp-single-job-side-info-data" id="lev"></div>
+                                                    </div>
+                                                    <div class="mt-4">
+                                                        <div class="pxp-single-job-side-info-label pxp-text-light">Employment Type</div>
+                                                        <div class="pxp-single-job-side-info-data" id="jobtype"></div>
+                                                    </div>
+                                                    <div class="mt-4">
+                                                        <div class="pxp-single-job-side-info-label pxp-text-light">Salary</div>
+                                                        <div class="pxp-single-job-side-info-data" id="sal"></div>
+                                                    </div>
+                                                </div>
+                                                <div class="mt-3 mt-lg-4 pxp-single-job-side-panel">
+                                                    <div class="pxp-single-job-side-company">
+                                                        <div class="pxp-single-job-side-company-logo pxp-cover" id="coverimage"></div>
+                                                        <div class="pxp-single-job-side-company-profile">
+                                                            <div class="pxp-single-job-side-company-name" id="comna"></div>
+                                                            <a href="single-company-1.html">View profile</a>
+                                                        </div>
+                                                    </div>
+                                                    <div class="mt-4">
+                                                        <div class="pxp-single-job-side-info-label pxp-text-light">Industry</div>
+                                                        <div class="pxp-single-job-side-info-data" id="indus"></div>
+                                                    </div>
+                                                    <div class="mt-4">
+                                                        <div class="pxp-single-job-side-info-label pxp-text-light">Company size</div>
+                                                        <div class="pxp-single-job-side-info-data" id="size"></div>
+                                                    </div>
+                                                    <div class="mt-4">
+                                                        <div class="pxp-single-job-side-info-label pxp-text-light">Founded in</div>
+                                                        <div class="pxp-single-job-side-info-data" id="yearfounded"></div>
+                                                    </div>
+                                                    <div class="mt-4">
+                                                        <div class="pxp-single-job-side-info-label pxp-text-light">Phone</div>
+                                                        <div class="pxp-single-job-side-info-data" id="phone"></div>
+                                                    </div>
+                                                    <div class="mt-4">
+                                                        <div class="pxp-single-job-side-info-label pxp-text-light">Email</div>
+                                                        <div class="pxp-single-job-side-info-data" id="ema"></div>
+                                                    </div>
+                                                    <div class="mt-4">
+                                                        <div class="pxp-single-job-side-info-label pxp-text-light">Location</div>
+                                                        <div class="pxp-single-job-side-info-data" id="locat"></div>
+                                                    </div>
+                                                    <div class="mt-4">
+                                                        <div class="pxp-single-job-side-info-label pxp-text-light">Website</div>
+                                                        <div class="pxp-single-job-side-info-data"><a href="#" id="webs"></a></div>
+                                                    </div>
+                                                    <div class="mt-4">
+                                                        <div class="pxp-single-job-side-info-data">
+                                                            <ul class="list-unstyled pxp-single-job-side-info-social">
+                                                                <li><a href="#" id="fb2"><span class="fa fa-facebook"></span></a></li>
+                                                                <li><a href="#" id="tw2"><span class="fa fa-twitter"></span></a></li>
+                                                                <li><a href="#" id="in2"><span class="fa fa-instagram"></span></a></li>
+                                                                <li><a href="#" id="ln2"><span class="fa fa-linkedin"></span></a></li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>        
+                        </div>
+                    </div>
+                </div>
+            </div>
 
 
 
@@ -501,53 +752,55 @@
                 })
             }
 
-        function loadermodal(id)
-        {
+            function loadermodal(id)
+            {
             $.ajax(
             {
                 type:"GET",
-                url: "cjobapp/",
+                url: "{% url 'mpoweradmin:jobapp' pk %}",
                 data:{
                         jobid: id
                 },
                 success: function( data ) 
                 {
-                    $('#jobtitle').text(JSON.parse(data['info'])[0].title);
-                    $('#comname').text(JSON.parse(data['company'])[0].ename);
-                    $('#loca').text(JSON.parse(data['info'])[0].location);
-                    $('#jobtit').text(JSON.parse(data['info'])[0].fnarea);
-                    $('#datesh').text(JSON.parse(data['info'])[0].postdate);
-                    $('#desc').text(JSON.parse(data['info'])[0].jobdesc);
-                    $('#exp').text(JSON.parse(data['info'])[0].experience);
-                    let salrange=JSON.parse(data['info'])[0].basicpay;
+                    console.log(data);
+                    console.log(JSON.parse(data['info'])[0]);
+                    $('#jobtitle').text(JSON.parse(data['info'])[0].fields.title);
+                    $('#comname').text(JSON.parse(data['company'])[0].fields.ename);
+                    $('#loca').text(JSON.parse(data['info'])[0].fields.location);
+                    $('#jobtit').text(JSON.parse(data['info'])[0].fields.fnarea);
+                    $('#datesh').text(JSON.parse(data['info'])[0].fields.postdate);
+                    $('#desc').text(JSON.parse(data['info'])[0].fields.jobdesc);
+                    $('#exp').text(JSON.parse(data['info'])[0].fields.experience);
+                    let salrange=JSON.parse(data['info'])[0].fields.basicpay;
                     if(salrange=="1")
                     {
-                        $('#sal').text("$0 - $700");
+                        $('#sal').text("₹0 - ₹1LPA");
                     }
                     else if(salrange=="2")
                     {
-                        $('#sal').text("$700 - $1000");
+                        $('#sal').text("₹1LPA - ₹3LPA");
                     }
                     else if(salrange=="3")
                     {
-                        $('#sal').text("$1000 - $1200");
+                        $('#sal').text("₹3LPA - ₹5LPA");
                     }
                     else if(salrange=="4")
                     {
-                        $('#sal').text("$1200 - $1400");
+                        $('#sal').text("₹5LPA - ₹7LPA");
                     }
                     else if(salrange=="5")
                     {
-                        $('#sal').text("$1500 - $1800");
+                        $('#sal').text("₹7LPA - ₹10LPA");
                     }
                     else if(salrange=="6")
                     {
-                        $('#sal').text("$2000 - $3000");
+                        $('#sal').text("₹10LPA - ₹15LPA");
                     }
-                    $('#comna').text(JSON.parse(data['company'])[0].ename);
-                    $('#indus').text(JSON.parse(data['company'])[0].industry);
-                    $('#locat').text(JSON.parse(data['company'])[0].location);
-                    let ski=JSON.parse(data['info'])[0].skills;
+                    $('#comna').text(JSON.parse(data['company'])[0].fields.ename);
+                    $('#indus').text(JSON.parse(data['company'])[0].fields.industry);
+                    $('#locat').text(JSON.parse(data['company'])[0].fields.location);
+                    let ski=JSON.parse(data['info'])[0].fields.skills;
                     let lu=document.getElementById('skil');
                     while (lu.firstChild) {
                         lu.removeChild(lu.lastChild);
@@ -562,7 +815,7 @@
                             lu.append(il);
                         }
                     }
-                    let resp=JSON.parse(data['info'])[0].responsibilities;
+                    let resp=JSON.parse(data['info'])[0].fields.responsibilities;
                     let lur=document.getElementById('resp');
                     while (lur.firstChild) {
                         lur.removeChild(lur.lastChild);
@@ -577,7 +830,7 @@
                             lur.append(il);
                         }
                     }
-                    let reqr=JSON.parse(data['info'])[0].requirements;
+                    let reqr=JSON.parse(data['info'])[0].fields.requirements;
                     let luq=document.getElementById('requ');
                     while (luq.firstChild) {
                         luq.removeChild(luq.lastChild);
@@ -595,7 +848,109 @@
                 }
             })
         }
+        function companyload(id)
+        {
 
+            $.ajax(
+                {
+                    type:"GET",
+                    url: "{% url 'mpoweradmin:company' pk %}",
+                    data:{
+                        eid: id,
+                    },
+                    success: function( data ) 
+                    {
+                        let datainfo=JSON.parse(data['info'])[0];
+                        $('#comnam').text(datainfo.ename);
+                        $('#comna2').text(datainfo.ename);
+                        $('#comloc').text(datainfo.location);
+                        $('#comlo2').text(datainfo.location);
+                        $('#comabo').text(datainfo.profile);
+                        $('#comind').text(datainfo.industry);
+                        let siz=datainfo.size;
+                        if(siz=="1")
+                        {
+                            $('#comsiz').text('< 50 employees')
+                        }
+                        else if(siz=="2")
+                        {
+                            $('#comsiz').text('50 - 100 employees')
+                        }
+                        else if(siz=="3")
+                        {
+                            $('#comsiz').text('100 - 150 employees')
+                        }
+                        else if(siz=="4")
+                        {
+                            $('#comsiz').text('150 - 200 employees')
+                        }
+                        else if(siz=="5")
+                        {
+                            $('#comsiz').text('200 - 250 employees')
+                        }
+                        else if(siz=="6")
+                        {
+                            $('#comsiz').text('250 - 300 employees')
+                        }
+                        else if(siz=="7")
+                        {
+                            $('#comsiz').text('> 300 employees')
+                        }
+                        $('#comyea').text(datainfo.yearfounded);
+                        $('#compho').text(datainfo.phone);
+                        $('#comema').text(JSON.parse(data['emai']).email);
+                        $('#comweb').text(datainfo.website);
+                        let fbl=datainfo.fblink;
+                        if(fbl)
+                        {
+                            let fblink=document.getElementById('comfac');
+                            fblink.setAttribute('href', fbl)
+                            fblink.setAttribute('target', '_blank')
+                        }
+                        let twl=datainfo.twlink;
+                        if(twl)
+                        {
+                            let twlink=document.getElementById('comtwi');
+                            twlink.setAttribute('href', twl)
+                            twlink.setAttribute('target', '_blank')
+                        }
+                        let inl=datainfo.inlink;
+                        if(inl)
+                        {
+                            let inlink=document.getElementById('comins');
+                            inlink.setAttribute('href', inl)
+                            inlink.setAttribute('target', '_blank')
+                        }
+                        let lnl=datainfo.lnlink;
+                        if(lnl)
+                        {
+                            let lnlink=document.getElementById('comlin');
+                            lnlink.setAttribute('href', lnl)
+                            lnlink.setAttribute('target', '_blank')
+                        }
+                        let urln=data['logo'];
+                        $('#coverim').remove()
+                        if(urln)
+                        {
+                            let ab=document.createElement('img')
+                            ab.setAttribute('src', urln);
+                            ab.setAttribute('id', 'coverim');
+                            ab.setAttribute('class', 'pxp-single-candidate-hero-avatar')
+                            ab.style.width='7rem';
+                            ab.style.height='7rem';
+                            document.getElementById('coverimage2').append(ab)
+                        }
+                        let cov=data['cover'];
+                        if(cov)
+                        {
+                            let ab=document.getElementById('comcov');
+                            let bc="url("+cov+")";
+                            ab.style.backgroundImage=bc;
+                        }
+                    },
+            })
+        }
+        
         function candidatemodal(id){
             console.log(id);
             $.ajax(

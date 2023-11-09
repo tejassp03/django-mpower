@@ -75,6 +75,9 @@ from ip2geotools.databases.noncommercial import DbIpCity
 @csrf_exempt
 def index(request):
     if request.method == 'POST':
+        if 'location' in request.POST:
+            longitude = request.POST['longitude']
+            latitude = request.POST['latitude']
         user = Login.objects.filter(email=request.POST['c_email'])
         if (len(user) == 0):
             return JsonResponse({'message': 'X'})
@@ -126,6 +129,7 @@ def index(request):
                     return JsonResponse({'message': 'Y', 'url': urlval})
             else:
                 return JsonResponse({'message': 'X'})
+    
     jobs = Jobs.objects.all()
     typ = jobs.values('fnarea').annotate(
         Count('fnarea')).order_by('-fnarea__count')
@@ -238,6 +242,9 @@ def user_login(request):
 
 
 def admin_login(request):
+
+    if 'type' in request.session and request.session['type'] == 'admin':
+        return redirect('mpoweradmin:cdashboard', pk=request.session.get('pk'))
     if request.method == 'POST':
         username = request.POST['email']
         password = request.POST['pass']
@@ -381,6 +388,56 @@ def candidates(request):
 
 def postjob(request):
     return render(request, 'company-dashboard-new-job.html')
+ 
+def seminars(request):
+    locs = request.GET.getlist('loc', None)
+    locations = request.GET.getlist('location', None)
+    titles = request.GET.getlist('title', None)
+    query = Q()
+    if locs and any(locs):
+        query &= Q(city__in=locs)
+
+    if locations and any(locations):
+        query &= Q(city__in=locations)
+
+    if titles and any(titles):
+        query &= Q(title__in=titles)
+    sem = Seminars.objects.filter(query)
+    if locs:
+        sem = sem.filter(city__in=locs)
+    count = 0
+    locations = []
+    allsem = []
+    
+    titles_ = []
+    all_locations = []
+    for i in sem:
+        single_location = {
+            'location' : i.city
+        }
+        titles_.append(i.title)
+        all_locations.append(i.city)
+        singlesem = {
+            'id': i.seminar_id,
+            'title': i.title,
+            'city': i.city,
+            'poster': i.image.url,
+            'date': i.date,
+        }
+        count = count+1
+        locations.append(single_location)
+        allsem.append(singlesem)
+
+    p = Paginator(allsem, 5)
+    page_number = request.GET.get('page')
+    try:
+        page_obj = p.get_page(page_number)
+    except PageNotAnInteger:
+        page_obj = p.page(1)
+    except EmptyPage:
+        page_obj = p.page(p.num_pages)
+
+    return render(request, 'seminars.html', {'page_obj':page_obj,'pe': page_obj,'count':count,'locations':locations,'all_titles':titles_,'all_locations':all_locations})
 
 
 def findjobs(request):
@@ -549,6 +606,7 @@ def profile_completion(request, pk):
         all_skills = ""
         for i in skills:
             all_skills = all_skills+i+","
+            
         experiences = request.POST.get('experience')
         jobseeker.skills = all_skills
         jobseeker.experience = experiences
@@ -1041,6 +1099,22 @@ def extract_text_from_pdf(pdf_file):
     return pdf_text
 
 ######################################################################################################################
+
+def singleseminar(request,pk1):
+    sem = Seminars.objects.get(seminar_id = pk1)
+    singlesem= {}
+    singlesem['title'] = sem.title
+    singlesem['date'] = sem.date
+    singlesem['address'] = sem.address
+    singlesem['desc'] = sem.description
+    singlesem['city'] = sem.city
+    try:
+        singlesem['poster'] = sem.image.url
+    except:
+        pass
+    speakers = [speaker.strip() for speaker in sem.speaker.split(',')]
+
+    return render(request,'singleseminar.html',{'seminar_details':singlesem,'speakers':speakers})
 
 def singlejob(request, pk2):
     if request.method == "POST":
