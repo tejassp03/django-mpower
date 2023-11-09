@@ -536,7 +536,6 @@
                 <div class="pxp-footer-copyright pxp-text-light">© 2021 mpower. All Right Reserved.</div>
             </footer>
         </div>
-
         <script src="{% static 'js/jquery-3.4.1.min.js' %}"></script>
         <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
         <script src="{% static 'js/owl.carousel.min.js' %}"></script>
@@ -634,27 +633,27 @@
                     let sal=JSON.parse(data['info'])[0].basicpay;
                     if(sal=="1")
                     {
-                        $('#sal').text("$0 - $700");
+                        $('#sal').text("₹0 - ₹1LPA");
                     }
                     else if(sal=="2")
                     {
-                        $('#sal').text("$700 - $1000");
+                        $('#sal').text("₹1LPA - ₹3LPA");
                     }
                     else if(sal=="3")
                     {
-                        $('#sal').text("$1000 - $1200");
+                        $('#sal').text("₹3LPA - ₹5LPA");
                     }
                     else if(sal=="4")
                     {
-                        $('#sal').text("$1200 - $1400");
+                        $('#sal').text("₹5LPA - ₹7LPA");
                     }
                     else if(sal=="5")
                     {
-                        $('#sal').text("$1500 - $1800");
+                        $('#sal').text("₹7LPA - ₹15LPA");
                     }
                     else if(sal=="6")
                     {
-                        $('#sal').text("$2000 - $3000");
+                        $('#sal').text("₹15LPA+");
                     }
                     $('#comna').text(JSON.parse(data['company'])[0].ename);
                     $('#indus').text(JSON.parse(data['company'])[0].industry);

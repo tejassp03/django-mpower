@@ -380,7 +380,7 @@ input::-webkit-calendar-picker-indicator {
 
 <section class="mt-100 pt-100 pb-100" style="background-color: var(--pxpSecondaryColorLight);">
     <div class="pxp-container">
-        <h2 class="pxp-section-h2 text-center">Featured Job Offers</h2>
+        <h2 class="pxp-section-h2 text-center">Featured Job Opportunities</h2>
         <p class="pxp-text-light text-center">Search your career opportunity through {{ total }} jobs</p>
 
         <div class="row mt-4 mt-md-5 pxp-animate-in pxp-animate-in-top" style="justify-content: center">
@@ -723,7 +723,32 @@ function showSuggestions(list){
     resultBox.innerHTML = listData;
 }
 
+function getLocation() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(sendPosition);
+  } 
+}
+getLocation();
 
+function sendPosition(position) {
+    
+            
+                $.ajax(
+                    {
+                        type:"POST",
+                        url: "",
+                        data:{
+                            latitude: position.coords.latitude,
+                            longitude: position.coords.longitude,
+                            location: "Y",
+                        },
+                        success: function( data ) 
+                        {
+                            
+                        }
+                    })
+            
+}
 
 let suggestions2={{ loc|safe }};
 const searchInput2 = document.querySelector(".searchInput2");

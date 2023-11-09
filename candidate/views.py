@@ -85,6 +85,9 @@ def dashboard(request, pk):
         if (count > 10):
             break
     all_applics = []
+    is_approved = 0
+    approved_company_name = "NA"
+    approved_role = "NA"
     for i in applics:
         singappli = {}
         job = Jobs.objects.get(jobid=i.job_id.jobid)
@@ -98,6 +101,10 @@ def dashboard(request, pk):
         singappli['logo'] = com.logo
         
         all_applics.append(singappli)
+        if i.status == 1:
+            is_approved = i.job_id.jobid
+            approved_company_name = i.job_id.eid.ename
+            approved_role = i.job_id.title
 
     visits = ProfileVisits.objects.filter(user_type="c", user_id=pk)
     applics_chart = []
@@ -212,7 +219,7 @@ def dashboard(request, pk):
         [item[0] for item in visits_365], default=str)
     charts_context['vcount_365'] = dumps(countsv[4])
     appli = Application.objects.filter(user_id_id = pk)
-    return render(request, 'dashboard-candidate.html', {'user': context, 'applications': all_applics, 'pk': pk, 'profile': profile, 'notifics': all_notis, 'messcount': countunmess, 'charts': charts_context, 'recent': recent_mess_temp, 'pending': popupmess,'appli':appli})
+    return render(request, 'dashboard-candidate.html', {'user': context, 'applications': all_applics, 'pk': pk, 'profile': profile, 'notifics': all_notis, 'messcount': countunmess, 'charts': charts_context, 'recent': recent_mess_temp, 'pending': popupmess,'appli':appli,'is_approved':is_approved,'approved_company_name':approved_company_name,'approved_role':approved_role})
 
 
 def jobapp(request, pk):
@@ -1007,9 +1014,11 @@ def test_reminder():
         email.fail_silently = True
         email.send()
 
-def feedback(request,pk,pk2):
-    inter = Interview.objects.get(int_id = pk2)
-    feed = Feedback.objects.filter(int_id = pk2)
+
+def feedback(request,pk,pk1):
+    inter = Interview.objects.get(int_id = pk1)
+    feed = Feedback.objects.get(int_id = pk1)
+
     data = {}
     if len(feed)>0:
         data['ename'] = inter.eid.ename
@@ -1236,8 +1245,8 @@ def attempt_mock(request,pk, pk1):
         single_ques['opt3'] = i.option3
         single_ques['opt4'] = i.option4
         try:
-            if(i.images.url != None):
-                single_ques['image'] = i.images.url
+            if(i.body != None):
+                single_ques['body'] = i.body
         except:
             pass
         all_ques.append(single_ques)

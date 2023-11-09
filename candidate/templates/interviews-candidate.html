@@ -81,7 +81,13 @@
                                 <ul class="list-unstyled" style="justify-content: center">
                                     <li><button title="Preview" onclick="interviewload({{i.eid}})" data-bs-target="#pxp-interview-modal" data-bs-toggle="modal"><span class="fa fa-eye"></span></button></li>
                                     {% if i.isdone %}
-                                    <li><button title="Feedback info"  ><a href="{% url 'candidate:feedback' pk i.int_id %}"><span class="fa fa-comment"></span></a></button></li>
+                                    <li><button title="Feedback info">
+                                        <a href="{% url 'candidate:feedback' pk i.int_id %}">
+                                            <span class="fa fa-comment"></span>
+                                        </a>
+                                        </button>
+                                    </li>
+
                                     {% endif %}
                                 </ul>
                             </div>

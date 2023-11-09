@@ -58,6 +58,18 @@
                 background-repeat: no-repeat;
                 background-position: center;
             }
+            .que_body {
+                border: 1px solid #ccc; 
+                padding: 15px; 
+                background-color: #f9f9f9; 
+                border-radius: 5px; 
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
+                /* font-family: 'Courier New', monospace;  */
+                /* white-space: pre-wrap;  */
+                font-size: 14px; 
+                /* line-height: 1.5;  */
+            }
+
             
             @media all and (max-width: 768px) {
               h1 {
@@ -104,6 +116,18 @@
     border-radius: 5px;
     cursor: pointer;
 }
+section {
+    display: flex;
+    flex-direction: column;
+}
+
+.que_text {
+    overflow-wrap: break-word; 
+}
+body {
+    overflow: auto;
+}
+
 
         </style>
     </head>
@@ -164,7 +188,11 @@
         <section>
             <div class="que_text">
             </div>
-            <div class="que_image" >
+           
+
+            <!-- <div class="que_image" >
+             </div>-->
+            <div class="que_body" >
             </div>
             <div class="option_list">
             </div>
@@ -296,8 +324,8 @@ for(let i=0;i<quest.length;i++)
     obj['options'].push(quest[i].opt2);
     obj['options'].push(quest[i].opt3);
     obj['options'].push(quest[i].opt4);
-    if (quest[i].image !== undefined) {
-        obj['image'] = quest[i].image;
+    if (quest[i].body !== undefined) {
+        obj['body'] = quest[i].body;
     }
     obj['answer']=quest[i].opt1;
     questions.push(obj);
@@ -385,23 +413,31 @@ next_btn.onclick = ()=>{
 }
 function showQuetions(index){
     const que_text = document.querySelector(".que_text");
-    const que_image = document.querySelector(".que_image");
-    que_image.style.backgroundImage=null;
-    let imageTag;
-    if (questions[index].image) {
-        que_image.style.height = "13.75rem";
-        const imageUrl = questions[index].image;
-        que_image.style.backgroundImage = `url("${imageUrl}")`;
+    const que_body = document.querySelector(".que_body");
+
+    // const que_image = document.querySelector(".que_image");
+    // que_image.style.backgroundImage=null;
+    // let imageTag;
+    // if (questions[index].image) {
+    //     que_image.style.height = "13.75rem";
+    //     const imageUrl = questions[index].image;
+    //     que_image.style.backgroundImage = `url("${imageUrl}")`;
+    // }
+    // else{
+    //     que_image.style.height = "0rem";
+    // }
+    let body_tag = "";
+    if(questions[index].body != undefined){
+        body_tag = questions[index].body;
     }
-    else{
-        que_image.style.height = "0rem";
-    }
+    
     let que_tag = '<span>'+ questions[index].numb + ". " + questions[index].question +'</span>';
     let option_tag = '<div class="option 1"><span>'+ questions[index].options[0] +'</span></div>'
     + '<div class="option 2"><span>'+ questions[index].options[1] +'</span></div>'
     + '<div class="option 3"><span>'+ questions[index].options[2] +'</span></div>'
     + '<div class="option 4"><span>'+ questions[index].options[3] +'</span></div>';
     que_text.innerHTML = que_tag;
+    que_body.innerHTML = body_tag;
     option_list.innerHTML = option_tag;
     currques=index;
     

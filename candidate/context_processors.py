@@ -44,7 +44,7 @@ def notifs(request):
                 'notis' : data
             }
         
-        elif(request.session.get('type')=="a"):
+        elif(request.session.get('type')=="admin"):
             emp=Admin.objects.get(aid=request.session['pk'])
             notifs=Notifications.objects.filter(rece_id=emp.log_id, readed=0).order_by('-datetime')
             request.session['notifnum']=len(notifs)

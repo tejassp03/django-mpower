@@ -4,6 +4,8 @@
 
 {% block title %}
 <title>mpower - Admin dashboard - Create Mock</title>
+<script src="https://cdn.tiny.cloud/1/5ecnrvd26y6z0mwbr7beq0jdmyx2yi17sluo7rqccq0fxe13/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
+
 {% endblock %}
 {% block content %}
 
@@ -163,6 +165,28 @@ i.material-icons {
 @keyframes ripple {
     100% {opacity: 0; transform: scale(2.5);}
 }
+.rotatePlus {
+      display: inline-block;
+      transition: transform 0.3s ease; 
+    }
+
+    .hidden {
+      display: none;
+    }
+   
+    fade-in {
+      animation: fadeIn 0.5s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+   
 </style>
 <div class="pxp-dashboard-content-details">
     <h1>Create test</h1>
@@ -211,10 +235,10 @@ i.material-icons {
             <div class="queswithopt">
                 <div class="singlequestion">
                     <div class="questondesc" style="display: flex; align-items: baseline">
-                        Q. &nbsp;<input type="text" class="form-control" name="desc" placeholder="Question" required/>
+                        Q. &nbsp;<input type="text" class="form-control" name="desc" placeholder="Question" maxlength="749" required/>
                     </div>
                 </div>
-                <div class="wrapper">
+                <!--<div class="wrapper">
                     <div class="box">
                         <div class="js--image-preview">
                         </div>
@@ -225,8 +249,16 @@ i.material-icons {
                         </div>
                     </div>
                     
-                </div>
-            
+                </div>-->
+                <div class="pxp-company-dashboard-jobs-bulk-actions mb-3 d-flex justify-content-center">
+                    <button class="btn btn-primary" type="button" style="padding: 0.5rem" onclick="createTextarea(1)" id="textButton_1">
+                      Code <span class="rotatePlus">+</span>
+                    </button>
+                  </div>
+                  <!-- <div id="textareaContainer_1" class="hidden">
+                    <textarea name="code-editor_1" id="textBody_1"></textarea>
+                  </div> -->
+
                 <div class="options" style="display: flex; flex-wrap: wrap; justify-content: space-around">
                     <div class="questondesc col-5 mt-1" style="display: flex; align-items: baseline">
                         <span style="width: 6rem">Option 1. &nbsp;</span><input type="text" class="form-control" name="optdesc" placeholder="Option" required/>
@@ -265,6 +297,42 @@ i.material-icons {
 </form>
 </div>
 <script>
+    // tinymce.init({
+    //     selector: 'textarea', 
+    //     plugins: 'advlist autolink lists link image charmap print preview anchor',
+    //     toolbar: 'undo redo | formatselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image',
+    // });
+</script>
+
+<script>
+
+function createTextarea(index) {
+    var textareaId = 'textBody_' + index;
+    var containerId = '#textareaContainer_' + index;
+    var buttonId = '#textButton_' + index;
+    var rotatePlus = $(buttonId + ' .rotatePlus');
+
+    if ($(containerId).length === 0) {
+      var newContainer = $('<div>', { class: 'textareaContainer fade-in', id: 'textareaContainer_' + index });
+      var newTextarea = $('<textarea>', { class: 'newTextarea', id: textareaId, name: 'code-editor_' + index });
+      newContainer.append(newTextarea);
+      $(buttonId).after(newContainer);
+      rotatePlus.css('transform', 'rotate(45deg)');
+
+      tinymce.init({
+        selector: '#' + textareaId,
+        plugins: 'advlist lists charmap print preview',
+        toolbar: 'undo redo | formatselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent',
+      });
+    } else {
+      var editor = tinymce.get(textareaId);
+      if (editor) {
+        editor.destroy();
+      }
+      $(containerId).remove();
+      rotatePlus.css('transform', 'rotate(0deg)');
+    }
+  }
  function handleFileUpload(input) {
     const box = input.closest('.box');
     initDropEffect(box);
@@ -275,15 +343,8 @@ i.material-icons {
 function initImageUpload(box) {
     let uploadField = box.querySelector('.image-upload');
 
-    //uploadField.addEventListener('change', getFile);
-    
-    //console.log("hello1A"+uploadField);
-
-
-    //function getFile(e){
-        //let file = e.currentTarget.files[0];
         checkType(uploadField.files[0]);
-    //}
+   
     
     function previewImage(file){
         let thumb = box.querySelector('.js--image-preview'),
@@ -375,7 +436,7 @@ $('#pen').removeClass('pxp-active');
 $('#templ').removeClass('pxp-active');
 $('#step').removeClass('pxp-active');
 })
-var panelNumber=1;
+var panelNumber=2;
 function removeques()
 {
     let div=document.getElementsByClassName('queswithopt');
@@ -392,7 +453,7 @@ function removeques()
 
 function addques()
 {
-    panelNumber = panelNumber + 1;
+    
 
     let div=document.createElement('div');
     div.setAttribute('class', 'queswithopt')
@@ -407,40 +468,68 @@ function addques()
     ////////////////////////////////////////////
 
 
-    const wrapperDiv = document.createElement('div');
-    wrapperDiv.classList.add('wrapper');
+    //const wrapperDiv = document.createElement('div');
+    //wrapperDiv.classList.add('wrapper');
     
-    const boxDiv = document.createElement('div');
-    boxDiv.classList.add('box');
+    //const boxDiv = document.createElement('div');
+    //boxDiv.classList.add('box');
     
-    const imagePreviewDiv = document.createElement('div');
-    imagePreviewDiv.classList.add('js--image-preview');
+    //const imagePreviewDiv = document.createElement('div');
+    //imagePreviewDiv.classList.add('js--image-preview');
     
-    const uploadOptionsDiv = document.createElement('div');
-    uploadOptionsDiv.classList.add('upload-options');
+    //const uploadOptionsDiv = document.createElement('div');
+    //uploadOptionsDiv.classList.add('upload-options');
     
-    const labelElement = document.createElement('label');
+    //const labelElement = document.createElement('label');
     
-    const inputElement = document.createElement('input');
-    inputElement.setAttribute('type', 'file');
-    inputElement.classList.add('image-upload');
-    inputElement.setAttribute('accept', 'image/*');
-    inputElement.setAttribute('onchange', 'handleFileUpload(this)');
-    inputElement.setAttribute('name', 'image_'+panelNumber);
+    //const inputElement = document.createElement('input');
+    //inputElement.setAttribute('type', 'file');
+    //inputElement.classList.add('image-upload');
+    //inputElement.setAttribute('accept', 'image/*');
+    //inputElement.setAttribute('onchange', 'handleFileUpload(this)');
+    //inputElement.setAttribute('name', 'image_'+panelNumber);
 
 
     
-    labelElement.appendChild(inputElement);
+    //labelElement.appendChild(inputElement);
     
-    uploadOptionsDiv.appendChild(labelElement);
+    //uploadOptionsDiv.appendChild(labelElement);
     
-    boxDiv.appendChild(imagePreviewDiv);
-    boxDiv.appendChild(uploadOptionsDiv);
+    //boxDiv.appendChild(imagePreviewDiv);
+    //boxDiv.appendChild(uploadOptionsDiv);
     
-    wrapperDiv.appendChild(boxDiv);
+    //wrapperDiv.appendChild(boxDiv);
     
-    div.appendChild(wrapperDiv);
+    //div.appendChild(wrapperDiv);
+
+
+    var divElement = document.createElement('div');
+    divElement.className = 'pxp-company-dashboard-jobs-bulk-actions mb-3 d-flex justify-content-center';
+
+// Create the button element
+    var buttonElement = document.createElement('button');
+    buttonElement.className = 'btn btn-primary';
+    buttonElement.setAttribute('type', 'button');
+    buttonElement.setAttribute('style', 'padding: 0.5rem');
+    buttonElement.setAttribute('onclick', 'createTextarea('+panelNumber+')');
+    buttonElement.setAttribute('id', 'textButton_'+panelNumber);
     
+// Create the text node for the button
+    var buttonText = document.createTextNode('Code ');
+
+// Create the span element for the rotation symbol
+    var spanElement = document.createElement('span');
+    spanElement.className = 'rotatePlus';
+    spanElement.appendChild(document.createTextNode('+'));
+
+// Append elements to the button
+    buttonElement.appendChild(buttonText);
+    buttonElement.appendChild(spanElement);
+
+// Append the button to the div
+    divElement.appendChild(buttonElement);
+    div.append(divElement);
+    panelNumber = panelNumber+1;
     ////////////////////////////////////////////
     let optdiv=document.createElement('div');
     optdiv.setAttribute('class', 'options');
