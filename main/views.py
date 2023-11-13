@@ -411,9 +411,9 @@ def seminars(request):
 
     if datesort:
         if datesort == 'newest':
-            sem = sem.order_by('-date')  
+            sem = sem.order_by('-created_date')  
         elif datesort == 'oldest':
-            sem = sem.order_by('date')
+            sem = sem.order_by('created_date')
     count = 0
     locations = []
     allsem = []
@@ -446,7 +446,6 @@ def seminars(request):
     except EmptyPage:
         page_obj = p.page(p.num_pages)
     context = {'d':d_val,'l':l_val}
-    print(context)
     return render(request, 'seminars.html', {'page_obj':page_obj,'pe': page_obj,'count':count,'locations':locations,'all_titles':titles_,'all_locations':all_locations,'context':context})
 
 
