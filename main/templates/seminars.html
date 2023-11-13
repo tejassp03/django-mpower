@@ -398,14 +398,16 @@ input::-webkit-calendar-picker-indicator {
                         <h3 class="mt-3 mt-lg-4">Location</h3>
                         <div class="list-group mt-2 mt-lg-3">
                             {% comment %} <form method="GET"> {% endcomment %}
-                                {% for i in locations%}
-                                <label class="list-group-item d-flex justify-content-between align-items-center pxp-checked">
-                                    <span class="d-flex">
-                                        <input class="form-check-input me-2 cat" type="checkbox" value="{{i.location}}" name="loc">
-                                        {{i.location}}
-                                    </span>
-                                </label>
-                                {% endfor %}
+                                {% for i in locations %}
+                                    <label class="list-group-item d-flex justify-content-between align-items-center pxp-checked">
+                                        <span class="d-flex">
+                                            <input class="form-check-input me-2 cat" type="checkbox" value="{{ i.location }}" name="loc"
+                                                {% if i.location in context.l %}checked{% endif %}>
+                                                {{ i.location }}
+                                                </span>
+                                    </label>
+                            {% endfor %}
+
                             {% comment %} </form> {% endcomment %}
                         </div>
                         <div class="filterbuttons">
@@ -424,21 +426,21 @@ input::-webkit-calendar-picker-indicator {
                             <h2><span class="pxp-text-light">Showing</span>&nbsp; {{ count }} &nbsp;<span class="pxp-text-light">seminars</span></h2>
                         </div>
                         <div class="col-auto">
-                            <select class="form-select" name="datesort">
-                                {% if "0" == context.d %}
+                            <select class="form-select" name="datesort" id="datesort-select">
+                                {% if 0 == context.d %}
                                 <option value="0" selected>Most relevant</option>
                                 {% else %}
                                 <option value="0">Most relevant</option>
                                 {% endif %}
-                                {% if "1" == context.d %}
-                                <option value="1" selected>Newest</option>
+                                {% if "newest" == context.d %}
+                                <option value="newest" selected>Newest</option>
                                 {% else %}
-                                <option value="1">Newest</option>
+                                <option value="newest">Newest</option>
                                 {% endif %}
-                                {% if "2" == context.d %}
-                                <option value="2" selected>Oldest</option>
+                                {% if "oldest" == context.d %}
+                                <option value="oldest" selected>Oldest</option>
                                 {% else %}
-                                <option value="2">Oldest</option>
+                                <option value="oldest">Oldest</option>
                                 {% endif %}
                             </select>
                         </div>
@@ -551,6 +553,30 @@ input::-webkit-calendar-picker-indicator {
 </section>
 
 {% include "footer.html" %}
+<script>
+    $(document).ready(function () {
+        $('#datesort-select').change(function () {
+            var selectedValue = $(this).val();
+
+            var currentUrl = window.location.href;
+            var newUrl = updateQueryStringParameter(currentUrl, 'datesort', selectedValue);
+
+            window.location.href = newUrl;
+        });
+
+        function updateQueryStringParameter(uri, key, value) {
+            var re = new RegExp("([?&])" + key + "=.*?(&|$)", "i");
+            var separator = uri.indexOf('?') !== -1 ? "&" : "?";
+            if (uri.match(re)) {
+                return uri.replace(re, '$1' + key + "=" + value + '$2');
+            }
+            else {
+                return uri + separator + key + "=" + value;
+            }
+        }
+    });
+</script>
+
 <script>
     let suggestions={{ all_titles|safe }};
     console.log(suggestions);

@@ -427,7 +427,7 @@ $(document).ready(function () {
 
             if (match) {
                 let link = match[1];
-                let text = textWithLink.replace(match[0], ''); // Remove the link from the text
+                let text = textWithLink.replace(match[0], ''); 
                 li.innerHTML = `${text} <a href="${link}">Link</a>`;
                 console.log(link+" "+text);
                 ul.appendChild(li);

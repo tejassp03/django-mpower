@@ -355,7 +355,7 @@ input::-webkit-calendar-picker-indicator {
         <p class="pxp-text-light text-center">Search your career opportunity with our categories</p>
 
         <div class="row mt-4 mt-md-5 pxp-animate-in pxp-animate-in-top" style="justify-content: center">
-            {% for i in vals|slice:":5" %}
+            {% for i in vals|slice:":4" %}
             <div class="col-12 col-md-4 col-lg-3 col-xxl-2 pxp-categories-card-1-container">
                 <a href="#" class="pxp-categories-card-1">
                     <div class="pxp-categories-card-1-icon-container">
@@ -370,7 +370,7 @@ input::-webkit-calendar-picker-indicator {
             {% endfor %}
             
         </div>
-        {% if vals|length > 5 %}
+        {% if vals|length > 4 %}
             <div class="mt-4 mt-md-5 text-center pxp-animate-in pxp-animate-in-top">
                 <a href="#" class="btn rounded-pill pxp-section-cta">All Categories<span class="fa fa-angle-right"></span></a>
             </div>
@@ -434,7 +434,7 @@ input::-webkit-calendar-picker-indicator {
         <div class="row mt-4 mt-md-5 pxp-animate-in pxp-animate-in-top" style="justify-content: center">
             {% for i in seminars|slice:":4" %}
             <div class="col-12 col-md-4 col-lg-3 col-xxl-2 pxp-categories-card-1-container">
-                <a href="#" class=" pxp-seminar-card" >
+                <a href="{% url 'main:singleseminar' pk1=i.seminar_id %}" class=" pxp-seminar-card" >
                     <div class="pxp-categories-card-1-icon-container">
                         <div class="pxp-categories-card-1-icon" style="background-image: url({{ i.image.url }});background-size: cover;">
                         
@@ -449,9 +449,9 @@ input::-webkit-calendar-picker-indicator {
             
         </div>
 
-        {% if seminars|length > 5 %}
+        {% if seminars|length > 1 %}
             <div class="mt-4 mt-md-5 text-center pxp-animate-in pxp-animate-in-top">
-                <a href="{% url 'main:jobs' %}" class="btn rounded-pill pxp-section-cta">All Job Offers<span class="fa fa-angle-right"></span></a>
+                <a href="{% url 'main:seminars' %}" class="btn rounded-pill pxp-section-cta">All Seminars<span class="fa fa-angle-right"></span></a>
             </div>
         {% endif %}
     </div>

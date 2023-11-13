@@ -21,6 +21,7 @@ import PyPDF2
 import string
 import spacy
 from jobster.settings import BASE_DIR
+from urllib.parse import urlparse
 
 
 # Create your views here.
@@ -50,8 +51,11 @@ def dashboard(request, pk):
         if i.cand_feedback:
             continue
         else:
+            absolute_uri = request.build_absolute_uri()
+            parsed_uri = urlparse(absolute_uri)
+            base_url = f"{parsed_uri.scheme}://{parsed_uri.netloc}"
             ans = "Please provide your feedback for the interview with " + \
-                i.eid.ename+"\n Link: http://localhost:8000/give_feed/" + \
+                i.eid.ename+"\n Link:"+base_url+"/give_feed/" + \
                 str(i.int_id)
             popupmess.append(ans)
     for i in threads:
@@ -1076,8 +1080,11 @@ def feed_get(request, pk):
         data['is_cand_done'] = True
         data['feed_cand'] = inter.cand_feedback
     else:
+        absolute_uri = request.build_absolute_uri()
+        parsed_uri = urlparse(absolute_uri)
+        base_url = f"{parsed_uri.scheme}://{parsed_uri.netloc}"
         ans = "Please provide your feedback for the interview with "+inter.eid.ename + \
-            "\n Link: http://localhost:8000/give_feed/"+str(inter.int_id)
+            "\n Link: "+base_url+"/give_feed/"+str(inter.int_id)
         data['feed_cand'] = ans
     data['feed_received'] = []
     feeds = Feedback.objects.filter(int_id=inter.int_id)

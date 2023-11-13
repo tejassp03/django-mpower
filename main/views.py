@@ -393,6 +393,9 @@ def seminars(request):
     locs = request.GET.getlist('loc', None)
     locations = request.GET.getlist('location', None)
     titles = request.GET.getlist('title', None)
+    datesort = request.GET.get('datesort',None)
+    l_val = locs + locations
+    d_val = datesort
     query = Q()
     if locs and any(locs):
         query &= Q(city__in=locs)
@@ -405,6 +408,12 @@ def seminars(request):
     sem = Seminars.objects.filter(query)
     if locs:
         sem = sem.filter(city__in=locs)
+
+    if datesort:
+        if datesort == 'newest':
+            sem = sem.order_by('-date')  
+        elif datesort == 'oldest':
+            sem = sem.order_by('date')
     count = 0
     locations = []
     allsem = []
@@ -436,8 +445,9 @@ def seminars(request):
         page_obj = p.page(1)
     except EmptyPage:
         page_obj = p.page(p.num_pages)
-
-    return render(request, 'seminars.html', {'page_obj':page_obj,'pe': page_obj,'count':count,'locations':locations,'all_titles':titles_,'all_locations':all_locations})
+    context = {'d':d_val,'l':l_val}
+    print(context)
+    return render(request, 'seminars.html', {'page_obj':page_obj,'pe': page_obj,'count':count,'locations':locations,'all_titles':titles_,'all_locations':all_locations,'context':context})
 
 
 def findjobs(request):
