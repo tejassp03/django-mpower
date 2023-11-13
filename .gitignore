@@ -25,6 +25,8 @@ static/uploads/
 
 # Ignore local development settings
 jobster/
+jobster/settings.py
+jobster/__pycache__/
 
 # Ignore secret key files
 *.key
