@@ -423,7 +423,9 @@ $(document).ready(function () {
         {
             let li = document.createElement('li');
             let textWithLink = data[i];
-            let match = textWithLink.match(/Link: (http:\/\/[^\s]+)/);
+            let match = textWithLink.match(/Link:\s*(https?:\/\/[^\s]+)/);
+            console.log("textWithLink:", textWithLink);
+            console.log("Match:", match);
 
             if (match) {
                 let link = match[1];
