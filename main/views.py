@@ -71,6 +71,7 @@ from django.utils.encoding import force_bytes
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from ip2geotools.databases.noncommercial import DbIpCity
+import threading
 
 @csrf_exempt
 def index(request):
@@ -631,11 +632,13 @@ def job_suggestion_email(all_skills,loger,empls,jobseeker):
         #####################################################################
         ### EMAIL############
         email_subject = "Registration Successfull"
+        jobs_link = reverse('main:jobs')
         message = render_to_string('email.html', {
             'name': empls.name,
             'suggestions' :zip(matching_company_names,matching_job_titles,matching_job_locations,jobid_list),
             'suggestions_match' :suggestions_match,
-            'cand_id':jobseeker.user_id
+            'cand_id':jobseeker.user_id,
+            'jobs_link':jobs_link
         })
         
         
@@ -708,8 +711,9 @@ def profile_completion(request, pk):
         resumeanalysis.jobseeker_id = jobseeker
         resumeanalysis.save()
 
-
-        job_suggestion_email(all_skills,loger,empls,jobseeker)
+        job_suggestions_email_thread = threading.Thread(target=job_suggestion_email, args=(all_skills,loger,empls,jobseeker))
+        job_suggestions_email_thread.start()
+        #job_suggestion_email(all_skills,loger,empls,jobseeker)
         ########################EMAIL########################################
         # matching_eid_list = []
         # matching_job_titles = []
