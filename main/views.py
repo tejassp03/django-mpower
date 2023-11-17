@@ -280,7 +280,7 @@ def register(request):
             messages.error(
                 request, "Both your password and your confirmation password must be exactly same")
             return redirect('main:index')
-        if not re.fullmatch(r'^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$', request.POST['password']):
+        if not re.fullmatch(r"^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{8,}$", request.POST['password']):
             messages.error(request, "Please enter a valid password")
             return redirect('main:index')
         user = Login()
@@ -334,7 +334,7 @@ def admin_register(request):
             messages.error(
                 request, "Both your password and your confirmation password must be exactly same")
             return redirect('main:admin_register')
-        if not re.fullmatch(r'^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$', request.POST['password']):
+        if not re.fullmatch(r"^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{8,}$", request.POST['password']):
             messages.error(request, "Please enter a valid password")
             return redirect('main:admin_register')
         user = Login()
@@ -587,6 +587,65 @@ def findjobs(request):
         titles_.append(i['title'])
     return render(request, 'jobs.html', {'page_obj': page_obj, 'pe': page_obj, 'count': count, 'locations': locations,'countloc':countloc, 'titles': titles, 'categories': categories, 'GET_params': GET_params, 'jobtype': zip(jobtype, countjob), 'emptype': zip(emptype, countemp), 'saltype': zip(salary, countsal), 'context': context,'all_titles':titles_,'all_locations':locations_,'all_cats':all_cat})
 
+def job_suggestion_email(all_skills,loger,empls,jobseeker):
+    try:
+        matching_eid_list = []
+        matching_job_titles = []
+        matching_job_locations = []
+        matching_company_names = []
+        jobid_list = []
+
+        all_jobs = Jobs.objects.all()
+
+        for job in all_jobs:
+            if job.skills:
+                job_skills = job.skills.split(',')
+        
+                if any(skill.strip().lower() in all_skills.lower() for skill in job_skills):
+
+                    matching_eid_list.append(job.eid_id)
+            
+                    matching_job_titles.append(job.title)
+            
+                    matching_job_locations.append(job.location)
+                    jobid_list.append(job.jobid)
+
+       
+
+        matching_employers = Employer.objects.filter(eid__in=matching_eid_list)
+
+        ename_dict = {employer.eid: employer.ename for employer in matching_employers}
+
+        matching_company_names = [ename_dict[eid] for eid in matching_eid_list]
+        
+
+        matching_company_names = matching_company_names[:3]
+        matching_job_titles = matching_job_titles[:3]
+        matching_job_locations = matching_job_locations[:3]
+        
+
+        suggestions_match = True
+
+        if len(matching_job_locations)==0 and len(matching_company_names)==0 and len(matching_job_titles) ==0:
+            suggestions_match = False
+        #####################################################################
+        ### EMAIL############
+        email_subject = "Registration Successfull"
+        message = render_to_string('email.html', {
+            'name': empls.name,
+            'suggestions' :zip(matching_company_names,matching_job_titles,matching_job_locations,jobid_list),
+            'suggestions_match' :suggestions_match,
+            'cand_id':jobseeker.user_id
+        })
+        
+        
+        email = EmailMessage(email_subject, message, settings.EMAIL_HOST_USER, [loger.email])
+        email.fail_silently = True
+        email.content_subtype = "html"
+        email.send()
+
+    except:
+        pass
 
 def profile_completion(request, pk):
     if request.method == 'POST':
@@ -649,61 +708,63 @@ def profile_completion(request, pk):
         resumeanalysis.jobseeker_id = jobseeker
         resumeanalysis.save()
 
+
+        job_suggestion_email(all_skills,loger,empls,jobseeker)
         ########################EMAIL########################################
-        matching_eid_list = []
-        matching_job_titles = []
-        matching_job_locations = []
-        matching_company_names = []
-        jobid_list = []
+        # matching_eid_list = []
+        # matching_job_titles = []
+        # matching_job_locations = []
+        # matching_company_names = []
+        # jobid_list = []
 
-        all_jobs = Jobs.objects.all()
+        # all_jobs = Jobs.objects.all()
 
-        for job in all_jobs:
-            if job.skills:
-                job_skills = job.skills.split(',')
+        # for job in all_jobs:
+        #     if job.skills:
+        #         job_skills = job.skills.split(',')
         
-                if any(skill.strip().lower() in all_skills.lower() for skill in job_skills):
+        #         if any(skill.strip().lower() in all_skills.lower() for skill in job_skills):
 
-                    matching_eid_list.append(job.eid_id)
+        #             matching_eid_list.append(job.eid_id)
             
-                    matching_job_titles.append(job.title)
+        #             matching_job_titles.append(job.title)
             
-                    matching_job_locations.append(job.location)
-                    jobid_list.append(job.jobid)
+        #             matching_job_locations.append(job.location)
+        #             jobid_list.append(job.jobid)
 
        
 
-        matching_employers = Employer.objects.filter(eid__in=matching_eid_list)
+        # matching_employers = Employer.objects.filter(eid__in=matching_eid_list)
 
-        ename_dict = {employer.eid: employer.ename for employer in matching_employers}
+        # ename_dict = {employer.eid: employer.ename for employer in matching_employers}
 
-        matching_company_names = [ename_dict[eid] for eid in matching_eid_list]
+        # matching_company_names = [ename_dict[eid] for eid in matching_eid_list]
         
 
-        matching_company_names = matching_company_names[:3]
-        matching_job_titles = matching_job_titles[:3]
-        matching_job_locations = matching_job_locations[:3]
+        # matching_company_names = matching_company_names[:3]
+        # matching_job_titles = matching_job_titles[:3]
+        # matching_job_locations = matching_job_locations[:3]
         
 
-        suggestions_match = True
+        # suggestions_match = True
 
-        if len(matching_job_locations)==0 and len(matching_company_names)==0 and len(matching_job_titles) ==0:
-            suggestions_match = False
-        #####################################################################
-        ### EMAIL############
-        email_subject = "Registration Successfull"
-        message = render_to_string('email.html', {
-            'name': empls.name,
-            'suggestions' :zip(matching_company_names,matching_job_titles,matching_job_locations,jobid_list),
-            'suggestions_match' :suggestions_match,
-            'cand_id':jobseeker.user_id
-        })
+        # if len(matching_job_locations)==0 and len(matching_company_names)==0 and len(matching_job_titles) ==0:
+        #     suggestions_match = False
+        # #####################################################################
+        # ### EMAIL############
+        # email_subject = "Registration Successfull"
+        # message = render_to_string('email.html', {
+        #     'name': empls.name,
+        #     'suggestions' :zip(matching_company_names,matching_job_titles,matching_job_locations,jobid_list),
+        #     'suggestions_match' :suggestions_match,
+        #     'cand_id':jobseeker.user_id
+        # })
         
         
-        email = EmailMessage(email_subject, message, settings.EMAIL_HOST_USER, [loger.email])
-        email.fail_silently = True
-        email.content_subtype = "html"
-        email.send()
+        # email = EmailMessage(email_subject, message, settings.EMAIL_HOST_USER, [loger.email])
+        # email.fail_silently = True
+        # email.content_subtype = "html"
+        # email.send()
 
         # if(empls.Resume):
         # 	analysis_object = ResumeAnalysis()
@@ -1582,7 +1643,7 @@ def password_reset(request):
         if request.POST['fnew'] != request.POST['cnew']:
             return JsonResponse({'message': 'Both your password and your confirmation password must be exactly the same'})
         
-        if not re.fullmatch(r'^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$', request.POST['fnew']):
+        if not re.fullmatch(r"^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{8,}$", request.POST['fnew']):
             return JsonResponse({'message': 'Please enter a valid password'})        
         user.password = make_password(request.POST['fnew'])
         user.save()
