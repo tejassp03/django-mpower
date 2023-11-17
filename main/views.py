@@ -588,7 +588,7 @@ def findjobs(request):
         titles_.append(i['title'])
     return render(request, 'jobs.html', {'page_obj': page_obj, 'pe': page_obj, 'count': count, 'locations': locations,'countloc':countloc, 'titles': titles, 'categories': categories, 'GET_params': GET_params, 'jobtype': zip(jobtype, countjob), 'emptype': zip(emptype, countemp), 'saltype': zip(salary, countsal), 'context': context,'all_titles':titles_,'all_locations':locations_,'all_cats':all_cat})
 
-def job_suggestion_email(all_skills,loger,empls,jobseeker):
+def job_suggestion_email(all_skills,loger,empls,jobseeker,request):
     try:
         matching_eid_list = []
         matching_job_titles = []
@@ -611,8 +611,6 @@ def job_suggestion_email(all_skills,loger,empls,jobseeker):
                     matching_job_locations.append(job.location)
                     jobid_list.append(job.jobid)
 
-       
-
         matching_employers = Employer.objects.filter(eid__in=matching_eid_list)
 
         ename_dict = {employer.eid: employer.ename for employer in matching_employers}
@@ -632,7 +630,9 @@ def job_suggestion_email(all_skills,loger,empls,jobseeker):
         #####################################################################
         ### EMAIL############
         email_subject = "Registration Successfull"
-        jobs_link = reverse('main:jobs')
+        parsed_url = urlparse(request.build_absolute_uri())
+        main_url = f"{parsed_url.scheme}://{parsed_url.netloc}"
+        jobs_link = main_url+reverse('main:jobs')
         message = render_to_string('email.html', {
             'name': empls.name,
             'suggestions' :zip(matching_company_names,matching_job_titles,matching_job_locations,jobid_list),
@@ -711,7 +711,7 @@ def profile_completion(request, pk):
         resumeanalysis.jobseeker_id = jobseeker
         resumeanalysis.save()
 
-        job_suggestions_email_thread = threading.Thread(target=job_suggestion_email, args=(all_skills,loger,empls,jobseeker))
+        job_suggestions_email_thread = threading.Thread(target=job_suggestion_email, args=(all_skills,loger,empls,jobseeker,request))
         job_suggestions_email_thread.start()
         #job_suggestion_email(all_skills,loger,empls,jobseeker)
         ########################EMAIL########################################
