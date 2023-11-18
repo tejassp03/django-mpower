@@ -117,13 +117,20 @@
 
               <fieldset>
                 <h3>Setup your phone</h3>
-                <div class="form-row"> 
-                  <div class="form-group col-md-6">  
-                    <input type="tel" id="phone" class="form-control" placeholder="+91" name="code"> 
-                  </div>  
-                  <div class="form-group col-md-6"> 
+                <div class="form-row d-flex justify-content-center "> 
+                    <div class="form-group col-md-6 d-none">
+                        <input type="text" id="countryCode" class="form-control" placeholder="Country Code" readonly>
+                    </div>
+                    <div class="form-group col-md-6 d-none">
+                        <input type="text" id="phoneNumber" class="form-control" placeholder="Phone Number" readonly>
+                    </div>
+                    <div class="form-group col-md-6 ">  
+                        <input type="tel" id="phone" class="form-control" placeholder="0000000000" name="mobile" maxlength="10"> 
+                    </div>
+
+                  <!--<div class="form-group col-md-6"> 
                     <input type="text" class="form-control" placeholder="0000000000" name="mobile" id="phone2" maxlength="10" >
-                  </div>
+                  </div>-->
                 </div>
                 <button type="button" class="action-but">Get OTP</button>
                 <div id="hider" class="finde">
@@ -314,6 +321,8 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
         <script src="{% static 'js/main.js' %}"></script>
         <script>
+        </script>
+        <script>
             (function($) {
                 "use strict";  
                 
@@ -415,12 +424,34 @@
                 }; 
                 
                 //* Add Phone no select
-                function phoneNoselect(){
-                    if ( $('#msform').length ){   
-                        $("#phone").intlTelInput(); 
-                        $("#phone").intlTelInput("setNumber", "+91"); 
+                function phoneNoselect() {
+                    if ($('#msform').length) {
+                        var input = $("#phone");
+                        input.intlTelInput({
+                        initialCountry: "in",
+                        separateDialCode: false,
+                        utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.13/js/utils.js",
+                     });
+
+                    var iti = input.intlTelInput("getSelectedCountryData");
+
+                    $('#countryCode').val('+' + iti.dialCode);
+                    $('#phoneNumber').val(input.val());
+
+                    input.on("countrychange", function (e, countryData) {
+                        $('#countryCode').val('+' + countryData.dialCode);
+                        console.log(countryData);
+                        // var maxLength = iti.countryData[0].length;
+                        console.log(iti);
+                        // $('#phone').attr('maxlength', maxLength);
+                        $('#phoneNumber').val(input.val());
+                    });
+                    input.on('keyup', function(){
+                        $('#phoneNumber').val(input.val());
+                    });
                     };
-                }; 
+                };
+
                 //* Select js
                 function nice_Select(){
                     if ( $('.product_select').length ){ 
@@ -434,7 +465,7 @@
             })(jQuery);
 
             $('.action-but').click(function(){
-                if(document.getElementById('phone2').value=="")
+                if(document.getElementById('phone').value=="")
                 {
                     alert("Please enter a valid phone number");
                     return;
@@ -443,16 +474,17 @@
                 {
                     document.getElementById('hider').setAttribute('class', 'finde2');
                 }
-                let text1 = document.getElementById('phone').value;
-                let text2 = document.getElementById('phone2').value;
+                let text1 = document.getElementById('countryCode').value;
+                let text2 = document.getElementById('phoneNumber').value;
                 let result = text1+text2
+                console.log(result);
                 $.ajax(
                 {
                     type:"GET",
                     url: "get_otp/",
                     data:{
-                        'code': document.getElementById('phone').value,
-                        'phone': document.getElementById('phone2').value,
+                        'code': document.getElementById('countryCode').value,
+                        'phone': document.getElementById('phoneNumber').value,
                         csrfmiddlewaretoken: '{{ csrf_token }}'
                     },
                     success: function( data ) 
@@ -470,8 +502,8 @@
                 })
             
             $('.action-but2').click(function(){
-                let text1 = document.getElementById('phone').value;
-                let text2 = document.getElementById('phone2').value;
+                let text1 = document.getElementById('countryCode').value;
+                let text2 = document.getElementById('phoneNumber').value;
                 let result = text1+text2
                 let code1 = document.getElementById('otp_val1').value;
                 let code2 = document.getElementById('otp_val2').value;
