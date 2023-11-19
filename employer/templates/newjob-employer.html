@@ -100,7 +100,7 @@
             <div class="col-md-6 col-xxl-3">
                 <div class="mb-3">
                     <label for="pxp-company-job-location" class="form-label">Location</label>
-                    <select id="pxp-company-job-location" class="form-select notnormal" name="city">
+                    <select id="pxp-company-job-location" class="form-select notnormal" name="location">
                         
                     </select>
                 </div>
@@ -351,6 +351,7 @@
                     contentType: false,
                     success: function( data ) 
                     {
+                        console.log(data);
                         // let candidates=JSON.parse(data['candidates']);
                         // var tbody = document.getElementById("tableBody");
                         // // console.log(matchPer.value+" "+candidates[0].score);
