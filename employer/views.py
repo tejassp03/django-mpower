@@ -312,7 +312,8 @@ def newjob(request, pk):
                         resume_pdf_file = job_seeker.Resume.path
                         resume_text = extract_text_from_pdf(resume_pdf_file)
                     except:
-                        pass
+                        resume_text = ""
+
                     resume_text = preprocess_text(resume_text)
                     total_job_seeker_data = f"{job_seeker_data}{resume_text}"
                     vectorizer = CountVectorizer()
