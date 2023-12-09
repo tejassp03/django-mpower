@@ -265,6 +265,7 @@ background-image: linear-gradient(315deg, #f9d29d 0%, #ffd8cb 74%);
                                             <option value="a">Select Action</option>
                                             
                                             <option value="b_{{i.user_id}}">View profile</option>
+                                            <option value="z_{{i.apply_id}}">Screening Answers</option>
                                             {% if i.status <= 4 %}
                                             <option value="h_{{i.user_id}}_{{i.test_id}}">Schedule Interview</option>
                                             {% endif %}
@@ -281,7 +282,9 @@ background-image: linear-gradient(315deg, #f9d29d 0%, #ffd8cb 74%);
                                             <option value="d_{{i.user_id}}_{{i.log_id}}">Send Message</option>
                                             <option value="o_{{i.user_id}}_{{i.apply_id}}">View onboarding status</option>
                                             <option value="g_{{i.user_id}}_{{i.apply_id}}">Delete</option>
+                                            <option value="x_{{i.user_id}}_{{i.log_id}}">Resume</option>
                                             {%else %}
+                                            <option value="x_{{i.user_id}}_{{i.log_id}}">Resume</option>
                                             <option value="d_{{i.user_id}}_{{i.log_id}}">Send Message</option>
                                             <option value="e_{{i.user_id}}_{{i.apply_id}}">Approve</option>
                                             <option value="f_{{i.user_id}}_{{i.apply_id}}">Reject</option>
@@ -413,6 +416,28 @@ background-image: linear-gradient(315deg, #f9d29d 0%, #ffd8cb 74%);
     </div>
 </div>
 
+<div class="modal fade" id="screeningQuestionsModal" tabindex="-1" role="dialog" aria-labelledby="popupModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document"> 
+        <div class="modal-content" style="padding: 20px;"> 
+            <div class="modal-header d-flex justify-content-center">
+                <h5 class="modal-title" id="popupModalLabel">Screening Questions</h5>
+            </div>
+            <div class="modal-body">
+                <form id="screeningQuestionsForm d-flex justify-content-center">
+                    <div id="messages" class="d-flex justify-content-center"></div>
+                    <label id="question1" for="answer1"></label>
+                    <textarea id="answer1" name="question1" class="form-control" style="width: 100%;"   disabled></textarea><br> 
+                    <label id="question2" for="answer2"></label>
+                    <textarea id="answer2" name="question2" class="form-control" style="width: 100%;"   disabled></textarea>
+                    <div class="modal-footer">
+                        <button class="btn btn-primary" data-dismiss="modal" id="screeningQuestionsClose">Close</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% if jobs_ %}
 <!--<div id="popup" class="popup">
     <div class="popup-content">
@@ -478,6 +503,7 @@ $(document).ready(function () {
         let ab='#'+{{ jobs.0.jobid }};
         $(ab).addClass('pxp-active')
     }
+    
     let show='{{shower}}';
     if(show)
     {
@@ -536,27 +562,84 @@ $(document).ready(function () {
             let temp="#pxp-showtemp-modal-button-"+val_option[1]+"-"+val_option[2];
             $(temp).click();
         }
+        else if(val_option[0] == "x")
+        {
+            resumeLink(val_option[1]);
+        }
+        else if(val_option[0] == "z")
+        {
+            screeningQuestions(val_option[1]);
+        }
     })
-})
+});
+
+function screeningQuestions(id) {
+    $.ajax({
+        type: "POST",
+        url: "{% url 'employer:screening_questions' pk %}",
+        data: {
+            'apply_id': id,
+            csrfmiddlewaretoken: '{{ csrf_token }}'
+        },
+        success: function(data) {
+            if (!data.screening_questions) {
+                $('#answer1').css('display', 'none');
+                $('#answer2').css('display', 'none');
+                $('#question1').css('display', 'none');
+                $('#question2').css('display', 'none');
+                $('#messages').html('<p>Screening questions not found.</p>');
+            }else{
+            $('#question1').text("Q1. " + data.screening_questions[0].question_one);
+            $('#question2').text("Q2. " + data.screening_questions[0].question_two);
+            $('#answer1').val(data.screening_answers[0].screening_answer_one);
+            $('#answer2').val(data.screening_answers[0].screening_answer_two);
+            }
+            $('#screeningQuestionsModal').modal('show');
+        }
+    });
+}
+
+function resumeLink(id)
+{
+    $.ajax(
+        {
+            type:"POST",
+            url: "{% url 'employer:resume_link' pk %}",
+            data:{
+                    'user_id': id,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function( data ) 
+            {
+                console.log(data);
+                if (data && data.link) {
+                    window.open(data.link, '_blank');
+                }
+            }
+    })
+}
 
 // Function to show the popup
-function showPopup() {
-    document.getElementById("popup").style.display = "flex";
-}
+//function showPopup() {
+  //  document.getElementById("popup").style.display = "flex";
+//}
 
 // Function to close the popup
-function closePopup() {
-    document.getElementById("popup").style.display = "none";
-    candifetch(jobid);
-}
+//function closePopup() {
+  //  document.getElementById("popup").style.display = "none";
+    //candifetch(jobid);
+//}
 
 // Show the popup when the page loads
-window.onload = function() {
-    showPopup();
-};
+//window.onload = function() {
+  //  showPopup();
+//};
 
 // Close the popup when the close button is clicked
-document.getElementById("close-popup").addEventListener("click", closePopup);
+$('#screeningQuestionsClose').click(function() {
+    $('#screeningQuestionsModal').modal('hide');
+});
+
 
 function candifetch(id)
 {
@@ -880,16 +963,27 @@ function candifetch(id)
                     selectorsopt.setAttribute('name', finalstringval);
                     let finalonchangeval="tme2("+datainfo[i].user_id+")";
                     selectorsopt.setAttribute('onchange', finalonchangeval);
+
+
                     let opt1=document.createElement('option');
 
                     opt1.setAttribute('value', 'a');
                     opt1.innerHTML="Select Action";
                     selectorsopt.append(opt1);
+
+
                     let opt2=document.createElement('option');
                     idval="b_"+datainfo[i].user_id;
                     opt2.setAttribute('value', idval);
                     opt2.innerHTML="View profile";
                     selectorsopt.append(opt2);
+
+                    let opt2z=document.createElement('option');
+                    idval="z_"+datainfo[i].apply_id;
+                    opt2z.setAttribute('value', idval);
+                    opt2z.innerHTML="Screening Questions";
+                    selectorsopt.append(opt2z);
+
                     if(datainfo[i].status==0)
                     {
                     let opt3=document.createElement('option');
@@ -938,6 +1032,11 @@ function candifetch(id)
                         opt15.setAttribute('value', idval);
                         opt15.innerHTML="View onboarding status";
                         selectorsopt.append(opt15);
+                        let opt4d=document.createElement('option');
+                        idval="x_"+datainfo[i].user_id+"_"+datainfo[i].log_id;
+                        opt4d.setAttribute('value', idval);
+                        opt4d.innerHTML="Resume";
+                        selectorsopt.append(opt4d);
                         let opt4=document.createElement('option');
                         idval="d_"+datainfo[i].user_id+"_"+datainfo[i].log_id;
                         opt4.setAttribute('value', idval);
@@ -955,6 +1054,11 @@ function candifetch(id)
                     }
                     else
                     {
+                        let opt4d=document.createElement('option');
+                        idval="x_"+datainfo[i].user_id+"_"+datainfo[i].log_id;
+                        opt4d.setAttribute('value', idval);
+                        opt4d.innerHTML="Resume";
+                        selectorsopt.append(opt4d);
                         let opt4=document.createElement('option');
                         idval="d_"+datainfo[i].user_id+"_"+datainfo[i].log_id;
                         opt4.setAttribute('value', idval);
@@ -1351,9 +1455,9 @@ function tme2(id)
     }
     else if(val_option[0] == "h")
     {
-        console.log('h');
         let temp="#pxp-interview-modal-button-"+val_option[1]+"-"+val_option[2];
         $(temp).click();
+        getCandName(id);
     } 
     else if(val_option[0] == "l")
     {
@@ -1376,6 +1480,34 @@ function tme2(id)
         let temp="#pxp-showtemp-modal-button-"+val_option[1]+"-"+val_option[2];
         $(temp).click();
     }
+    else if(val_option[0] == "x")
+    {
+        resumeLink(val_option[1]);
+    }
+    else if(val_option[0] == "z")
+    {
+        screeningQuestions(val_option[1]);
+    }
+}
+
+function getCandName(id)
+{
+    console.log(id);
+    $.ajax(
+        {
+            type:"POST",
+            url: "{% url 'employer:get_cand_name' pk %}",
+            data:{
+                    'id': id,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function( data ) 
+            {
+                var name = data.name;
+                var modalHeader = document.querySelector('.modal-header h5');
+                modalHeader.innerHTML = `<span class="fa fa-calendar"></span>&nbsp;Schedule Interview with ${name}`;
+            }
+    })
 }
 
 function templatemodal(id, appid)

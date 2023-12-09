@@ -553,6 +553,17 @@ input::-webkit-calendar-picker-indicator {
 
 {% include "footer.html" %}
 <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const titleParam = urlParams.get('title');
+    const locationParam = urlParams.get('location');
+    if (titleParam) {
+        document.getElementById('title').value = decodeURIComponent(titleParam);
+    }
+    if (locationParam) {
+        document.getElementById('location').value = decodeURIComponent(locationParam);
+    }
+</script>
+<script>
     let suggestions={{ all_titles|safe }};
     // 
 const searchInput = document.querySelector(".searchInput");

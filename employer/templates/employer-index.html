@@ -403,6 +403,14 @@
                                                     </ul>
                                                 </div>
                                             </div>
+
+                                            <!--<div class="mt-4 mt-lg-5">
+                                                <h2>Resume</h2>
+                                                <div class="pxp-single-candidate-skills">
+                                                    <ul class="list-unstyled" id="resumeadder">
+                                                    </ul>
+                                                </div>
+                                            </div>-->
                 
                                             <div class="mt-4 mt-lg-5">
                                                 <h2>Work Experience</h2>
@@ -483,10 +491,10 @@
                     </div>
                     
                     <div class="modal-header">
-                        {% for candidate in single %}
-                        <h5><span class="fa fa-calendar"></span>&nbsp;Schedule Interview with {{candidate.name}}</h5>
-                        {% endfor %}
-                        </div>
+                        
+                        <h5><span class="fa fa-calendar"></span>&nbsp;Schedule Interview with </h5>
+                        
+                    </div>
                         <hr style="margin: 0px" />
                         <div>
                             <div class="left-pane">
@@ -501,7 +509,7 @@
                                 <input type="text" class="form-control" id="intlink" placeholder="Paste interview link" name="intlink" />
                             </div>
                             <div class="right-pane">
-                                <h6>Schedule a specific time</h6>
+                                <label class="input-label" for="datetimeInput">Schedule a specific time</label>
                                 <input type="datetime-local" name="interviewDate" id="datetimeInput" class="form-control">
                             </div>
                         </div>
@@ -585,30 +593,30 @@
                     $('#desc').text(JSON.parse(data['info'])[0].jobdesc);
                     $('#exp').text(JSON.parse(data['info'])[0].experience);
                     let salrange=JSON.parse(data['info'])[0].basicpay;
-                    if(salrange=="1")
-                    {
-                        $('#sal').text("$0 - $700");
-                    }
-                    else if(salrange=="2")
-                    {
-                        $('#sal').text("$700 - $1000");
-                    }
-                    else if(salrange=="3")
-                    {
-                        $('#sal').text("$1000 - $1200");
-                    }
-                    else if(salrange=="4")
-                    {
-                        $('#sal').text("$1200 - $1400");
-                    }
-                    else if(salrange=="5")
-                    {
-                        $('#sal').text("$1500 - $1800");
-                    }
-                    else if(salrange=="6")
-                    {
-                        $('#sal').text("$2000 - $3000");
-                    }
+                    // if(salrange=="1")
+                    // {
+                        $('#sal').text(salrange);
+                    // }
+                    // else if(salrange=="2")
+                    // {
+                    //     $('#sal').text("$700 - $1000");
+                    // }
+                    // else if(salrange=="3")
+                    // {
+                    //     $('#sal').text("$1000 - $1200");
+                    // }
+                    // else if(salrange=="4")
+                    // {
+                    //     $('#sal').text("$1200 - $1400");
+                    // }
+                    // else if(salrange=="5")
+                    // {
+                    //     $('#sal').text("$1500 - $1800");
+                    // }
+                    // else if(salrange=="6")
+                    // {
+                    //     $('#sal').text("$2000 - $3000");
+                    // }
                     $('#comna').text(JSON.parse(data['company'])[0].ename);
                     $('#indus').text(JSON.parse(data['company'])[0].industry);
                     $('#locat').text(JSON.parse(data['company'])[0].location);
@@ -711,9 +719,11 @@
                     {
                         for(let i=0;i<skil.length;i++)
                         {
-                            let ab=document.createElement('li');
-                            ab.innerHTML=skil[i];
-                            ul.append(ab);
+                            if(skil[i].length>0){
+                                let ab=document.createElement('li');
+                                ab.innerHTML=skil[i];
+                                ul.append(ab);
+                            }
                         }
                     }
                     else
@@ -722,6 +732,16 @@
                         ab.text('Not Specified');
                         ul.append(ab);
                     }
+                    let ulResume=$('#resumeadder');
+                    ulResume.empty();
+                    let lia = document.createElement('li');
+                    let resumeLink=datainfo.resumeLink;
+                    let resumea = document.createElement('a');
+                    resumea.setAttribute('href',resumeLink);
+                    resumea.setAttribute('target','_blank');
+                    resumea.text = "Resume.pdf";
+                    lia.append(resumea);
+                    ulResume.append(lia);
                     let work=JSON.parse(data['work']);
                     let bigdiv=document.getElementById('expadder');
                     bigdiv.innerHTML="";

@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
-from .models import Admin, JobSeeker, Login, Employer, ResumeAnalysis, Jobs, LikedJobs, Application, Interview, Feedback, Newsletter, Course, AllSkills, RoleDetails, Notifications, Seminars
+from .models import Admin, JobSeeker, Login, Employer, ResumeAnalysis, Jobs, LikedJobs, Application, Interview, Feedback, Newsletter, Course, AllSkills, RoleDetails, Notifications, Seminars, ScreeningQuestions
 import random
 import re
 import requests
@@ -52,6 +52,9 @@ from django.core.mail import send_mail
 from django.utils import timezone
 from django.urls import reverse
 from django.http import HttpResponse
+import json
+from scipy.sparse import save_npz, load_npz
+from io import BytesIO
 # import plotly.express as px
 
 from datetime import date, timedelta, datetime
@@ -130,7 +133,7 @@ def index(request):
                     return JsonResponse({'message': 'Y', 'url': urlval})
             else:
                 return JsonResponse({'message': 'X'})
-    
+
     jobs = Jobs.objects.all()
     typ = jobs.values('fnarea').annotate(
         Count('fnarea')).order_by('-fnarea__count')
@@ -204,9 +207,77 @@ def index(request):
         title.append(i['title'])
     for i in locations:
         locate.append(i['location'])
+    save_resume_vector_matrix_all()
     
     return render(request, 'index.html', {'locations': locations, 'titles': titles, 'title': dumps(title), 'vals': vals, 'jobs': jobs_info, 'coms': coms_info, 'loc': locate, 'total': len(jobs),'seminars':seminars_in_ascending_order})
 
+def save_resume_vector_matrix_all():
+    try:
+        vectorizer = CountVectorizer()
+        jobSeeker = JobSeeker.objects.all()
+        for job_seeker in jobSeeker:
+            try:
+                important_data_jobseeker = f"{job_seeker.location} {job_seeker.experience} {job_seeker.skills} {job_seeker.basic_edu} {job_seeker.master_edu} {job_seeker.other_qual} {job_seeker.cursal} {job_seeker.expsal} {job_seeker.notice_period}"
+                resume_pdf_file = job_seeker.Resume.path
+                resume_text = extract_text_from_pdf(resume_pdf_file)
+                job_seeker_data = preprocess_text(important_data_jobseeker)
+                resume_text = preprocess_text(resume_text)
+                total_job_seeker_data = f"{job_seeker_data}{resume_text}"
+                job_seeker_data_vector = vectorizer.fit_transform([total_job_seeker_data])
+                serialized_data = serialize_sparse_matrix(job_seeker_data_vector)
+                try:
+                    resume_analysis = ResumeAnalysis.objects.get(jobseeker_id=job_seeker)
+                    resume_analysis.sparse_matrix_data = serialized_data
+                    resume_analysis.save()
+                except:
+                    resume_analysis = ResumeAnalysis()
+                    resume_analysis.actual_skills = job_seeker.skills
+                    resume_analysis.jobseeker_id = job_seeker
+                    resume_analysis.save()
+
+            except Exception as e:
+                pass
+        # deserialized_data = deserialize_sparse_matrix(resume_analysis.sparse_matrix_data)
+        
+    except Exception as e:
+        pass
+
+def serialize_sparse_matrix(matrix):
+    buffer = BytesIO()
+    save_npz(buffer, matrix)
+    serialized_matrix = buffer.getvalue()
+
+    json_compatible_data = serialized_matrix.decode('latin1')  
+    return json_compatible_data
+
+def deserialize_sparse_matrix(serialized_data):
+    serialized_matrix = serialized_data.encode('latin1')
+
+    buffer = BytesIO(serialized_matrix)
+    matrix = load_npz(buffer)
+    return matrix
+
+def save_resume_vector_matrix(pk):
+    try:
+        vectorizer = CountVectorizer()
+        job_seeker = JobSeeker.objects.get(user_id=pk)
+        important_data_jobseeker = f"{job_seeker.location} {job_seeker.experience} {job_seeker.skills} {job_seeker.basic_edu} {job_seeker.master_edu} {job_seeker.other_qual} {job_seeker.cursal} {job_seeker.expsal} {job_seeker.notice_period}"
+        resume_pdf_file = job_seeker.Resume.path
+        resume_text = extract_text_from_pdf(resume_pdf_file)
+        job_seeker_data = preprocess_text(important_data_jobseeker)
+        resume_text = preprocess_text(resume_text)
+        total_job_seeker_data = f"{job_seeker_data}{resume_text}"
+        job_seeker_data_vector = vectorizer.fit_transform([total_job_seeker_data])
+        serialized_data = serialize_sparse_matrix(job_seeker_data_vector)
+        resume_analysis = ResumeAnalysis.objects.get(jobseeker_id=job_seeker)
+        resume_analysis.sparse_matrix_data = serialized_data
+        resume_analysis.save()
+        # deserialized_data = deserialize_sparse_matrix(resume_analysis.sparse_matrix_data)
+        
+    except Exception as e:
+        pass
+
+        
 
 def view_function(request):
     messages.add_message(request, messages.INFO, 'This is an info message')
@@ -706,11 +777,18 @@ def profile_completion(request, pk):
         request.session['name'] = empls.name
         request.session['pk'] = empls.user_id
         request.session['type'] = "c"
-        resumeanalysis = ResumeAnalysis()
-        resumeanalysis.actual_skills = all_skills
-        resumeanalysis.jobseeker_id = jobseeker
-        resumeanalysis.save()
+        try:
+            resumeanalysis = ResumeAnalysis.objects.get(jobseeker_id = jobseeker)
+            resumeanalysis.actual_skills = all_skills
+            resumeanalysis.save()
+        except:
+            resumeanalysis = ResumeAnalysis()
+            resumeanalysis.actual_skills = all_skills
+            resumeanalysis.jobseeker_id = jobseeker
+            resumeanalysis.save()
 
+        save_resume_vector_matrix_thread = threading.Thread(target=save_resume_vector_matrix, args=(pk))
+        save_resume_vector_matrix_thread.start()
         job_suggestions_email_thread = threading.Thread(target=job_suggestion_email, args=(all_skills,loger,empls,jobseeker,request))
         job_suggestions_email_thread.start()
         #job_suggestion_email(all_skills,loger,empls,jobseeker)
@@ -1101,9 +1179,9 @@ class JobMatcher:
                 matched_params += 1
 
         # Check if expected salary matches
-        if self.jobseeker.expsal and self.job.basicpay:
-            if self.jobseeker.expsal <= int(self.job.basicpay):
-                matched_params += 1
+        # if self.jobseeker.expsal and self.job.basicpay:
+        #     if self.jobseeker.expsal <= int(self.job.basicpay):
+        #         matched_params += 1
 
         # Calculate match percentage
         match_percentage = (matched_params / total_params) * 100
@@ -1114,13 +1192,14 @@ class JobMatcher:
         matching_details = {}
 
         # Check if skills match
-        if self.jobseeker.skills and self.job.skills:
-            job_skills = set(self.job.skills.lower().split(','))
-            seeker_skills = set(self.jobseeker.skills.lower().split(','))
+        if self.jobseeker.skills and self.job.skills and len(self.jobseeker.skills) > 0 and len(self.job.skills) > 0:
+            job_skills = [skill.strip() for skill in self.job.skills.lower().split(',') if skill.strip()]
+            seeker_skills = [skill.strip() for skill in self.jobseeker.skills.lower().split(',') if skill.strip()]
             matching_details['skills'] = {
-                'match': list(job_skills.intersection(seeker_skills)),
-                'not_match': list(job_skills.difference(seeker_skills))
+                'match': list(set(job_skills).intersection(set(seeker_skills))),
+                'not_match': list(set(job_skills).difference(set(seeker_skills)))
             }
+
             
 
         # Check if location matches
@@ -1142,10 +1221,10 @@ class JobMatcher:
             }
 
         # Check if expected salary matches
-        if self.jobseeker.expsal and self.job.basicpay:
-            matching_details['expected_salary'] = {
-                'match': True if self.jobseeker.expsal <= int(self.job.basicpay) else False
-            }
+        # if self.jobseeker.expsal and self.job.basicpay:
+        #     matching_details['expected_salary'] = {
+        #         'match': True if self.jobseeker.expsal <= int(self.job.basicpay) else False
+        #     }
 
         return matching_details
 
@@ -1187,6 +1266,8 @@ def singleseminar(request,pk1):
     except:
         pass
     speakers = [speaker.strip() for speaker in sem.speaker.split(',')]
+    # print(sem.speaker,sem.speaker.split(','),speakers)
+
 
     return render(request,'singleseminar.html',{'seminar_details':singlesem,'speakers':speakers})
 
@@ -1234,14 +1315,20 @@ def singlejob(request, pk2):
     for i in jobdet.responsibilities.split("\n"):
         responsibilities.append(i)
     quality = "Please login to check eligibility"
+    skills_e = [skill.strip() for skill in jobdet.skills.split(',')]
     if 'pk' in request.session:
         try:
             cand = JobSeeker.objects.get(user_id=request.session['pk'])
         except:
-            cand = Employer.objects.get(eid=request.session['pk'])
-            
+            try:
+                cand = Employer.objects.get(eid=request.session['pk'])
+            except:
+                cand = Admin.objects.get(aid=request.session['pk'])
+        # skills_e = [skill.strip() for skill in jobdet.skills.split(',')]
         if cand.log_id.user_type == "employer":
-            return render(request, 'singlejob.html', {'job_details': jobdet, 'company_details': companydet, 'liked': lik, 'loger': loger, 'skills': skills, 'requirements': requirements, 'responsibilities': responsibilities, 'date': app_date, 'score': 'X'})
+            return render(request, 'singlejob.html', {'job_details': jobdet, 'company_details': companydet, 'liked': lik, 'loger': loger, 'skills': skills_e, 'requirements': requirements, 'responsibilities': responsibilities, 'date': app_date, 'score': 'X'})
+        if cand.log_id.user_type == "admin":
+            return render(request, 'singlejob.html', {'job_details': jobdet, 'company_details': companydet, 'liked': lik, 'loger': loger, 'skills': skills_e, 'requirements': requirements, 'responsibilities': responsibilities, 'date': app_date, 'score': 'X'})
         for i in skills:
             for j in cand.skills.split(","):
                 if j not in i:
@@ -1251,7 +1338,7 @@ def singlejob(request, pk2):
             pdfFileObj = open("static/media/"+str(cand.Resume), 'rb')
             pdfReader = PyPDF2.PdfReader(pdfFileObj)
         except:
-            return render(request, 'singlejob.html', {'job_details': jobdet, 'company_details': companydet, 'liked': lik, 'loger': loger, 'skills': skills, 'requirements': requirements, 'responsibilities': responsibilities, 'date': app_date, 'score': 'Please submit your resume', 'skills_required': skills_required})
+            return render(request, 'singlejob.html', {'job_details': jobdet, 'company_details': companydet, 'liked': lik, 'loger': loger, 'skills': skills_e, 'requirements': requirements, 'responsibilities': responsibilities, 'date': app_date, 'score': 'Please submit your resume', 'skills_required': skills_required})
         num_pages = len(pdfReader.pages)
         count = 0
         text = ""
@@ -1351,7 +1438,13 @@ def singlejob(request, pk2):
     else:
         job_matching_percentage = "Please login to check eligibility"
         matching_details = "No"
-    return render(request, 'singlejob.html', {'job_details': jobdet, 'company_details': companydet, 'liked': lik, 'loger': loger, 'skills': skills, 'requirements': requirements, 'responsibilities': responsibilities, 'date': app_date, 'score': job_matching_percentage, 'skills_required': skills_required,'matching_details': matching_details})
+    screening_questions = ''
+    try:
+        screening_questions = ScreeningQuestions.objects.get(job_id = pk2)
+    except:
+        pass
+
+    return render(request, 'singlejob.html', {'job_details': jobdet, 'company_details': companydet, 'liked': lik, 'loger': loger, 'skills': skills_e, 'requirements': requirements, 'responsibilities': responsibilities, 'date': app_date, 'score': job_matching_percentage, 'skills_required': skills_required,'matching_details': matching_details,'screening_questions':screening_questions})
 
 
     
@@ -1520,7 +1613,8 @@ def get_job(request):
         applic.status = 0
         applic.job_id = Jobs.objects.get(jobid=request.POST['id'])
         applic.eid = applic.job_id.eid
-        applic.why_desc = request.POST['whyhire']
+        applic.screening_answer_one = request.POST['answer1']
+        applic.screening_answer_two = request.POST['answer2']
         applic.date_applied = timezone.localtime() 
         # + timedelta(hours=5, minutes=30)
         applic.save()

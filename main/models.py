@@ -144,6 +144,9 @@ class ExperienceJob(models.Model):
     company = models.CharField(max_length=200, default=None, null=True)
     time_period = models.CharField(max_length=50, default=None, null=True)
     description = models.CharField(max_length=500, default=None, null=True)
+    experience_month = models.IntegerField(null=True)
+    experience_year = models.IntegerField(null=True)
+
 
     class Meta:
         db_table = "experiencejob"
@@ -160,6 +163,18 @@ class Education(models.Model):
 
     class Meta:
         db_table = "education"
+
+class Training(models.Model):
+    training_id = models.AutoField(primary_key=True)
+    user_id = models.ForeignKey(
+        JobSeeker, default=None, null=True, on_delete=models.CASCADE)
+    title = models.CharField(max_length=100, default=None, null=True)
+    organization = models.CharField(max_length=200, default=None, null=True)
+    time_period = models.CharField(max_length=50, default=None, null=True)
+    description = models.CharField(max_length=500, default=None, null=True)
+
+    class Meta:
+        db_table = "training"
 
 
 class ProfileVisits(models.Model):
@@ -218,6 +233,7 @@ class ResumeAnalysis(models.Model):
     reco_courses = models.CharField(max_length=1000, default=None, null=True)
     recommendations = models.CharField(
         max_length=1000, default=None, null=True)
+    sparse_matrix_data = models.TextField(default=None, null=True)
 
     class Meta:
         db_table = "resumeanalysis"
@@ -269,9 +285,16 @@ class TestQues(models.Model):
     correct = models.IntegerField()
     images = models.ImageField(upload_to='test_images/', default=None, null=True)
 
-
     class Meta:
         db_table = "testques"
+
+class ScreeningQuestions(models.Model):
+    screening_ques_id = models.AutoField(primary_key=True)
+    job_id = models.ForeignKey(Jobs, default=None, null=True, on_delete=models.CASCADE)
+    question_one = models.TextField(default=None,null=True)
+    question_two = models.TextField(default=None,null=True)
+    class Meta:
+        db_table = "ScreeningQuestions"
 
 class Application(models.Model):
     apply_id = models.AutoField(primary_key=True)
@@ -281,6 +304,9 @@ class Application(models.Model):
                             null=True, on_delete=models.CASCADE)
     job_id = models.ForeignKey(
         Jobs, default=None, null=True, on_delete=models.CASCADE)
+    screeningquestions_id = models.ForeignKey(ScreeningQuestions,default=None,null=True,on_delete=models.CASCADE)
+    screening_answer_one = models.TextField(default=None,null=True)
+    screening_answer_two = models.TextField(default=None,null=True)
     status = models.IntegerField(default=None, null=True)
     date_applied = models.DateTimeField(default=timezone.now)
     test = models.ForeignKey(TestInfo, default=None,
@@ -515,4 +541,10 @@ class CandidateStepProgress(models.Model):
 
     class Meta:
         db_table = "candidatestepprogress"
+
+
+
+
+
+
 

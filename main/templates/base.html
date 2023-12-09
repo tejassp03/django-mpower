@@ -302,19 +302,32 @@
                     <hr style="margin: 0px" />
                     <div class="modal-body" style="padding: 1rem !important">
                         <div class="pxp-company-dashboard-jobs-bulk-actions">
-                            <div id="whyhire">
+                            <div id="whyhire" style="width: 200%;" >
                                 <input name="jobidval" style="display: none" />
-                                <label for="pxp-company-job-description" class="form-label">Why should we hire you?</label>
-                                <textarea class="form-control" rows=10 cols=70 id="pxp-company-job-description" placeholder="Mention about your skills, experiences, etc" name="whyhire" minlength=50></textarea>
+                                {% if screening_questions %}
+                                {% if screening_questions.question_one %}
+                                <label class="font-weight-bold text-break" for="question1" style="font-weight:bold;">Q1. {{screening_questions.question_one}}</label>
+                                <textarea id="answer1" name="answer1" class="form-control" style="width: 100%;" placeholder="write your response here...." required></textarea><br> 
+                                {% endif %}
+                                {% if screening_questions.question_two %}
+                                <label class="font-weight-bold text-break" for="question2" style="font-weight:bold;">Q2. {{screening_questions.question_two}}</label>
+                                <textarea id="answer2" name="answer2" class="form-control" style="width: 100%;" placeholder="write your response here...." required></textarea>
+                                {% endif %}
+                                {%else%}
+                                <textarea id="answer1" name="answer1" class="form-control" style="display: none;" placeholder="write your response here...." ></textarea>
+                                <textarea id="answer2" name="answer2" class="form-control" style="display: none;" placeholder="write your response here...." ></textarea>
+
+                                <h5 class="d-flex justify-content-center">Confirm to apply for job.</h5>
+                                {%endif%}
                             </div>
                         </div>
                     </div>
                     <hr style="margin: 0px" />
-                    <div class="modal-header" style="padding: 10px">
-                        <a class="btn rounded-pill pxp-nav-btn" onclick="applics()">Submit</a>
+                    <div class="modal-header d-flex justify-content-center" style="padding: 10px">
+                        <a class="btn rounded-pill pxp-nav-btn " onclick="applics()">{% if screening_questions%}Submit{%else%}Confirm{%endif%}</a>
                     </div>
-                    <div class="modal-header" id="spanadder">
-                    </div>
+                    <!--<div class="modal-header" id="spanadder">
+                    </div>-->
                 </div>
             </div>
         </div>
@@ -538,10 +551,18 @@
 
             function applics()
             {
-                if($('[name=whyhire]').val()=="")
+                let isScreeningAnswer = '{{screening_questions}}';
+                if(isScreeningAnswer){
+                if($('[name=answer1]').val()=="")
                 {
-                    alert("Please answer the question");
+                    alert("Please answer the question Q1.");
                     return;
+                }
+                if($('[name=answer2]').val()=="")
+                {
+                    alert("Please answer the question Q2.");
+                    return;
+                }
                 }
                 $.ajax(
                     {
@@ -549,7 +570,8 @@
                         url: "{% url 'main:get_job' %}",
                         data:{
                             id: $('[name=jobidval]').val(),
-                            whyhire: $('[name=whyhire]').val(),
+                            answer1: $('[name=answer1]').val(),
+                            answer2: $('[name=answer2]').val(),
                             csrfmiddlewaretoken: '{{ csrf_token }}'
                         },
                         success: function( data ) 

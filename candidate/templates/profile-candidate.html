@@ -69,7 +69,7 @@
                     <div class="col-sm-6">
                         <div class="mb-3">
                             <label for="pxp-candidate-phone" class="form-label">Phone</label>
-                            <input type="tel" id="pxp-candidate-phone" class="form-control" placeholder="(+12) 345 6789" name="phone" value="{{ user.phone }}">
+                            <input type="tel" id="pxp-candidate-phone" class="form-control" placeholder="(+12) 345 6789" name="phone" value="{% with phone_without_country_code=user.phone|slice:"3:" %}{{ phone_without_country_code }}{% endwith %}">
                             <a class="btn rounded-pill pxp-subsection-cta action-but3">Get OTP</a>
                         </div>
                     </div>
@@ -113,11 +113,51 @@
                                     {% for i in  skills_ %}
                                        <option value="{{i.skill}}">{{i.skill}}</option>
                                     {% endfor %} 
-                                </select>
+            </select>
                 <!--<input type="text" class="form-control" placeholder="Skill" name="skill">-->
                 <button type="submit" class="btn skilladder">Add Skill</button>
             </div>
         </div>
+        <div class="mt-4 mt-lg-5">
+            <h2>Salary</h2>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label for="pxp-candidate-current-salary" class="form-label">Current Salary</label>
+                        <input type="text" id="pxp-candidate-current-salary" class="form-control" placeholder="E.g. 1000000" name="curSal" value="{{ user.cursal }}">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label for="pxp-candidate-expected-salary" class="form-label">Expected Salary</label>
+                        <input type="text" id="pxp-candidate-expected-salary" class="form-control" placeholder="E.g. 2000000" name="expSal" value="{{ user.expsal }}">
+                    </div>
+                </div>
+            </div>
+            <button class="btn rounded-pill pxp-subsection-cta updateSal">Update Salary</button>
+
+        </div>
+        <div class="mt-4 mt-lg-5">
+            <h2>Resume</h2>
+            <div class="row">
+                <div class="col-md-6 col-xxl-3">
+                    <div class="mb-3">
+                        <label for="pxp-company-job-salary" title = "Upload Job Description"class="form-label job-label">Job Description</label>
+                        <input type="file" id="pxp-candidate-cover-choose-file2" accept="application/pdf" name="jobDescriptionFile">
+                        <label for="pxp-candidate-cover-choose-file2" id="pxp-cover-hover"class="pxp-cover" style="height:7.3vh;"><span class="spanJobDesc">Upload Job Description (size < 2MB)</span></label>
+                    </div>
+                </div>
+                <div class="col-md-6 col-xxl-3">
+                    <div class="mb-3">
+                        <label for="pxp-company-job-description" title = "Job Description file"class="form-label preview-label">Previous File</label>
+                        <a href="{{ user.Resume.url }}" target="_blank"  id="pxp-company-job-description" class="form-control btn btn-primary file-link pxp-cover">{{extracted_name}}</a>
+                    </div>
+                </div>
+            </div>
+            <button class="btn rounded-pill pxp-subsection-cta uploadResume">Upload</button>
+
+        </div>
+
 
         <div class="mt-4 mt-lg-5">
             <h2>Work Experience</h2>
@@ -160,6 +200,30 @@
                         <input type="text" id="pxp-candidate-work-time" class="form-control" placeholder="E.g. 2005 - 2013" name="time_period">
                     </div>
                 </div>
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label for="pxp-company-job-category" class="form-label">Experience duration</label>
+                     <select id="pxp-company-job-category" class="form-select notnormal" name="expMonth">
+                                <option disabled selected>--Months--</option>
+                            {% for i in numbersMonth %}
+                                <option>{{ i }}</option>
+                            {% endfor %}  
+                        </select>
+                    </div>
+                
+                </div>
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label for="pxp-company-job-category" class="form-label">&nbsp</label>
+                     <select id="pxp-company-job-category" class="form-select notnormal" name="expYear">
+                                <option disabled selected>--Years--</option>
+                            {% for i in numbersYear %}
+                                <option>{{ i }}</option>
+                            {% endfor %}  
+                        </select>
+                    </div>
+                
+                </div>
             </div>
             <div class="mb-3">
                 <label for="pxp-candidate-work-about" class="form-label">Description</label>
@@ -169,7 +233,7 @@
         </div>
 
         <div class="mt-4 mt-lg-5">
-            <h2>Education & Training</h2>
+            <h2>Education</h2>
             <div class="table-responsive">
                 <table class="table align-middle">
                     {% for i in education %}
@@ -215,6 +279,54 @@
                 <textarea class="form-control pxp-smaller" id="pxp-candidate-edu-about" placeholder="Type a short description here..."  name="desc"></textarea>
             </div>
             <button class="btn rounded-pill pxp-subsection-cta addedu">Add Education</button>
+        </div>
+        <div class="mt-4 mt-lg-5">
+            <h2>Training & Certifications</h2>
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    {% for i in training %}
+                    <tr>
+                        <td style="width: 30%;"><div class="pxp-candidate-dashboard-experience-title">{{ i.title }}</div></td>
+                        <td style="width: 25%;"><div class="pxp-candidate-dashboard-experience-school">{{ i.organization }}</div></td>
+                        <td style="width: 25%;"><div class="pxp-candidate-dashboard-experience-time">{{ i.time_period }}</div></td>
+                        <td>
+                            <div class="pxp-dashboard-table-options">
+                                <ul class="list-unstyled">
+                                    <li><button type="button" title="Edit" id="pxp-edu-modal-button" data-bs-target="#pxp-training-modal" data-bs-toggle="modal" onclick="trainingModal('{{i.training_id}}')"><span class="fa fa-pencil"></span></button></li>
+                                    <li><button title="Delete" class="delete_training"><input style="display: none" value={{ i.training_id }} /><span class="fa fa-trash-o"></span></button></li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+
+            <div class="row mt-3 mt-lg-4">
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label for="pxp-candidate-edu-title" class="form-label">Title</label>
+                        <input type="text" id="pxp-candidate-training-title" class="form-control" placeholder="E.g. Android Development.." name="training_title">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label for="pxp-candidate-edu-school" class="form-label">Issuing Organization</label>
+                        <input type="text" id="pxp-candidate-training-org" class="form-control" placeholder="E.g. Stanford Online, Coursera..." name="organization">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label for="pxp-candidate-edu-time" class="form-label">Time period</label>
+                        <input type="text" id="pxp-candidate-training-time" class="form-control" placeholder="E.g. 2005 - 2013"  name="period_training">
+                    </div>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label for="pxp-candidate-edu-about" class="form-label">Description</label>
+                <textarea class="form-control pxp-smaller" id="pxp-candidate-edu-about" placeholder="Type a short description here..."  name="descTraining"></textarea>
+            </div>
+            <button class="btn rounded-pill pxp-subsection-cta addtraining">Add Certificate</button>
         </div>
 
         <div class="mt-4 mt-lg-5">
@@ -296,6 +408,28 @@
                             <input type="text" id="pxp-candidate-work-time" class="form-control" placeholder="E.g. 2005 - 2013" name="time_periodm">
                         </div>
                     </div>
+                    <div class="col-md-4">
+                    <div class="mb-3">
+                        <label for="pxp-company-job-category" class="form-label">Experience duration</label>
+                     <select id="pxp-company-job-category" class="form-select notnormal" name="expMonthm">
+                            {% for i in numbersMonth %}
+                                <option>{{ i }}</option>
+                            {% endfor %}  
+                        </select>
+                    </div>
+                
+                </div>
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label for="pxp-company-job-category" class="form-label">&nbsp</label>
+                     <select id="pxp-company-job-category" class="form-select notnormal" name="expYearm">
+                            {% for i in numbersYear %}
+                                <option>{{ i }}</option>
+                            {% endfor %}  
+                        </select>
+                    </div>
+                
+                </div>
                 </div>
                 <div class="mb-3">
                     <label for="pxp-candidate-work-about" class="form-label">Description</label>
@@ -347,6 +481,44 @@
     </div>
 </div>
 
+<div class="modal fade pxp-user-modal" id="pxp-training-modal" aria-hidden="true" aria-labelledby="trainingModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered" style="
+    display: flex;
+    align-items: center;
+    justify-content: center;">
+        <div class="modal-content" style="width: 100vw; display: flex; flex-direction: row; align-items: center">
+            <div class="modal-body" style="width: 60vw; padding: 15px 15px !important">
+                <div class="row mt-3 mt-lg-4">
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label for="pxp-candidate-training-title" class="form-label">Title</label>
+                            <input type="text" id="pxp-candidate-training-title" class="form-control" placeholder="E.g. Android Development" name="training_titlem">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label for="pxp-candidate-training-organization" class="form-label">Issuing Organization</label>
+                            <input type="text" id="pxp-candidate-training-organization" class="form-control" placeholder="E.g. Stanford online, Coursera" name="organizationm">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label for="pxp-candidate-training-time" class="form-label">Time period</label>
+                            <input type="text" id="pxp-candidate-training-time" class="form-control" placeholder="E.g. 2005 - 2013"  name="period_trainingm">
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="pxp-candidate-training-about" class="form-label">Description</label>
+                    <textarea class="form-control pxp-smaller" id="pxp-candidate-training-about" placeholder="Type a short description here..."  name="desctrainingm"></textarea>
+                </div>
+                <input style="display: none" name="trainingidm">
+                <button class="btn rounded-pill pxp-subsection-cta" onclick="trainingmodalsub()">Edit Certificate</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="modal fade pxp-otp-modal" id="pxp-otp-modal" aria-hidden="true" aria-labelledby="otpModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -365,6 +537,7 @@
 {% endblock content %}
 
 {% block script %}
+
 let ab=0;
 $('.skilladder').click(function(e){
     e.preventDefault()
@@ -392,6 +565,8 @@ $('.addexper').click(function(e){
                 title: $('[name="job_title"]').val(),
                 company: $('[name="company"]').val(),
                 time_period: $('[name="time_period"]').val(),
+                exp_month: $('[name="expMonth"]').val(),
+                exp_year: $('[name="expYear"]').val(),
                 description: $('[name="description"]').val(),
                 csrfmiddlewaretoken: '{{ csrf_token }}'
         },
@@ -401,6 +576,48 @@ $('.addexper').click(function(e){
         }
      })
 })
+
+$('.updateSal').click(function(e){
+    e.preventDefault()
+    $.ajax(
+    {
+        type:"POST",
+        url: "{% url 'candidate:update_salary' pk %}",
+        data:{
+                cursal: $('[name="curSal"]').val(),
+                expsal: $('[name="expSal"]').val(),
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+        },
+        success: function( data ) 
+        {
+           window.location.reload();
+        }
+     })
+})
+
+$('.uploadResume').click(function(e){
+    e.preventDefault();
+
+    var formData = new FormData();
+    var fileInput = document.getElementById('pxp-candidate-cover-choose-file2').files[0]; 
+
+    formData.append('resume', fileInput);
+
+    formData.append('csrfmiddlewaretoken', '{{ csrf_token }}'); 
+
+    $.ajax({
+        type: "POST",
+        url: "{% url 'candidate:upload_resume' pk %}",
+        data: formData,
+        processData: false,
+        contentType: false, 
+        success: function(data) {
+            window.location.reload();
+        }
+    });
+});
+
+
 $('.addedu').click(function(e){
     e.preventDefault()
     $.ajax(
@@ -412,6 +629,25 @@ $('.addedu').click(function(e){
                 school: $('[name="school"]').val(),
                 period_edu: $('[name="period_edu"]').val(),
                 desc: $('[name="desc"]').val(),
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+        },
+        success: function( data ) 
+        {
+           window.location.reload();
+        }
+     })
+})
+$('.addtraining').click(function(e){
+    e.preventDefault()
+    $.ajax(
+    {
+        type:"POST",
+        url: "add_training/",
+        data:{
+                title: $('[name="training_title"]').val(),
+                organization: $('[name="organization"]').val(),
+                period_training: $('[name="period_training"]').val(),
+                desc: $('[name="descTraining"]').val(),
                 csrfmiddlewaretoken: '{{ csrf_token }}'
         },
         success: function( data ) 
@@ -469,6 +705,23 @@ $('.delete_edu').click(function(e){
      })
 })
 
+$('.delete_training').click(function(e){
+    e.preventDefault()
+    $.ajax(
+    {
+        type:"POST",
+        url: "delete_training/",
+        data:{
+                id: $(this).children()[0].value,
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+        },
+        success: function( data ) 
+        {
+           window.location.reload();
+        }
+     })
+})
+
 
 function expmodal(id)
 {
@@ -481,8 +734,13 @@ function expmodal(id)
         },
         success: function( data ) 
         {
+            $('[name="expMonthm"]').val(JSON.parse(data['info'])[0].experience_month); // Selecting the option with value equal to expMonth
+            $('[name="expYearm"]').val(JSON.parse(data['info'])[0].experience_year); // Selecting the option with value equal to expYear
+
             $('[name="expidm"]').val(JSON.parse(data['info'])[0].exp_id);
             $('[name="job_titlem"]').val(JSON.parse(data['info'])[0].job_title);
+            // $('[name="expMonthm"]').val(JSON.parse(data['numbersMonth'])[0]);
+            // $('[name="expYearm"]').val(JSON.parse(data['numbersYear'])[0]);
             $('[name="companym"]').val(JSON.parse(data['info'])[0].company);
             $('[name="time_periodm"]').val(JSON.parse(data['info'])[0].time_period);
             $('[name="descriptionm"]').val(JSON.parse(data['info'])[0].description);
@@ -501,12 +759,15 @@ function expmodalsub()
                 job_title: $('[name="job_titlem"]').val(),
                 company: $('[name="companym"]').val(),
                 time_period: $('[name="time_periodm"]').val(),
+                experience_month : $('[name="expMonthm"]').val(),
+                experience_year : $('[name="expYearm"]').val(),
                 description: $('[name="descriptionm"]').val(),
                 csrfmiddlewaretoken: '{{ csrf_token }}'
         },
         success: function( data ) 
         {
            alert("Data updated successfully");
+           window.location.reload();
         }
     })
 }
@@ -530,6 +791,25 @@ function edumodal(id)
         }
     })
 }
+function trainingModal(id)
+{
+    $.ajax(
+    {
+        type:"GET",
+        url: "{% url 'candidate:edit_training' pk=pk %}",
+        data:{
+                trainingid: id
+        },
+        success: function( data ) 
+        {
+            $('[name="trainingidm"]').val(JSON.parse(data['info'])[0].training_id);
+            $('[name="training_titlem"]').val(JSON.parse(data['info'])[0].title);
+            $('[name="organizationm"]').val(JSON.parse(data['info'])[0].organization);
+            $('[name="period_trainingm"]').val(JSON.parse(data['info'])[0].time_period);
+            $('[name="desctrainingm"]').val(JSON.parse(data['info'])[0].description);
+        }
+    })
+}
 
 function edumodalsub()
 {
@@ -548,6 +828,29 @@ function edumodalsub()
         success: function( data ) 
         {
             alert("Data updated successfully");
+            window.location.reload();
+        }
+    })
+}
+
+function trainingmodalsub()
+{
+    $.ajax(
+    {
+        type:"POST",
+        url: "{% url 'candidate:edit_training' pk=pk %}",
+        data:{
+                trainingid: $('[name="trainingidm"]').val(),
+                title: $('[name="training_titlem"]').val(),
+                organization: $('[name="organizationm"]').val(),
+                time_period: $('[name="period_trainingm"]').val(),
+                description: $('[name="desctrainingm"]').val(),
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+        },
+        success: function( data ) 
+        {
+            alert("Data updated successfully");
+            window.location.reload();
         }
     })
 }
@@ -576,6 +879,12 @@ $(document).ready(function () {
     $('#ins').removeClass('pxp-active');
     $('#jch').removeClass('pxp-active');
     $('#pla').removeClass('pxp-active');
+    // var filename = "{{ user.Resume.url }}"; 
+    // var file_name = filename.split('/').pop();
+    // var final_file_name = file_name.split('_').pop();
+    // console.log(final_file_name);
+
+    // $('.file-link').text(final_file_name);
 })
 
 

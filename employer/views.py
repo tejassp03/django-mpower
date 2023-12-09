@@ -31,6 +31,11 @@ import os
 from django.views.decorators.csrf import csrf_exempt
 import random
 import threading
+import json
+from scipy.sparse import save_npz, load_npz
+from io import BytesIO
+from sklearn.decomposition import PCA
+from sklearn.decomposition import TruncatedSVD
 # Create your views here.
 
 
@@ -248,10 +253,16 @@ def dashboard(request, pk):
     # print(charts_context)
     return render(request, 'dashboard-employer.html', {'pk': pk, 'nums': nums, 'notifics': all_notis, 'recent': recent_mess_temp, 'candi': finalrecent, 'charts': charts_context, 'counts': counts,'jobs_':jobs_})
 
+def deserialize_sparse_matrix(serialized_data):
+    serialized_matrix = serialized_data.encode('latin1')
 
+    buffer = BytesIO(serialized_matrix)
+    matrix = load_npz(buffer)
+    return matrix
 
 def newjob(request, pk):
     if (request.method == "POST"):
+        print(request.POST['question1'],request.POST['question2'])
         job = Jobs()
         job.eid = Employer.objects.get(eid=pk)
         job.title = request.POST['title']
@@ -261,7 +272,7 @@ def newjob(request, pk):
         job.experience = request.POST['experience']
         job.careerlevel = request.POST['careerlevel']
         job.jobtype = request.POST['jobtype']
-        job.basicpay = request.POST['basicpay']
+        job.basicpay = request.POST['basicpay'] +" "+request.POST['basicpaySuffix']
         skills = request.POST.getlist('skills')
         all_skills = ""
         for i in skills:
@@ -285,6 +296,13 @@ def newjob(request, pk):
         except:
             filev = None
         job.save()
+        screening_questions = ScreeningQuestions()
+        screening_questions.job_id = job
+        screening_questions.question_one = request.POST['question1']
+        screening_questions.question_two = request.POST['question2']
+        screening_questions.save()
+
+
         job_id = job.jobid
         candid = []
         jobid = job_id
@@ -295,41 +313,40 @@ def newjob(request, pk):
                     send = True
                 job_.status = 5
                 job_.save()
+                vectorizer = CountVectorizer()
                 matching_percentages = []
+                important_data_jobs = f"{job_.title} {job_.jobdesc} {job_.fnarea} {job_.skills} {job_.experience} {job_.basicpay} {job_.location} {job_.industry} {job_.ugqual} {job_.pgqual} {job_.profile} {job_.jobtype} {job_.requirements} {job_.responsibilities} {job_.notice_period}"
+                job_description = preprocess_text(important_data_jobs)
+                total_job_desc_data = f"{job_description}"
+                job_description_vector = vectorizer.fit_transform([total_job_desc_data])
+                try:
+                    job_desc_file = job_.job_desc.path
+                    job_text = extract_text_from_pdf(job_desc_file)
+                    total_job_desc_data = f"{job_description}{job_text}"
+                except:
+                    pass
                 for job_seeker in JobSeeker.objects.all():
-                    important_data_jobs = f"{job_.title} {job_.jobdesc} {job_.fnarea} {job_.skills} {job_.experience} {job_.basicpay} {job_.location} {job_.industry} {job_.ugqual} {job_.pgqual} {job_.profile} {job_.jobtype} {job_.requirements} {job_.responsibilities} {job_.notice_period}"
-                    job_description = preprocess_text(important_data_jobs)
-                    total_job_desc_data = f"{job_description}"
                     try:
-                        job_desc_file = job_.job_desc.path
-                        job_text = extract_text_from_pdf(job_desc_file)
-                        total_job_desc_data = f"{job_description}{job_text}"
-                    except:
-                        pass
-                    important_data_jobseeker = f"{job_seeker.location} {job_seeker.experience} {job_seeker.skills} {job_seeker.basic_edu} {job_seeker.master_edu} {job_seeker.other_qual} {job_seeker.cursal} {job_seeker.expsal} {job_seeker.notice_period}"
-                    job_seeker_data = preprocess_text(important_data_jobseeker)
-                    try:
-                        resume_pdf_file = job_seeker.Resume.path
-                        resume_text = extract_text_from_pdf(resume_pdf_file)
-                    except:
-                        resume_text = ""
+                        resume_analysis = ResumeAnalysis.objects.get(jobseeker_id=job_seeker)
+                        job_seeker_data_vector = deserialize_sparse_matrix(resume_analysis.sparse_matrix_data)
+                        job_seeker_dimensions = job_seeker_data_vector.shape[1]
+                        job_description_dimensions = job_description_vector.shape[1]
+                        min_dimensions = min(job_seeker_dimensions, job_description_dimensions)
+                        job_seeker_data_vector_trimmed = job_seeker_data_vector[:, :min_dimensions]
+                        job_description_vector_trimmed = job_description_vector[:, :min_dimensions]
+                        cosine_sim_job_seeker = cosine_similarity(job_description_vector_trimmed, job_seeker_data_vector_trimmed)
 
-                    resume_text = preprocess_text(resume_text)
-                    total_job_seeker_data = f"{job_seeker_data}{resume_text}"
-                    vectorizer = CountVectorizer()
-
-                    job_description_vector = vectorizer.fit_transform([total_job_desc_data])
-                    job_seeker_data_vector = vectorizer.transform([total_job_seeker_data])
-                    cosine_sim_job_seeker = cosine_similarity(job_description_vector, job_seeker_data_vector)
-
-                    job_matching_percentage = round(cosine_sim_job_seeker[0][0] * 100, 2)
-                    job_matcher = JobMatcher(jobseeker=job_seeker, job=job_)
-                    match_percentage = job_matcher.calculate_match_percentage()
-                    total_matching_percentage = round((job_matching_percentage + match_percentage) / 2, 2)
-                    matching_percentages.append((job_seeker.user_id, total_matching_percentage))
-                    matching_percentages.sort(key=lambda x: x[1], reverse=True)
+                        job_matching_percentage = round(cosine_sim_job_seeker[0][0] * 100, 2)
+                        job_matcher = JobMatcher(jobseeker=job_seeker, job=job_)
+                        match_percentage = job_matcher.calculate_match_percentage()
+                        total_matching_percentage = round((job_matching_percentage + match_percentage + 40) / 2, 2)
+                        matching_percentages.append((job_seeker.user_id, total_matching_percentage))
+                    except Exception as e:
+                        print(e)
+                matching_percentages.sort(key=lambda x: x[1], reverse=True)
 
                 top_matching_job_seekers = matching_percentages[:20]
+                # print(top_matching_job_seekers)
                 if(send):
                     email_thread = threading.Thread(target=send_email_newjob, args=(top_matching_job_seekers,job_.eid.log_id.email))
                     email_thread.start()
@@ -362,9 +379,25 @@ def newjob(request, pk):
         return JsonResponse(data_)
     if 'shower' in request.session:
         del request.session['shower']
+
+    cities = ['Adilabad', 'Agra', 'Ahmedabad', 'Ahmednagar', 'Aizawl', 'Ajitgarh (Mohali)', 'Ajmer', 'Akola', 'Alappuzha', 'Aligarh', 'Alirajpur', 'Allahabad', 'Almora', 'Alwar', 'Ambala', 'Ambedkar Nagar', 'Amravati', 'Amreli district', 'Amritsar', 'Anand', 'Anantapur', 'Anantnag', 'Angul', 'Anjaw', 'Anuppur', 'Araria', 'Ariyalur', 'Arwal', 'Ashok Nagar', 'Auraiya', 'Aurangabad', 'Aurangabad', 'Azamgarh', 'Badgam', 'Bagalkot', 'Bageshwar', 'Bagpat', 'Bahraich', 'Baksa', 'Balaghat', 'Balangir', 'Balasore', 'Ballia', 'Balrampur', 'Banaskantha', 'Banda', 'Bandipora', 'Bangalore Rural', 'Bangalore Urban', 'Banka', 'Bankura', 'Banswara', 'Barabanki', 'Baramulla', 'Baran', 'Bardhaman', 'Bareilly', 'Bargarh (Baragarh)', 'Barmer', 'Barnala', 'Barpeta', 'Barwani', 'Bastar', 'Basti', 'Bathinda', 'Beed', 'Begusarai', 'Belgaum', 'Bellary', 'Betul', 'Bhadrak', 'Bhagalpur', 'Bhandara', 'Bharatpur', 'Bharuch', 'Bhavnagar', 'Bhilwara', 'Bhind', 'Bhiwani', 'Bhojpur', 'Bhopal', 'Bidar', 'Bijapur', 'Bijapur', 'Bijnor', 'Bikaner', 'Bilaspur', 'Bilaspur', 'Birbhum', 'Bishnupur', 'Bokaro', 'Bongaigaon', 'Boudh (Bauda)', 'Budaun', 'Bulandshahr', 'Buldhana', 'Bundi', 'Burhanpur', 'Buxar', 'Cachar', 'Central Delhi', 'Chamarajnagar', 'Chamba', 'Chamoli', 'Champawat', 'Champhai', 'Chandauli', 'Chandel', 'Chandigarh', 'Chandrapur', 'Changlang', 'Chatra', 'Chennai', 'Chhatarpur', 'Chhatrapati Shahuji Maharaj Nagar', 'Chhindwara', 'Chikkaballapur', 'Chikkamagaluru', 'Chirang', 'Chitradurga', 'Chitrakoot', 'Chittoor', 'Chittorgarh', 'Churachandpur', 'Churu', 'Coimbatore', 'Cooch Behar', 'Cuddalore', 'Cuttack', 'Dadra and Nagar Haveli', 'Dahod', 'Dakshin Dinajpur', 'Dakshina Kannada', 'Daman', 'Damoh', 'Dantewada', 'Darbhanga', 'Darjeeling', 'Darrang', 'Datia', 'Dausa', 'Davanagere', 'Debagarh (Deogarh)', 'Dehradun', 'Deoghar', 'Deoria', 'Dewas', 'Dhalai', 'Dhamtari', 'Dhanbad', 'Dhar', 'Dharmapuri', 'Dharwad', 'Dhemaji', 'Dhenkanal', 'Dholpur', 'Dhubri', 'Dhule', 'Dibang Valley', 'Dibrugarh', 'Dima Hasao', 'Dimapur', 'Dindigul', 'Dindori', 'Diu', 'Doda', 'Dumka', 'Dungapur', 'Durg', 'East Champaran', 'East Delhi', 'East Garo Hills', 'East Khasi Hills', 'East Siang', 'East Sikkim', 'East Singhbhum', 'Eluru', 'Ernakulam', 'Erode', 'Etah', 'Etawah', 'Faizabad', 'Faridabad', 'Faridkot', 'Farrukhabad', 'Fatehabad', 'Fatehgarh Sahib', 'Fatehpur', 'Fazilka', 'Firozabad', 'Firozpur', 'Gadag', 'Gadchiroli', 'Gajapati', 'Ganderbal', 'Gandhinagar', 'Ganganagar', 'Ganjam', 'Garhwa', 'Gautam Buddh Nagar', 'Gaya', 'Ghaziabad', 'Ghazipur', 'Giridih', 'Goalpara', 'Godda', 'Golaghat', 'Gonda', 'Gondia', 'Gopalganj', 'Gorakhpur', 'Gulbarga', 'Gumla', 'Guna', 'Guntur', 'Gurdaspur', 'Gurgaon', 'Gwalior', 'Hailakandi', 'Hamirpur', 'Hamirpur', 'Hanumangarh', 'Harda', 'Hardoi', 'Haridwar', 'Hassan', 'Haveri district', 'Hazaribag', 'Hingoli', 'Hissar', 'Hooghly', 'Hoshangabad', 'Hoshiarpur', 'Howrah', 'Hyderabad', 'Hyderabad', 'Idukki', 'Imphal East', 'Imphal West', 'Indore', 'Jabalpur', 'Jagatsinghpur', 'Jaintia Hills', 'Jaipur', 'Jaisalmer', 'Jajpur', 'Jalandhar', 'Jalaun', 'Jalgaon', 'Jalna', 'Jalore', 'Jalpaiguri', 'Jammu', 'Jamnagar', 'Jamtara', 'Jamui', 'Janjgir-Champa', 'Jashpur', 'Jaunpur district', 'Jehanabad', 'Jhabua', 'Jhajjar', 'Jhalawar', 'Jhansi', 'Jharsuguda', 'Jhunjhunu', 'Jind', 'Jodhpur', 'Jorhat', 'Junagadh', 'Jyotiba Phule Nagar', 'Kabirdham (formerly Kawardha)', 'Kadapa', 'Kaimur', 'Kaithal', 'Kakinada', 'Kalahandi', 'Kamrup', 'Kamrup Metropolitan', 'Kanchipuram', 'Kandhamal', 'Kangra', 'Kanker', 'Kannauj', 'Kannur', 'Kanpur', 'Kanshi Ram Nagar', 'Kanyakumari', 'Kapurthala', 'Karaikal', 'Karauli', 'Karbi Anglong', 'Kargil', 'Karimganj', 'Karimnagar', 'Karnal', 'Karur', 'Kasaragod', 'Kathua', 'Katihar', 'Katni', 'Kaushambi', 'Kendrapara', 'Kendujhar (Keonjhar)', 'Khagaria', 'Khammam', 'Khandwa (East Nimar)', 'Khargone (West Nimar)', 'Kheda', 'Khordha', 'Khowai', 'Khunti', 'Kinnaur', 'Kishanganj', 'Kishtwar', 'Kodagu', 'Koderma', 'Kohima', 'Kokrajhar', 'Kolar', 'Kolasib', 'Kolhapur', 'Kolkata', 'Kollam', 'Koppal', 'Koraput', 'Korba', 'Koriya', 'Kota', 'Kottayam', 'Kozhikode', 'Krishna', 'Kulgam', 'Kullu', 'Kupwara', 'Kurnool', 'Kurukshetra', 'Kurung Kumey', 'Kushinagar', 'Kutch', 'Lahaul and Spiti', 'Lakhimpur', 'Lakhimpur Kheri', 'Lakhisarai', 'Lalitpur', 'Latehar', 'Latur', 'Lawngtlai', 'Leh', 'Lohardaga', 'Lohit', 'Lower Dibang Valley', 'Lower Subansiri', 'Lucknow', 'Ludhiana', 'Lunglei', 'Madhepura', 'Madhubani', 'Madurai', 'Mahamaya Nagar', 'Maharajganj', 'Mahasamund', 'Mahbubnagar', 'Mahe', 'Mahendragarh', 'Mahoba', 'Mainpuri', 'Malappuram', 'Maldah', 'Malkangiri', 'Mamit', 'Mandi', 'Mandla', 'Mandsaur', 'Mandya', 'Mansa', 'Marigaon', 'Mathura', 'Mau', 'Mayurbhanj', 'Medak', 'Meerut', 'Mehsana', 'Mewat', 'Mirzapur', 'Moga', 'Mokokchung', 'Mon', 'Moradabad', 'Morena', 'Mumbai City', 'Mumbai suburban', 'Munger', 'Murshidabad', 'Muzaffarnagar', 'Muzaffarpur', 'Mysore', 'Nabarangpur', 'Nadia', 'Nagaon', 'Nagapattinam', 'Nagaur', 'Nagpur', 'Nainital', 'Nalanda', 'Nalbari', 'Nalgonda', 'Namakkal', 'Nanded', 'Nandurbar', 'Narayanpur', 'Narmada', 'Narsinghpur', 'Nashik', 'Navsari', 'Nawada', 'Nawanshahr', 'Nayagarh', 'Neemuch', 'Nellore', 'New Delhi', 'Nilgiris', 'Nizamabad', 'North 24 Parganas', 'North Delhi', 'North East Delhi', 'North Goa', 'North Sikkim', 'North Tripura', 'North West Delhi', 'Nuapada', 'Ongole', 'Osmanabad', 'Pakur', 'Palakkad', 'Palamu', 'Pali', 'Palwal', 'Panchkula', 'Panchmahal', 'Panchsheel Nagar district (Hapur)', 'Panipat', 'Panna', 'Papum Pare', 'Parbhani', 'Paschim Medinipur', 'Patan', 'Pathanamthitta', 'Pathankot', 'Patiala', 'Patna', 'Pauri Garhwal', 'Perambalur', 'Phek', 'Pilibhit', 'Pithoragarh', 'Pondicherry', 'Poonch', 'Porbandar', 'Pratapgarh', 'Pratapgarh', 'Pudukkottai', 'Pulwama', 'Pune', 'Purba Medinipur', 'Puri', 'Purnia', 'Purulia', 'Raebareli', 'Raichur', 'Raigad', 'Raigarh', 'Raipur', 'Raisen', 'Rajauri', 'Rajgarh', 'Rajkot', 'Rajnandgaon', 'Rajsamand', 'Ramabai Nagar (Kanpur Dehat)', 'Ramanagara', 'Ramanathapuram', 'Ramban', 'Ramgarh', 'Rampur', 'Ranchi', 'Ratlam', 'Ratnagiri', 'Rayagada', 'Reasi', 'Rewa', 'Rewari', 'Ri Bhoi', 'Rohtak', 'Rohtas', 'Rudraprayag', 'Rupnagar', 'Sabarkantha', 'Sagar', 'Saharanpur', 'Saharsa', 'Sahibganj', 'Saiha', 'Salem', 'Samastipur', 'Samba', 'Sambalpur', 'Sangli', 'Sangrur', 'Sant Kabir Nagar', 'Sant Ravidas Nagar', 'Saran', 'Satara', 'Satna', 'Sawai Madhopur', 'Sehore', 'Senapati', 'Seoni', 'Seraikela Kharsawan', 'Serchhip', 'Shahdol', 'Shahjahanpur', 'Shajapur', 'Shamli', 'Sheikhpura', 'Sheohar', 'Sheopur', 'Shimla', 'Shimoga', 'Shivpuri', 'Shopian', 'Shravasti', 'Sibsagar', 'Siddharthnagar', 'Sidhi', 'Sikar', 'Simdega', 'Sindhudurg', 'Singrauli', 'Sirmaur', 'Sirohi', 'Sirsa', 'Sitamarhi', 'Sitapur', 'Sivaganga', 'Siwan', 'Solan', 'Solapur', 'Sonbhadra', 'Sonipat', 'Sonitpur', 'South 24 Parganas', 'South Delhi', 'South Garo Hills', 'South Goa', 'South Sikkim', 'South Tripura', 'South West Delhi', 'Sri Muktsar Sahib', 'Srikakulam', 'Srinagar', 'Subarnapur (Sonepur)', 'Sultanpur', 'Sundergarh', 'Supaul', 'Surat', 'Surendranagar', 'Surguja', 'Tamenglong', 'Tarn Taran', 'Tawang', 'Tehri Garhwal', 'Thane', 'Thanjavur', 'The Dangs', 'Theni', 'Thiruvananthapuram', 'Thoothukudi', 'Thoubal', 'Thrissur', 'Tikamgarh', 'Tinsukia', 'Tirap', 'Tiruchirappalli', 'Tirunelveli', 'Tirupur', 'Tiruvallur', 'Tiruvannamalai', 'Tiruvarur', 'Tonk', 'Tuensang', 'Tumkur', 'Udaipur', 'Udalguri', 'Udham Singh Nagar', 'Udhampur', 'Udupi', 'Ujjain', 'Ukhrul', 'Umaria', 'Una', 'Unnao', 'Upper Siang', 'Upper Subansiri', 'Uttar Dinajpur', 'Uttara Kannada', 'Uttarkashi', 'Vadodara', 'Vaishali', 'Valsad', 'Varanasi', 'Vellore', 'Vidisha', 'Viluppuram', 'Virudhunagar', 'Visakhapatnam', 'Vizianagaram', 'Vyara', 'Warangal', 'Wardha', 'Washim', 'Wayanad', 'West Champaran', 'West Delhi', 'West Garo Hills', 'West Kameng', 'West Khasi Hills', 'West Siang', 'West Sikkim', 'West Singhbhum', 'West Tripura', 'Wokha', 'Yadgir', 'Yamuna Nagar', 'Yanam', 'Yavatmal', 'Zunheboto'];
+    
     roledetails = RoleDetails.objects.all()
     allskills = AllSkills.objects.all()
-    return render(request, 'newjob-employer.html', {'pk': pk, 'roledetails': roledetails,'allskills':allskills})
+    return render(request, 'newjob-employer.html', {'pk': pk, 'roledetails': roledetails,'allskills':allskills,'cities':cities})
+
+from django.http import JsonResponse
+
+def get_cand_name(request, pk):
+    if request.method == "POST":
+        try:
+            jobseeker = JobSeeker.objects.get(user_id=request.POST['id'])
+            name = jobseeker.name
+            return JsonResponse({'name': name}, safe=False)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, safe=False)
+    return JsonResponse({'Error in request method'}, safe=False)
+
 
 
 def send_email_newjob(top_matching_job_seekers,emp_mail):
@@ -708,6 +741,7 @@ def get_candidate(request, pk):
     cand['phone'] = candidate.phone
     if (candidate.skills):
         cand['skills'] = candidate.skills.split(",")
+    cand['resumeLink'] = candidate.Resume.url
     work = ExperienceJob.objects.filter(user_id=candidate.user_id)
     edu = Education.objects.filter(user_id=candidate.user_id)
     visit = ProfileVisits()
@@ -992,7 +1026,7 @@ def edit_job(request, pk):
             job[0].experience = request.POST['experience']
             job[0].careerlevel = request.POST['careerlevel']
             job[0].jobtype = request.POST['jobtype']
-            job[0].basicpay = request.POST['basicpay']
+            job[0].basicpay = request.POST['basicpay'] +" "+request.POST['basicpaySuffix']
             job[0].skills = request.POST['skills']
             job[0].responsibilities = request.POST['responsibilities']
             job[0].requirements = request.POST['requirements']
@@ -1045,9 +1079,9 @@ class JobMatcher:
                 matched_params += 1
 
         # Check if expected salary matches
-        if self.jobseeker.expsal and self.job.basicpay:
-            if self.jobseeker.expsal <= int(self.job.basicpay):
-                matched_params += 1
+        # if self.jobseeker.expsal and self.job.basicpay:
+        #     if self.jobseeker.expsal <= int(self.job.basicpay):
+        #         matched_params += 1
 
         # Calculate match percentage
         match_percentage = (matched_params / total_params) * 100
@@ -1086,10 +1120,10 @@ class JobMatcher:
             }
 
         # Check if expected salary matches
-        if self.jobseeker.expsal and self.job.basicpay:
-            matching_details['expected_salary'] = {
-                'match': True if self.jobseeker.expsal <= int(self.job.basicpay) else False
-            }
+        # if self.jobseeker.expsal and self.job.basicpay:
+        #     matching_details['expected_salary'] = {
+        #         'match': True if self.jobseeker.expsal <= int(self.job.basicpay) else False
+        #     }
 
         return matching_details
 
@@ -1104,6 +1138,7 @@ def preprocess_text(text):
 
     preprocessed_text = ' '.join(words)
     return preprocessed_text
+
 
 
 def extract_text_from_pdf(pdf_file):
@@ -1726,9 +1761,9 @@ class JobMatcher:
                 matched_params += 1
 
         # Check if expected salary matches
-        if self.jobseeker.expsal and self.job.basicpay:
-            if self.jobseeker.expsal <= int(self.job.basicpay):
-                matched_params += 1
+        # if self.jobseeker.expsal and self.job.basicpay:
+        #     if self.jobseeker.expsal <= int(self.job.basicpay):
+        #         matched_params += 1
 
         # Calculate match percentage
         match_percentage = (matched_params / total_params) * 100
@@ -1767,10 +1802,10 @@ class JobMatcher:
             }
 
         # Check if expected salary matches
-        if self.jobseeker.expsal and self.job.basicpay:
-            matching_details['expected_salary'] = {
-                'match': True if self.jobseeker.expsal <= int(self.job.basicpay) else False
-            }
+        # if self.jobseeker.expsal and self.job.basicpay:
+        #     matching_details['expected_salary'] = {
+        #         'match': True if self.jobseeker.expsal <= int(self.job.basicpay) else False
+        #     }
 
         return matching_details
 
@@ -1835,7 +1870,7 @@ def suggest(request, pk):
                         job_matcher = JobMatcher(jobseeker=job_seeker, job=job_)
                         match_percentage = job_matcher.calculate_match_percentage()
                         total_matching_percentage = round((job_matching_percentage + match_percentage) / 2, 2)
-                        matching_percentages.append((job_seeker.user_id, total_matching_percentage))
+                        matching_percentages.append((job_seeker.user_id, total_matching_percentage+20))
                         matching_percentages.sort(key=lambda x: x[1], reverse=True)
 
                 top_matching_job_seekers = matching_percentages[:20]
@@ -2089,6 +2124,41 @@ def edit_step(request, pk):
         step.save()
         return JsonResponse({'info': 'done'})
     return JsonResponse({'info': dumps(list(step.values()), default=str)})
+from django.http import HttpResponseNotFound
+def resume_link(request, pk):
+    if request.method == "POST":
+        try:
+            seeker = JobSeeker.objects.get(user_id=request.POST.get('user_id'))
+            link = seeker.Resume.url
+            return JsonResponse({'link': link})
+        except JobSeeker.DoesNotExist:
+            return HttpResponseNotFound('Resume not found for this user')
+    else:
+        return JsonResponse({'error': 'Try POST method'})
+
+def screening_questions(request, pk):
+    if request.method == "POST":
+        try:
+            apply_id = request.POST.get('apply_id')
+            if not apply_id:
+                return JsonResponse({'error': 'No apply_id provided'})
+
+            screening_answers = Application.objects.filter(apply_id=apply_id)
+            if not screening_answers.exists():
+                return JsonResponse({'Application not found'})
+
+            screening_questions = ScreeningQuestions.objects.filter(job_id=screening_answers.first().job_id)
+            if not screening_questions.exists():
+                return JsonResponse({'Screening questions not found'})
+
+            return JsonResponse({
+                'screening_questions': list(screening_questions.values()),
+                'screening_answers': list(screening_answers.values())
+            })
+        except Exception as e:
+            return JsonResponse({'error': str(e)})
+    else:
+        return JsonResponse({'error': 'Try using the POST method'})
 
 def get_mocks(request):
     if request.method == "POST":
@@ -2100,7 +2170,6 @@ def get_mocks(request):
                 job_skills = job_.skills
                 job_skills_list = job_skills.split(',')
                 matching_mocktestinfo = MockTestInfo.objects.filter(tech__in=job_skills_list)
-                print(matching_mocktestinfo)
                 return JsonResponse({'mocktests': matching_mocktestinfo.values()})
 
             except Jobs.DoesNotExist:

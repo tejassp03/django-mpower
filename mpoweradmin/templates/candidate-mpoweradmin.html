@@ -1096,10 +1096,10 @@ function tme2(id)
     }  
     else if(val_option[0] == "s")
     {
-        console.log("Hello 0");
+        //console.log("Hello 0");
         let temp="#pxp-share-button-"+val_option[1];
-        console.log("Hello 0");
-        console.log(temp);
+        //console.log("Hello 0");
+        //console.log(temp);
         $(temp).click(); 
     }
 }
@@ -1141,7 +1141,8 @@ Job Role: ${datainfo.title}
 Skills Required: ${datainfo.skills}
 `;
             e.preventDefault();
-            window.open(`https://telegram.me/share/url?url=http://localhost:8000/singlejob/${jobId}/&text=${encodeURIComponent(jobDetailsString)}`, '_blank');
+            let currentUrl = window.location.origin;
+            window.open(`https://telegram.me/share/url?url=${currentUrl}/singlejob/${jobId}/&text=${encodeURIComponent(jobDetailsString)}`, '_blank');
           });
           
           $("#shareViaEmail").click(function (e) {

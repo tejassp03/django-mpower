@@ -64,6 +64,26 @@
     font-weight: 500;
 }
 
+
+.suggestions-container {
+  max-height: 100px; 
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  padding: 5px;
+  margin-top: 5px;
+  display: none;
+}
+
+.suggestion {
+  cursor: pointer;
+  padding: 5px;
+}
+
+.suggestion:hover {
+  background-color: #f0f0f0;
+}
+
+
 </style>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/js/standalone/selectize.min.js" integrity="sha256-+C0A5Ilqmu4QcSPxrlGpaZxJ04VjsRjKu+G82kl5UJk=" crossorigin="anonymous"></script>
@@ -101,6 +121,9 @@
                 <div class="mb-3">
                     <label for="pxp-company-job-location" class="form-label">Location</label>
                     <select id="pxp-company-job-location" class="form-select notnormal" name="location">
+                        {% for i in cities %}
+                        <option value="{{i}}">{{i}}</option>
+                        {% endfor %}
                         
                     </select>
                 </div>
@@ -177,16 +200,16 @@
             <div class="col-md-6 col-xxl-3">
                 <div class="mb-3">
                     <label for="pxp-company-job-salary" class="form-label">Salary range</label>
-                    <select id="pxp-company-job-salary" class="form-select" name="basicpay">
-                        <option value="1">₹0 - ₹1LPA</option>
-                        <option value="2">₹1LPA - ₹3LPA</option>
-                        <option value="3">₹3LPA - ₹5LPA</option>
-                        <option value="4">₹5LPA - ₹7LPA</option>
-                        <option value="5">₹7LPA - ₹15LPA</option>
-                        <option value="6">₹15LPA+</option>
-                    </select>
+                    <div class="input-group">
+                        <input type="text" id="salary-input" class="form-control" placeholder="₹1-₹3" name="basicpay" style="width:60%;">
+                        <select id="pxp-company-job-salary" class="form-select" name="basicpaySuffix" style="width:40%;">
+                            <option value="Lakh">Lakh</option>
+                            <option value="Crore">Crore</option>
+                        </select>
+                    </div>
                 </div>
             </div>
+            
             <div class="col-md-6 col-xxl-3">
                 <div class="mb-3">
                     <label for="pxp-company-job-salary" title = "Upload Job Description"class="form-label">Job Description</label>
@@ -201,7 +224,7 @@
             <!-- <div class="wrapper">
                 <div class="container"> -->
                     <div class="form-group">
-                      <select multiple placeholder="Choose skills" name="skills" class="notnormal">
+                      <select multiple placeholder="  Choose skills" name="skills" class="notnormal">
                         {% for i in allskills %}
                         <option>{{ i.skill }}</option>
                         {% endfor %}
@@ -220,15 +243,16 @@
                         <option value="2">Yes</option>
                     </select>
                 </div>
-            </div>
-            <div class="col-md-6 col-xxl-3">
+            </div>-->
+            <div class="col-md-6 col-xxl-3" style="display: none;">
                 <div class="mb-3">
                     <label for="pxp-company-job-match" class="form-label">Match Percentage</label>
-                    <input type="text" id="pxp-company-job-match" class="form-control" placeholder="E.g. 30" name="matchper" required minlength="1" maxlength="100">
+                    <input type="text" id="pxp-company-job-match" class="form-control" placeholder="E.g. 30" name="matchper" required minlength="1" maxlength="100" value="0" style="display: none;">
                 </div>
-            </div>-->
+            </div>
             
         </div>
+
 
         <div class="mt-4 mt-lg-5">
             <button class="btn rounded-pill pxp-section-cta" id="submit-button">Publish Job</button>
@@ -248,7 +272,7 @@
             <p class="text-muted">Ai is doing it's magic and candidate suggestion will be available soon at Applications tab.</p>
         </div>
         
-        <!--<div class="modal-body" style="padding: 1rem !important">
+        <div class="modal-body" style="padding: 1rem !important">
             <div class="pxp-company-dashboard-jobs-bulk-actions" style="margin-left: auto" id="modalOutTable">
                 <table class="table table-hover align-middle" id="table">
                     <thead>
@@ -271,32 +295,129 @@
                 </table>
                 
             </div>
-        </div>-->
-        <!--<div class="spinner-border text-primary" role="status" id="spinner">
+        </div>
+        <div class="spinner-border text-primary" role="status" id="spinner">
             <span class="sr-only">Loading...</span>
-        </div>-->
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="screeningQuestionsModal" tabindex="-1" role="dialog" aria-labelledby="popupModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document"> 
+        <div class="modal-content" style="padding: 20px;"> 
+            <div class="modal-header d-flex justify-content-center">
+                <h5 class="modal-title" id="popupModalLabel">Screening Questions</h5>
+            </div>
+            <div class="modal-body">
+                <form id="screeningQuestionsForm">
+                    <label for="question1">Question 1:</label>
+                    <div id="suggestionsContainer1" class="suggestions-container"></div>
+                    <textarea id="question1" name="question1" class="form-control" style="width: 100%;" placeholder="Tell us something about yourself...." class="text-area-with-suggestions"></textarea><br> 
+                    <label for="question2">Question 2:</label>
+                    <div id="suggestionsContainer2" class="suggestions-container"></div>
+                    <textarea id="question2" name="question2" class="form-control" style="width: 100%;" placeholder="Provide some details about your previous projects...." class="text-area-with-suggestions"></textarea>
+                    <div class="modal-footer">
+                        <button class="btn btn-primary" id="screeningQuestionsSubmit">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 </div>
 
 <script>
-      
-   var cities = ['Adilabad', 'Agra', 'Ahmedabad', 'Ahmednagar', 'Aizawl', 'Ajitgarh (Mohali)', 'Ajmer', 'Akola', 'Alappuzha', 'Aligarh', 'Alirajpur', 'Allahabad', 'Almora', 'Alwar', 'Ambala', 'Ambedkar Nagar', 'Amravati', 'Amreli district', 'Amritsar', 'Anand', 'Anantapur', 'Anantnag', 'Angul', 'Anjaw', 'Anuppur', 'Araria', 'Ariyalur', 'Arwal', 'Ashok Nagar', 'Auraiya', 'Aurangabad', 'Aurangabad', 'Azamgarh', 'Badgam', 'Bagalkot', 'Bageshwar', 'Bagpat', 'Bahraich', 'Baksa', 'Balaghat', 'Balangir', 'Balasore', 'Ballia', 'Balrampur', 'Banaskantha', 'Banda', 'Bandipora', 'Bangalore Rural', 'Bangalore Urban', 'Banka', 'Bankura', 'Banswara', 'Barabanki', 'Baramulla', 'Baran', 'Bardhaman', 'Bareilly', 'Bargarh (Baragarh)', 'Barmer', 'Barnala', 'Barpeta', 'Barwani', 'Bastar', 'Basti', 'Bathinda', 'Beed', 'Begusarai', 'Belgaum', 'Bellary', 'Betul', 'Bhadrak', 'Bhagalpur', 'Bhandara', 'Bharatpur', 'Bharuch', 'Bhavnagar', 'Bhilwara', 'Bhind', 'Bhiwani', 'Bhojpur', 'Bhopal', 'Bidar', 'Bijapur', 'Bijapur', 'Bijnor', 'Bikaner', 'Bilaspur', 'Bilaspur', 'Birbhum', 'Bishnupur', 'Bokaro', 'Bongaigaon', 'Boudh (Bauda)', 'Budaun', 'Bulandshahr', 'Buldhana', 'Bundi', 'Burhanpur', 'Buxar', 'Cachar', 'Central Delhi', 'Chamarajnagar', 'Chamba', 'Chamoli', 'Champawat', 'Champhai', 'Chandauli', 'Chandel', 'Chandigarh', 'Chandrapur', 'Changlang', 'Chatra', 'Chennai', 'Chhatarpur', 'Chhatrapati Shahuji Maharaj Nagar', 'Chhindwara', 'Chikkaballapur', 'Chikkamagaluru', 'Chirang', 'Chitradurga', 'Chitrakoot', 'Chittoor', 'Chittorgarh', 'Churachandpur', 'Churu', 'Coimbatore', 'Cooch Behar', 'Cuddalore', 'Cuttack', 'Dadra and Nagar Haveli', 'Dahod', 'Dakshin Dinajpur', 'Dakshina Kannada', 'Daman', 'Damoh', 'Dantewada', 'Darbhanga', 'Darjeeling', 'Darrang', 'Datia', 'Dausa', 'Davanagere', 'Debagarh (Deogarh)', 'Dehradun', 'Deoghar', 'Deoria', 'Dewas', 'Dhalai', 'Dhamtari', 'Dhanbad', 'Dhar', 'Dharmapuri', 'Dharwad', 'Dhemaji', 'Dhenkanal', 'Dholpur', 'Dhubri', 'Dhule', 'Dibang Valley', 'Dibrugarh', 'Dima Hasao', 'Dimapur', 'Dindigul', 'Dindori', 'Diu', 'Doda', 'Dumka', 'Dungapur', 'Durg', 'East Champaran', 'East Delhi', 'East Garo Hills', 'East Khasi Hills', 'East Siang', 'East Sikkim', 'East Singhbhum', 'Eluru', 'Ernakulam', 'Erode', 'Etah', 'Etawah', 'Faizabad', 'Faridabad', 'Faridkot', 'Farrukhabad', 'Fatehabad', 'Fatehgarh Sahib', 'Fatehpur', 'Fazilka', 'Firozabad', 'Firozpur', 'Gadag', 'Gadchiroli', 'Gajapati', 'Ganderbal', 'Gandhinagar', 'Ganganagar', 'Ganjam', 'Garhwa', 'Gautam Buddh Nagar', 'Gaya', 'Ghaziabad', 'Ghazipur', 'Giridih', 'Goalpara', 'Godda', 'Golaghat', 'Gonda', 'Gondia', 'Gopalganj', 'Gorakhpur', 'Gulbarga', 'Gumla', 'Guna', 'Guntur', 'Gurdaspur', 'Gurgaon', 'Gwalior', 'Hailakandi', 'Hamirpur', 'Hamirpur', 'Hanumangarh', 'Harda', 'Hardoi', 'Haridwar', 'Hassan', 'Haveri district', 'Hazaribag', 'Hingoli', 'Hissar', 'Hooghly', 'Hoshangabad', 'Hoshiarpur', 'Howrah', 'Hyderabad', 'Hyderabad', 'Idukki', 'Imphal East', 'Imphal West', 'Indore', 'Jabalpur', 'Jagatsinghpur', 'Jaintia Hills', 'Jaipur', 'Jaisalmer', 'Jajpur', 'Jalandhar', 'Jalaun', 'Jalgaon', 'Jalna', 'Jalore', 'Jalpaiguri', 'Jammu', 'Jamnagar', 'Jamtara', 'Jamui', 'Janjgir-Champa', 'Jashpur', 'Jaunpur district', 'Jehanabad', 'Jhabua', 'Jhajjar', 'Jhalawar', 'Jhansi', 'Jharsuguda', 'Jhunjhunu', 'Jind', 'Jodhpur', 'Jorhat', 'Junagadh', 'Jyotiba Phule Nagar', 'Kabirdham (formerly Kawardha)', 'Kadapa', 'Kaimur', 'Kaithal', 'Kakinada', 'Kalahandi', 'Kamrup', 'Kamrup Metropolitan', 'Kanchipuram', 'Kandhamal', 'Kangra', 'Kanker', 'Kannauj', 'Kannur', 'Kanpur', 'Kanshi Ram Nagar', 'Kanyakumari', 'Kapurthala', 'Karaikal', 'Karauli', 'Karbi Anglong', 'Kargil', 'Karimganj', 'Karimnagar', 'Karnal', 'Karur', 'Kasaragod', 'Kathua', 'Katihar', 'Katni', 'Kaushambi', 'Kendrapara', 'Kendujhar (Keonjhar)', 'Khagaria', 'Khammam', 'Khandwa (East Nimar)', 'Khargone (West Nimar)', 'Kheda', 'Khordha', 'Khowai', 'Khunti', 'Kinnaur', 'Kishanganj', 'Kishtwar', 'Kodagu', 'Koderma', 'Kohima', 'Kokrajhar', 'Kolar', 'Kolasib', 'Kolhapur', 'Kolkata', 'Kollam', 'Koppal', 'Koraput', 'Korba', 'Koriya', 'Kota', 'Kottayam', 'Kozhikode', 'Krishna', 'Kulgam', 'Kullu', 'Kupwara', 'Kurnool', 'Kurukshetra', 'Kurung Kumey', 'Kushinagar', 'Kutch', 'Lahaul and Spiti', 'Lakhimpur', 'Lakhimpur Kheri', 'Lakhisarai', 'Lalitpur', 'Latehar', 'Latur', 'Lawngtlai', 'Leh', 'Lohardaga', 'Lohit', 'Lower Dibang Valley', 'Lower Subansiri', 'Lucknow', 'Ludhiana', 'Lunglei', 'Madhepura', 'Madhubani', 'Madurai', 'Mahamaya Nagar', 'Maharajganj', 'Mahasamund', 'Mahbubnagar', 'Mahe', 'Mahendragarh', 'Mahoba', 'Mainpuri', 'Malappuram', 'Maldah', 'Malkangiri', 'Mamit', 'Mandi', 'Mandla', 'Mandsaur', 'Mandya', 'Mansa', 'Marigaon', 'Mathura', 'Mau', 'Mayurbhanj', 'Medak', 'Meerut', 'Mehsana', 'Mewat', 'Mirzapur', 'Moga', 'Mokokchung', 'Mon', 'Moradabad', 'Morena', 'Mumbai City', 'Mumbai suburban', 'Munger', 'Murshidabad', 'Muzaffarnagar', 'Muzaffarpur', 'Mysore', 'Nabarangpur', 'Nadia', 'Nagaon', 'Nagapattinam', 'Nagaur', 'Nagpur', 'Nainital', 'Nalanda', 'Nalbari', 'Nalgonda', 'Namakkal', 'Nanded', 'Nandurbar', 'Narayanpur', 'Narmada', 'Narsinghpur', 'Nashik', 'Navsari', 'Nawada', 'Nawanshahr', 'Nayagarh', 'Neemuch', 'Nellore', 'New Delhi', 'Nilgiris', 'Nizamabad', 'North 24 Parganas', 'North Delhi', 'North East Delhi', 'North Goa', 'North Sikkim', 'North Tripura', 'North West Delhi', 'Nuapada', 'Ongole', 'Osmanabad', 'Pakur', 'Palakkad', 'Palamu', 'Pali', 'Palwal', 'Panchkula', 'Panchmahal', 'Panchsheel Nagar district (Hapur)', 'Panipat', 'Panna', 'Papum Pare', 'Parbhani', 'Paschim Medinipur', 'Patan', 'Pathanamthitta', 'Pathankot', 'Patiala', 'Patna', 'Pauri Garhwal', 'Perambalur', 'Phek', 'Pilibhit', 'Pithoragarh', 'Pondicherry', 'Poonch', 'Porbandar', 'Pratapgarh', 'Pratapgarh', 'Pudukkottai', 'Pulwama', 'Pune', 'Purba Medinipur', 'Puri', 'Purnia', 'Purulia', 'Raebareli', 'Raichur', 'Raigad', 'Raigarh', 'Raipur', 'Raisen', 'Rajauri', 'Rajgarh', 'Rajkot', 'Rajnandgaon', 'Rajsamand', 'Ramabai Nagar (Kanpur Dehat)', 'Ramanagara', 'Ramanathapuram', 'Ramban', 'Ramgarh', 'Rampur', 'Ranchi', 'Ratlam', 'Ratnagiri', 'Rayagada', 'Reasi', 'Rewa', 'Rewari', 'Ri Bhoi', 'Rohtak', 'Rohtas', 'Rudraprayag', 'Rupnagar', 'Sabarkantha', 'Sagar', 'Saharanpur', 'Saharsa', 'Sahibganj', 'Saiha', 'Salem', 'Samastipur', 'Samba', 'Sambalpur', 'Sangli', 'Sangrur', 'Sant Kabir Nagar', 'Sant Ravidas Nagar', 'Saran', 'Satara', 'Satna', 'Sawai Madhopur', 'Sehore', 'Senapati', 'Seoni', 'Seraikela Kharsawan', 'Serchhip', 'Shahdol', 'Shahjahanpur', 'Shajapur', 'Shamli', 'Sheikhpura', 'Sheohar', 'Sheopur', 'Shimla', 'Shimoga', 'Shivpuri', 'Shopian', 'Shravasti', 'Sibsagar', 'Siddharthnagar', 'Sidhi', 'Sikar', 'Simdega', 'Sindhudurg', 'Singrauli', 'Sirmaur', 'Sirohi', 'Sirsa', 'Sitamarhi', 'Sitapur', 'Sivaganga', 'Siwan', 'Solan', 'Solapur', 'Sonbhadra', 'Sonipat', 'Sonitpur', 'South 24 Parganas', 'South Delhi', 'South Garo Hills', 'South Goa', 'South Sikkim', 'South Tripura', 'South West Delhi', 'Sri Muktsar Sahib', 'Srikakulam', 'Srinagar', 'Subarnapur (Sonepur)', 'Sultanpur', 'Sundergarh', 'Supaul', 'Surat', 'Surendranagar', 'Surguja', 'Tamenglong', 'Tarn Taran', 'Tawang', 'Tehri Garhwal', 'Thane', 'Thanjavur', 'The Dangs', 'Theni', 'Thiruvananthapuram', 'Thoothukudi', 'Thoubal', 'Thrissur', 'Tikamgarh', 'Tinsukia', 'Tirap', 'Tiruchirappalli', 'Tirunelveli', 'Tirupur', 'Tiruvallur', 'Tiruvannamalai', 'Tiruvarur', 'Tonk', 'Tuensang', 'Tumkur', 'Udaipur', 'Udalguri', 'Udham Singh Nagar', 'Udhampur', 'Udupi', 'Ujjain', 'Ukhrul', 'Umaria', 'Una', 'Unnao', 'Upper Siang', 'Upper Subansiri', 'Uttar Dinajpur', 'Uttara Kannada', 'Uttarkashi', 'Vadodara', 'Vaishali', 'Valsad', 'Varanasi', 'Vellore', 'Vidisha', 'Viluppuram', 'Virudhunagar', 'Visakhapatnam', 'Vizianagaram', 'Vyara', 'Warangal', 'Wardha', 'Washim', 'Wayanad', 'West Champaran', 'West Delhi', 'West Garo Hills', 'West Kameng', 'West Khasi Hills', 'West Siang', 'West Sikkim', 'West Singhbhum', 'West Tripura', 'Wokha', 'Yadgir', 'Yamuna Nagar', 'Yanam', 'Yavatmal', 'Zunheboto'];
-   const citySelect = document.getElementById("pxp-company-job-location");
+let timeout1;
+let timeout2;
 
-    cities.forEach(city => {
-      const option = document.createElement("option");
-      option.value = city;
-      option.text = city;
-      citySelect.appendChild(option);
-    });
-    
-    //   $('#pxp-company-job-location').selectize({
-    //       sortField: 'text'
-    //   });
+document.getElementById('question1').addEventListener('focusout', function () {
+  const suggestionsContainer = document.getElementById('suggestionsContainer1');
+  clearTimeout(timeout1);
+  timeout1 = setTimeout(function () {
+    suggestionsContainer.style.display = 'none';
+  }, 100); 
+});
 
+document.getElementById('question2').addEventListener('focusout', function () {
+  const suggestionsContainer = document.getElementById('suggestionsContainer2');
+  clearTimeout(timeout2);
+  timeout2 = setTimeout(function () {
+    suggestionsContainer.style.display = 'none';
+  }, 100); 
+});
 
+function populateTextArea1(suggestion) {
+  document.getElementById('question1').value = suggestion;
+}
+
+function populateTextArea2(suggestion) {
+  document.getElementById('question2').value = suggestion;
+}
+
+document.getElementById('suggestionsContainer1').addEventListener('click', function (event) {
+  if (event.target.classList.contains('suggestion')) {
+    populateTextArea1(event.target.textContent);
+    this.style.display = 'none';
+    this.innerHTML = '';
+  }
+});
+
+document.getElementById('suggestionsContainer2').addEventListener('click', function (event) {
+  if (event.target.classList.contains('suggestion')) {
+    populateTextArea2(event.target.textContent);
+    this.innerHTML = '';
+    this.style.display = 'none';
+  }
+});
+
+const suggestions1 = [
+  "Highlight your key skills...",
+  "Discuss your relevant experience...",
+  "Mention your educational background...",
+];
+
+const suggestions2 = [
+  "Describe your role in previous projects...",
+  "Highlight project outcomes...",
+  "Discuss challenges faced and solutions...",
+];
+
+document.getElementById('question1').addEventListener('input', function () {
+  const inputText = this.value.trim();
+  const suggestionsContainer = document.getElementById('suggestionsContainer1');
+
+  suggestionsContainer.innerHTML = '';
+
+  suggestions1.forEach(suggestion => {
+    if (suggestion.toLowerCase().includes(inputText.toLowerCase())) {
+      const suggestionElement = document.createElement('div');
+      suggestionElement.classList.add('suggestion');
+      suggestionElement.textContent = suggestion;
+      suggestionsContainer.appendChild(suggestionElement);
+      suggestionsContainer.style.display = 'block';
+    }
+  });
+});
+
+document.getElementById('question2').addEventListener('input', function () {
+  const inputText = this.value.trim();
+  const suggestionsContainer = document.getElementById('suggestionsContainer2');
+
+  suggestionsContainer.innerHTML = '';
+
+  suggestions2.forEach(suggestion => {
+    if (suggestion.toLowerCase().includes(inputText.toLowerCase())) {
+      const suggestionElement = document.createElement('div');
+      suggestionElement.classList.add('suggestion');
+      suggestionElement.textContent = suggestion;
+      suggestionsContainer.appendChild(suggestionElement);
+      suggestionsContainer.style.display = 'block';
+    }
+  });
+});
 
 </script>
+
+
 <script>
     const textarea = document.getElementById("pxp-company-job-description");
     const textareaA = document.getElementById("pxp-company-job-Responsibilities");
@@ -333,136 +454,156 @@
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         const modal = document.getElementById("pxp-results-modal");
-        //const spinner = document.getElementById("spinner");
+        const spinner = document.getElementById("spinner");
         const closeBtn = document.querySelector(".close");
         const form = document.getElementById("job-offer-form");
+        const screeningQuestionsForm = document.getElementById("screeningQuestionsForm");
         const matchPer = document.getElementById("pxp-company-job-match");
         
         form.addEventListener("submit", function (event) {
             let i = 0;
-            showPopup();
+            // showPopup();
             event.preventDefault();
+            $('#screeningQuestionsModal').modal('show');
+            screeningQuestionsForm.addEventListener("submit", function (e) {
+                e.preventDefault();
+
+                const question1Value = document.getElementById("question1").value;
+                const question2Value = document.getElementById("question2").value;
+
+                const originalFormData = new FormData(form);
+                originalFormData.append("question1", question1Value);
+                originalFormData.append("question2", question2Value);
+
+            
             $.ajax(
                 {
                     type:"POST",
                     url: form.action,
-                    data: new FormData(form),
+                    data: originalFormData,
                     processData: false,
                     contentType: false,
                     success: function( data ) 
                     {
+                        $('#screeningQuestionsModal').modal('hide');
+                        showPopup();
                         console.log(data);
-                        // let candidates=JSON.parse(data['candidates']);
-                        // var tbody = document.getElementById("tableBody");
-                        // // console.log(matchPer.value+" "+candidates[0].score);
-                        // if(matchPer.value>candidates[0].score){
+                        let candidates=JSON.parse(data['candidates']);
+                        var tbody = document.getElementById("tableBody");
+                        // console.log(matchPer.value+" "+candidates[0].score);
+                        if(matchPer.value>candidates[0].score){
                             
-                        //     var modalBody = document.getElementById("popup-content");
+                            var modalBody = document.getElementById("popup-content");
 
-                        //     var h4 = document.createElement("h4");
-                        //     h4.textContent = "No suitable canddiates found above "+matchPer.value+"%";
-                        //     var h5 = document.createElement("h5");
-                        //     h5.textContent = "Highest is "+candidates[0].score+"%, lower the match percentage";
-                        //     var input = document.createElement("input");
-                        //     input.setAttribute('name','matchPerAgain');
-                        //     input.setAttribute('id','matchPerAgain');
-                        //     input.setAttribute('type','text');
-                        //     input.setAttribute('class','form-control');
-                        //     input.setAttribute('placeholder','Eg. 30');
-                        //     var btn = document.createElement("button");
-                        //     btn.setAttribute('class','btn btn-primary');
-                        //     let onfunc='matchPerChange('+data['jobid']+')';
-                        //     btn.setAttribute('onclick',onfunc);
-                        //     btn.setAttribute('id','matchBtn');
-                        //     btn.textContent = 'Submit';
-                        //     modalBody.appendChild(h4);
-                        //     modalBody.appendChild(h5);
-                        //     modalBody.appendChild(input);
-                        //     modalBody.appendChild(btn);
-                        // }else{
-                        //     while (tbody.firstChild) {
-                        //         tbody.removeChild(tbody.firstChild);
-                        //     }
-                        // for(i=0;i<10;i++){
-                        //     if(matchPer.value<candidates[i].score){
-                        //     var newRow = document.createElement("tr");
-                        //     var cell1 = document.createElement("td");
-                        //     cell1.setAttribute("width","3%");
-                        //     var div1a = document.createElement("div");
-                        //     div1a.setAttribute('class','pxp-company-dashboard-candidate-avatar pxp-cover');
-                        //     if(candidates[i].photo)
-                        //     {
-                        //         let ans='url(/media/'+candidates[i].photo+')';
-                        //         div1a.style.backgroundImage=ans;
-                        //         cell1.append(div1a);
-                        //     }
-                        //     else
-                        //     {   
-                        //         div1a.style.backgroundImage='url({% static '/images/company-logo-1.png' %})';
-                        //         cell1.append(div1a);
-                        //     }
-                        //     newRow.appendChild(cell1);
+                            var h4 = document.createElement("h4");
+                            h4.textContent = "No suitable canddiates found above "+matchPer.value+"%";
+                            var h5 = document.createElement("h5");
+                            h5.textContent = "Highest is "+candidates[0].score+"%, lower the match percentage";
+                            var input = document.createElement("input");
+                            input.setAttribute('name','matchPerAgain');
+                            input.setAttribute('id','matchPerAgain');
+                            input.setAttribute('type','text');
+                            input.setAttribute('class','form-control');
+                            input.setAttribute('placeholder','Eg. 30');
+                            var btn = document.createElement("button");
+                            btn.setAttribute('class','btn btn-primary');
+                            let onfunc='matchPerChange('+data['jobid']+')';
+                            btn.setAttribute('onclick',onfunc);
+                            btn.setAttribute('id','matchBtn');
+                            btn.textContent = 'Submit';
+                            modalBody.appendChild(h4);
+                            modalBody.appendChild(h5);
+                            modalBody.appendChild(input);
+                            modalBody.appendChild(btn);
+                        }else{
 
-                        //     var cell2 = document.createElement("td");
-                        //     var anc = document.createElement("a");
-                        //     anc.setAttribute('href','#');
-                        //     var div2a = document.createElement("div");
-                        //     div2a.setAttribute('class','pxp-company-dashboard-job-title');
-                        //     div2a.textContent = candidates[i].name;
-                        //     anc.appendChild(div2a);
-                        //     var div2b = document.createElement("div");
-                        //     div2b.setAttribute('class','pxp-company-dashboard-job-location');
-                        //     // div2b.setAttribute('style','var(--pxpTextColor)');
-                        //     div2b.style.color = 'var(--pxpTextColor)';
+                        for(i=0;i<10;i++){
+                            if(matchPer.value<candidates[i].score){
+                            var newRow = document.createElement("tr");
+                            var cell1 = document.createElement("td");
+                            cell1.setAttribute("width","3%");
+                            var div1a = document.createElement("div");
+                            div1a.setAttribute('class','pxp-company-dashboard-candidate-avatar pxp-cover');
+                            if(candidates[i].photo)
+                            {
+                                let ans='url(/media/'+candidates[i].photo+')';
+                                div1a.style.backgroundImage=ans;
+                                cell1.append(div1a);
+                            }
+                            else
+                            {   
+                                div1a.style.backgroundImage='url({% static '/images/company-logo-1.png' %})';
+                                cell1.append(div1a);
+                            }
+                            newRow.appendChild(cell1);
 
-                        //     var spa = document.createElement("span");
-                        //     spa.setAttribute('class','fa fa-globe me-1');
-                        //     div2b.appendChild(spa);
-                        //     // div2b.textContent = candidates[i].location;
-                        //     var locationText = document.createTextNode(candidates[i].location);
-                        //     div2b.appendChild(locationText);
-                        //     anc.appendChild(div2b);
-                        //     cell2.appendChild(anc);
-                        //     newRow.appendChild(cell2);
+                            var cell2 = document.createElement("td");
+                            var anc = document.createElement("a");
+                            anc.setAttribute('href','#');
+                            var div2a = document.createElement("div");
+                            div2a.setAttribute('class','pxp-company-dashboard-job-title');
+                            div2a.textContent = candidates[i].name;
+                            anc.appendChild(div2a);
+                            var div2b = document.createElement("div");
+                            div2b.setAttribute('class','pxp-company-dashboard-job-location');
+                            // div2b.setAttribute('style','var(--pxpTextColor)');
+                            div2b.style.color = 'var(--pxpTextColor)';
+
+                            var spa = document.createElement("span");
+                            spa.setAttribute('class','fa fa-globe me-1');
+                            div2b.appendChild(spa);
+                            // div2b.textContent = candidates[i].location;
+                            var locationText = document.createTextNode(candidates[i].location);
+                            div2b.appendChild(locationText);
+                            anc.appendChild(div2b);
+                            cell2.appendChild(anc);
+                            newRow.appendChild(cell2);
 
 
-                        //     var cell3 = document.createElement("td");
-                        //     var div3a = document.createElement("div");
-                        //     div3a.setAttribute('class','pxp-company-dashboard-job-title');
-                        //     div3a.textContent = candidates[i].score;
-                        //     cell3.appendChild(div3a);
-                        //     newRow.appendChild(cell3);
+                            var cell3 = document.createElement("td");
+                            var div3a = document.createElement("div");
+                            div3a.setAttribute('class','pxp-company-dashboard-job-title');
+                            div3a.textContent = candidates[i].score;
+                            cell3.appendChild(div3a);
+                            newRow.appendChild(cell3);
 
-                        //     var cell4 = document.createElement("td");
-                        //     var div4a = document.createElement("div");
-                        //     div4a.setAttribute('class','pxp-dashboard-table-options');
-                        //     var ul4a = document.createElement("ul");
-                        //     ul4a.setAttribute('class','list-unstyled');
-                        //     var li4a = document.createElement("li");
-                        //     var btn4a = document.createElement("button");
-                        //     btn4a.setAttribute('title','View profile');
-                        //     btn4a.setAttribute('id','pxp-candidate-modal-button');
-                        //     btn4a.setAttribute('data-bs-target','#pxp-candidate-modal');
-                        //     btn4a.setAttribute('data-bs-toggle','modal');
-                        //     let uid='candidatemodal('+candidates[i].user_id+')';
-                        //     btn4a.setAttribute('onclick',uid);
-                        //     btn4a.setAttribute('data-bs-target','#pxp-candidate-modal');
-                        //     var spa4a = document.createElement("span");
-                        //     spa4a.setAttribute('class','fa fa-eye');
-                        //     btn4a.appendChild(spa4a);
-                        //     li4a.appendChild(btn4a);
-                        //     ul4a.appendChild(li4a);
-                        //     div4a.appendChild(ul4a);
-                        //     cell4.appendChild(div4a);
-                        //     newRow.appendChild(cell4);
+                            var cell4 = document.createElement("td");
+                            var div4a = document.createElement("div");
+                            div4a.setAttribute('class','pxp-dashboard-table-options');
+                            var ul4a = document.createElement("ul");
+                            ul4a.setAttribute('class','list-unstyled');
+                            var li4a = document.createElement("li");
+                            var btn4a = document.createElement("button");
+                            btn4a.setAttribute('title','View profile');
+                            btn4a.setAttribute('id','pxp-candidate-modal-button');
+                            btn4a.setAttribute('data-bs-target','#pxp-candidate-modal');
+                            btn4a.setAttribute('data-bs-toggle','modal');
+                            let uid='candidatemodal('+candidates[i].user_id+')';
+                            btn4a.setAttribute('onclick',uid);
+                            btn4a.setAttribute('data-bs-target','#pxp-candidate-modal');
+                            var spa4a = document.createElement("span");
+                            spa4a.setAttribute('class','fa fa-eye');
+                            btn4a.appendChild(spa4a);
+                            li4a.appendChild(btn4a);
+                            ul4a.appendChild(li4a);
+                            div4a.appendChild(ul4a);
+                            cell4.appendChild(div4a);
+                            newRow.appendChild(cell4);
+                            console.log(newRow);
 
-                        //     tbody.appendChild(newRow);
-                        // }
+                            console.log(tbody);
+
+                            tbody.appendChild(newRow);
+                            console.log(tbody);
+                        }
      
-                        // }}
-                        //spinner.style.display = 'none';
+                        }
+                    }
+                        spinner.style.display = 'none';
                     }
                 });
+            });
+
         });
         function showPopup() {
             document.getElementById("popup").style.display = "flex";
@@ -487,7 +628,7 @@
                 document.getElementById("pxp-company-job-title"),
                 document.getElementById("pxp-company-job-location"),
                 document.getElementById("pxp-company-job-description"),
-                document.getElementById("pxp-company-job-skills"),
+                // document.getElementById("pxp-company-job-skills"),
                 document.getElementById("pxp-company-job-Responsibilities"),
                 document.getElementById("pxp-company-job-Requirements"),
                 document.getElementById("pxp-company-job-experience"),

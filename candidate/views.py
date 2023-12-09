@@ -10,7 +10,12 @@ import re
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from itertools import chain
 from django.template import RequestContext
-
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
+from nltk.stem import PorterStemmer
+from sklearn.cluster import KMeans
 from datetime import date, timedelta, datetime
 import heapq
 from django.core.mail import EmailMessage
@@ -22,6 +27,11 @@ import string
 import spacy
 from jobster.settings import BASE_DIR
 from urllib.parse import urlparse
+import json
+from scipy.sparse import save_npz, load_npz
+from io import BytesIO
+import threading
+
 
 
 # Create your views here.
@@ -294,12 +304,78 @@ def jobapp(request, pk):
             break
     return JsonResponse({'logo': image, 'info': dumps(list(jobinfo.values()), default=str), 'company': dumps(list(employer.values())), 'emai': dumps(email), 'score': quality, 'skills_required': skills_required})
 
+def extract_text_from_pdf(pdf_file):
+    pdf_text = ""
+    with open(pdf_file, 'rb') as file:
+        pdf_reader = PyPDF2.PdfReader(file)
+        num_pages = len(pdf_reader.pages)
+        for page_num in range(num_pages):
+            page = pdf_reader.pages[page_num]
+            pdf_text += page.extract_text()
+    return pdf_text
+
+def preprocess_text(text):
+    words = word_tokenize(text)
+
+    stop_words = set(stopwords.words('english'))
+    words = [word for word in words if word.lower() not in stop_words]
+
+    stemmer = PorterStemmer()
+    words = [stemmer.stem(word) for word in words]
+
+    preprocessed_text = ' '.join(words)
+    return preprocessed_text
+
+def serialize_sparse_matrix(matrix):
+    buffer = BytesIO()
+    save_npz(buffer, matrix)
+    serialized_matrix = buffer.getvalue()
+
+    json_compatible_data = serialized_matrix.decode('latin1')  
+    return json_compatible_data
+
+def deserialize_sparse_matrix(serialized_data):
+    serialized_matrix = serialized_data.encode('latin1')
+
+    buffer = BytesIO(serialized_matrix)
+    matrix = load_npz(buffer)
+    return matrix
+def save_resume_vector_matrix(pk):
+    try:
+        vectorizer = CountVectorizer()
+        job_seeker = JobSeeker.objects.get(user_id=pk)
+        important_data_jobseeker = f"{job_seeker.location} {job_seeker.experience} {job_seeker.skills} {job_seeker.basic_edu} {job_seeker.master_edu} {job_seeker.other_qual} {job_seeker.cursal} {job_seeker.expsal} {job_seeker.notice_period}"
+        resume_pdf_file = job_seeker.Resume.path
+        resume_text = extract_text_from_pdf(resume_pdf_file)
+        job_seeker_data = preprocess_text(important_data_jobseeker)
+        resume_text = preprocess_text(resume_text)
+        total_job_seeker_data = f"{job_seeker_data}{resume_text}"
+        job_seeker_data_vector = vectorizer.fit_transform([total_job_seeker_data])
+        serialized_data = serialize_sparse_matrix(job_seeker_data_vector)
+        resume_analysis = ResumeAnalysis.objects.get(jobseeker_id=job_seeker)
+        resume_analysis.sparse_matrix_data = serialized_data
+        resume_analysis.save()
+        # deserialized_data = deserialize_sparse_matrix(resume_analysis.sparse_matrix_data)
+        
+    except Exception as e:
+        print(e)
 
 def edit_profile(request, pk):
     context = JobSeeker.objects.get(user_id=pk)
     skills = context.skills.split(",")
     experience = ExperienceJob.objects.filter(user_id=pk)
     education = Education.objects.filter(user_id=pk)
+    training = Training.objects.filter(user_id=pk)
+    numbersMonth = range(1, 13)
+    numbersYear = range(1, 31)
+    extracted_name = "Resume.pdf"
+    resume_filename = os.path.basename(context.Resume.url)
+
+    filename_parts = resume_filename.split('_Resume_')
+    if len(filename_parts) > 1:
+        extracted_name = filename_parts[-1]
+    
+    
     for i in skills:
         if i == "":
             skills.remove(i)
@@ -333,7 +409,8 @@ def edit_profile(request, pk):
         return redirect('candidate:edit', pk=pk)
     titlerole = RoleDetails.objects.all()
     skills_ = AllSkills.objects.all()
-    return render(request, 'profile-candidate.html', {'user': context, 'pk': pk, 'log': request.session['email'], 'skills': skills, 'experience': experience, 'education': education,'titlerole':titlerole,'skills_':skills_})
+    return render(request, 'profile-candidate.html', {'user': context, 'pk': pk, 'log': request.session['email'], 'skills': skills, 'experience': experience, 'education': education,'training':training,'titlerole':titlerole,'skills_':skills_,'numbersMonth':numbersMonth,'numbersYear':numbersYear,'extracted_name':extracted_name})
+
 
 
 def returnvalue(phone):
@@ -387,6 +464,8 @@ def add_exp(request, pk):
         exp.company = request.POST['company']
         exp.time_period = request.POST['time_period']
         exp.description = request.POST['description']
+        exp.experience_month = request.POST['exp_month']
+        exp.experience_year = request.POST['exp_year']
         exp.save()
     return redirect('candidate:edit', pk=pk)
 
@@ -401,6 +480,18 @@ def add_edu(request, pk):
         edu.time_period = request.POST['period_edu']
         edu.description = request.POST['desc']
         edu.save()
+    return redirect('candidate:edit', pk=pk)
+
+def add_training(request, pk):
+    if (request.method == "POST"):
+        tra = Training()
+        user = JobSeeker.objects.get(user_id=pk)
+        tra.user_id = user
+        tra.title = request.POST['title']
+        tra.organization = request.POST['organization']
+        tra.time_period = request.POST['period_training']
+        tra.description = request.POST['desc']
+        tra.save()
     return redirect('candidate:edit', pk=pk)
 
 
@@ -438,9 +529,17 @@ def delete_edu(request, pk):
         edu.delete()
     return redirect('candidate:edit', pk=pk)
 
+def delete_training(request, pk):
+    if request.method == "POST":
+        tra = Training.objects.get(training_id=request.POST['id'])
+        tra.delete()
+    return redirect('candidate:edit', pk=pk)
+
 
 def edit_exp(request, pk):
     exp = None
+    numbersMonth = list(range(1, 13))
+    numbersYear = list(range(1, 31))
     if (request.method == "GET"):
         exp = ExperienceJob.objects.filter(exp_id=request.GET['expid'])
     else:
@@ -450,10 +549,12 @@ def edit_exp(request, pk):
             exp[0].job_title = request.POST['job_title']
             exp[0].company = request.POST['company']
             exp[0].time_period = request.POST['time_period']
+            exp[0].experience_month = request.POST['experience_month']
+            exp[0].experience_year = request.POST['experience_year']
             exp[0].description = request.POST['description']
             exp[0].save()
         return redirect('candidate:edit', pk=pk)
-    return JsonResponse({'info': dumps(list(exp.values()), default=str)})
+    return JsonResponse({'info': dumps(list(exp.values()), default=str),'numbersMonth':numbersMonth,'numbersYear':numbersYear})
 
 
 def edit_edu(request, pk):
@@ -471,6 +572,58 @@ def edit_edu(request, pk):
             edu[0].save()
         return redirect('candidate:edit', pk=pk)
     return JsonResponse({'info': dumps(list(edu.values()), default=str)})
+
+def edit_training(request, pk):
+    training = None
+    if (request.method == "GET"):
+        tra = Training.objects.filter(training_id=request.GET['trainingid'])
+    else:
+        tra = Training.objects.filter(training_id=request.POST['trainingid'])
+    if request.method == "POST":
+        if (len(tra) > 0):
+            tra[0].title = request.POST['title']
+            tra[0].organization = request.POST['organization']
+            tra[0].time_period = request.POST['time_period']
+            tra[0].description = request.POST['description']
+            tra[0].save()
+        return redirect('candidate:edit', pk=pk)
+    return JsonResponse({'info': dumps(list(tra.values()), default=str)})
+
+def update_salary(request,pk):
+    if request.method == 'POST':
+        seeker = JobSeeker.objects.get(user_id=pk)
+        seeker.cursal = request.POST['cursal']
+        seeker.expsal = request.POST['expsal']
+        seeker.save()
+        return redirect('candidate:edit', pk=pk)
+    else:
+        return JsonResponse({'message':"try POST method"})
+
+from django.http import JsonResponse
+
+def upload_resume(request, pk):
+    if request.method == "POST":
+        try:
+            jobseeker = JobSeeker.objects.get(user_id=pk)
+            if jobseeker.Resume:
+                jobseeker.Resume.delete()
+            
+            filev = request.FILES['resume']
+            lst = filev.name.split(".")
+            new_file_name = f"{pk}_{jobseeker.name}_Resume_{filev.name}"
+            jobseeker.Resume.save(new_file_name, filev)
+            jobseeker.save()
+            save_resume_vector_matrix_thread = threading.Thread(target=save_resume_vector_matrix, args=(pk))
+            save_resume_vector_matrix_thread.start()
+            
+            
+            return JsonResponse({'message': 'Resume uploaded successfully'})
+        except JobSeeker.DoesNotExist:
+            return JsonResponse({'error': 'JobSeeker not found'}, status=404)
+        except Exception as e:
+            return JsonResponse({'error': f'Failed to upload resume: {str(e)}'}, status=400)
+    
+    return JsonResponse({'error': 'Invalid request'}, status=400)
 
 
 def thread(request, pk):

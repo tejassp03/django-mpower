@@ -245,17 +245,17 @@
                                     </select>
                                 </div>
                             </div>
+                            
                             <div class="col-md-6 col-xxl-3">
                                 <div class="mb-3">
                                     <label for="pxp-company-job-salary" class="form-label">Salary range</label>
-                                    <select id="pxp-company-job-salary" class="form-select" name="basicpay">
-                                        <option value="1">₹0 - ₹1LPA</option>
-                                        <option value="2">₹1LPA - ₹3LPA</option>
-                                        <option value="3">₹3LPA - ₹15LPA</option>
-                                        <option value="4">₹5LPA - ₹7LPA</option>
-                                        <option value="5">₹7LPA - ₹15LPA</option>
-                                        <option value="6">₹15LPA+</option>
-                                    </select>
+                                    <div class="input-group">
+                                        <input type="text" id="salary-input" class="form-control" placeholder="₹1-₹3" name="basicpay" style="width:60%;">
+                                        <select id="pxp-company-job-salary" class="form-select" name="basicpaySuffix" style="width:40%;">
+                                            <option value="Lakh">Lakh</option>
+                                            <option value="Crore">Crore</option>
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-md-6 col-xxl-3">
@@ -436,14 +436,25 @@ function toggle(source) {
           $('[name="description"]').val(JSON.parse(data['info'])[0].jobdesc);
           $('[name="experience"]').val(JSON.parse(data['info'])[0].experience);
           $('[name="careerlevel"]').val(JSON.parse(data['info'])[0].careerlevel);
-          $('[name="jobtype"]').val(JSON.parse(data['info'])[0].jobtype);
+          //$('[name="jobtype"]').val(JSON.parse(data['info'])[0].jobtype);
           $('[name="basicpay"]').val(JSON.parse(data['info'])[0].basicpay);
+            const basicpayValue = JSON.parse(data['info'])[0].basicpay;
+            if (basicpayValue.includes('Crore')) {
+                $('#pxp-company-job-salary').val('Crore');
+                const newValue = basicpayValue.replace('Crore', '').trim();
+                $('[name="basicpay"]').val(newValue);
+            } else if (basicpayValue.includes('Lakh')) {
+                $('#pxp-company-job-salary').val('Lakh');
+                const newValue = basicpayValue.replace('Lakh', '').trim();
+                $('[name="basicpay"]').val(newValue);
+            }
           $('[name="skills"]').val(JSON.parse(data['info'])[0].skills);
           $('[name="responsibilities"]').val(JSON.parse(data['info'])[0].responsibilities);
           $('[name="requirements"]').val(JSON.parse(data['info'])[0].requirements);
           $('.file-link').attr('href', "/media/"+JSON.parse(data['info'])[0].job_desc);
           if (JSON.parse(data['info'])[0].job_desc !== null) {
             var filename = JSON.parse(data['info'])[0].job_desc;
+            console.log(filename);
             var file_name = filename.split('/').pop();
             var final_file_name = file_name.split('_').pop();
             $('.file-link').show();
@@ -475,6 +486,7 @@ function toggle(source) {
     formData.append('careerlevel', $('[name="careerlevel"]').val());
     formData.append('jobtype', $('[name="jobtype"]').val());
     formData.append('basicpay', $('[name="basicpay"]').val());
+    formData.append('basicpaySuffix', $('[name="basicpaySuffix"]').val());
     formData.append('skills', $('[name="skills"]').val());
     formData.append('responsibilities', $('[name="responsibilities"]').val());
     formData.append('requirements', $('[name="requirements"]').val());

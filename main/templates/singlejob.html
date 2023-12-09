@@ -218,7 +218,7 @@
                     {% endif %}
                             <p style="font-weight: 100; line-height: 1.9;">Location: {% if matching_details.location.match %}<span class="green-check">&#9989;</span>{% else %}<span class="red-cross">&#10060;</span>{% endif %}</p>
                             <p style="font-weight: 100; line-height: 1.9;">Notice Period: {% if matching_details.notice_period.match %}<span class="green-check">&#9989;</span>{% else %}<span class="red-cross">&#10060;</span>{% endif %}</p>
-                            <p style="font-weight: 100; line-height: 1.9;">Expected Salary: {% if matching_details.expected_salary.match %}<span class="green-check">&#9989;</span>{% else %}<span class="red-cross">&#10060;</span>{% endif %}</p>
+                            <!-- <p style="font-weight: 100; line-height: 1.9;">Expected Salary: {% if matching_details.expected_salary.match %}<span class="green-check">&#9989;</span>{% else %}<span class="red-cross">&#10060;</span>{% endif %}</p> -->
                             <p style="font-weight: 100; line-height: 1.9;">Experience: {% if matching_details.experience.match %}<span class="green-check">&#9989;</span>{% else %}<span class="red-cross">&#10060;</span>{% endif %}</p>
 
                         </div>
@@ -242,10 +242,10 @@
                         {% endif %}
                     </div> -->
 
-                    <div class="pxp-single-job-content-details mt-4 mt-lg-5">
-                        <h4>Overview</h4>
+                    <div class="pxp-single-job-content-details mt-4 mt-lg-5 text-break">
+                        <h4>Job Overview</h4>
                         <p>{{ job_details.jobdesc }}</p>
-                        <div class="mt-4">
+                        <div class="mt-4 text-break" >
                             <h4>Responsibilities</h4>
                             <ul>
                                 {% for respon in responsibilities %}
@@ -253,21 +253,34 @@
                                 {% endfor %}
                             </ul>
                         </div>
-                        <div class="mt-4">
-                            <h4>Requirements</h4>
+                        <div class="mt-4 text-break">
+                            <h4>Required Skills</h4>
                             <ul>
                                 {% for require in requirements %}
                                     <li>{{ require }}</li>
                                 {% endfor %}
                             </ul>
                         </div>
-                        <div class="mt-4">
+                        <!-- <div class="mt-4">
                             <h4>Skills</h4>
                             <ul>
                                 {% for skill in skills %}
                                     <li>{{ skill }}</li>
                                 {% endfor %}
                             </ul>
+                        </div> -->
+                        <div class="mt-4 mt-lg-5">
+                            <!-- <h4>Skills</h4> -->
+                            <div class="pxp-single-candidate-skills">
+                                <ul class="list-unstyled" id="skillsadder">
+                                    {% for skill in skills %}
+                                        {% if skill %}
+                                            <li>{{ skill }}</li>
+                                        {% endif %}
+                                    {% endfor %}
+                                </ul>
+                                
+                            </div>
                         </div>
 
                         {% if request.session.name %}
@@ -301,6 +314,10 @@
                         </div>
                         <div class="mt-4">
                             <div class="pxp-single-job-side-info-label pxp-text-light">Salary</div>
+                            <div class="pxp-single-job-side-info-data">{{ job_details.basicpay }}</div>
+                        </div>
+                        <!-- <div class="mt-4">
+                            <div class="pxp-single-job-side-info-label pxp-text-light">Salary</div>
                             {% if job_details.basicpay == "1" %}
                             <div class="pxp-single-job-side-info-data">₹0 - ₹100000</div>
                             {% elif job_details.basicpay == "2" %}
@@ -314,7 +331,7 @@
                             {% elif job_details.basicpay == "6" %}
                             <div class="pxp-single-job-side-info-data">₹1500000+</div>
                             {% endif %}
-                        </div>
+                        </div> -->
                     </div>
                     <div class="mt-3 mt-lg-4 pxp-single-job-side-panel">
                         <div class="pxp-single-job-side-company">
@@ -330,7 +347,7 @@
                         </div>
                         <div class="mt-4">
                             <div class="pxp-single-job-side-info-label pxp-text-light">Industry</div>
-                            <div class="pxp-single-job-side-info-data">{{ job_details.industry }}</div>
+                            <div class="pxp-single-job-side-info-data">{{ company_details.industry }}</div>
                         </div>
                         <div class="mt-4">
                             <div class="pxp-single-job-side-info-label pxp-text-light">Company size</div>
@@ -353,6 +370,10 @@
                         <div class="mt-4">
                             <div class="pxp-single-job-side-info-label pxp-text-light">Founded in</div>
                             <div class="pxp-single-job-side-info-data">{{ company_details.yearfounded }}</div>
+                        </div>
+                        <div class="mt-4">
+                            <div class="pxp-single-job-side-info-label pxp-text-light">Contact Person</div>
+                            <div class="pxp-single-job-side-info-data">{{ company_details.executive }}</div>
                         </div>
                         <div class="mt-4">
                             <div class="pxp-single-job-side-info-label pxp-text-light">Phone</div>
