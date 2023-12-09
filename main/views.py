@@ -212,9 +212,20 @@ def index(request):
     return render(request, 'index.html', {'locations': locations, 'titles': titles, 'title': dumps(title), 'vals': vals, 'jobs': jobs_info, 'coms': coms_info, 'loc': locate, 'total': len(jobs),'seminars':seminars_in_ascending_order})
 
 def save_resume_vector_matrix_all():
+    duplicate_jobseekers = ResumeAnalysis.objects.values('jobseeker_id').annotate(
+        jobseeker_count=Count('jobseeker_id')
+    ).filter(jobseeker_count__gt=1)
+
+    for duplicate in duplicate_jobseekers:
+        jobseeker_id = duplicate['jobseeker_id']
+        
+        duplicate_entries = ResumeAnalysis.objects.filter(jobseeker_id=jobseeker_id)[1:]
+        
+        duplicate_entries.delete()
     try:
         vectorizer = CountVectorizer()
         jobSeeker = JobSeeker.objects.all()
+        i = 0
         for job_seeker in jobSeeker:
             try:
                 important_data_jobseeker = f"{job_seeker.location} {job_seeker.experience} {job_seeker.skills} {job_seeker.basic_edu} {job_seeker.master_edu} {job_seeker.other_qual} {job_seeker.cursal} {job_seeker.expsal} {job_seeker.notice_period}"
@@ -234,7 +245,8 @@ def save_resume_vector_matrix_all():
                     resume_analysis.actual_skills = job_seeker.skills
                     resume_analysis.jobseeker_id = job_seeker
                     resume_analysis.save()
-
+                
+                print(i+1)
             except Exception as e:
                 pass
         # deserialized_data = deserialize_sparse_matrix(resume_analysis.sparse_matrix_data)
