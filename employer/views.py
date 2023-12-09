@@ -342,7 +342,7 @@ def newjob(request, pk):
                         total_matching_percentage = round((job_matching_percentage + match_percentage + 40) / 2, 2)
                         matching_percentages.append((job_seeker.user_id, total_matching_percentage))
                     except Exception as e:
-                        print(e)
+                        pass
                 matching_percentages.sort(key=lambda x: x[1], reverse=True)
 
                 top_matching_job_seekers = matching_percentages[:20]
@@ -1033,7 +1033,7 @@ def edit_job(request, pk):
             try:
                 if 'jobDescriptionFile' in request.FILES:
                     filev = request.FILES['jobDescriptionFile']
-                    print("hi",filev)
+                    # print("hi",filev)
                     lst = filev._name.split(".")
                     random_integer = random.randint(1, 10000)
                     filev._name = str(pk)+"_"+str(request.POST['title'])+"_job_description"+str(random_integer)+"_"+filev._name

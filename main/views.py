@@ -207,23 +207,19 @@ def index(request):
         title.append(i['title'])
     for i in locations:
         locate.append(i['location'])
-    save_resume_vector_matrix_all()
+    # save_resume_vector_matrix_all()
     
     return render(request, 'index.html', {'locations': locations, 'titles': titles, 'title': dumps(title), 'vals': vals, 'jobs': jobs_info, 'coms': coms_info, 'loc': locate, 'total': len(jobs),'seminars':seminars_in_ascending_order})
 
 def save_resume_vector_matrix_all():
     all_entries = ResumeAnalysis.objects.all()
 
-    # Create a dictionary to store jobseeker_ids and their respective instances
     jobseeker_instances = defaultdict(list)
 
-    # Populate the dictionary
     for entry in all_entries:
         jobseeker_instances[entry.jobseeker_id].append(entry)
 
-    # Iterate through the dictionary items
     for jobseeker_id, instances in jobseeker_instances.items():
-        # Keep the first instance and delete the rest
         if len(instances) > 1:
             instances_to_delete = instances[1:]
             for instance in instances_to_delete:

@@ -358,7 +358,7 @@ def save_resume_vector_matrix(pk):
         # deserialized_data = deserialize_sparse_matrix(resume_analysis.sparse_matrix_data)
         
     except Exception as e:
-        print(e)
+        pass
 
 def edit_profile(request, pk):
     context = JobSeeker.objects.get(user_id=pk)
