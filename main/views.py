@@ -212,16 +212,22 @@ def index(request):
     return render(request, 'index.html', {'locations': locations, 'titles': titles, 'title': dumps(title), 'vals': vals, 'jobs': jobs_info, 'coms': coms_info, 'loc': locate, 'total': len(jobs),'seminars':seminars_in_ascending_order})
 
 def save_resume_vector_matrix_all():
-    duplicate_jobseekers = ResumeAnalysis.objects.values('jobseeker_id').annotate(
-        jobseeker_count=Count('jobseeker_id')
-    ).filter(jobseeker_count__gt=1)
+    all_entries = ResumeAnalysis.objects.all()
 
-    for duplicate in duplicate_jobseekers:
-        jobseeker_id = duplicate['jobseeker_id']
-        
-        duplicate_entries = ResumeAnalysis.objects.filter(jobseeker_id=jobseeker_id)[1:]
-        
-        duplicate_entries.delete()
+    # Create a dictionary to store jobseeker_ids and their respective instances
+    jobseeker_instances = defaultdict(list)
+
+    # Populate the dictionary
+    for entry in all_entries:
+        jobseeker_instances[entry.jobseeker_id].append(entry)
+
+    # Iterate through the dictionary items
+    for jobseeker_id, instances in jobseeker_instances.items():
+        # Keep the first instance and delete the rest
+        if len(instances) > 1:
+            instances_to_delete = instances[1:]
+            for instance in instances_to_delete:
+                instance.delete()
     try:
         vectorizer = CountVectorizer()
         jobSeeker = JobSeeker.objects.all()
