@@ -1454,10 +1454,12 @@ def singlejob(request, pk2):
         matching_details = "No"
     screening_questions = ''
     try:
+        print(pk2)
         screening_questions = ScreeningQuestions.objects.get(job_id = pk2)
         print(screening_questions)
     except:
         pass
+    print(screening_questions)
 
     return render(request, 'singlejob.html', {'job_details': jobdet, 'company_details': companydet, 'liked': lik, 'loger': loger, 'skills': skills_e, 'requirements': requirements, 'responsibilities': responsibilities, 'date': app_date, 'score': job_matching_percentage, 'skills_required': skills_required,'matching_details': matching_details,'screening_questions':screening_questions})
 
