@@ -1302,6 +1302,14 @@ def singlejob(request, pk2):
             like = LikedJobs(job_id=job_id, user_id=user_id)
             like.save()
         return redirect('main:singlejob', pk2=pk2)
+
+    # try:
+    print(pk2)
+    screening_questions = ScreeningQuestions.objects.filter(job_id=pk2).first()
+    print(screening_questions.question_one)
+    # except:
+    #     pass
+    # print(screening_questions)
     jobdet = Jobs.objects.get(jobid=pk2)
     jobdet.num_of_visits = jobdet.num_of_visits+1
     jobdet.save()
@@ -1352,7 +1360,7 @@ def singlejob(request, pk2):
             pdfFileObj = open("static/media/"+str(cand.Resume), 'rb')
             pdfReader = PyPDF2.PdfReader(pdfFileObj)
         except:
-            return render(request, 'singlejob.html', {'job_details': jobdet, 'company_details': companydet, 'liked': lik, 'loger': loger, 'skills': skills_e, 'requirements': requirements, 'responsibilities': responsibilities, 'date': app_date, 'score': 'Please submit your resume', 'skills_required': skills_required})
+            return render(request, 'singlejob.html', {'job_details': jobdet, 'company_details': companydet, 'liked': lik, 'loger': loger, 'skills': skills_e, 'requirements': requirements, 'responsibilities': responsibilities, 'date': app_date, 'score': 'Please submit your resume', 'skills_required': skills_required,'screening_questions':screening_questions})
         num_pages = len(pdfReader.pages)
         count = 0
         text = ""
@@ -1431,8 +1439,8 @@ def singlejob(request, pk2):
         cosine_sim_job_seeker = cosine_similarity(job_description_vector, job_seeker_data_vector)
 
         job_matching_percentage = round(cosine_sim_job_seeker[0][0] * 100, 2)
-    # print(f"Job Matching Percentage (Job Seeker Skills): {job_matching_percentage}%")
-    #######################################################################################
+        # print(f"Job Matching Percentage (Job Seeker Skills): {job_matching_percentage}%")
+        #######################################################################################
 
     
     
@@ -1452,14 +1460,7 @@ def singlejob(request, pk2):
     else:
         job_matching_percentage = "Please login to check eligibility"
         matching_details = "No"
-    screening_questions = ''
-    try:
-        print(pk2)
-        screening_questions = ScreeningQuestions.objects.get(job_id = pk2)
-        print(screening_questions)
-    except:
-        pass
-    print(screening_questions)
+    
 
     return render(request, 'singlejob.html', {'job_details': jobdet, 'company_details': companydet, 'liked': lik, 'loger': loger, 'skills': skills_e, 'requirements': requirements, 'responsibilities': responsibilities, 'date': app_date, 'score': job_matching_percentage, 'skills_required': skills_required,'matching_details': matching_details,'screening_questions':screening_questions})
 

@@ -543,6 +543,8 @@ document.getElementById('question2').addEventListener('input', function () {
         const matchPer = document.getElementById("pxp-company-job-match");
         
         form.addEventListener("submit", function (event) {
+            $('#screeningQuestionsSubmit').prop('disabled', false);
+
             let i = 0;
             // showPopup();
             event.preventDefault();
@@ -556,6 +558,8 @@ document.getElementById('question2').addEventListener('input', function () {
                 const originalFormData = new FormData(form);
                 originalFormData.append("question1", question1Value);
                 originalFormData.append("question2", question2Value);
+                $('#screeningQuestionsSubmit').prop('disabled', true);
+
 
             
             $.ajax(

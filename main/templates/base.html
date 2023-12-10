@@ -314,10 +314,8 @@
                                 <textarea id="answer2" name="answer2" class="form-control" style="width: 100%;" placeholder="write your response here...." required></textarea>
                                 {% endif %}
                                 {%else%}
-                                <textarea id="answer1" name="answer1" class="form-control" style="display: none;" placeholder="write your response here...." ></textarea>
-                                <textarea id="answer2" name="answer2" class="form-control" style="display: none;" placeholder="write your response here...." ></textarea>
-
                                 <h5 class="d-flex justify-content-center">Confirm to apply for job.</h5>
+                                <p>{{screening_questions.question_one}}</p>
                                 {%endif%}
                             </div>
                         </div>
