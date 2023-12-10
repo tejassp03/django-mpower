@@ -1304,9 +1304,9 @@ def singlejob(request, pk2):
         return redirect('main:singlejob', pk2=pk2)
 
     # try:
-    print(pk2)
+    # print(pk2)
     screening_questions = ScreeningQuestions.objects.filter(job_id=pk2).first()
-    print(screening_questions.question_one)
+    # print(screening_questions.question_one)
     # except:
     #     pass
     # print(screening_questions)
