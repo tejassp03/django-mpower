@@ -108,26 +108,26 @@ WSGI_APPLICATION = 'jobster.wsgi.application'
 #     }
 # }
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'mpo',
-        'USER': 'root',
-        'HOST': 'localhost',
-        'PORT': '3306',
-    }
-}
-
 # DATABASES = {
-#      'default': {
-#          'ENGINE': 'django.db.backends.mysql',
-#          'NAME': 'mpower',
-#          'USER': 'tejas',
-#          'PASSWORD': 'djangompower',
-#          'HOST': 'mpower-db.cwj8xtndrcdf.ap-south-1.rds.amazonaws.com',
-#          'PORT': '3306',
-#      }
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'mpo',
+#         'USER': 'root',
+#         'HOST': 'localhost',
+#         'PORT': '3306',
+#     }
 # }
+
+DATABASES = {
+     'default': {
+         'ENGINE': 'django.db.backends.mysql',
+         'NAME': 'mpower',
+         'USER': 'tejas',
+         'PASSWORD': 'djangompower',
+         'HOST': 'mpower-db.cwj8xtndrcdf.ap-south-1.rds.amazonaws.com',
+         'PORT': '3306',
+     }
+}
 
 
 # DATABASES = {
