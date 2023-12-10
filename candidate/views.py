@@ -1428,7 +1428,7 @@ def submit_mock(request, pk):
         
         
         total = len(testques)
-        print(total,count)
+        # print(total,count)
         
         
     return JsonResponse({'message': "submitted",'total':total,'right':count})

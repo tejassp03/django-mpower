@@ -564,14 +564,16 @@
                     return;
                 }
                 }
+                const answer1Value = $('[name=answer1]').val() || '';
+                const answer2Value = $('[name=answer2]').val() || '';
                 $.ajax(
                     {
                         type:"POST",
                         url: "{% url 'main:get_job' %}",
                         data:{
                             id: $('[name=jobidval]').val(),
-                            answer1: $('[name=answer1]').val(),
-                            answer2: $('[name=answer2]').val(),
+                            answer1: answer1Value,
+                            answer2: answer2Value,
                             csrfmiddlewaretoken: '{{ csrf_token }}'
                         },
                         success: function( data ) 

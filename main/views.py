@@ -1455,6 +1455,7 @@ def singlejob(request, pk2):
     screening_questions = ''
     try:
         screening_questions = ScreeningQuestions.objects.get(job_id = pk2)
+        print(screening_questions)
     except:
         pass
 
@@ -1622,17 +1623,21 @@ def get_job(request):
         job = Jobs.objects.get(jobid=request.GET['id'])
         return JsonResponse({'name': job.title, 'id': job.jobid})
     if (request.method == "POST"):
-        applic = Application()
-        applic.user_id = JobSeeker.objects.get(user_id=request.session['pk'])
-        applic.status = 0
-        applic.job_id = Jobs.objects.get(jobid=request.POST['id'])
-        applic.eid = applic.job_id.eid
-        applic.screening_answer_one = request.POST['answer1']
-        applic.screening_answer_two = request.POST['answer2']
-        applic.date_applied = timezone.localtime() 
+        try:
+            applic = Application()
+            applic.user_id = JobSeeker.objects.get(user_id=request.session['pk'])
+            applic.status = 0
+            applic.job_id = Jobs.objects.get(jobid=request.POST['id'])
+            applic.eid = applic.job_id.eid
+            applic.screening_answer_one = request.POST['answer1']
+            applic.screening_answer_two = request.POST['answer2']
+            applic.date_applied = timezone.localtime() 
         # + timedelta(hours=5, minutes=30)
-        applic.save()
-        return JsonResponse({'message': 'Y'})
+            applic.save()
+            return JsonResponse({'message': 'Y'})
+        except Exception as e:
+            print(e)
+
 
 
 def give_feedback(request, pk):

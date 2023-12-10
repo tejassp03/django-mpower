@@ -262,7 +262,6 @@ def deserialize_sparse_matrix(serialized_data):
 
 def newjob(request, pk):
     if (request.method == "POST"):
-        print(request.POST['question1'],request.POST['question2'])
         job = Jobs()
         job.eid = Employer.objects.get(eid=pk)
         job.title = request.POST['title']

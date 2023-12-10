@@ -589,10 +589,30 @@ function screeningQuestions(id) {
                 $('#question2').css('display', 'none');
                 $('#messages').html('<p>Screening questions not found.</p>');
             }else{
-            $('#question1').text("Q1. " + data.screening_questions[0].question_one);
-            $('#question2').text("Q2. " + data.screening_questions[0].question_two);
-            $('#answer1').val(data.screening_answers[0].screening_answer_one);
-            $('#answer2').val(data.screening_answers[0].screening_answer_two);
+                if(data.screening_questions[0].question_one){
+                    $('#question1').text("Q1. " + data.screening_questions[0].question_one);
+                    $('#question1').css('display', 'block');
+                    $('#answer1').val(data.screening_answers[0].screening_answer_one);
+                    $('#answer1').css('display', 'block');
+                }else{
+                    $('#question1').css('display', 'none');
+                    $('#answer1').css('display', 'none');
+                }
+
+                if(data.screening_questions[0].question_two){
+                    $('#question2').text("Q2. " + data.screening_questions[0].question_two);
+                    $('#answer2').val(data.screening_answers[0].screening_answer_two);
+                    $('#question2').css('display', 'block');
+                    $('#answer2').css('display', 'block');
+                }else{
+                    $('#question2').css('display', 'none');
+                    $('#answer2').css('display', 'none');
+
+                }
+
+
+            
+            
             }
             $('#screeningQuestionsModal').modal('show');
         }
