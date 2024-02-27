@@ -111,12 +111,22 @@ WSGI_APPLICATION = 'jobster.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'mpower',
+        'NAME': 'mpo',
         'USER': 'root',
         'HOST': 'localhost',
         'PORT': '3306',
     }
 }
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'brthg6tkr5nbinhmb1xg',
+#         'USER': 'uyswy6f1k1jgaeq2',
+#         'PASSWORD':'KyBvlKwt6C0myXv6Ig0q',
+#         'HOST': 'brthg6tkr5nbinhmb1xg-mysql.services.clever-cloud.com',
+#         'PORT': '3306',
+#     }
+# }
 
 # DATABASES = {
 #      'default': {

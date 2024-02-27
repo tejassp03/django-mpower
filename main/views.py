@@ -73,7 +73,7 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
-from ip2geotools.databases.noncommercial import DbIpCity
+# from ip2geotools.databases.noncommercial import DbIpCity
 import threading
 
 @csrf_exempt
@@ -82,134 +82,113 @@ def index(request):
         if 'location' in request.POST:
             longitude = request.POST['longitude']
             latitude = request.POST['latitude']
-        user = Login.objects.filter(email=request.POST['c_email'])
-        if (len(user) == 0):
+            
+        user = Login.objects.filter(email=request.POST.get('c_email', ''))
+        if not user.exists():
             return JsonResponse({'message': 'X'})
-        else:
 
-            if (check_password(request.POST['c_pass'], user[0].password)):
-                if (request.POST['user'] == 'candidate' and JobSeeker.objects.filter(log_id=user[0].log_id)):
-                    jobseeker = JobSeeker.objects.get(log_id=user[0].log_id)
-                    if ((jobseeker.phone == None or jobseeker.phone == "" or len(jobseeker.phone) <= 4) and (jobseeker.location == None or jobseeker.location == "") and (jobseeker.experience == None or jobseeker.experience == "") and (jobseeker.skills == None or jobseeker.skills == "") and (jobseeker.basic_edu == None or jobseeker.basic_edu == "") and (jobseeker.master_edu == None or jobseeker.master_edu == "") and (jobseeker.other_qual == None or jobseeker.other_qual == "") and (jobseeker.dob == None or jobseeker.dob == "") and (jobseeker.Resume == "" or jobseeker.Resume == None) and (jobseeker.photo == "" or jobseeker.photo == None)):
-                        urlval = "/profile_completion/"+str(user[0].log_id)+"/"
-                        return JsonResponse({'message': 'Y', 'url': urlval})
-                    # return redirect('main:profilecompletion', pk=user[0].log_id)
-                elif (request.POST['user'] == 'employer' and Employer.objects.filter(log_id=user[0].log_id)):
-                    employer = Employer.objects.get(log_id=user[0].log_id)
-                    if ((employer.etype == None or employer.etype == "") and (employer.industry == None or employer.industry == "") and (employer.address == None or employer.address == "") and (employer.pincode == None or employer.pincode == "") and (employer.executive == None or employer.executive == "") and (employer.phone == None or employer.phone == "" or len(employer.phone) <= 4) and (employer.location == None or employer.location == "") and (employer.profile == None or employer.profile == "") and (employer.logo == "" or employer.logo == None)):
-                        urlval = "/emp_completion/"+str(user[0].log_id)+"/"
-                        return JsonResponse({'message': 'Y', 'url': urlval})
-                    
-                else:
-                    return JsonResponse({'message': 'X'})
-                request.session['email'] = request.POST['c_email']
-                request.session['password'] = user[0].password
-                user[0].status = 1
-                user[0].save()
-                if (request.POST['user'] == 'candidate'):
-                    empls = JobSeeker.objects.get(log_id=user[0].log_id)
-                    request.session['name'] = empls.name
-                    request.session['pk'] = empls.user_id
-                    request.session['type'] = "c"
-                    if (empls.photo):
-                        request.session['photo'] = empls.photo.url
-                    jobid = request.POST.get('jobid')
-                    if jobid:
-                        urlval = "/singlejob/"+jobid+"/"
-                    else:
-                        urlval = "/candidate/"+str(jobseeker.user_id)+"/"
+        user = user.first()
+        if not check_password(request.POST.get('c_pass', ''), user.password):
+            return JsonResponse({'message': 'X'})
 
-                    # print(request.POST['jobid'])
-                    return JsonResponse({'message': 'Y', 'url': urlval})
-                else:
-                    emp = Employer.objects.get(log_id=user[0].log_id)
-                    request.session['name'] = emp.ename
-                    request.session['pk'] = emp.eid
-                    request.session['type'] = "e"
-                    if (emp.logo):
-                        request.session['photo'] = emp.logo.url
-                    urlval = "/employer/"+str(emp.eid)+"/"
-                    
-                    return JsonResponse({'message': 'Y', 'url': urlval})
-            else:
-                return JsonResponse({'message': 'X'})
+        user_type = request.POST.get('user', '')
+        if user_type == 'candidate':
+            jobseeker = JobSeeker.objects.filter(log_id=user.log_id).first()
+            if jobseeker:
+                if not all([
+                    not jobseeker.phone, 
+                    not jobseeker.location, 
+                    not jobseeker.experience, 
+                    not jobseeker.skills, 
+                    not jobseeker.basic_edu, 
+                    not jobseeker.master_edu, 
+                    not jobseeker.other_qual, 
+                    not jobseeker.dob, 
+                    not jobseeker.Resume, 
+                    not jobseeker.photo
+                ]):
+                    return JsonResponse({'message': 'Y', 'url': f"/profile_completion/{user.log_id}/"})
+        elif user_type == 'employer':
+            employer = Employer.objects.filter(log_id=user.log_id).first()
+            if employer:
+                if not all([
+                    not employer.etype, 
+                    not employer.industry, 
+                    not employer.address, 
+                    not employer.pincode, 
+                    not employer.executive, 
+                    not employer.phone, 
+                    not employer.location, 
+                    not employer.profile, 
+                    not employer.logo
+                ]):
+                    return JsonResponse({'message': 'Y', 'url': f"/emp_completion/{user.log_id}/"})
+
+        return JsonResponse({'message': 'X'})
 
     jobs = Jobs.objects.all()
-    typ = jobs.values('fnarea').annotate(
-        Count('fnarea')).order_by('-fnarea__count')
-    applics = Application.objects.values('job_id').annotate(
-        Count('job_id')).order_by('-job_id__count')
-    coms = jobs.values('eid').annotate(Count('eid')).order_by('-eid__count')
-    vals = []
-    co = 0
+    typ = jobs.values('fnarea').annotate(Count('fnarea')).order_by('-fnarea__count')[:6]
+    coms = jobs.values('eid').annotate(Count('eid')).order_by('-eid__count')[:6]
+    vals = [{'fnarea': i['fnarea'], 'count': i['fnarea__count']} for i in typ]
+    
     try:
         user_ip = request.META.get('REMOTE_ADDR')
         url = f"https://ipinfo.io/{user_ip}/json"
         response = requests.get(url)
-
         data = response.json()
         user_city = data.get('city', 'City Not Found')
-    except:
-        pass
-    seminars = Seminars.objects.all()
-    seminar_distances = [(seminar, calculate_distance(seminar.city, user_city)) for seminar in seminars]
-    seminar_distances.sort(key=lambda x: x[1])
-    seminars_in_ascending_order = [seminar for seminar, _ in seminar_distances]
+    except Exception as e:
+        print(f"Error fetching user IP: {e}")
+        user_city = 'City Not Found'
 
-    for i in typ:
-        if (co > 5):
-            break
-        single_val = {}
-        single_val['fnarea'] = i['fnarea']
-        single_val['count'] = i['fnarea__count']
-        vals.append(single_val)
-        co = co+1
-    locations = jobs.order_by().values('location').distinct()
-    titles = jobs.order_by().values('title').distinct()
-    title = []
-    locate = []
-    jobs_info = []
-    co = 0
-    feature_jobs = jobs.order_by('-num_of_visits')
-    for i in feature_jobs:
-        if (co > 7):
-            break
-        single_j = {}
-        sin = i
-        single_j['fnarea'] = sin.fnarea
-        single_j['title'] = sin.title
-        single_j['location'] = sin.location
-        single_j['type'] = sin.jobtype
-        single_j['date'] = sin.postdate
-        single_j['name'] = sin.eid.ename
-        single_j['jobid'] = sin.jobid
-        if (sin.eid.logo):
-            single_j['logo'] = sin.eid.logo
-        else:
-            single_j['logo'] = None
-        single_j['eid'] = sin.eid.eid
-        jobs_info.append(single_j)
-        co = co+1
-    coms_info = []
-    for i in coms:
-        single_com = {}
-        emp = Employer.objects.get(eid=i['eid'])
-        single_com['name'] = emp.ename
-        single_com['eid'] = emp.eid
-        if (emp.logo):
-            single_com['logo'] = emp.logo
-        else:
-            single_com['logo'] = None
-        single_com['info'] = emp.profile
-        single_com['count'] = i['eid__count']
-        coms_info.append(single_com)
-    for i in titles:
-        title.append(i['title'])
-    for i in locations:
-        locate.append(i['location'])
-    # save_resume_vector_matrix_all()
-    
-    return render(request, 'index.html', {'locations': locations, 'titles': titles, 'title': dumps(title), 'vals': vals, 'jobs': jobs_info, 'coms': coms_info, 'loc': locate, 'total': len(jobs),'seminars':seminars_in_ascending_order})
+    # Fetch seminars ordered by latest posted date
+    seminars_in_ascending_order = Seminars.objects.order_by('-created_date')
+
+    # Fetch distinct locations and titles
+    locations = list(jobs.order_by().values_list('location', flat=True).distinct())
+    titles = list(jobs.order_by().values_list('title', flat=True).distinct())
+
+
+    jobs_info = [
+        {
+            'fnarea': job.fnarea,
+            'title': job.title,
+            'location': job.location,
+            'type': job.jobtype,
+            'date': job.postdate,
+            'name': job.eid.ename,
+            'jobid': job.jobid,
+            'logo': job.eid.logo if job.eid.logo else None,
+            'eid': job.eid.eid
+        }
+        for job in jobs.order_by('-num_of_visits')[:8]
+    ]
+
+    coms_info = [
+        {
+            'name': emp.ename,
+            'eid': emp.eid,
+            'logo': emp.logo if emp.logo else None,
+            'info': emp.profile,
+            'count': count['eid__count']
+        }
+        for count in coms
+        for emp in Employer.objects.filter(eid=count['eid'])
+    ]
+
+    return render(request, 'index.html', {
+    'locations': locations,
+    'titles': titles,
+    'title': dumps([title for title in titles]),
+    'vals': vals,
+    'jobs': jobs_info,
+    'coms': coms_info,
+    'loc': locations,
+    'total': len(jobs),
+    'seminars': seminars_in_ascending_order
+})
+
+
 
 def save_resume_vector_matrix_all():
     all_entries = ResumeAnalysis.objects.all()
