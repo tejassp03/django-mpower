@@ -30,8 +30,8 @@ class JobSeeker(models.Model):
     basic_edu = models.CharField(max_length=100, default=None, null=True)
     master_edu = models.CharField(max_length=100, default=None, null=True)
     other_qual = models.CharField(max_length=100, default=None, null=True)
-    cursal = models.IntegerField(default=0)
-    expsal = models.IntegerField(default=0)
+    cursal = models.FloatField(default=0)
+    expsal = models.FloatField(default=0)
     dob = models.CharField(max_length=50, default=None, null=True)
     Resume = models.FileField(upload_to='resumes/', default=None, null=True)
     photo = models.ImageField(upload_to='photos/', default=None, null=True)
@@ -57,6 +57,9 @@ class Employer(models.Model):
     phone = models.CharField(max_length=100, default=None, null=True)
     location = models.CharField(max_length=200, default=None, null=True)
     profile = models.CharField(max_length=700, default=None, null=True)
+    strength = models.CharField(max_length=200, default=None, null=True)
+    turnover = models.CharField(max_length=300, default=None, null=True)
+    details = models.CharField(max_length=700, default=None, null=True)
     logo = models.ImageField(
         upload_to='logos/', default=None, blank=True, null=True)
     website = models.CharField(max_length=100, blank=True, null=True)
@@ -71,6 +74,7 @@ class Employer(models.Model):
         upload_to='cover/', default=None, blank=True, null=True)
     about = models.CharField(
         max_length=500, default="Not Specified", null=True)
+    email = models.EmailField(null=False, blank=False)
 
     class Meta:
         db_table = "employer"
@@ -291,8 +295,12 @@ class TestQues(models.Model):
 class ScreeningQuestions(models.Model):
     screening_ques_id = models.AutoField(primary_key=True)
     job_id = models.ForeignKey(Jobs, default=None, null=True, on_delete=models.CASCADE)
+    questions = models.TextField(default=None,null=True)
+    
+    # both are deprecated
     question_one = models.TextField(default=None,null=True)
     question_two = models.TextField(default=None,null=True)
+
     class Meta:
         db_table = "ScreeningQuestions"
 

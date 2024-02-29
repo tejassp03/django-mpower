@@ -283,8 +283,8 @@ def newjob(request, pk):
         # normalized_skills = ','.join(skill.strip() for skill in raw_skills.split(','))
 
         job.skills = all_skills
-        job.responsibilities = request.POST['responsibilities']
-        job.requirements = request.POST['requirements']
+        # job.responsibilities = request.POST['responsibilities']
+        # job.requirements = request.POST['requirements']
         filev = None
         try:
             filev = request.FILES["jobDescriptionFile"]
@@ -297,8 +297,7 @@ def newjob(request, pk):
         job.save()
         screening_questions = ScreeningQuestions()
         screening_questions.job_id = job
-        screening_questions.question_one = request.POST['question1']
-        screening_questions.question_two = request.POST['question2']
+        screening_questions.questions = request.POST.get('questions', []).join(', ')
         screening_questions.save()
 
 
@@ -448,6 +447,10 @@ def edit(request, pk):
         context.twlink = request.POST['twlink']
         context.inlink = request.POST['inlink']
         context.lnlink = request.POST['lnlink']
+        context.email = request.POST['email']
+        context.strength = request.POST.get('strength', "")
+        context.details = request.POST.get('details', "")
+        context.turnover = request.POST.get('turnover', "")
         filev = None
         try:
             filev = request.FILES['logo']

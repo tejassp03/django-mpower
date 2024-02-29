@@ -245,7 +245,7 @@
                     <div class="pxp-single-job-content-details mt-4 mt-lg-5 text-break">
                         <h4>Job Overview</h4>
                         <p>{{ job_details.jobdesc }}</p>
-                        <div class="mt-4 text-break" >
+                        {% comment %} <div class="mt-4 text-break" >
                             <h4>Responsibilities</h4>
                             <ul>
                                 {% for respon in responsibilities %}
@@ -260,7 +260,7 @@
                                     <li>{{ require }}</li>
                                 {% endfor %}
                             </ul>
-                        </div>
+                        </div> {% endcomment %}
                         <!-- <div class="mt-4">
                             <h4>Skills</h4>
                             <ul>

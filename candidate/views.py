@@ -1,3 +1,4 @@
+from django.core import serializers
 import os
 from django.shortcuts import render, redirect
 from main.models import *
@@ -31,7 +32,6 @@ import json
 from scipy.sparse import save_npz, load_npz
 from io import BytesIO
 import threading
-
 
 
 # Create your views here.
@@ -113,7 +113,7 @@ def dashboard(request, pk):
         com = Employer.objects.get(eid=job.eid.eid)
         singappli['ename'] = com.ename
         singappli['logo'] = com.logo
-        
+
         all_applics.append(singappli)
         if i.status == 1:
             is_approved = i.job_id.jobid
@@ -232,8 +232,8 @@ def dashboard(request, pk):
     charts_context['vdates365'] = dumps(
         [item[0] for item in visits_365], default=str)
     charts_context['vcount_365'] = dumps(countsv[4])
-    appli = Application.objects.filter(user_id_id = pk)
-    return render(request, 'dashboard-candidate.html', {'user': context, 'applications': all_applics, 'pk': pk, 'profile': profile, 'notifics': all_notis, 'messcount': countunmess, 'charts': charts_context, 'recent': recent_mess_temp, 'pending': popupmess,'appli':appli,'is_approved':is_approved,'approved_company_name':approved_company_name,'approved_role':approved_role})
+    appli = Application.objects.filter(user_id_id=pk)
+    return render(request, 'dashboard-candidate.html', {'user': context, 'applications': all_applics, 'pk': pk, 'profile': profile, 'notifics': all_notis, 'messcount': countunmess, 'charts': charts_context, 'recent': recent_mess_temp, 'pending': popupmess, 'appli': appli, 'is_approved': is_approved, 'approved_company_name': approved_company_name, 'approved_role': approved_role})
 
 
 def jobapp(request, pk):
@@ -304,6 +304,7 @@ def jobapp(request, pk):
             break
     return JsonResponse({'logo': image, 'info': dumps(list(jobinfo.values()), default=str), 'company': dumps(list(employer.values())), 'emai': dumps(email), 'score': quality, 'skills_required': skills_required})
 
+
 def extract_text_from_pdf(pdf_file):
     pdf_text = ""
     with open(pdf_file, 'rb') as file:
@@ -313,6 +314,7 @@ def extract_text_from_pdf(pdf_file):
             page = pdf_reader.pages[page_num]
             pdf_text += page.extract_text()
     return pdf_text
+
 
 def preprocess_text(text):
     words = word_tokenize(text)
@@ -326,13 +328,15 @@ def preprocess_text(text):
     preprocessed_text = ' '.join(words)
     return preprocessed_text
 
+
 def serialize_sparse_matrix(matrix):
     buffer = BytesIO()
     save_npz(buffer, matrix)
     serialized_matrix = buffer.getvalue()
 
-    json_compatible_data = serialized_matrix.decode('latin1')  
+    json_compatible_data = serialized_matrix.decode('latin1')
     return json_compatible_data
+
 
 def deserialize_sparse_matrix(serialized_data):
     serialized_matrix = serialized_data.encode('latin1')
@@ -340,6 +344,8 @@ def deserialize_sparse_matrix(serialized_data):
     buffer = BytesIO(serialized_matrix)
     matrix = load_npz(buffer)
     return matrix
+
+
 def save_resume_vector_matrix(pk):
     try:
         vectorizer = CountVectorizer()
@@ -350,15 +356,17 @@ def save_resume_vector_matrix(pk):
         job_seeker_data = preprocess_text(important_data_jobseeker)
         resume_text = preprocess_text(resume_text)
         total_job_seeker_data = f"{job_seeker_data}{resume_text}"
-        job_seeker_data_vector = vectorizer.fit_transform([total_job_seeker_data])
+        job_seeker_data_vector = vectorizer.fit_transform(
+            [total_job_seeker_data])
         serialized_data = serialize_sparse_matrix(job_seeker_data_vector)
         resume_analysis = ResumeAnalysis.objects.get(jobseeker_id=job_seeker)
         resume_analysis.sparse_matrix_data = serialized_data
         resume_analysis.save()
         # deserialized_data = deserialize_sparse_matrix(resume_analysis.sparse_matrix_data)
-        
+
     except Exception as e:
         pass
+
 
 def edit_profile(request, pk):
     context = JobSeeker.objects.get(user_id=pk)
@@ -369,13 +377,14 @@ def edit_profile(request, pk):
     numbersMonth = range(1, 13)
     numbersYear = range(1, 31)
     extracted_name = "Resume.pdf"
-    resume_filename = os.path.basename(context.Resume.url)
+    resume_filename = None
+    if context.Resume.name != "":
+        resume_filename = os.path.basename(context.Resume.url)
 
-    filename_parts = resume_filename.split('_Resume_')
-    if len(filename_parts) > 1:
-        extracted_name = filename_parts[-1]
-    
-    
+        filename_parts = resume_filename.split('_Resume_')
+        if len(filename_parts) > 1:
+            extracted_name = filename_parts[-1]
+
     for i in skills:
         if i == "":
             skills.remove(i)
@@ -409,8 +418,7 @@ def edit_profile(request, pk):
         return redirect('candidate:edit', pk=pk)
     titlerole = RoleDetails.objects.all()
     skills_ = AllSkills.objects.all()
-    return render(request, 'profile-candidate.html', {'user': context, 'pk': pk, 'log': request.session['email'], 'skills': skills, 'experience': experience, 'education': education,'training':training,'titlerole':titlerole,'skills_':skills_,'numbersMonth':numbersMonth,'numbersYear':numbersYear,'extracted_name':extracted_name})
-
+    return render(request, 'profile-candidate.html', {'user': context, 'pk': pk, 'log': request.session['email'], 'skills': skills, 'experience': experience, 'education': education, 'training': training, 'titlerole': titlerole, 'skills_': skills_, 'numbersMonth': numbersMonth, 'numbersYear': numbersYear, 'extracted_name': extracted_name})
 
 
 def returnvalue(phone):
@@ -482,6 +490,7 @@ def add_edu(request, pk):
         edu.save()
     return redirect('candidate:edit', pk=pk)
 
+
 def add_training(request, pk):
     if (request.method == "POST"):
         tra = Training()
@@ -529,6 +538,7 @@ def delete_edu(request, pk):
         edu.delete()
     return redirect('candidate:edit', pk=pk)
 
+
 def delete_training(request, pk):
     if request.method == "POST":
         tra = Training.objects.get(training_id=request.POST['id'])
@@ -554,7 +564,7 @@ def edit_exp(request, pk):
             exp[0].description = request.POST['description']
             exp[0].save()
         return redirect('candidate:edit', pk=pk)
-    return JsonResponse({'info': dumps(list(exp.values()), default=str),'numbersMonth':numbersMonth,'numbersYear':numbersYear})
+    return JsonResponse({'info': dumps(list(exp.values()), default=str), 'numbersMonth': numbersMonth, 'numbersYear': numbersYear})
 
 
 def edit_edu(request, pk):
@@ -573,6 +583,7 @@ def edit_edu(request, pk):
         return redirect('candidate:edit', pk=pk)
     return JsonResponse({'info': dumps(list(edu.values()), default=str)})
 
+
 def edit_training(request, pk):
     training = None
     if (request.method == "GET"):
@@ -589,7 +600,8 @@ def edit_training(request, pk):
         return redirect('candidate:edit', pk=pk)
     return JsonResponse({'info': dumps(list(tra.values()), default=str)})
 
-def update_salary(request,pk):
+
+def update_salary(request, pk):
     if request.method == 'POST':
         seeker = JobSeeker.objects.get(user_id=pk)
         seeker.cursal = request.POST['cursal']
@@ -597,9 +609,8 @@ def update_salary(request,pk):
         seeker.save()
         return redirect('candidate:edit', pk=pk)
     else:
-        return JsonResponse({'message':"try POST method"})
+        return JsonResponse({'message': "try POST method"})
 
-from django.http import JsonResponse
 
 def upload_resume(request, pk):
     if request.method == "POST":
@@ -607,22 +618,22 @@ def upload_resume(request, pk):
             jobseeker = JobSeeker.objects.get(user_id=pk)
             if jobseeker.Resume:
                 jobseeker.Resume.delete()
-            
+
             filev = request.FILES['resume']
             lst = filev.name.split(".")
             new_file_name = f"{pk}_{jobseeker.name}_Resume_{filev.name}"
             jobseeker.Resume.save(new_file_name, filev)
             jobseeker.save()
-            save_resume_vector_matrix_thread = threading.Thread(target=save_resume_vector_matrix, args=(pk))
+            save_resume_vector_matrix_thread = threading.Thread(
+                target=save_resume_vector_matrix, args=(pk))
             save_resume_vector_matrix_thread.start()
-            
-            
+
             return JsonResponse({'message': 'Resume uploaded successfully'})
         except JobSeeker.DoesNotExist:
             return JsonResponse({'error': 'JobSeeker not found'}, status=404)
         except Exception as e:
             return JsonResponse({'error': f'Failed to upload resume: {str(e)}'}, status=400)
-    
+
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
 
@@ -1111,7 +1122,8 @@ def attempt(request, pk, pk2, pk3):
     testinfo = TestInfo.objects.get(test_id=pk2)
     testques = TestQues.objects.filter(testinfoid=testinfo.testinfoid)
     name = testinfo.test_name
-    test_user = TestUser.objects.get(test_id=testinfo.test_id_id,user_id = pk,emp_id_id = testinfo.eid.eid, apply_id = pk3)
+    test_user = TestUser.objects.get(
+        test_id=testinfo.test_id_id, user_id=pk, emp_id_id=testinfo.eid.eid, apply_id=pk3)
     start_time = test_user.date
     time_limit = testinfo.time_limit
     all_ques = []
@@ -1124,20 +1136,20 @@ def attempt(request, pk, pk2, pk3):
         single_ques['opt3'] = i.option3
         single_ques['opt4'] = i.option4
         try:
-            if(i.images.url != None):
+            if (i.images.url != None):
                 single_ques['image'] = i.images.url
         except:
             pass
         all_ques.append(single_ques)
     time_length = (time_limit//len(all_ques))*60
-    return render(request, 'attempt-employer.html', {'pk': pk, 'pk2': pk2, 'pk3':pk3, 'test': all_ques, 'name': name,'start_time':start_time,'time_length':time_length})
+    return render(request, 'attempt-employer.html', {'pk': pk, 'pk2': pk2, 'pk3': pk3, 'test': all_ques, 'name': name, 'start_time': start_time, 'time_length': time_length})
 
 
 def submit(request, pk):
     if request.method == "POST":
         testinfo = TestInfo.objects.get(test_id=request.POST['testid'])
         usertest = TestUser.objects.get(
-            user_id=pk, test_id=request.POST['testid'],emp_id_id = testinfo.eid.eid,apply_id = request.POST['apply_id'])
+            user_id=pk, test_id=request.POST['testid'], emp_id_id=testinfo.eid.eid, apply_id=request.POST['apply_id'])
         testques = TestQues.objects.filter(testinfoid=testinfo.testinfoid)
         ans = request.POST.getlist('answers[]')
         usertest.total_ques = len(testques)
@@ -1151,7 +1163,8 @@ def submit(request, pk):
         usertest.answers = str_ans
         usertest.date = datetime.now()
         usertest.save()
-        applics = Application.objects.get(user_id=pk, test=testinfo, apply_id = request.POST['apply_id'])
+        applics = Application.objects.get(
+            user_id=pk, test=testinfo, apply_id=request.POST['apply_id'])
         applics.status = 4
         applics.save()
         notif = Notifications()
@@ -1162,32 +1175,35 @@ def submit(request, pk):
         notif.save()
     return JsonResponse({'message': "submitted"})
 
+
 def test_reminder():
     apps = Application.objects.filter(status=3)
     for i in apps:
         email_subject = "Test Pending"
         message = f"You have a test pending from {i.eid.ename} for {i.job_id.title}."
-        email = EmailMessage(email_subject, message, settings.EMAIL_HOST_USER, [i.user_id.log_id.email])
+        email = EmailMessage(email_subject, message, settings.EMAIL_HOST_USER, [
+                             i.user_id.log_id.email])
         email.fail_silently = True
         email.send()
 
 
-def feedback(request,pk,pk1):
-    inter = Interview.objects.get(int_id = pk1)
-    feed = Feedback.objects.get(int_id = pk1)
+def feedback(request, pk, pk1):
+    inter = Interview.objects.get(int_id=pk1)
+    feed = Feedback.objects.get(int_id=pk1)
 
     data = {}
-    if len(feed)>0:
+    if len(feed) > 0:
         data['ename'] = inter.eid.ename
         data['title'] = inter.apply_id.job_id.title
         data['logo'] = inter.eid.logo.url
         data['feed'] = feed[0].emp_feedback
         data['rating'] = feed[0].rating
     else:
-        data['inter']="n"
+        data['inter'] = "n"
         messages.success(request, "Feedback not given")
         return redirect('candidate:interviews', pk=pk)
-    return render(request,'feedback.html',{'data':data})
+    return render(request, 'feedback.html', {'data': data})
+
 
 def interviews(request, pk):
     inter = Interview.objects.filter(user_id=pk).order_by('-schedule_date')
@@ -1223,7 +1239,8 @@ def interviews(request, pk):
 
 
 def get_interview(request, pk):
-    inter = Interview.objects.filter(eid=request.GET['eid'], user_id=pk).first()
+    inter = Interview.objects.filter(
+        eid=request.GET['eid'], user_id=pk).first()
     data = {}
     data['date'] = inter.schedule_date
     data['link'] = inter.int_link
@@ -1254,52 +1271,56 @@ def feed_get(request, pk):
 
 
 def templates(request, pk):
-    template=CandidateTemplateAssignments.objects.filter(candidate_id=pk)
-    data={}
-    if len(template)>0:
-        data['not_temp']=0
-        steps=[]
-        data['temp_name']=template[0].template_id.template_name
-        data['temp_desc']=template[0].template_id.template_description
-        candass=CandidateTemplateAssignments.objects.get(candidate_id=pk, template_id=template[0].template_id.template_id)
-        all_steps=CandidateStepProgress.objects.filter(assignment_id=candass.assignment_id)
-        date_from_db=candass.date_assigned
+    template = CandidateTemplateAssignments.objects.filter(candidate_id=pk)
+    data = {}
+    if len(template) > 0:
+        data['not_temp'] = 0
+        steps = []
+        data['temp_name'] = template[0].template_id.template_name
+        data['temp_desc'] = template[0].template_id.template_description
+        candass = CandidateTemplateAssignments.objects.get(
+            candidate_id=pk, template_id=template[0].template_id.template_id)
+        all_steps = CandidateStepProgress.objects.filter(
+            assignment_id=candass.assignment_id)
+        date_from_db = candass.date_assigned
         for i in all_steps:
-            final_data={}
-            final_data['prog_id']=i.progress_id
-            final_data['step_name']=i.step_id.step_name
-            final_data['step_desc']=i.step_id.step_description
-            final_data['is_done']=i.is_completed
-            final_data['date']=i.completion_date
-            final_data['assigned']=date_from_db
-            date_from_db=date_from_db + timedelta(days=1)
+            final_data = {}
+            final_data['prog_id'] = i.progress_id
+            final_data['step_name'] = i.step_id.step_name
+            final_data['step_desc'] = i.step_id.step_description
+            final_data['is_done'] = i.is_completed
+            final_data['date'] = i.completion_date
+            final_data['assigned'] = date_from_db
+            date_from_db = date_from_db + timedelta(days=1)
             steps.append(final_data)
-        data['steps']=steps
+        data['steps'] = steps
     else:
-        data['not_temp']=1
+        data['not_temp'] = 1
     return render(request, 'onboarding.html', {'pk': pk, 'data': data})
 
 
 def get_template(request, pk):
-    progress_val=CandidateStepProgress.objects.get(progress_id=request.GET['progr_id'])
-    final_data={}
-    final_data['name']=progress_val.step_id.step_name
-    final_data['desc']=progress_val.step_id.step_description
-    final_data['reso']=progress_val.step_id.step_resources
-    final_data['tasks']=progress_val.step_id.step_tasks
+    progress_val = CandidateStepProgress.objects.get(
+        progress_id=request.GET['progr_id'])
+    final_data = {}
+    final_data['name'] = progress_val.step_id.step_name
+    final_data['desc'] = progress_val.step_id.step_description
+    final_data['reso'] = progress_val.step_id.step_resources
+    final_data['tasks'] = progress_val.step_id.step_tasks
     return JsonResponse({'info': final_data})
+
 
 def set_step(request, pk):
     if request.method == "POST":
-        progress_val=CandidateStepProgress.objects.get(progress_id=request.POST['progr_id'])
-        progress_val.is_completed=1
-        progress_val.completion_date=timezone.now()
+        progress_val = CandidateStepProgress.objects.get(
+            progress_id=request.POST['progr_id'])
+        progress_val.is_completed = 1
+        progress_val.completion_date = timezone.now()
         progress_val.save()
-        temp=progress_val.assignment_id
-        temp.current_step_order=temp.current_step_order+1
+        temp = progress_val.assignment_id
+        temp.current_step_order = temp.current_step_order+1
         temp.save()
         return JsonResponse({'info': 'done'})
-
 
 
 def job_change(request, pk):
@@ -1363,8 +1384,6 @@ def job_change(request, pk):
             page_obj = p.page(p.num_pages)
     return render(request, 'jobsuggest-candidate.html', {'pk': pk, 'pe': page_obj, 'count': count})
 
-from django.core import serializers
-
 
 def get_mocks(request, pk):
     if request.method == "POST":
@@ -1375,10 +1394,11 @@ def get_mocks(request, pk):
                 job_ = Jobs.objects.get(jobid=job_id)
                 job_skills = job_.skills
                 job_skills_list = job_skills.split(',')
-                matching_mocktestinfo = MockTestInfo.objects.filter(tech__in=job_skills_list)
-                
-             
-                mocktest_data = serializers.serialize('json', matching_mocktestinfo)
+                matching_mocktestinfo = MockTestInfo.objects.filter(
+                    tech__in=job_skills_list)
+
+                mocktest_data = serializers.serialize(
+                    'json', matching_mocktestinfo)
 
                 return JsonResponse({'mocktests': mocktest_data}, safe=False)
 
@@ -1388,8 +1408,7 @@ def get_mocks(request, pk):
         return JsonResponse({'error': 'Missing or invalid jobid parameter'}, status=400)
 
 
-
-def attempt_mock(request,pk, pk1):
+def attempt_mock(request, pk, pk1):
     testinfo = MockTestInfo.objects.get(test_id=pk1)
     testques = MockTestQues.objects.filter(testinfoid=testinfo.testinfoid)
     name = testinfo.test_name
@@ -1405,13 +1424,14 @@ def attempt_mock(request,pk, pk1):
         single_ques['opt3'] = i.option3
         single_ques['opt4'] = i.option4
         try:
-            if(i.body != None):
+            if (i.body != None):
                 single_ques['body'] = i.body
         except:
             pass
         all_ques.append(single_ques)
     time_length = (time_limit//len(all_ques))*60
-    return render(request, 'attempt-mock.html', {'pk': pk, 'pk2': pk1,  'test': all_ques, 'name': name,'start_time':start_time,'time_length':time_length})
+    return render(request, 'attempt-mock.html', {'pk': pk, 'pk2': pk1,  'test': all_ques, 'name': name, 'start_time': start_time, 'time_length': time_length})
+
 
 def submit_mock(request, pk):
     if request.method == "POST":
@@ -1425,13 +1445,11 @@ def submit_mock(request, pk):
             if i.correct == int(j):
                 count = count+1
 
-        
-        
         total = len(testques)
         # print(total,count)
-        
-        
-    return JsonResponse({'message': "submitted",'total':total,'right':count})
+
+    return JsonResponse({'message': "submitted", 'total': total, 'right': count})
+
 
 def logout(request, pk):
     user = Login.objects.get(
