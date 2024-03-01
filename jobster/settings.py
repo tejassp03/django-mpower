@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
+import nltk
 import pymysql
 from dotenv import load_dotenv
 from pathlib import Path
@@ -19,12 +20,10 @@ import mimetypes
 mimetypes.add_type("text/css", ".css", True)
 pymysql.install_as_MySQLdb()
 load_dotenv()
-import nltk
-#nltk.download('punkt')
+# nltk.download('punkt')
 # import psycopg2
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 
 # Quick-start development settings - unsuitable for production
@@ -36,7 +35,7 @@ SECRET_KEY = 'django-insecure-b7#088%6h$a0*!lm!5^nc#@3b5mp95*lr13-w4b)+9c$-d!#o&
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*','http://13.231.178.59:8000/']
+ALLOWED_HOSTS = ['*', 'http://13.231.178.59:8000/']
 
 CORS_ORIGIN_WHITELIST = [
     'http://localhost:8000'
@@ -139,6 +138,24 @@ DATABASES = {
 #      }
 # }
 
+DATABASES = {
+    # 'prod': {
+    #     'ENGINE': 'django.db.backends.mysql',
+    #     'NAME': 'mpower',
+    #     'USER': 'tejas',
+    #     'PASSWORD': 'djangompower',
+    #     'HOST': 'mpower-db.cwj8xtndrcdf.ap-south-1.rds.amazonaws.com',
+    #     'PORT': '3306',
+    # },
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'mpower',
+        'USER': 'user',
+        'PASSWORD': 'password',
+        'HOST': 'localhost',
+        'PORT': '3300',
+    }
+}
 
 # DATABASES = {
 #     'default': {

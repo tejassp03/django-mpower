@@ -133,6 +133,36 @@
                         {% endif %}
                     </div>
                 </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="pxp-company-details" class="form-label">Details</label>
+                        {% if context.details == None %}
+                        <input type="text" id="pxp-company-details" class="form-control" placeholder="E.g. Work in fintech" name="details">
+                        {% else %}
+                        <input type="text" id="pxp-company-details" class="form-control" placeholder="E.g. Work in fintech" name="details" value="{{ context.details }}">
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="pxp-company-strength" class="form-label">Company's Strengths</label>
+                        {% if context.strength == None %}
+                        <input type="text" id="pxp-company-strength" class="form-control" placeholder="E.g. Diverse Culture" name="strength">
+                        {% else %}
+                        <input type="text" id="pxp-company-strength" class="form-control" placeholder="E.g. Diverse Culture" name="strength" value="{{ context.strength }}">
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="pxp-company-turnover" class="form-label">Company's trunover</label>
+                        {% if context.turnover == None %}
+                        <input type="text" id="pxp-company-turnover" class="form-control" placeholder="E.g. 2 Cr. per Annum" name="turnover">
+                        {% else %}
+                        <input type="text" id="pxp-company-turnover" class="form-control" placeholder="E.g. 2 Cr. per Annum" name="turnover" value="{{ context.turnover }}">
+                        {% endif %}
+                    </div>
+                </div>
             </div>
             <div class="mb-3">
                 <label for="pxp-company-address" class="form-label">Address</label>

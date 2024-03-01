@@ -151,7 +151,7 @@
             <textarea class="form-control" id="pxp-company-job-skills" placeholder="Type the skills here..." name="skills" minlength=50 required maxlength="700"></textarea>
         </div> -->
         
-        <div class="mb-3">
+        {% comment %} <div class="mb-3">
             <label for="pxp-company-job-Responsibilities" class="form-label">Responsibilities</label>
             <textarea class="form-control" id="pxp-company-job-Responsibilities" placeholder="Type the responsibilities here..." name="responsibilities" minlength=150 required maxlength="700"></textarea>
             <p id="char-count-1">0/700</p>
@@ -163,7 +163,7 @@
             <textarea class="form-control" id="pxp-company-job-Requirements" placeholder="Type the requirements here..." name="requirements" minlength=150 required maxlength="700"></textarea>
             <p id="char-count-2">0/700</p>
 
-        </div>
+        </div> {% endcomment %}
 
         <div class="row">
             <div class="col-md-6 col-xxl-3">
@@ -310,14 +310,14 @@
             </div>
             <div class="modal-body">
                 <form id="screeningQuestionsForm">
-                    <label for="question1">Question 1:</label>
-                    <div id="suggestionsContainer1" class="suggestions-container"></div>
-                    <textarea id="question1" name="question1" class="form-control" style="width: 100%;" placeholder="Tell us something about yourself...." class="text-area-with-suggestions"></textarea><br> 
-                    <label for="question2">Question 2:</label>
-                    <div id="suggestionsContainer2" class="suggestions-container"></div>
-                    <textarea id="question2" name="question2" class="form-control" style="width: 100%;" placeholder="Provide some details about your previous projects...." class="text-area-with-suggestions"></textarea>
+                    <div id="questionsContainer">
+                        <label for="question1">Question 1:</label>
+                        <div id="suggestionsContainer1" class="suggestions-container"></div>
+                        <textarea id="question1" name="question1" class="form-control" style="width: 100%;" placeholder="Tell us something about yourself...." class="text-area-with-suggestions"></textarea><br>
+                    </div>
                     <div class="modal-footer">
-                        <button class="btn btn-primary" id="screeningQuestionsSubmit">Submit</button>
+                        <button class="btn btn-secondary" id="addQuestionButton" type="button">Add Question</button>
+                        <button class="btn btn-primary" id="screeningQuestionsSubmit" >Submit</button>
                     </div>
                 </form>
             </div>
@@ -325,185 +325,11 @@
     </div>
 </div>
 
-<script>
-let timeout1;
-let timeout2;
-
-document.getElementById('question1').addEventListener('focusout', function () {
-  const suggestionsContainer = document.getElementById('suggestionsContainer1');
-  clearTimeout(timeout1);
-  timeout1 = setTimeout(function () {
-    suggestionsContainer.style.display = 'none';
-  }, 100); 
-});
-
-document.getElementById('question2').addEventListener('focusout', function () {
-  const suggestionsContainer = document.getElementById('suggestionsContainer2');
-  clearTimeout(timeout2);
-  timeout2 = setTimeout(function () {
-    suggestionsContainer.style.display = 'none';
-  }, 100); 
-});
-
-function populateTextArea1(suggestion) {
-  document.getElementById('question1').value = suggestion;
-}
-
-function populateTextArea2(suggestion) {
-  document.getElementById('question2').value = suggestion;
-}
-
-document.getElementById('suggestionsContainer1').addEventListener('click', function (event) {
-  if (event.target.classList.contains('suggestion')) {
-    populateTextArea1(event.target.textContent);
-    this.style.display = 'none';
-    this.innerHTML = '';
-  }
-});
-
-document.getElementById('suggestionsContainer2').addEventListener('click', function (event) {
-  if (event.target.classList.contains('suggestion')) {
-    populateTextArea2(event.target.textContent);
-    this.innerHTML = '';
-    this.style.display = 'none';
-  }
-});
-
-
-const suggestions1 = [
-    "Explain a complex software problem you encountered and how you resolved it.",
-    "Discuss your preferred programming languages and their applications in your projects.",
-    "Describe your experience with different software development methodologies (Agile, Scrum, etc.).",
-    "Can you explain your approach to debugging and troubleshooting code issues?",
-    "Discuss your experience with version control systems (Git, SVN, etc.) and branching strategies.",
-    "Explain your familiarity with various software testing approaches (unit testing, integration testing, etc.).",
-    "Describe your process for ensuring the security of software applications or systems.",
-    "Discuss your involvement in designing scalable and efficient software architectures.",
-    "How do you stay updated with the latest technologies and trends in software development?",
-    "Explain your approach to code reviews and their importance in the development process.",
-    "Discuss your experience in designing RESTful APIs or microservices architecture.",
-    "Describe your familiarity with cloud platforms and services (AWS, Azure, etc.).",
-    "Can you explain your role in the deployment and monitoring of software applications?",
-    "Discuss your experience in optimizing software performance and addressing bottlenecks.",
-    "Explain your approach to documentation and knowledge sharing within software teams.",
-    "Describe your experience with database design, optimization, and query optimization.",
-    "Discuss your involvement in open-source projects or contributions to tech communities.",
-    "Explain your familiarity with software design patterns and their application.",
-    "Describe a situation where you had to prioritize tasks to meet project deadlines.",
-    "Can you discuss your experience with continuous integration and continuous deployment (CI/CD)?",
-    "Explain your approach to building user-friendly and intuitive software interfaces.",
-    "Discuss your familiarity with data structures and algorithms and their importance in software development.",
-    "Describe your involvement in resolving conflicts within a software development team.",
-    "How do you ensure software code quality and maintainability in your projects?",
-    "Explain your approach to managing technical debt in software development.",
-    "Describe your experience with Agile ceremonies (stand-ups, retrospectives, etc.).",
-    "Discuss your involvement in building scalable and fault-tolerant distributed systems.",
-    "Explain your approach to managing dependencies and third-party libraries in projects.",
-    "Describe your experience with performance profiling and optimization of software applications.",
-    "Discuss your familiarity with software licensing and intellectual property considerations.",
-    "Can you explain your role in mentoring or coaching junior members in software teams?",
-    "Explain your approach to conducting codebase refactoring and its importance.",
-    "Describe your experience with software requirements gathering and analysis.",
-    "Discuss your involvement in addressing scalability challenges in software systems.",
-    "How do you approach building software solutions with a focus on user experience?",
-    "Explain your familiarity with DevOps practices and their integration into software development.",
-    "Describe your experience with designing and implementing fault-tolerant systems.",
-    "Discuss your involvement in resolving critical incidents or production issues.",
-    "Explain your approach to automated testing and its role in the development lifecycle.",
-    "Describe your experience with designing and implementing security measures in software applications.",
-    "Describe your role in previous projects...",
-  "Highlight project outcomes...",
-  "Discuss challenges faced and solutions...",
-];
-
-
-const suggestions2 = [
-"Explain a complex software problem you encountered and how you resolved it.",
-    "Discuss your preferred programming languages and their applications in your projects.",
-    "Describe your experience with different software development methodologies (Agile, Scrum, etc.).",
-    "Can you explain your approach to debugging and troubleshooting code issues?",
-    "Discuss your experience with version control systems (Git, SVN, etc.) and branching strategies.",
-    "Explain your familiarity with various software testing approaches (unit testing, integration testing, etc.).",
-    "Describe your process for ensuring the security of software applications or systems.",
-    "Discuss your involvement in designing scalable and efficient software architectures.",
-    "How do you stay updated with the latest technologies and trends in software development?",
-    "Explain your approach to code reviews and their importance in the development process.",
-    "Discuss your experience in designing RESTful APIs or microservices architecture.",
-    "Describe your familiarity with cloud platforms and services (AWS, Azure, etc.).",
-    "Can you explain your role in the deployment and monitoring of software applications?",
-    "Discuss your experience in optimizing software performance and addressing bottlenecks.",
-    "Explain your approach to documentation and knowledge sharing within software teams.",
-    "Describe your experience with database design, optimization, and query optimization.",
-    "Discuss your involvement in open-source projects or contributions to tech communities.",
-    "Explain your familiarity with software design patterns and their application.",
-    "Describe a situation where you had to prioritize tasks to meet project deadlines.",
-    "Can you discuss your experience with continuous integration and continuous deployment (CI/CD)?",
-    "Explain your approach to building user-friendly and intuitive software interfaces.",
-    "Discuss your familiarity with data structures and algorithms and their importance in software development.",
-    "Describe your involvement in resolving conflicts within a software development team.",
-    "How do you ensure software code quality and maintainability in your projects?",
-    "Explain your approach to managing technical debt in software development.",
-    "Describe your experience with Agile ceremonies (stand-ups, retrospectives, etc.).",
-    "Discuss your involvement in building scalable and fault-tolerant distributed systems.",
-    "Explain your approach to managing dependencies and third-party libraries in projects.",
-    "Describe your experience with performance profiling and optimization of software applications.",
-    "Discuss your familiarity with software licensing and intellectual property considerations.",
-    "Can you explain your role in mentoring or coaching junior members in software teams?",
-    "Explain your approach to conducting codebase refactoring and its importance.",
-    "Describe your experience with software requirements gathering and analysis.",
-    "Discuss your involvement in addressing scalability challenges in software systems.",
-    "How do you approach building software solutions with a focus on user experience?",
-    "Explain your familiarity with DevOps practices and their integration into software development.",
-    "Describe your experience with designing and implementing fault-tolerant systems.",
-    "Discuss your involvement in resolving critical incidents or production issues.",
-    "Explain your approach to automated testing and its role in the development lifecycle.",
-    "Describe your experience with designing and implementing security measures in software applications.",
-    "Describe your role in previous projects...",
-  "Highlight project outcomes...",
-  "Discuss challenges faced and solutions...",
-];
-
-document.getElementById('question1').addEventListener('input', function () {
-  const inputText = this.value.trim();
-  const suggestionsContainer = document.getElementById('suggestionsContainer1');
-
-  suggestionsContainer.innerHTML = '';
-
-  suggestions1.forEach(suggestion => {
-    if (suggestion.toLowerCase().includes(inputText.toLowerCase())) {
-      const suggestionElement = document.createElement('div');
-      suggestionElement.classList.add('suggestion');
-      suggestionElement.textContent = suggestion;
-      suggestionsContainer.appendChild(suggestionElement);
-      suggestionsContainer.style.display = 'block';
-    }
-  });
-});
-
-document.getElementById('question2').addEventListener('input', function () {
-  const inputText = this.value.trim();
-  const suggestionsContainer = document.getElementById('suggestionsContainer2');
-
-  suggestionsContainer.innerHTML = '';
-
-  suggestions2.forEach(suggestion => {
-    if (suggestion.toLowerCase().includes(inputText.toLowerCase())) {
-      const suggestionElement = document.createElement('div');
-      suggestionElement.classList.add('suggestion');
-      suggestionElement.textContent = suggestion;
-      suggestionsContainer.appendChild(suggestionElement);
-      suggestionsContainer.style.display = 'block';
-    }
-  });
-});
-
-</script>
-
 
 <script>
     const textarea = document.getElementById("pxp-company-job-description");
-    const textareaA = document.getElementById("pxp-company-job-Responsibilities");
-    const textareaB = document.getElementById("pxp-company-job-Requirements");
+    //const textareaA = document.getElementById("pxp-company-job-Responsibilities");
+    //const textareaB = document.getElementById("pxp-company-job-Requirements");
 
     const charCount = document.getElementById("char-count");
     const charCount1 = document.getElementById("char-count-1");
@@ -512,13 +338,13 @@ document.getElementById('question2').addEventListener('input', function () {
     textarea.addEventListener("input", function () {
         updateCharCount(textarea, charCount);
     });
-    textareaA.addEventListener("input", function () {
-        updateCharCount(textareaA, charCount1);
-    });
+    //textareaA.addEventListener("input", function () {
+    //    updateCharCount(textareaA, charCount1);
+    //});
 
-    textareaB.addEventListener("input", function () {
-        updateCharCount(textareaB, charCount2);
-    });
+    //textareaB.addEventListener("input", function () {
+    //    updateCharCount(textareaB, charCount2);
+    //});
 
     function updateCharCount(textArea, charCountElement) {
         const currentText = textArea.value;
@@ -534,6 +360,173 @@ document.getElementById('question2').addEventListener('input', function () {
 </script>
 
 <script>
+    function AddSuggestionHideTimer(questionNode){
+        let timeout;
+        return function () {
+          const suggestionsContainer = questionNode.querySelector('#suggestionsContainer');
+          if (!suggestionsContainer) return;
+          clearTimeout(timeout);
+          timeout = setTimeout(function () {
+            suggestionsContainer.style.display = 'none';
+          }, 100); 
+        };
+    }
+    
+    function suggestionContainerSetupQuestion(questionNode, questionInput){
+        questionNode.querySelector('#suggestionsContainer').addEventListener('click', function (event) {
+          if (event.target.classList.contains('suggestion')) {
+            questionInput.value = event.target.textContent;
+            this.style.display = 'none';
+            this.innerHTML = '';
+          }
+        });
+    }
+    
+    
+    const suggestions1 = [
+        "Explain a complex software problem you encountered and how you resolved it.",
+        "Discuss your preferred programming languages and their applications in your projects.",
+        "Describe your experience with different software development methodologies (Agile, Scrum, etc.).",
+        "Can you explain your approach to debugging and troubleshooting code issues?",
+        "Discuss your experience with version control systems (Git, SVN, etc.) and branching strategies.",
+        "Explain your familiarity with various software testing approaches (unit testing, integration testing, etc.).",
+        "Describe your process for ensuring the security of software applications or systems.",
+        "Discuss your involvement in designing scalable and efficient software architectures.",
+        "How do you stay updated with the latest technologies and trends in software development?",
+        "Explain your approach to code reviews and their importance in the development process.",
+        "Discuss your experience in designing RESTful APIs or microservices architecture.",
+        "Describe your familiarity with cloud platforms and services (AWS, Azure, etc.).",
+        "Can you explain your role in the deployment and monitoring of software applications?",
+        "Discuss your experience in optimizing software performance and addressing bottlenecks.",
+        "Explain your approach to documentation and knowledge sharing within software teams.",
+        "Describe your experience with database design, optimization, and query optimization.",
+        "Discuss your involvement in open-source projects or contributions to tech communities.",
+        "Explain your familiarity with software design patterns and their application.",
+        "Describe a situation where you had to prioritize tasks to meet project deadlines.",
+        "Can you discuss your experience with continuous integration and continuous deployment (CI/CD)?",
+        "Explain your approach to building user-friendly and intuitive software interfaces.",
+        "Discuss your familiarity with data structures and algorithms and their importance in software development.",
+        "Describe your involvement in resolving conflicts within a software development team.",
+        "How do you ensure software code quality and maintainability in your projects?",
+        "Explain your approach to managing technical debt in software development.",
+        "Describe your experience with Agile ceremonies (stand-ups, retrospectives, etc.).",
+        "Discuss your involvement in building scalable and fault-tolerant distributed systems.",
+        "Explain your approach to managing dependencies and third-party libraries in projects.",
+        "Describe your experience with performance profiling and optimization of software applications.",
+        "Discuss your familiarity with software licensing and intellectual property considerations.",
+        "Can you explain your role in mentoring or coaching junior members in software teams?",
+        "Explain your approach to conducting codebase refactoring and its importance.",
+        "Describe your experience with software requirements gathering and analysis.",
+        "Discuss your involvement in addressing scalability challenges in software systems.",
+        "How do you approach building software solutions with a focus on user experience?",
+        "Explain your familiarity with DevOps practices and their integration into software development.",
+        "Describe your experience with designing and implementing fault-tolerant systems.",
+        "Discuss your involvement in resolving critical incidents or production issues.",
+        "Explain your approach to automated testing and its role in the development lifecycle.",
+        "Describe your experience with designing and implementing security measures in software applications.",
+        "Describe your role in previous projects...",
+      "Highlight project outcomes...",
+      "Discuss challenges faced and solutions...",
+    ];
+    
+    
+    const suggestions2 = [
+    "Explain a complex software problem you encountered and how you resolved it.",
+        "Discuss your preferred programming languages and their applications in your projects.",
+        "Describe your experience with different software development methodologies (Agile, Scrum, etc.).",
+        "Can you explain your approach to debugging and troubleshooting code issues?",
+        "Discuss your experience with version control systems (Git, SVN, etc.) and branching strategies.",
+        "Explain your familiarity with various software testing approaches (unit testing, integration testing, etc.).",
+        "Describe your process for ensuring the security of software applications or systems.",
+        "Discuss your involvement in designing scalable and efficient software architectures.",
+        "How do you stay updated with the latest technologies and trends in software development?",
+        "Explain your approach to code reviews and their importance in the development process.",
+        "Discuss your experience in designing RESTful APIs or microservices architecture.",
+        "Describe your familiarity with cloud platforms and services (AWS, Azure, etc.).",
+        "Can you explain your role in the deployment and monitoring of software applications?",
+        "Discuss your experience in optimizing software performance and addressing bottlenecks.",
+        "Explain your approach to documentation and knowledge sharing within software teams.",
+        "Describe your experience with database design, optimization, and query optimization.",
+        "Discuss your involvement in open-source projects or contributions to tech communities.",
+        "Explain your familiarity with software design patterns and their application.",
+        "Describe a situation where you had to prioritize tasks to meet project deadlines.",
+        "Can you discuss your experience with continuous integration and continuous deployment (CI/CD)?",
+        "Explain your approach to building user-friendly and intuitive software interfaces.",
+        "Discuss your familiarity with data structures and algorithms and their importance in software development.",
+        "Describe your involvement in resolving conflicts within a software development team.",
+        "How do you ensure software code quality and maintainability in your projects?",
+        "Explain your approach to managing technical debt in software development.",
+        "Describe your experience with Agile ceremonies (stand-ups, retrospectives, etc.).",
+        "Discuss your involvement in building scalable and fault-tolerant distributed systems.",
+        "Explain your approach to managing dependencies and third-party libraries in projects.",
+        "Describe your experience with performance profiling and optimization of software applications.",
+        "Discuss your familiarity with software licensing and intellectual property considerations.",
+        "Can you explain your role in mentoring or coaching junior members in software teams?",
+        "Explain your approach to conducting codebase refactoring and its importance.",
+        "Describe your experience with software requirements gathering and analysis.",
+        "Discuss your involvement in addressing scalability challenges in software systems.",
+        "How do you approach building software solutions with a focus on user experience?",
+        "Explain your familiarity with DevOps practices and their integration into software development.",
+        "Describe your experience with designing and implementing fault-tolerant systems.",
+        "Discuss your involvement in resolving critical incidents or production issues.",
+        "Explain your approach to automated testing and its role in the development lifecycle.",
+        "Describe your experience with designing and implementing security measures in software applications.",
+        "Describe your role in previous projects...",
+      "Highlight project outcomes...",
+      "Discuss challenges faced and solutions...",
+    ];
+    
+    function onQuestionInputChange(questionNode){
+        return function () {
+          const inputText = this.value.trim();
+          let suggestionsContainer = questionNode.querySelector('#suggestionsContainer');
+          suggestionsContainer.innerHTML = '';
+        
+          suggestions1.forEach(suggestion => {
+            if (suggestion.toLowerCase().includes(inputText.toLowerCase())) {
+              const suggestionElement = document.createElement('div');
+              suggestionElement.classList.add('suggestion');
+              suggestionElement.textContent = suggestion;
+              suggestionsContainer.appendChild(suggestionElement);
+              suggestionsContainer.style.display = 'block';
+            }
+          });
+        };
+    }
+    
+    function createQuestionNode(questionId, label, placeholder, parent) {
+        const questionDiv = document.createElement(questionId)
+        
+        // Create label element
+        const labelElement = document.createElement('label');
+        labelElement.setAttribute('for', questionId);
+        labelElement.textContent = label;
+    
+        questionDiv.append(labelElement)
+        
+        // Create suggestions container
+        const suggestionsContainer = document.createElement('div');
+        suggestionsContainer.id = `suggestionsContainer`;
+        suggestionsContainer.className = 'suggestions-container';
+        questionDiv.append(suggestionsContainer)
+        
+        // Create textarea element
+        const textareaElement = document.createElement('textarea');
+        textareaElement.id = `${questionId}-input`;
+        textareaElement.name = questionId;
+        textareaElement.className = 'form-control text-area-with-suggestions';
+        textareaElement.style.width = '100%';
+        textareaElement.placeholder = placeholder;
+        questionDiv.append(textareaElement)
+    
+        textareaElement.addEventListener("focusout", AddSuggestionHideTimer(questionDiv))
+        textareaElement.addEventListener("input", onQuestionInputChange(questionDiv))
+        suggestionContainerSetupQuestion(questionDiv, textareaElement)
+    
+        parent.appendChild(questionDiv);
+    }
+
+
     document.addEventListener("DOMContentLoaded", function () {
         const modal = document.getElementById("pxp-results-modal");
         const spinner = document.getElementById("spinner");
@@ -541,6 +534,8 @@ document.getElementById('question2').addEventListener('input', function () {
         const form = document.getElementById("job-offer-form");
         const screeningQuestionsForm = document.getElementById("screeningQuestionsForm");
         const matchPer = document.getElementById("pxp-company-job-match");
+        let questionsLength = 1
+        const questionIds = new Array()
         
         form.addEventListener("submit", function (event) {
             $('#screeningQuestionsSubmit').prop('disabled', false);
@@ -549,15 +544,39 @@ document.getElementById('question2').addEventListener('input', function () {
             // showPopup();
             event.preventDefault();
             $('#screeningQuestionsModal').modal('show');
+
+            
+            questionIds.length = 0
+            questionsLength = 1
+            const questionContainer = document.getElementById("questionsContainer")
+            const addquestionButton = document.getElementById("addQuestionButton")
+            questionContainer.innerHTML = ""
+
+            createQuestionNode(`question-${questionsLength}`,`Question ${questionsLength}`, "Your first question", questionContainer)
+            questionIds.push(`question-${questionsLength}`)
+            
+            addquestionButton.onclick = function (e) {
+                e.stopPropagation();
+                questionsLength++;
+                createQuestionNode(`question-${questionsLength}`,`Question ${questionsLength}`, "Your next question", questionContainer)
+                questionIds.push(`question-${questionsLength}`)
+            };
+            
             screeningQuestionsForm.addEventListener("submit", function (e) {
                 e.preventDefault();
 
-                const question1Value = document.getElementById("question1").value;
-                const question2Value = document.getElementById("question2").value;
-
                 const originalFormData = new FormData(form);
-                originalFormData.append("question1", question1Value);
-                originalFormData.append("question2", question2Value);
+                const modalForm = new FormData(e.target)
+                const finalQuestionsArray = []
+
+                for (let fieldId of questionIds){
+                    const value = modalForm.get(fieldId)
+                    if (!value){
+                        continue
+                    }
+                    finalQuestionsArray.push(value)
+                }
+                originalFormData.append("questions", finalQuestionsArray)
                 $('#screeningQuestionsSubmit').prop('disabled', true);
 
 
@@ -715,8 +734,8 @@ document.getElementById('question2').addEventListener('input', function () {
                 document.getElementById("pxp-company-job-location"),
                 document.getElementById("pxp-company-job-description"),
                 // document.getElementById("pxp-company-job-skills"),
-                document.getElementById("pxp-company-job-Responsibilities"),
-                document.getElementById("pxp-company-job-Requirements"),
+                //document.getElementById("pxp-company-job-Responsibilities"),
+                //document.getElementById("pxp-company-job-Requirements"),
                 document.getElementById("pxp-company-job-experience"),
             ];
             let isValid = true;

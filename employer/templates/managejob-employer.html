@@ -203,15 +203,15 @@
                             <textarea class="form-control" id="pxp-company-job-description" placeholder="Type the skills here..." name="skills"></textarea>
                         </div>
 
-                        <div class="mb-3">
+                        <!-- <div class="mb-3">
                             <label for="pxp-company-job-description" class="form-label">Responsibilities</label>
                             <textarea class="form-control" id="pxp-company-job-description" placeholder="Type the responsibilities here..." name="responsibilities"></textarea>
-                        </div>
+                        </div> 
 
                         <div class="mb-3">
                             <label for="pxp-company-job-description" class="form-label">Requirements</label>
                             <textarea class="form-control" id="pxp-company-job-description" placeholder="Type the requirements here..." name="requirements"></textarea>
-                        </div>
+                        </div> -->
                 
                         <div class="row">
                             <div class="col-md-6 col-xxl-3">
@@ -449,8 +449,8 @@ function toggle(source) {
                 $('[name="basicpay"]').val(newValue);
             }
           $('[name="skills"]').val(JSON.parse(data['info'])[0].skills);
-          $('[name="responsibilities"]').val(JSON.parse(data['info'])[0].responsibilities);
-          $('[name="requirements"]').val(JSON.parse(data['info'])[0].requirements);
+          // $('[name="responsibilities"]').val(JSON.parse(data['info'])[0].responsibilities);
+          // $('[name="requirements"]').val(JSON.parse(data['info'])[0].requirements);
           $('.file-link').attr('href', "/media/"+JSON.parse(data['info'])[0].job_desc);
           if (JSON.parse(data['info'])[0].job_desc !== null) {
             var filename = JSON.parse(data['info'])[0].job_desc;
@@ -488,8 +488,8 @@ function toggle(source) {
     formData.append('basicpay', $('[name="basicpay"]').val());
     formData.append('basicpaySuffix', $('[name="basicpaySuffix"]').val());
     formData.append('skills', $('[name="skills"]').val());
-    formData.append('responsibilities', $('[name="responsibilities"]').val());
-    formData.append('requirements', $('[name="requirements"]').val());
+    // formData.append('responsibilities', $('[name="responsibilities"]').val());
+    // formData.append('requirements', $('[name="requirements"]').val());
     formData.append('jobDescriptionFile', jobDescriptionFileInput.files[0]);
     formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
 

@@ -1,254 +1,394 @@
-{% load static %}
-{% block content %}
-<!doctype html>
+{% load static %} {% block content %}
+<!DOCTYPE html>
 <html lang="en" class="pxp-root">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
-        <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-beta.2/css/bootstrap.css'>
-        <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/12.1.2/css/intlTelInput.css'>
-        <link rel='stylesheet' href='https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css'>
-        <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/jquery-nice-select/1.1.0/css/nice-select.min.css'>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.css"></link>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-beta.2/css/bootstrap.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/12.1.2/css/intlTelInput.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/jquery-nice-select/1.1.0/css/nice-select.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    />
 
-  
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-  <!-- select2 -->
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+      integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+      crossorigin="anonymous"
+    />
+    <!-- select2 -->
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css"
+      rel="stylesheet"
+    />
 
-  <!-- select2-bootstrap4-theme -->
-  <link href="https://raw.githack.com/ttskch/select2-bootstrap4-theme/master/dist/select2-bootstrap4.css" rel="stylesheet"> <!-- for live demo page -->
-  <link href="select2-bootstrap4.css" rel="stylesheet"> 
-  
-     
-        <link rel="shortcut icon" href="{% static 'images/favicon.png' %}" type="image/x-icon">
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600;700&display=swap" rel="stylesheet">
-        <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
-        <link rel="stylesheet" href="{% static 'css/font-awesome.min.css' %}">
-        <link rel="stylesheet" href="{% static 'css/owl.carousel.min.css' %}">
-        <link rel="stylesheet" href="{% static 'css/owl.theme.default.min.css' %}">
-        <link rel="stylesheet" href="{% static 'css/animate.css' %}">
-        <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <!-- select2-bootstrap4-theme -->
+    <link
+      href="https://raw.githack.com/ttskch/select2-bootstrap4-theme/master/dist/select2-bootstrap4.css"
+      rel="stylesheet"
+    />
+    <!-- for live demo page -->
+    <link href="select2-bootstrap4.css" rel="stylesheet" />
 
-        <title>mpower - Profile Completion</title>
-        <style>
-            #signin
-            {
-                display: none;
-            }
-            .pxp-nav-trigger
-            {
-                display: none !important;
-            }
-            .pxp-nav{
-                display: none !important;
-            }
-            .pxp-user-nav{
-                display: none !important;
-            }
-            #questioneer
-            {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-            }
-            .individualQuestion, .individualQuestiona
-            {
+    <link
+      rel="shortcut icon"
+      href="{% static 'images/favicon.png' %}"
+      type="image/x-icon"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet" />
+    <link rel="stylesheet" href="{% static 'css/font-awesome.min.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/owl.carousel.min.css' %}" />
+    <link
+      rel="stylesheet"
+      href="{% static 'css/owl.theme.default.min.css' %}"
+    />
+    <link rel="stylesheet" href="{% static 'css/animate.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+
+    <title>mpower - Profile Completion</title>
+    <style>
+      #signin {
+        display: none;
+      }
+      .pxp-nav-trigger {
+        display: none !important;
+      }
+      .pxp-nav {
+        display: none !important;
+      }
+      .pxp-user-nav {
+        display: none !important;
+      }
+      #questioneer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .individualQuestion,
+      .individualQuestiona {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 10px 10px;
+      }
+
+      h3 {
+        color: #000000;
+        margin: 40px 0;
+        padding: 0;
+        font-size: 28px;
+        text-align: center;
+      }
+
+      select {
+        width: 100%;
+        min-height: 100px;
+        border-radius: 3px;
+        border: 1px solid #444;
+        padding: 10px;
+        color: #444444;
+        font-size: 14px;
+      }
+      .select2-search__field {
+        width: 100% !important;
+      }
+    </style>
+  </head>
+
+  <body>
+    {% include "indexheader.html" %} 
+    {% if messages %} 
+        {% for message in messages %} 
+            {% if message.tags %}
+            <script>
+            alert("{{ message }}");
+            </script>
+            {% endif %} 
+        {% endfor %} 
+    {% endif %}
+    <article>
+      <!-- Start Multiform HTML -->
+      <section class="multi_step_form">
+        <form id="msform" method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          <!-- progressbar -->
+          <ul id="progressbar">
+            <li class="active">Verify Phone</li>
+            <li>Personal Information</li>
+            <li>Work Profile</li>
+            <li>Upload Resume</li>
+          </ul>
+          <!-- fieldsets -->
+
+          <fieldset>
+            <h3>Setup your phone</h3>
+            <div class="form-row d-flex justify-content-center">
+              <div class="form-group col-md-6 d-none">
+                <input
+                  type="text"
+                  id="countryCode"
+                  class="form-control"
+                  placeholder="Country Code"
+                  name="code"
+                  readonly
+                />
+              </div>
+              <div class="form-group col-md-6 d-none">
+                <input
+                  type="text"
+                  id="phoneNumber"
+                  class="form-control"
+                  placeholder="Phone Number"
+                  readonly
+                />
+              </div>
+              <div class="form-group col-md-6">
+                <input
+                  type="tel"
+                  id="phone"
+                  class="form-control"
+                  placeholder="0000000000"
+                  name="mobile"
+                  maxlength="10"
+                />
+              </div>
+
+              <!--<div class="form-group col-md-6"> 
+                    <input type="text" class="form-control" placeholder="0000000000" name="mobile" id="phone2" maxlength="10" >
+                  </div>-->
+            </div>
+            <button type="button" class="action-but">Get OTP</button>
+            <div id="hider" class="finde">
+              <div class="done_text">
+                <h6>
+                  A secret code is sent to your phone. <br />Please enter it
+                  here.
+                </h6>
+              </div>
+              <div class="code_group">
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="Enter OTP"
+                  name="digit"
+                  id="otp_val"
+                  maxlength="6"
+                  onkeyup="onKeyUpEvent(1, event)"
+                  onfocus="onFocusEvent(1)"
+                />
+              </div>
+              <button
+                type="button"
+                class="action-but2"
+                style="color: green; background: white; border: 1px solid green"
+              >
+                Verify
+              </button>
+            </div>
+            <button
+              type="button"
+              class="next action-button"
+              style="display: none"
+              id="verifier"
+            >
+              Continue
+            </button>
+          </fieldset>
+
+          <fieldset>
+            <h3>Please Enter Details</h3>
+            <div
+              class="pxp-candidate-cover1 mb-3"
+              style="
                 display: flex;
                 justify-content: center;
                 align-items: center;
-                margin: 10px 10px;
-            }
-
-              
-              h3 {
-                color: #000000;
-                margin: 40px 0;
-                padding: 0;
-                font-size: 28px;
-                text-align: center;
-              }
-              
-              select {
-                width: 100%;
-                min-height: 100px;
-                border-radius: 3px;
-                border: 1px solid #444;
-                padding: 10px;
-                color: #444444;
-                font-size: 14px;
-              }
-              .select2-search__field
-              {
-                width: 100% !important;
-              }
-        </style>
-    </head>
-   
-    <body>
-        {% include "indexheader.html" %}
-        {% if messages %}
-        {% for message in messages %}
-         {% if message.tags %}  
-         <script>alert('{{ message }}')</script>
-        {% endif %}
-
-        {% endfor %}
-
-        {% endif %}
-            <article>
-          
-                <!-- Start Multiform HTML -->
-            <section class="multi_step_form">  
-            <form id="msform" method="post" enctype="multipart/form-data">
-                {% csrf_token %}
-              <!-- progressbar -->
-              <ul id="progressbar">
-                <li class="active">Verify Phone</li>
-                <li>Personal Information</li>
-                <li>Work Profile</li>
-                <li>Upload Resume</li>
-              </ul>
-              <!-- fieldsets -->
-
-              <fieldset>
-                <h3>Setup your phone</h3>
-                <div class="form-row d-flex justify-content-center "> 
-                    <div class="form-group col-md-6 d-none">
-                        <input type="text" id="countryCode" class="form-control" placeholder="Country Code" name="code" readonly>
-                    </div>
-                    <div class="form-group col-md-6 d-none">
-                        <input type="text" id="phoneNumber" class="form-control" placeholder="Phone Number" readonly>
-                    </div>
-                    <div class="form-group col-md-6 ">  
-                        <input type="tel" id="phone" class="form-control" placeholder="0000000000" name="mobile" maxlength="10"> 
-                    </div>
-
-                  <!--<div class="form-group col-md-6"> 
-                    <input type="text" class="form-control" placeholder="0000000000" name="mobile" id="phone2" maxlength="10" >
-                  </div>-->
-                </div>
-                <button type="button" class="action-but">Get OTP</button>
-                <div id="hider" class="finde">
-                <div class="done_text">
-                  <h6>A secret code is sent to your phone. <br>Please enter it here.</h6> 
-                </div>
-                <div class="code_group"> 
-                  <input type="text" class="form-control" placeholder="0" name="digit" id="otp_val1" maxlength=1 onkeyup="onKeyUpEvent(1, event)" onfocus="onFocusEvent(1)">
-                  <input type="text" class="form-control" placeholder="0" name="digit" id="otp_val2" maxlength=1 onkeyup="onKeyUpEvent(2, event)" onfocus="onFocusEvent(2)">
-                  <input type="text" class="form-control" placeholder="0" name="digit" id="otp_val3" maxlength=1 onkeyup="onKeyUpEvent(3, event)" onfocus="onFocusEvent(3)">
-                  <input type="text" class="form-control" placeholder="0" name="digit" id="otp_val4" maxlength=1 onkeyup="onKeyUpEvent(4, event)" onfocus="onFocusEvent(4)">
-                  <input type="text" class="form-control" placeholder="0" name="digit" id="otp_val5" maxlength=1 onkeyup="onKeyUpEvent(5, event)" onfocus="onFocusEvent(5)">
-                  <input type="text" class="form-control" placeholder="0" name="digit" id="otp_val6" maxlength=1 onkeyup="onKeyUpEvent(6, event)" onfocus="onFocusEvent(6)">
-                </div>
-                <button type="button" class="action-but2" style="color: green; background: white; border: 1px solid green">Verify</button>
+              "
+            >
+              <input
+                type="file"
+                id="pxp-candidate-cover-choose-file1"
+                accept="image/*"
+                name="photo"
+              />
+              <label
+                for="pxp-candidate-cover-choose-file1"
+                class="pxp-cover"
+                style="border-radius: 100%; width: 10rem"
+                ><span>Upload Photo</span></label
+              >
             </div>
-                <button type="button" class="next action-button" style="display: none" id="verifier">Continue</button>
-              </fieldset>
-
-
-              <fieldset>
-                <h3>Please Enter Details</h3>
-                <div class="pxp-candidate-cover1 mb-3" style="display: flex; justify-content: center; align-items: center">
-                    <input type="file" id="pxp-candidate-cover-choose-file1" accept="image/*" name="photo">
-                    <label for="pxp-candidate-cover-choose-file1" class="pxp-cover" style="border-radius: 100%; width: 10rem"><span>Upload Photo</span></label>
-                </div>
-                <div class="form-group fg_2"> 
-                  <input type="text" class="form-control" placeholder="Address" name="address">
-                </div> 
-                <div class="form-group fg_2" style="display: flex; justify-content: center; align-items: center">
-                  <input class="form-control textbox-n" placeholder="Date of birth" name="dob" type="text" onfocus="(this.type='date')" id="date">
-                </div>
-                  <div class="form-group fg_2">
-                    <div class="wrapper">
-                        <div class="container">
-                            <div class="form-group">
-                                Basic Education<span style="color: red;">*</span> <select placeholder="Select an Option" name="basic" class="notnormal" required>
-                              <!--  <option selected disabled>Select an Option</option>-->
-                                {% for i in educat %}
-                                <option>{{ i.course }}</option>
-                                {% endfor %}
-                              </select>
-                            </div>
-                        </div>
-                    </div>
-                  </div> 
-                  <div class="form-group fg_2"> 
-                    <div class="wrapper">
-                        <div class="container">
-                            <div class="form-group">
-                                Master Education <select placeholder="Select an Option" name="master" class="notnormal">
-                                    <option selected disabled>Select an Option</option>
-                                {% for i in educat %}
-                                <option>{{ i.course }}</option>
-                                {% endfor %}
-                              </select>
-                            </div>
-                        </div>
-                    </div>
-                  </div> 
-                  <div class="form-group fg_2"> 
-                    <div class="wrapper">
-                        <div class="container">
-                            <div class="form-group">
-                                Other Qualifications <select placeholder="Select an Option" name="other" class="notnormal">
-                                    <option selected disabled>Select an Option</option>
-                                {% for i in educat %}
-                                <option>{{ i.course }}</option>
-                                {% endfor %}
-                              </select>
-                            </div>
-                        </div>
-                    </div>
-                  </div> 
-                <button type="button" class="action-button previous previous_button" style="margin-bottom: 30px">Back</button> 
-                <button type="button" class="next action-button" style="margin-bottom: 30px">Continue</button>   
-              </fieldset>
-
-
-              <fieldset>
-                <h3>Please enter the details accurately to help us serve you better.</h3>
-                <div class="wrapper">
-                    <div class="container">
-                        <div class="form-group">
-                          <select multiple placeholder="Choose skills" name="skills" class="notnormal">
-                            {% for i in allskills %}
-                            <option>{{ i.skill }}</option>
-                            {% endfor %}
-                          </select>
-                        </div>
-                    </div>
-                </div>
-                <br>
-                <div class="form-group fg_2">
-                    Job Role
-                    <br>
-                    <select class="form-group" name="role" style="min-height: 3rem !important">
-                        {% for i in roledetails %}
-                            <option>{{ i.role }}</option>
-                            {% endfor %}
+            <div
+              class="form-group fg_2"
+              style="
+                display: flex;
+                justify-content: center;
+                align-items: center;
+              "
+            >
+              <input
+                class="form-control textbox-n"
+                placeholder="Date of birth"
+                name="dob"
+                type="date"
+                id="date"
+              />
+            </div>
+            <div class="form-group fg_2">
+              <div class="wrapper">
+                <div class="container">
+                  <div class="form-group">
+                    Basic Education<span style="color: red">*</span>
+                    <select
+                      placeholder="Select an Option"
+                      name="basic"
+                      class="notnormal"
+                      required
+                    >
+                      <!--  <option selected disabled>Select an Option</option>-->
+                      {% for i in educat %}
+                      <option>{{ i.course }}</option>
+                      {% endfor %}
                     </select>
+                  </div>
                 </div>
-                <br>
-                <div class="form-group fg_2">
-                    Experience
-                    <br>
-                    <select class="form-group" name="experience" style="min-height: 3rem !important">
-                        <option value="0">Fresher</option>
-                        <option value="1">&#10092; 1 year</option>
-                        <option value="2">1 year</option>
-                        <option value="3">2 years</option>
-                        <option value="4">3 years</option>
-                        <option value="5">4 years</option>
-                        <option value="6">&#10093; 5 years</option>
+              </div>
+            </div>
+            <div class="form-group fg_2">
+              <div class="wrapper">
+                <div class="container">
+                  <div class="form-group">
+                    Master Education
+                    <select
+                      placeholder="Select an Option"
+                      name="master"
+                      class="notnormal"
+                    >
+                      <option selected disabled>Select an Option</option>
+                      {% for i in educat %}
+                      <option>{{ i.course }}</option>
+                      {% endfor %}
                     </select>
+                  </div>
                 </div>
-                <br>
-                <!--<div class="form-group fg_2">
+              </div>
+            </div>
+            <div class="form-group fg_2">
+              <div class="wrapper">
+                <div class="container">
+                  <div class="form-group">
+                    Other Qualifications
+                    <select
+                      placeholder="Select an Option"
+                      name="other"
+                      class="notnormal"
+                    >
+                      <option selected disabled>Select an Option</option>
+                      {% for i in educat %}
+                      <option>{{ i.course }}</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <button
+              type="button"
+              class="action-button previous previous_button"
+              style="margin-bottom: 30px"
+            >
+              Back
+            </button>
+            <button
+              type="button"
+              class="next action-button"
+              style="margin-bottom: 30px"
+            >
+              Continue
+            </button>
+          </fieldset>
+
+          <fieldset>
+            <h3>
+              Please enter the details accurately to help us serve you better.
+            </h3>
+            <div class="wrapper">
+              <div class="container">
+                <div class="form-group">
+                  <select
+                    multiple
+                    placeholder="Choose skills"
+                    name="skills"
+                    class="notnormal"
+                  >
+                    {% for i in allskills %}
+                    <option>{{ i.skill }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+            </div>
+            <br />
+            <div class="form-group fg_2">
+              Job Role
+              <br />
+              <select
+                class="form-group"
+                name="role"
+                style="min-height: 3rem !important"
+              >
+                {% for i in roledetails %}
+                <option>{{ i.role }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <br />
+            <div class="form-group fg_2">
+              Experience
+              <br />
+              <input
+                class="form-control textbox-n"
+                placeholder="Experience in years eg. 1, 2, 3"
+                name="experience"
+                type="number"
+                id="experience"
+                style="margin-right: 10px"
+              />
+            </div>
+            <br />
+            <!--<div class="form-group fg_2">
                     Notice Period
                     <br>
                     <select class="form-group" name="notice_period_type" style="min-height: 3rem !important">
@@ -259,482 +399,569 @@
                 <div class="form-group fg_2" style="display: flex; justify-content: center; align-items: center">
                   <input class="form-control textbox-n" placeholder="Notice period time eg.1,2,3" name="notice_period_time" type="number"  id="notice_period_time">
                 </div>-->
-                Notice Period
-                <div class="form-group fg_2" style="display: flex; align-items: center;">
-                    <!--<label style="margin-right: 10px; margin-bottom:0rem;">Notice Period</label>-->
-                    <input class="form-control textbox-n" placeholder="Notice period time eg. 1, 2, 3" name="notice_period_time" type="number" id="notice_period_time" style="margin-right: 10px;">
-                    <select class="form-group" name="notice_period_type" style="min-height: 3rem !important; margin-bottom: 0rem;">
-                        <option value="Week">Week</option>
-                        <option value="Month">Month</option>
-                    </select>
-                     
-                </div>
+            Notice Period
+            <div
+              class="form-group fg_2"
+              style="display: flex; align-items: center"
+            >
+              <!--<label style="margin-right: 10px; margin-bottom:0rem;">Notice Period</label>-->
+              <input
+                class="form-control textbox-n"
+                placeholder="Notice period time eg. 1, 2, 3"
+                name="notice_period_time"
+                type="number"
+                id="notice_period_time"
+                style="margin-right: 10px"
+              />
+              <select
+                class="form-group"
+                name="notice_period_type"
+                style="min-height: 3rem !important; margin-bottom: 0rem"
+              >
+                <option value="Week">Week</option>
+                <option value="Month">Month</option>
+              </select>
+            </div>
 
-                <div class="form-group fg_2" style="display: flex; justify-content: center; align-items: center">
-                  <input class="form-control textbox-n" placeholder="Current Salary" name="cursal" type="number"  id="cursal">
-                </div>
-                <div class="form-group fg_2" style="display: flex; justify-content: center; align-items: center">
-                  <input class="form-control textbox-n" placeholder="Expected Salary" name="expsal" type="number" id="expsal">
-                </div>
-                
-                <button type="button" class="action-button previous previous_button" style="margin-bottom: 30px">Back</button> 
-                <button type="button" class="next action-button" style="margin-bottom: 30px">Continue</button>   
-              </fieldset>
+            <div
+              class="form-group fg_2"
+              style="
+                display: flex;
+                justify-content: center;
+                align-items: center;
+              "
+            >
+              <input
+                class="form-control textbox-n"
+                placeholder="Current Salary (in LPA)"
+                name="cursal"
+                type="number"
+                step="0.1"
+                id="cursal"
+              />
+            </div>
+            <div
+              class="form-group fg_2"
+              style="
+                display: flex;
+                justify-content: center;
+                align-items: center;
+              "
+            >
+              <input
+                class="form-control textbox-n"
+                placeholder="Expected Salary (in LPA)"
+                name="expsal"
+                type="number"
+                step="0.1"
+                id="expsal"
+              />
+            </div>
 
+            <button
+              type="button"
+              class="action-button previous previous_button"
+              style="margin-bottom: 30px"
+            >
+              Back
+            </button>
+            <button
+              type="button"
+              class="next action-button"
+              style="margin-bottom: 30px"
+            >
+              Continue
+            </button>
+          </fieldset>
 
-              <fieldset>
-                <h4 style="text-align: center">Resume</h4>
-                {% comment %} <div class="form-group fg_2">
-                    <input type="file" class="form-control" id="pxp-signin-page-email" placeholder="Upload Resume" name="resume" multiple="multiple" accept="application/pdf">
-                </div> {% endcomment %}
-                {% comment %} <div class="progress-bar1 mb-3">
-                    <span class="progress-bar-fill" style="width: 0%"></span>
-                </div> {% endcomment %}
-                <div class="pxp-candidate-cover2 mb-3" style="display: flex; justify-content: center; align-items: center">
-                    <input type="file" id="pxp-candidate-cover-choose-file2" accept="application/pdf" name="resume">
-                    <label for="pxp-candidate-cover-choose-file2" class="pxp-cover" style="border-radius: 1rem; width: 90%; height: 10vh"><span>Upload Resume (size < 2MB)</span></label>
-                </div>
-                <div class="analysisgif" style="display: none">
-                  <img src="{% static 'images/resume_a.gif' %}" alt="Resume Analysis" class="intimage">
-                  <h3>Resume Analysis in process...</h3>
-                  <h3>The analysis results will be shown in the dashboard!</h3>
-                </div>
-                <button type="button" class="action-button previous previous_button" id="lastback">Back</button>
-                <button  class="action-button" type="submit" id="gifshower">Finish</button>
-              </fieldset>   
-            </form>  
-          </section> 
-                <!-- END Multiform HTML -->
-            </article>
-        
-        <script src="{% static 'js/jquery-3.4.1.min.js' %}"></script>
-        <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
-        <script src="{% static 'js/owl.carousel.min.js' %}"></script>
-        <script src="{% static 'js/nav.js' %}"></script>
-        <script src='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-beta/js/bootstrap.min.js'></script>
-        <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.3/jquery.easing.min.js'></script>
-        <script src='https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/12.1.2/js/intlTelInput.js'></script>
-        <script src='https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js'></script>
-        <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery-nice-select/1.1.0/js/jquery.nice-select.min.js'></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
-        <script src="{% static 'js/main.js' %}"></script>
-        <script>
-        </script>
-        <script>
-            (function($) {
-                "use strict";  
-                
-                //* Form js
-                function verificationForm(){
-                    //jQuery time
-                    var current_fs, next_fs, previous_fs; //fieldsets
-                    var left, opacity, scale; //fieldset properties which we will animate
-                    var animating; //flag to prevent quick multi-click glitches
-            
-                    $(".next").click(function () {
-                        if (animating) return false;
-                        animating = true;
-            
-                        current_fs = $(this).parent();
-                        next_fs = $(this).parent().next();
-            
-                        //activate next step on progressbar using the index of next_fs
-                        $("#progressbar li").eq($("fieldset").index(next_fs)).addClass("active");
-            
-                        //show the next fieldset
-                        next_fs.show();
-                        //hide the current fieldset with style
-                        current_fs.animate({
-                            opacity: 0
-                        }, {
-                            step: function (now, mx) {
-                                //as the opacity of current_fs reduces to 0 - stored in "now"
-                                //1. scale current_fs down to 80%
-                                scale = 1 - (1 - now) * 0.2;
-                                //2. bring next_fs from the right(50%)
-                                left = (now * 50) + "%";
-                                //3. increase opacity of next_fs to 1 as it moves in
-                                opacity = 1 - now;
-                                current_fs.css({
-                                    'transform': 'scale(' + scale + ')',
-                                    'position': 'absolute'
-                                });
-                                next_fs.css({
-                                    'left': left,
-                                    'opacity': opacity
-                                });
-                            },
-                            duration: 800,
-                            complete: function () {
-                                current_fs.hide();
-                                animating = false;
-                            },
-                            //this comes from the custom easing plugin
-                            easing: 'easeInOutBack'
-                        });
-                    });
-            
-                    $(".previous").click(function () {
-                        if (animating) return false;
-                        animating = true;
-            
-                        current_fs = $(this).parent();
-                        previous_fs = $(this).parent().prev();
-            
-                        //de-activate current step on progressbar
-                        $("#progressbar li").eq($("fieldset").index(current_fs)).removeClass("active");
-            
-                        //show the previous fieldset
-                        previous_fs.show();
-                        //hide the current fieldset with style
-                        current_fs.animate({
-                            opacity: 0
-                        }, {
-                            step: function (now, mx) {
-                                //as the opacity of current_fs reduces to 0 - stored in "now"
-                                //1. scale previous_fs from 80% to 100%
-                                scale = 0.8 + (1 - now) * 0.2;
-                                //2. take current_fs to the right(50%) - from 0%
-                                left = ((1 - now) * 50) + "%";
-                                //3. increase opacity of previous_fs to 1 as it moves in
-                                opacity = 1 - now;
-                                current_fs.css({
-                                    'left': left
-                                });
-                                previous_fs.css({
-                                    'transform': 'scale(' + scale + ')',
-                                    'opacity': opacity
-                                });
-                            },
-                            duration: 800,
-                            complete: function () {
-                                current_fs.hide();
-                                animating = false;
-                            },
-                            //this comes from the custom easing plugin
-                            easing: 'easeInOutBack'
-                        });
-                    });
-            
-                    $(".submit").click(function () {
-                        return false;
-                    })
-                }; 
-                
-                //* Add Phone no select
-                function phoneNoselect() {
-                    if ($('#msform').length) {
-                        var input = $("#phone");
-                        input.intlTelInput({
-                        initialCountry: "in",
-                        separateDialCode: false,
-                        utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.13/js/utils.js",
-                     });
+          <fieldset>
+            <h4 style="text-align: center">Resume</h4>
+            {% comment %}
+            <div class="form-group fg_2">
+              <input
+                type="file"
+                class="form-control"
+                id="pxp-signin-page-email"
+                placeholder="Upload Resume"
+                name="resume"
+                multiple="multiple"
+                accept="application/pdf"
+              />
+            </div>
+            {% endcomment %} {% comment %}
+            <div class="progress-bar1 mb-3">
+              <span class="progress-bar-fill" style="width: 0%"></span>
+            </div>
+            {% endcomment %}
+            <div
+              class="pxp-candidate-cover2 mb-3"
+              style="
+                display: flex;
+                justify-content: center;
+                align-items: center;
+              "
+            >
+              <input
+                type="file"
+                id="pxp-candidate-cover-choose-file2"
+                accept="application/pdf"
+                name="resume"
+              />
+              <label
+                for="pxp-candidate-cover-choose-file2"
+                class="pxp-cover"
+                style="border-radius: 1rem; width: 90%; height: 10vh"
+                ><span>Upload Resume (size < 2MB)</span></label
+              >
+            </div>
+            <div class="analysisgif" style="display: none">
+              <img
+                src="{% static 'images/resume_a.gif' %}"
+                alt="Resume Analysis"
+                class="intimage"
+              />
+              <h3>Resume Analysis in process...</h3>
+              <h3>The analysis results will be shown in the dashboard!</h3>
+            </div>
+            <button
+              type="button"
+              class="action-button previous previous_button"
+              id="lastback"
+            >
+              Back
+            </button>
+            <button class="action-button" type="submit" id="gifshower">
+              Finish
+            </button>
+          </fieldset>
+        </form>
+      </section>
+      <!-- END Multiform HTML -->
+    </article>
 
-                    var iti = input.intlTelInput("getSelectedCountryData");
+    <script src="{% static 'js/jquery-3.4.1.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'js/owl.carousel.min.js' %}"></script>
+    <script src="{% static 'js/nav.js' %}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-beta/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.3/jquery.easing.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/12.1.2/js/intlTelInput.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-nice-select/1.1.0/js/jquery.nice-select.min.js"></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+      integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+      integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+      crossorigin="anonymous"
+    ></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+    <script></script>
+    <script>
+      (function ($) {
+        "use strict";
 
-                    $('#countryCode').val('+' + iti.dialCode);
-                    $('#phoneNumber').val(input.val());
+        //* Form js
+        function verificationForm() {
+          //jQuery time
+          var current_fs, next_fs, previous_fs; //fieldsets
+          var left, opacity, scale; //fieldset properties which we will animate
+          var animating; //flag to prevent quick multi-click glitches
 
-                    input.on("countrychange", function (e, countryData) {
-                        $('#countryCode').val('+' + countryData.dialCode);
-                        // console.log(countryData);
-                        // var maxLength = iti.countryData[0].length;
-                        // console.log(iti);
-                        // $('#phone').attr('maxlength', maxLength);
-                        $('#phoneNumber').val(input.val());
-                    });
-                    input.on('keyup', function(){
-                        $('#phoneNumber').val(input.val());
-                    });
-                    };
-                };
+          $(".next").click(function () {
+            if (animating) return false;
+            animating = true;
 
-                //* Select js
-                function nice_Select(){
-                    if ( $('.product_select').length ){ 
-                        $('select').niceSelect();
-                    };
-                }; 
-                /*Function Calls*/  
-                verificationForm ();
-                phoneNoselect ();
-                nice_Select ();
-            })(jQuery);
+            current_fs = $(this).parent();
+            next_fs = $(this).parent().next();
 
-            $('.action-but').click(function(){
-                if(document.getElementById('phone').value=="")
-                {
-                    alert("Please enter a valid phone number");
-                    return;
-                }
-                if(!document.getElementById('hider').matches('finde'))
-                {
-                    document.getElementById('hider').setAttribute('class', 'finde2');
-                }
-                let text1 = document.getElementById('countryCode').value;
-                let text2 = document.getElementById('phoneNumber').value;
-                let result = text1+text2
-                console.log(result);
-                $.ajax(
-                {
-                    type:"GET",
-                    url: "get_otp/",
-                    data:{
-                        'code': document.getElementById('countryCode').value,
-                        'phone': document.getElementById('phoneNumber').value,
-                        csrfmiddlewaretoken: '{{ csrf_token }}'
-                    },
-                    success: function( data ) 
-                    {
-                        alert(`OTP is ${data.OTP}`)
-                        $('.action-but2').css('display', 'inline-block');
-                        document.getElementById('otp_val1').value="";
-                        document.getElementById('otp_val2').value="";
-                        document.getElementById('otp_val3').value="";
-                        document.getElementById('otp_val4').value="";
-                        document.getElementById('otp_val5').value="";
-                        document.getElementById('otp_val6').value="";
-                    }
-                 })
-                })
-            
-            $('.action-but2').click(function(){
-                let text1 = document.getElementById('countryCode').value;
-                let text2 = document.getElementById('phoneNumber').value;
-                let result = text1+text2
-                let code1 = document.getElementById('otp_val1').value;
-                let code2 = document.getElementById('otp_val2').value;
-                let code3 = document.getElementById('otp_val3').value;
-                let code4 = document.getElementById('otp_val4').value;
-                let code5 = document.getElementById('otp_val5').value;
-                let code6 = document.getElementById('otp_val6').value;
-                if(code1=="" | code2=="" | code3=="" | code4=="" | code5=="" | code6=="")
-                {
-                    alert("Please enter all the digits of OTP");
-                    return;
-                }
-                let res1 = code1 + code2 + code3 + code4 + code5 + code6
-                $.ajax(
-                {
-                    type:"POST",
-                    url: "post_otp/",
-                    data:{
-                        'phone': text2,
-                        'OTP': res1,
-                        csrfmiddlewaretoken: '{{ csrf_token }}'
-                    },
-                    success: function( data ) 
-                    {
-                        if(data.message=='Please enter correct OTP')
-                        {
-                            alert('Please enter correct OTP or Generate a new one')
-                        }
-                        else
-                        {
-                            alert('Phone number verified');
-                            $('.action-but2').css('display', 'none');
-                            $('#verifier').click();
-                        }
-                    }
-                    })
-                })
+            //activate next step on progressbar using the index of next_fs
+            $("#progressbar li")
+              .eq($("fieldset").index(next_fs))
+              .addClass("active");
 
-                function getCodeBoxElement(index) {
-                    return document.getElementById('otp_val' + index);
-                  }
-                  function onKeyUpEvent(index, event) {
-                    const eventCode = event.which || event.keyCode;
-                    if (getCodeBoxElement(index).value.length === 1) {
-                      if (index !== 6) {
-                        getCodeBoxElement(index+ 1).focus();
-                      }
-                    }
-                    if (eventCode === 8 && index !== 1) {
-                      getCodeBoxElement(index - 1).focus();
-                    }
-                  }
-                  function onFocusEvent(index) {
-                    for (item = 1; item < index; item++) {
-                      const currentElement = getCodeBoxElement(item);
-                      if (!currentElement.value) {
-                          currentElement.focus();
-                          break;
-                      }
-                    }
-                  }
+            //show the next fieldset
+            next_fs.show();
+            //hide the current fieldset with style
+            current_fs.animate(
+              {
+                opacity: 0,
+              },
+              {
+                step: function (now, mx) {
+                  //as the opacity of current_fs reduces to 0 - stored in "now"
+                  //1. scale current_fs down to 80%
+                  scale = 1 - (1 - now) * 0.2;
+                  //2. bring next_fs from the right(50%)
+                  left = now * 50 + "%";
+                  //3. increase opacity of next_fs to 1 as it moves in
+                  opacity = 1 - now;
+                  current_fs.css({
+                    transform: "scale(" + scale + ")",
+                    position: "absolute",
+                  });
+                  next_fs.css({
+                    left: left,
+                    opacity: opacity,
+                  });
+                },
+                duration: 800,
+                complete: function () {
+                  current_fs.hide();
+                  animating = false;
+                },
+                //this comes from the custom easing plugin
+                easing: "easeInOutBack",
+              }
+            );
+          });
 
-                  $('#gifshower').click(function(){
-                    $('.analysisgif').css({'display': 'block'})
-                    $('#lastback').css({'display': 'none'})
-                    $('#gifshower').css({'display': 'none'})
-                  })
+          $(".previous").click(function () {
+            if (animating) return false;
+            animating = true;
 
-                  
-                    $(function () {
-                        $('.notnormal').each(function () {
-                          $(this).select2({
-                            theme: 'bootstrap4',
-                            width: 'style',
-                            placeholder: $(this).attr('placeholder'),
-                            allowClear: Boolean($(this).data('allow-clear')),
-                          });
-                        });
-                      });
+            current_fs = $(this).parent();
+            previous_fs = $(this).parent().prev();
 
+            //de-activate current step on progressbar
+            $("#progressbar li")
+              .eq($("fieldset").index(current_fs))
+              .removeClass("active");
 
-                    var count = 1;
-            var radioCount = 2;
-            var totalRadioCount = 2;
-            var questionRadioCount = "2";
-            var totalQuestionCount = 1;
-            var latestQuestionID = 1;
-            var questionRadioCountArray = [[1, 2]];
-            var counta = 1;
-            var radioCounta = 2;
-            var totalRadioCounta = 2;
-            var questionRadioCounta = "2";
-            var totalQuestionCounta = 1;
-            var latestQuestionIDa = 1;
-            var questionRadioCountArraya = [[1, 2]];
-            function addQuestion(targetval) {
-                if(targetval=="skills")
-                {
-                    count++;
-                    totalQuestionCount++;
-                    latestQuestionID++;
-                    radioCount = 1;
-                    totalRadioCount++;
-                    updateCountOnForm(count, "QuestionCount");
-                    latestQuestionID = Math.max(latestQuestionID, totalQuestionCount);
-                }
-                else
-                {
-                    counta++;
-                    totalQuestionCounta++;
-                    latestQuestionIDa++;
-                    radioCounta = 1;
-                    totalRadioCounta++;
-                    updateCountOnForm(counta, "QuestionCounta");
-                    latestQuestionID = Math.max(latestQuestionIDa, totalQuestionCounta);
-                }
-                const questionDiv = document.createElement('div');
-                const individualQuestion = document.createElement('div');
-                const question = document.createElement('input');
-                question.setAttribute('type', 'text');
-                const deleteButton = document.createElement('a');
-                deleteButton.setAttribute('class', 'btn delete_button');
-                const deleteIcon = document.createElement('i');
-                deleteButton.setAttribute('class', 'fa fa-close fa-2x');
-                if(targetval=="skills")
-                {
-                    questionDiv.setAttribute('id', `sq${totalQuestionCount}`);
-                    questionDiv.setAttribute('class', `single_question${totalQuestionCount} Ques col-6`);
-                    individualQuestion.setAttribute('class', 'individualQuestion');
-                    question.setAttribute('class', 'form-control specialInputQuestions');
-                    question.setAttribute('placeholder', 'Skill');
-                    question.setAttribute('id', `question${totalQuestionCount}`);
-                    question.setAttribute('name', `skill`);
-                    deleteButton.setAttribute('id', `${totalQuestionCount}`);
-                    deleteButton.setAttribute('onclick', 'deleteQuestion(this.id, "sq")');
-                }
-                else
-                {
-                    questionDiv.setAttribute('id', `eq${totalQuestionCounta}`);
-                    questionDiv.setAttribute('class', `single_question${totalQuestionCounta}a Ques`);
-                    individualQuestion.setAttribute('class', 'individualQuestiona');
-                    question.setAttribute('class', 'form-control specialInputQuestionsa');
-                    question.setAttribute('placeholder', 'Experience (Role, company, timespan)');
-                    question.setAttribute('id', `question${totalQuestionCounta}a`);
-                    question.setAttribute('name', `experience`);
-                    deleteButton.setAttribute('id', `${totalQuestionCounta}`);
-                    deleteButton.setAttribute('onclick', 'deleteQuestion(this.id, "eq")');
-                }
-                deleteButton.appendChild(deleteIcon);
-                individualQuestion.appendChild(question);
-                individualQuestion.appendChild(deleteButton);
-                questionDiv.appendChild(individualQuestion);
-                var quest;
-                if(targetval=="skills")
-                {
-                    updateRadioCountOnForm(totalRadioCount, "radioCount");
-                    quest=document.getElementById('questioneer');
-                    questionRadioCountArray.push([totalQuestionCount, radioCount]);
-                    rdc(questionRadioCountArray, "rdc");
-                }
-                else
-                {
-                    updateRadioCountOnForm(totalRadioCounta, "radioCounta");
-                    quest=document.getElementById('questioneera');
-                    questionRadioCountArraya.push([totalQuestionCounta, radioCounta]);
-                    rdc(questionRadioCountArraya, "rdca");
-                }
-                quest.appendChild(questionDiv);
+            //show the previous fieldset
+            previous_fs.show();
+            //hide the current fieldset with style
+            current_fs.animate(
+              {
+                opacity: 0,
+              },
+              {
+                step: function (now, mx) {
+                  //as the opacity of current_fs reduces to 0 - stored in "now"
+                  //1. scale previous_fs from 80% to 100%
+                  scale = 0.8 + (1 - now) * 0.2;
+                  //2. take current_fs to the right(50%) - from 0%
+                  left = (1 - now) * 50 + "%";
+                  //3. increase opacity of previous_fs to 1 as it moves in
+                  opacity = 1 - now;
+                  current_fs.css({
+                    left: left,
+                  });
+                  previous_fs.css({
+                    transform: "scale(" + scale + ")",
+                    opacity: opacity,
+                  });
+                },
+                duration: 800,
+                complete: function () {
+                  current_fs.hide();
+                  animating = false;
+                },
+                //this comes from the custom easing plugin
+                easing: "easeInOutBack",
+              }
+            );
+          });
+
+          $(".submit").click(function () {
+            return false;
+          });
+        }
+
+        //* Add Phone no select
+        function phoneNoselect() {
+          if ($("#msform").length) {
+            var input = $("#phone");
+            input.intlTelInput({
+              initialCountry: "in",
+              separateDialCode: false,
+              utilsScript:
+                "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.13/js/utils.js",
+            });
+
+            var iti = input.intlTelInput("getSelectedCountryData");
+
+            $("#countryCode").val("+" + iti.dialCode);
+            $("#phoneNumber").val(input.val());
+
+            input.on("countrychange", function (e, countryData) {
+              $("#countryCode").val("+" + countryData.dialCode);
+              // console.log(countryData);
+              // var maxLength = iti.countryData[0].length;
+              // console.log(iti);
+              // $('#phone').attr('maxlength', maxLength);
+              $("#phoneNumber").val(input.val());
+            });
+            input.on("keyup", function () {
+              $("#phoneNumber").val(input.val());
+            });
+          }
+        }
+
+        //* Select js
+        function nice_Select() {
+          if ($(".product_select").length) {
+            $("select").niceSelect();
+          }
+        }
+        /*Function Calls*/
+        verificationForm();
+        phoneNoselect();
+        nice_Select();
+      })(jQuery);
+
+      $(".action-but").click(function () {
+        if (document.getElementById("phone").value == "") {
+          alert("Please enter a valid phone number");
+          return;
+        }
+        if (!document.getElementById("hider").matches("finde")) {
+          document.getElementById("hider").setAttribute("class", "finde2");
+        }
+        let text1 = document.getElementById("countryCode").value;
+        let text2 = document.getElementById("phoneNumber").value;
+        let result = text1 + text2;
+        $.ajax({
+          type: "GET",
+          url: "get_otp/",
+          data: {
+            code: document.getElementById("countryCode").value,
+            phone: document.getElementById("phoneNumber").value,
+            csrfmiddlewaretoken: "{{ csrf_token }}",
+          },
+          success: function (data) {
+            alert(`OTP is ${data.OTP}`);
+            $(".action-but2").css("display", "inline-block");
+            document.getElementById("otp_val").value = "";
+          },
+        });
+      });
+
+      $(".action-but2").click(function () {
+        let text1 = document.getElementById("countryCode").value;
+        let text2 = document.getElementById("phoneNumber").value;
+        let result = text1 + text2;
+        let code = document.getElementById("otp_val").value;
+        if (code == "" || code.length !== 6) {
+          alert("Please enter all the digits of OTP");
+          return;
+        }
+        let res1 = code;
+        $.ajax({
+          type: "POST",
+          url: "post_otp/",
+          data: {
+            phone: text2,
+            OTP: res1,
+            csrfmiddlewaretoken: "{{ csrf_token }}",
+          },
+          success: function (data) {
+            if (data.message == "Please enter correct OTP") {
+              alert("Please enter correct OTP or Generate a new one");
+            } else {
+              alert("Phone number verified");
+              $(".action-but2").css("display", "none");
+              $("#verifier").click();
             }
-            function updateCountOnForm(count, targetval) {
-                var countKeeper = document.getElementById(targetval);
-                countKeeper.value = count; 
-            }
-            function updateRadioCountOnForm(totalRadioCount, targetval) {
-                var countKeeper = document.getElementById(targetval);
-                countKeeper.value = totalRadioCount; 
-            }
-            function rdc(questionRadioCountArray, targetval) {
-                var questionRadioCountString = document.getElementById(targetval);
-                questionRadioCountString.value = questionRadioCountArray;
-            }
-            function deleteQuestion(questionID, targetval) {
-                var classNameOfQuestionToRemove = targetval + questionID;
-                const element = document.getElementById(classNameOfQuestionToRemove);
-                element.remove();
-                questionID = parseInt(questionID);
-                var firstArray = [];
-                var firstArraya = [];
-                if(targetval=="sq")
-                {
-                    count--;
-                    updateCountOnForm(count, "QuestionCount");
-                    totalRadioCount = totalRadioCount - radioCount;
-                    updateRadioCountOnForm(totalRadioCount, "radioCount");
-                    if (questionID == totalQuestionCount) {
-                        totalQuestionCount--;
-                    }
-                    for (var i = 0; i < questionRadioCountArray.length; i++) {
-                        firstArray.push(questionRadioCountArray[i][0]);
-                    }
-                    var index = firstArray.indexOf(questionID);
-                    questionRadioCountArray.splice(index, 1);
-                    latestQuestionID = parseInt(questionRadioCountArray[questionRadioCountArray.length-1][0]);
-                    var double = questionRadioCountArray.pop();
-                    double.push(radioCount);
-                    questionRadioCountArray.push(double);
-                    rdc(questionRadioCountArray, "rdc");
-                }
-                else
-                {
-                    counta--;
-                    updateCountOnForm(count, "QuestionCounta");
-                    totalRadioCounta = totalRadioCounta - radioCounta;
-                    updateRadioCountOnForm(totalRadioCount, "radioCounta");
-                    if (questionID == totalQuestionCounta) {
-                        totalQuestionCounta--;
-                    }
-                    for (var i = 0; i < questionRadioCountArraya.length; i++) {
-                        firstArraya.push(questionRadioCountArraya[i][0]);
-                    }
-                    var indexa = firstArraya.indexOf(questionID);
-                    questionRadioCountArraya.splice(indexa, 1);
-                    latestQuestionID = parseInt(questionRadioCountArraya[questionRadioCountArraya.length-1][0]);
-                    var doublea = questionRadioCountArraya.pop();
-                    doublea.push(radioCounta);
-                    questionRadioCountArraya.push(doublea); 
-                    rdc(questionRadioCountArray, "rdca");
-                }
-            }
+          },
+        });
+      });
 
-        </script>
-    </body>
+      function getCodeBoxElement(index) {
+        return document.getElementById("otp_val" + index);
+      }
+      function onKeyUpEvent(index, event) {
+        const eventCode = event.which || event.keyCode;
+        if (getCodeBoxElement(index).value.length === 1) {
+          if (index !== 6) {
+            getCodeBoxElement(index + 1).focus();
+          }
+        }
+        if (eventCode === 8 && index !== 1) {
+          getCodeBoxElement(index - 1).focus();
+        }
+      }
+      function onFocusEvent(index) {
+        for (item = 1; item < index; item++) {
+          const currentElement = getCodeBoxElement(item);
+          if (!currentElement.value) {
+            currentElement.focus();
+            break;
+          }
+        }
+      }
+
+      $("#gifshower").click(function () {
+        $(".analysisgif").css({ display: "block" });
+        $("#lastback").css({ display: "none" });
+        $("#gifshower").css({ display: "none" });
+      });
+
+      $(function () {
+        $(".notnormal").each(function () {
+          $(this).select2({
+            theme: "bootstrap4",
+            width: "style",
+            placeholder: $(this).attr("placeholder"),
+            allowClear: Boolean($(this).data("allow-clear")),
+          });
+        });
+      });
+
+      var count = 1;
+      var radioCount = 2;
+      var totalRadioCount = 2;
+      var questionRadioCount = "2";
+      var totalQuestionCount = 1;
+      var latestQuestionID = 1;
+      var questionRadioCountArray = [[1, 2]];
+      var counta = 1;
+      var radioCounta = 2;
+      var totalRadioCounta = 2;
+      var questionRadioCounta = "2";
+      var totalQuestionCounta = 1;
+      var latestQuestionIDa = 1;
+      var questionRadioCountArraya = [[1, 2]];
+      function addQuestion(targetval) {
+        if (targetval == "skills") {
+          count++;
+          totalQuestionCount++;
+          latestQuestionID++;
+          radioCount = 1;
+          totalRadioCount++;
+          updateCountOnForm(count, "QuestionCount");
+          latestQuestionID = Math.max(latestQuestionID, totalQuestionCount);
+        } else {
+          counta++;
+          totalQuestionCounta++;
+          latestQuestionIDa++;
+          radioCounta = 1;
+          totalRadioCounta++;
+          updateCountOnForm(counta, "QuestionCounta");
+          latestQuestionID = Math.max(latestQuestionIDa, totalQuestionCounta);
+        }
+        const questionDiv = document.createElement("div");
+        const individualQuestion = document.createElement("div");
+        const question = document.createElement("input");
+        question.setAttribute("type", "text");
+        const deleteButton = document.createElement("a");
+        deleteButton.setAttribute("class", "btn delete_button");
+        const deleteIcon = document.createElement("i");
+        deleteButton.setAttribute("class", "fa fa-close fa-2x");
+        if (targetval == "skills") {
+          questionDiv.setAttribute("id", `sq${totalQuestionCount}`);
+          questionDiv.setAttribute(
+            "class",
+            `single_question${totalQuestionCount} Ques col-6`
+          );
+          individualQuestion.setAttribute("class", "individualQuestion");
+          question.setAttribute("class", "form-control specialInputQuestions");
+          question.setAttribute("placeholder", "Skill");
+          question.setAttribute("id", `question${totalQuestionCount}`);
+          question.setAttribute("name", `skill`);
+          deleteButton.setAttribute("id", `${totalQuestionCount}`);
+          deleteButton.setAttribute("onclick", 'deleteQuestion(this.id, "sq")');
+        } else {
+          questionDiv.setAttribute("id", `eq${totalQuestionCounta}`);
+          questionDiv.setAttribute(
+            "class",
+            `single_question${totalQuestionCounta}a Ques`
+          );
+          individualQuestion.setAttribute("class", "individualQuestiona");
+          question.setAttribute("class", "form-control specialInputQuestionsa");
+          question.setAttribute(
+            "placeholder",
+            "Experience (Role, company, timespan)"
+          );
+          question.setAttribute("id", `question${totalQuestionCounta}a`);
+          question.setAttribute("name", `experience`);
+          deleteButton.setAttribute("id", `${totalQuestionCounta}`);
+          deleteButton.setAttribute("onclick", 'deleteQuestion(this.id, "eq")');
+        }
+        deleteButton.appendChild(deleteIcon);
+        individualQuestion.appendChild(question);
+        individualQuestion.appendChild(deleteButton);
+        questionDiv.appendChild(individualQuestion);
+        var quest;
+        if (targetval == "skills") {
+          updateRadioCountOnForm(totalRadioCount, "radioCount");
+          quest = document.getElementById("questioneer");
+          questionRadioCountArray.push([totalQuestionCount, radioCount]);
+          rdc(questionRadioCountArray, "rdc");
+        } else {
+          updateRadioCountOnForm(totalRadioCounta, "radioCounta");
+          quest = document.getElementById("questioneera");
+          questionRadioCountArraya.push([totalQuestionCounta, radioCounta]);
+          rdc(questionRadioCountArraya, "rdca");
+        }
+        quest.appendChild(questionDiv);
+      }
+      function updateCountOnForm(count, targetval) {
+        var countKeeper = document.getElementById(targetval);
+        countKeeper.value = count;
+      }
+      function updateRadioCountOnForm(totalRadioCount, targetval) {
+        var countKeeper = document.getElementById(targetval);
+        countKeeper.value = totalRadioCount;
+      }
+      function rdc(questionRadioCountArray, targetval) {
+        var questionRadioCountString = document.getElementById(targetval);
+        questionRadioCountString.value = questionRadioCountArray;
+      }
+      function deleteQuestion(questionID, targetval) {
+        var classNameOfQuestionToRemove = targetval + questionID;
+        const element = document.getElementById(classNameOfQuestionToRemove);
+        element.remove();
+        questionID = parseInt(questionID);
+        var firstArray = [];
+        var firstArraya = [];
+        if (targetval == "sq") {
+          count--;
+          updateCountOnForm(count, "QuestionCount");
+          totalRadioCount = totalRadioCount - radioCount;
+          updateRadioCountOnForm(totalRadioCount, "radioCount");
+          if (questionID == totalQuestionCount) {
+            totalQuestionCount--;
+          }
+          for (var i = 0; i < questionRadioCountArray.length; i++) {
+            firstArray.push(questionRadioCountArray[i][0]);
+          }
+          var index = firstArray.indexOf(questionID);
+          questionRadioCountArray.splice(index, 1);
+          latestQuestionID = parseInt(
+            questionRadioCountArray[questionRadioCountArray.length - 1][0]
+          );
+          var double = questionRadioCountArray.pop();
+          double.push(radioCount);
+          questionRadioCountArray.push(double);
+          rdc(questionRadioCountArray, "rdc");
+        } else {
+          counta--;
+          updateCountOnForm(count, "QuestionCounta");
+          totalRadioCounta = totalRadioCounta - radioCounta;
+          updateRadioCountOnForm(totalRadioCount, "radioCounta");
+          if (questionID == totalQuestionCounta) {
+            totalQuestionCounta--;
+          }
+          for (var i = 0; i < questionRadioCountArraya.length; i++) {
+            firstArraya.push(questionRadioCountArraya[i][0]);
+          }
+          var indexa = firstArraya.indexOf(questionID);
+          questionRadioCountArraya.splice(indexa, 1);
+          latestQuestionID = parseInt(
+            questionRadioCountArraya[questionRadioCountArraya.length - 1][0]
+          );
+          var doublea = questionRadioCountArraya.pop();
+          doublea.push(radioCounta);
+          questionRadioCountArraya.push(doublea);
+          rdc(questionRadioCountArray, "rdca");
+        }
+      }
+    </script>
+  </body>
 </html>
 {% endblock %}

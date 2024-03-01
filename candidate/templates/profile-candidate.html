@@ -70,7 +70,7 @@
                         <div class="mb-3">
                             <label for="pxp-candidate-phone" class="form-label">Phone</label>
                             <input type="tel" id="pxp-candidate-phone" class="form-control" placeholder="(+12) 345 6789" name="phone" value="{% with phone_without_country_code=user.phone|slice:"3:" %}{{ phone_without_country_code }}{% endwith %}">
-                            <a class="btn rounded-pill pxp-subsection-cta action-but3">Get OTP</a>
+                            <a class="mt-3 btn rounded-pill pxp-subsection-cta action-but3">Get OTP</a>
                         </div>
                     </div>
                 </div>
@@ -80,10 +80,9 @@
                 <div class="pxp-candidate-cover mb-3">
                     <input type="file" id="pxp-candidate-cover-choose-file" accept="image/*" width="100%" height="166px" name="photo">
                     {% if request.session.photo %}
-                        <label for="pxp-candidate-cover-choose-file" class="pxp-cover" style="background-image: url('{{ request.session.photo }}')"><span>Update Photo</span></label>
-                    {% else %}
-                        <label for="pxp-candidate-cover-choose-file" class="pxp-cover"><span>Upload Photo</span></label>
+                        <img class="pxp-cover" src="{{ request.session.photo }}" />
                     {% endif %}
+                    <label for="pxp-candidate-cover-choose-file"><span>Upload Photo</span></label>
                 </div>
                 {% comment %} <div class="pxp-candidate-photo mb-3">
                     <input type="file" id="pxp-candidate-photo-choose-file" accept="image/*">
@@ -150,7 +149,11 @@
                 <div class="col-md-6 col-xxl-3">
                     <div class="mb-3">
                         <label for="pxp-company-job-description" title = "Job Description file"class="form-label preview-label">Previous File</label>
-                        <a href="{{ user.Resume.url }}" target="_blank"  id="pxp-company-job-description" class="form-control btn btn-primary file-link pxp-cover">{{extracted_name}}</a>
+                        {% if user.Resume.name|default:"" %}
+                            <a href="{{ user.Resume.url }}" target="_blank" id="pxp-company-job-description" class="form-control btn btn-primary file-link pxp-cover">{{ extracted_name }}</a>
+                        {% else %}
+                            <p>No Resume Found</p>
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -879,7 +882,7 @@ $(document).ready(function () {
     $('#ins').removeClass('pxp-active');
     $('#jch').removeClass('pxp-active');
     $('#pla').removeClass('pxp-active');
-    // var filename = "{{ user.Resume.url }}"; 
+    {# // var filename = "{{ user.Resume.url }}"; #} 
     // var file_name = filename.split('/').pop();
     // var final_file_name = file_name.split('_').pop();
     // console.log(final_file_name);

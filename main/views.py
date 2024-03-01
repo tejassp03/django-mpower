@@ -76,13 +76,14 @@ from django.contrib.auth.tokens import PasswordResetTokenGenerator
 # from ip2geotools.databases.noncommercial import DbIpCity
 import threading
 
+
 @csrf_exempt
 def index(request):
     if request.method == 'POST':
         if 'location' in request.POST:
             longitude = request.POST['longitude']
             latitude = request.POST['latitude']
-            
+
         user = Login.objects.filter(email=request.POST.get('c_email', ''))
         if not user.exists():
             return JsonResponse({'message': 'X'})
@@ -96,15 +97,15 @@ def index(request):
             jobseeker = JobSeeker.objects.filter(log_id=user.log_id).first()
             if jobseeker:
                 if not all([
-                    not jobseeker.phone, 
-                    not jobseeker.location, 
-                    not jobseeker.experience, 
-                    not jobseeker.skills, 
-                    not jobseeker.basic_edu, 
-                    not jobseeker.master_edu, 
-                    not jobseeker.other_qual, 
-                    not jobseeker.dob, 
-                    not jobseeker.Resume, 
+                    not jobseeker.phone,
+                    not jobseeker.location,
+                    not jobseeker.experience,
+                    not jobseeker.skills,
+                    not jobseeker.basic_edu,
+                    not jobseeker.master_edu,
+                    not jobseeker.other_qual,
+                    not jobseeker.dob,
+                    not jobseeker.Resume,
                     not jobseeker.photo
                 ]):
                     return JsonResponse({'message': 'Y', 'url': f"/profile_completion/{user.log_id}/"})
@@ -112,14 +113,14 @@ def index(request):
             employer = Employer.objects.filter(log_id=user.log_id).first()
             if employer:
                 if not all([
-                    not employer.etype, 
-                    not employer.industry, 
-                    not employer.address, 
-                    not employer.pincode, 
-                    not employer.executive, 
-                    not employer.phone, 
-                    not employer.location, 
-                    not employer.profile, 
+                    not employer.etype,
+                    not employer.industry,
+                    not employer.address,
+                    not employer.pincode,
+                    not employer.executive,
+                    not employer.phone,
+                    not employer.location,
+                    not employer.profile,
                     not employer.logo
                 ]):
                     return JsonResponse({'message': 'Y', 'url': f"/emp_completion/{user.log_id}/"})
@@ -127,10 +128,12 @@ def index(request):
         return JsonResponse({'message': 'X'})
 
     jobs = Jobs.objects.all()
-    typ = jobs.values('fnarea').annotate(Count('fnarea')).order_by('-fnarea__count')[:6]
-    coms = jobs.values('eid').annotate(Count('eid')).order_by('-eid__count')[:6]
+    typ = jobs.values('fnarea').annotate(
+        Count('fnarea')).order_by('-fnarea__count')[:6]
+    coms = jobs.values('eid').annotate(
+        Count('eid')).order_by('-eid__count')[:6]
     vals = [{'fnarea': i['fnarea'], 'count': i['fnarea__count']} for i in typ]
-    
+
     try:
         user_ip = request.META.get('REMOTE_ADDR')
         url = f"https://ipinfo.io/{user_ip}/json"
@@ -145,9 +148,9 @@ def index(request):
     seminars_in_ascending_order = Seminars.objects.order_by('-created_date')
 
     # Fetch distinct locations and titles
-    locations = list(jobs.order_by().values_list('location', flat=True).distinct())
+    locations = list(jobs.order_by().values_list(
+        'location', flat=True).distinct())
     titles = list(jobs.order_by().values_list('title', flat=True).distinct())
-
 
     jobs_info = [
         {
@@ -177,17 +180,16 @@ def index(request):
     ]
 
     return render(request, 'index.html', {
-    'locations': locations,
-    'titles': titles,
-    'title': dumps([title for title in titles]),
-    'vals': vals,
-    'jobs': jobs_info,
-    'coms': coms_info,
-    'loc': locations,
-    'total': len(jobs),
-    'seminars': seminars_in_ascending_order
-})
-
+        'locations': locations,
+        'titles': titles,
+        'title': dumps([title for title in titles]),
+        'vals': vals,
+        'jobs': jobs_info,
+        'coms': coms_info,
+        'loc': locations,
+        'total': len(jobs),
+        'seminars': seminars_in_ascending_order
+    })
 
 
 def save_resume_vector_matrix_all():
@@ -215,10 +217,13 @@ def save_resume_vector_matrix_all():
                 job_seeker_data = preprocess_text(important_data_jobseeker)
                 resume_text = preprocess_text(resume_text)
                 total_job_seeker_data = f"{job_seeker_data}{resume_text}"
-                job_seeker_data_vector = vectorizer.fit_transform([total_job_seeker_data])
-                serialized_data = serialize_sparse_matrix(job_seeker_data_vector)
+                job_seeker_data_vector = vectorizer.fit_transform(
+                    [total_job_seeker_data])
+                serialized_data = serialize_sparse_matrix(
+                    job_seeker_data_vector)
                 try:
-                    resume_analysis = ResumeAnalysis.objects.get(jobseeker_id=job_seeker)
+                    resume_analysis = ResumeAnalysis.objects.get(
+                        jobseeker_id=job_seeker)
                     resume_analysis.sparse_matrix_data = serialized_data
                     resume_analysis.save()
                 except:
@@ -226,22 +231,24 @@ def save_resume_vector_matrix_all():
                     resume_analysis.actual_skills = job_seeker.skills
                     resume_analysis.jobseeker_id = job_seeker
                     resume_analysis.save()
-                
+
                 print(i+1)
             except Exception as e:
                 pass
         # deserialized_data = deserialize_sparse_matrix(resume_analysis.sparse_matrix_data)
-        
+
     except Exception as e:
         pass
+
 
 def serialize_sparse_matrix(matrix):
     buffer = BytesIO()
     save_npz(buffer, matrix)
     serialized_matrix = buffer.getvalue()
 
-    json_compatible_data = serialized_matrix.decode('latin1')  
+    json_compatible_data = serialized_matrix.decode('latin1')
     return json_compatible_data
+
 
 def deserialize_sparse_matrix(serialized_data):
     serialized_matrix = serialized_data.encode('latin1')
@@ -249,6 +256,7 @@ def deserialize_sparse_matrix(serialized_data):
     buffer = BytesIO(serialized_matrix)
     matrix = load_npz(buffer)
     return matrix
+
 
 def save_resume_vector_matrix(pk):
     try:
@@ -260,17 +268,17 @@ def save_resume_vector_matrix(pk):
         job_seeker_data = preprocess_text(important_data_jobseeker)
         resume_text = preprocess_text(resume_text)
         total_job_seeker_data = f"{job_seeker_data}{resume_text}"
-        job_seeker_data_vector = vectorizer.fit_transform([total_job_seeker_data])
+        job_seeker_data_vector = vectorizer.fit_transform(
+            [total_job_seeker_data])
         serialized_data = serialize_sparse_matrix(job_seeker_data_vector)
         resume_analysis = ResumeAnalysis.objects.get(jobseeker_id=job_seeker)
         resume_analysis.sparse_matrix_data = serialized_data
         resume_analysis.save()
         # deserialized_data = deserialize_sparse_matrix(resume_analysis.sparse_matrix_data)
-        
+
     except Exception as e:
         pass
 
-        
 
 def view_function(request):
     messages.add_message(request, messages.INFO, 'This is an info message')
@@ -453,12 +461,13 @@ def candidates(request):
 
 def postjob(request):
     return render(request, 'company-dashboard-new-job.html')
- 
+
+
 def seminars(request):
     locs = request.GET.getlist('loc', None)
     locations = request.GET.getlist('location', None)
     titles = request.GET.getlist('title', None)
-    datesort = request.GET.get('datesort',None)
+    datesort = request.GET.get('datesort', None)
     l_val = locs + locations
     d_val = datesort
     query = Q()
@@ -476,18 +485,18 @@ def seminars(request):
 
     if datesort:
         if datesort == 'newest':
-            sem = sem.order_by('-created_date')  
+            sem = sem.order_by('-created_date')
         elif datesort == 'oldest':
             sem = sem.order_by('created_date')
     count = 0
     locations = []
     allsem = []
-    
+
     titles_ = []
     all_locations = []
     for i in sem:
         single_location = {
-            'location' : i.city
+            'location': i.city
         }
         titles_.append(i.title)
         all_locations.append(i.city)
@@ -510,8 +519,8 @@ def seminars(request):
         page_obj = p.page(1)
     except EmptyPage:
         page_obj = p.page(p.num_pages)
-    context = {'d':d_val,'l':l_val}
-    return render(request, 'seminars.html', {'page_obj':page_obj,'pe': page_obj,'count':count,'locations':locations,'all_titles':titles_,'all_locations':all_locations,'context':context})
+    context = {'d': d_val, 'l': l_val}
+    return render(request, 'seminars.html', {'page_obj': page_obj, 'pe': page_obj, 'count': count, 'locations': locations, 'all_titles': titles_, 'all_locations': all_locations, 'context': context})
 
 
 def findjobs(request):
@@ -530,42 +539,20 @@ def findjobs(request):
     t_val = request.GET.get('title', '') or 'all'
     c_val = request.GET.get('category', '') or 'all'
     l_val = request.GET.get('location', '') or 'all'
-    if (('title' not in request.GET) and ('category' not in request.GET) and ('location' not in request.GET)):
-        jobs = Jobs.objects.all().order_by('-postdate')
-    elif (t_val == "all" and l_val == "all" and c_val == "all"):
-        jobs = Jobs.objects.all()
-    elif (l_val == "all" and c_val == "all"):
-        jobs = Jobs.objects.filter(title=request.GET['title'])
-        # t_val = request.GET['title']
-    elif (t_val == "all" and c_val == "all"):
-        jobs = Jobs.objects.filter(location=request.GET['location'])
-        # l_val = request.GET['location']
-    elif (t_val == "all" and l_val == "all"):
-        jobs = Jobs.objects.filter(fnarea=request.GET['category'])
-        # c_val = request.GET['category']
-    elif (t_val == "all"):
-        jobs = Jobs.objects.filter(
-            location=request.GET['location'], fnarea=request.GET['category'])
-        # l_val = request.GET['location']
-        # c_val = request.GET['category']
-    elif (l_val == "all"):
-        jobs = Jobs.objects.filter(
-            title=request.GET['title'], fnarea=request.GET['category'])
-        # t_val = request.GET['title']
-        # c_val = request.GET['category']
-    elif (c_val == "all"):
-        jobs = Jobs.objects.filter(
-            title=request.GET['title'], location=request.GET['location'])
-        # t_val = request.GET['title']
-        # l_val = request.GET['location']
-    
-    else:
-        jobs = Jobs.objects.filter(
-            title=request.GET['title'], location=request.GET['location'], fnarea=request.GET['category'])
-        t_val = request.GET['title']
-        l_val = request.GET['location']
-        c_val = request.GET['category']
-    
+
+    jobs_filter = {}
+
+    # this an expensive query & will have to get optimised in the future: TODO
+    if (('title' in request.GET) or ('category' in request.GET) or ('location' in request.GET)):
+        if t_val != "all":
+            jobs_filter['title__istartswith'] = t_val
+        if c_val != "all":
+            jobs_filter['fnarea'] = c_val
+        if l_val != "all":
+            jobs_filter['location'] = l_val
+    jobs = Jobs.objects.filter(**jobs_filter)
+
+    # can and should add the jobs_filter pattern to the below queries: TODO
     if 'emp' in request.GET:
         jobs = jobs.filter(jobtype__in=request.GET.getlist('emp'))
         emp_sel = request.GET.getlist('emp')
@@ -574,7 +561,7 @@ def findjobs(request):
             exp = int(request.GET['exp'])
             jobs = jobs.filter(experience__lte=exp)
             exp_sel = exp
-        
+
     if 'sal' in request.GET:
         jobs = jobs.filter(basicpay__in=request.GET.getlist('sal'))
         sal_sel = request.GET.getlist('sal')
@@ -639,9 +626,9 @@ def findjobs(request):
         countsal.append(len(jobs.filter(basicpay=i['basicpay'])))
     for i in locations:
         countloc.append(len(jobs.filter(location=i['location'])))
-    
+
     context = {'c': c_val, 'l': l_val, 't': t_val, 'd': d_val,
-               'sel': emp_sel, 'eel': exp_sel, 'els': sal_sel,'wls':wt_sel,'cls':cat_sel,'lcs':loc_sel}
+               'sel': emp_sel, 'eel': exp_sel, 'els': sal_sel, 'wls': wt_sel, 'cls': cat_sel, 'lcs': loc_sel}
     if exp != 0:
         context['exp'] = exp
     locations_ = []
@@ -650,9 +637,10 @@ def findjobs(request):
     titles_ = []
     for i in all_titles:
         titles_.append(i['title'])
-    return render(request, 'jobs.html', {'page_obj': page_obj, 'pe': page_obj, 'count': count, 'locations': locations,'countloc':countloc, 'titles': titles, 'categories': categories, 'GET_params': GET_params, 'jobtype': zip(jobtype, countjob), 'emptype': zip(emptype, countemp), 'saltype': zip(salary, countsal), 'context': context,'all_titles':titles_,'all_locations':locations_,'all_cats':all_cat})
+    return render(request, 'jobs.html', {'page_obj': page_obj, 'pe': page_obj, 'count': count, 'locations': locations, 'countloc': countloc, 'titles': titles, 'categories': categories, 'GET_params': GET_params, 'jobtype': zip(jobtype, countjob), 'emptype': zip(emptype, countemp), 'saltype': zip(salary, countsal), 'context': context, 'all_titles': titles_, 'all_locations': locations_, 'all_cats': all_cat})
 
-def job_suggestion_email(all_skills,loger,empls,jobseeker,request):
+
+def job_suggestion_email(all_skills, loger, empls, jobseeker, request):
     try:
         matching_eid_list = []
         matching_job_titles = []
@@ -665,31 +653,30 @@ def job_suggestion_email(all_skills,loger,empls,jobseeker,request):
         for job in all_jobs:
             if job.skills:
                 job_skills = job.skills.split(',')
-        
+
                 if any(skill.strip().lower() in all_skills.lower() for skill in job_skills):
 
                     matching_eid_list.append(job.eid_id)
-            
+
                     matching_job_titles.append(job.title)
-            
+
                     matching_job_locations.append(job.location)
                     jobid_list.append(job.jobid)
 
         matching_employers = Employer.objects.filter(eid__in=matching_eid_list)
 
-        ename_dict = {employer.eid: employer.ename for employer in matching_employers}
+        ename_dict = {
+            employer.eid: employer.ename for employer in matching_employers}
 
         matching_company_names = [ename_dict[eid] for eid in matching_eid_list]
-        
 
         matching_company_names = matching_company_names[:3]
         matching_job_titles = matching_job_titles[:3]
         matching_job_locations = matching_job_locations[:3]
-        
 
         suggestions_match = True
 
-        if len(matching_job_locations)==0 and len(matching_company_names)==0 and len(matching_job_titles) ==0:
+        if len(matching_job_locations) == 0 and len(matching_company_names) == 0 and len(matching_job_titles) == 0:
             suggestions_match = False
         #####################################################################
         ### EMAIL############
@@ -699,20 +686,21 @@ def job_suggestion_email(all_skills,loger,empls,jobseeker,request):
         jobs_link = main_url+reverse('main:jobs')
         message = render_to_string('email.html', {
             'name': empls.name,
-            'suggestions' :zip(matching_company_names,matching_job_titles,matching_job_locations,jobid_list),
-            'suggestions_match' :suggestions_match,
-            'cand_id':jobseeker.user_id,
-            'jobs_link':jobs_link
+            'suggestions': zip(matching_company_names, matching_job_titles, matching_job_locations, jobid_list),
+            'suggestions_match': suggestions_match,
+            'cand_id': jobseeker.user_id,
+            'jobs_link': jobs_link
         })
-        
-        
-        email = EmailMessage(email_subject, message, settings.EMAIL_HOST_USER, [loger.email])
+
+        email = EmailMessage(email_subject, message,
+                             settings.EMAIL_HOST_USER, [loger.email])
         email.fail_silently = True
         email.content_subtype = "html"
         email.send()
 
     except:
         pass
+
 
 def profile_completion(request, pk):
     if request.method == 'POST':
@@ -726,7 +714,7 @@ def profile_completion(request, pk):
             return redirect('main:profilecompletion', pk=pk)
         jobseeker = JobSeeker.objects.get(log_id=pk)
         jobseeker.phone = request.POST['code']+request.POST['mobile']
-        jobseeker.location = request.POST['address']
+        # jobseeker.location = request.POST['address']
         jobseeker.dob = request.POST['dob']
         jobseeker.basic_edu = request.POST['basic']
         jobseeker.master_edu = request.POST.get('master', None)
@@ -735,17 +723,17 @@ def profile_completion(request, pk):
         jobseeker.expsal = request.POST.get('expsal', None)
         notice_period_type = request.POST.get('notice_period_type', None)
         notice_period_time = request.POST.get('notice_period_time', None)
-        jobseeker.role = request.POST.get('role',"")
+        jobseeker.role = request.POST.get('role', "")
         jobseeker.notice_period = f"{notice_period_time} {notice_period_type}"
         skills = request.POST.getlist('skills')
         all_skills = ""
         for i in skills:
             all_skills = all_skills+i+","
-            
+
         experiences = request.POST.get('experience')
         jobseeker.skills = all_skills
         jobseeker.experience = experiences
-         
+
         filev = None
         try:
             filev = request.FILES['resume']
@@ -761,7 +749,7 @@ def profile_completion(request, pk):
             jobseeker.photo = filev
         except:
             filev = None
-        
+
         jobseeker.save()
         loger = Login.objects.get(log_id=pk)
         request.session['email'] = loger.email
@@ -771,7 +759,7 @@ def profile_completion(request, pk):
         request.session['pk'] = empls.user_id
         request.session['type'] = "c"
         try:
-            resumeanalysis = ResumeAnalysis.objects.get(jobseeker_id = jobseeker)
+            resumeanalysis = ResumeAnalysis.objects.get(jobseeker_id=jobseeker)
             resumeanalysis.actual_skills = all_skills
             resumeanalysis.save()
         except:
@@ -780,12 +768,14 @@ def profile_completion(request, pk):
             resumeanalysis.jobseeker_id = jobseeker
             resumeanalysis.save()
 
-        save_resume_vector_matrix_thread = threading.Thread(target=save_resume_vector_matrix, args=(pk,))
+        save_resume_vector_matrix_thread = threading.Thread(
+            target=save_resume_vector_matrix, args=(pk,))
         save_resume_vector_matrix_thread.start()
-        job_suggestions_email_thread = threading.Thread(target=job_suggestion_email, args=(all_skills,loger,empls,jobseeker,request))
+        job_suggestions_email_thread = threading.Thread(
+            target=job_suggestion_email, args=(all_skills, loger, empls, jobseeker, request))
         job_suggestions_email_thread.start()
-        #job_suggestion_email(all_skills,loger,empls,jobseeker)
-        ########################EMAIL########################################
+        # job_suggestion_email(all_skills,loger,empls,jobseeker)
+        ######################## EMAIL########################################
         # matching_eid_list = []
         # matching_job_titles = []
         # matching_job_locations = []
@@ -797,29 +787,25 @@ def profile_completion(request, pk):
         # for job in all_jobs:
         #     if job.skills:
         #         job_skills = job.skills.split(',')
-        
+
         #         if any(skill.strip().lower() in all_skills.lower() for skill in job_skills):
 
         #             matching_eid_list.append(job.eid_id)
-            
+
         #             matching_job_titles.append(job.title)
-            
+
         #             matching_job_locations.append(job.location)
         #             jobid_list.append(job.jobid)
-
-       
 
         # matching_employers = Employer.objects.filter(eid__in=matching_eid_list)
 
         # ename_dict = {employer.eid: employer.ename for employer in matching_employers}
 
         # matching_company_names = [ename_dict[eid] for eid in matching_eid_list]
-        
 
         # matching_company_names = matching_company_names[:3]
         # matching_job_titles = matching_job_titles[:3]
         # matching_job_locations = matching_job_locations[:3]
-        
 
         # suggestions_match = True
 
@@ -834,8 +820,7 @@ def profile_completion(request, pk):
         #     'suggestions_match' :suggestions_match,
         #     'cand_id':jobseeker.user_id
         # })
-        
-        
+
         # email = EmailMessage(email_subject, message, settings.EMAIL_HOST_USER, [loger.email])
         # email.fail_silently = True
         # email.content_subtype = "html"
@@ -988,13 +973,13 @@ def profile_completion(request, pk):
         loger.status = 1
         loger.save()
         return redirect("candidate:dashboard", pk=jobseeker.user_id)
-    
+
     if (len(Login.objects.filter(log_id=pk, user_type="candidate")) == 0):
         return redirect('main:index')
     educat = Course.objects.all()
     allskills = AllSkills.objects.all()
     roledetails = RoleDetails.objects.all()
-    return render(request, 'profile_completion.html', {'educat': educat, 'allskills': allskills,'roledetails':roledetails})
+    return render(request, 'profile_completion.html', {'educat': educat, 'allskills': allskills, 'roledetails': roledetails})
 
 
 def pdf_reader(file):
@@ -1039,7 +1024,11 @@ def emp_completion(request, pk):
         employer.etype = request.POST['etype']
         employer.industry = request.POST['industry']
         employer.executive = request.POST['executive']
-        
+        employer.email = request.POST['email']
+        employer.strength = request.POST.get('strength', "")
+        employer.details = request.POST.get('details', "")
+        employer.turnover = request.POST.get('turnover', "")
+
         filev = None
         if 'logo' in request.FILES:
             filev = request.FILES['logo']
@@ -1047,21 +1036,25 @@ def emp_completion(request, pk):
             filev._name = str(pk)+"_"+employer.ename+"_Logo_"+filev._name
             employer.logo = filev
         else:
-            
-            # static_folder_path = settings.STATIC_ROOT
-            # images_folder_path = os.path.join(static_folder_path, "logo")
-            images_folder_path = "/home/ec2-user/django-mpower/main/static/logo"
-            image_files = os.listdir(images_folder_path)
-            if image_files:
-                file_bytes = None
-                random_image_filename = random.choice(image_files)
-                random_image_file_path = os.path.join(images_folder_path, random_image_filename)
-                with open(random_image_file_path, "rb") as image_file:
-                    file_bytes = image_file.read()
-                filev = ContentFile(file_bytes)
-                random_logo_name = str(pk)+"_"+employer.ename+"_Logo_"+random_image_filename
-                employer.logo.save(random_logo_name, filev)
-            
+            try:
+                # static_folder_path = settings.STATIC_ROOT
+                # images_folder_path = os.path.join(static_folder_path, "logo")
+                images_folder_path = "/home/ec2-user/django-mpower/main/static/logo"
+                image_files = os.listdir(images_folder_path)
+                if image_files:
+                    file_bytes = None
+                    random_image_filename = random.choice(image_files)
+                    random_image_file_path = os.path.join(
+                        images_folder_path, random_image_filename)
+                    with open(random_image_file_path, "rb") as image_file:
+                        file_bytes = image_file.read()
+                    filev = ContentFile(file_bytes)
+                    random_logo_name = str(
+                        pk)+"_"+employer.ename+"_Logo_"+random_image_filename
+                    employer.logo.save(random_logo_name, filev)
+            except:
+                pass
+
         employer.address = request.POST['address']
         employer.pincode = request.POST['pincode']
         employer.location = request.POST['location']
@@ -1078,7 +1071,7 @@ def emp_completion(request, pk):
         loger.status = 1
         loger.save()
         return redirect("employer:cdashboard", pk=employer.eid)
-    
+
     if (len(Login.objects.filter(log_id=pk, user_type="employer")) == 0):
         return redirect('main:index')
     return render(request, 'emp_completion.html')
@@ -1138,16 +1131,13 @@ def verify_otp(request, pk):
 ######################################################################################################
 
 
-
 class JobMatcher:
     def __init__(self, jobseeker, job):
         self.jobseeker = jobseeker
         self.job = job
-    
-    
 
     def calculate_match_percentage(self):
-        total_params = 5  
+        total_params = 5
         matched_params = 0
 
         if self.jobseeker.skills and self.job.skills:
@@ -1157,19 +1147,19 @@ class JobMatcher:
                 matched_params += 1
 
         # Check if location matches
-        if self.job.location and self.jobseeker.location:
-            if self.job.location.lower() == self.jobseeker.location.lower():
-                matched_params += 1
+        # if self.job.location and self.jobseeker.location:
+        #     if self.job.location.lower() == self.jobseeker.location.lower():
+        #         matched_params += 1
 
         # Check if notice period matches
-        if self.job.notice_period and self.jobseeker.notice_period:
-            if self.job.notice_period.lower() == self.jobseeker.notice_period.lower():
-                matched_params += 1
+        # if self.job.notice_period and self.jobseeker.notice_period:
+        #     if self.job.notice_period.lower() == self.jobseeker.notice_period.lower():
+        #         matched_params += 1
 
         # Check if Experience matches
-        if self.jobseeker.experience and self.job.experience:
-            if int(self.jobseeker.experience) >= int(self.job.experience):
-                matched_params += 1
+        # if self.jobseeker.experience and self.job.experience:
+        #     if int(self.jobseeker.experience) >= int(self.job.experience):
+        #         matched_params += 1
 
         # Check if expected salary matches
         # if self.jobseeker.expsal and self.job.basicpay:
@@ -1186,14 +1176,14 @@ class JobMatcher:
 
         # Check if skills match
         if self.jobseeker.skills and self.job.skills and len(self.jobseeker.skills) > 0 and len(self.job.skills) > 0:
-            job_skills = [skill.strip() for skill in self.job.skills.lower().split(',') if skill.strip()]
-            seeker_skills = [skill.strip() for skill in self.jobseeker.skills.lower().split(',') if skill.strip()]
+            job_skills = [skill.strip() for skill in self.job.skills.lower().split(
+                ',') if skill.strip()]
+            seeker_skills = [skill.strip() for skill in self.jobseeker.skills.lower().split(
+                ',') if skill.strip()]
             matching_details['skills'] = {
                 'match': list(set(job_skills).intersection(set(seeker_skills))),
                 'not_match': list(set(job_skills).difference(set(seeker_skills)))
             }
-
-            
 
         # Check if location matches
         if self.job.location and self.jobseeker.location:
@@ -1221,6 +1211,7 @@ class JobMatcher:
 
         return matching_details
 
+
 def preprocess_text(text):
     words = word_tokenize(text)
 
@@ -1246,9 +1237,10 @@ def extract_text_from_pdf(pdf_file):
 
 ######################################################################################################################
 
-def singleseminar(request,pk1):
-    sem = Seminars.objects.get(seminar_id = pk1)
-    singlesem= {}
+
+def singleseminar(request, pk1):
+    sem = Seminars.objects.get(seminar_id=pk1)
+    singlesem = {}
     singlesem['title'] = sem.title
     singlesem['date'] = sem.date
     singlesem['address'] = sem.address
@@ -1261,8 +1253,8 @@ def singleseminar(request,pk1):
     speakers = [speaker.strip() for speaker in sem.speaker.split(',')]
     # print(sem.speaker,sem.speaker.split(','),speakers)
 
+    return render(request, 'singleseminar.html', {'seminar_details': singlesem, 'speakers': speakers})
 
-    return render(request,'singleseminar.html',{'seminar_details':singlesem,'speakers':speakers})
 
 def singlejob(request, pk2):
     if request.method == "POST":
@@ -1309,12 +1301,12 @@ def singlejob(request, pk2):
     skills_required = []
     for i in jobdet.skills.split("\n"):
         skills.append(i)
-    requirements = []
-    for i in jobdet.requirements.split("\n"):
-        requirements.append(i)
-    responsibilities = []
-    for i in jobdet.responsibilities.split("\n"):
-        responsibilities.append(i)
+    # requirements = []
+    # for i in jobdet.requirements.split("\n"):
+    #     requirements.append(i)
+    # responsibilities = []
+    # for i in jobdet.responsibilities.split("\n"):
+    #     responsibilities.append(i)
     quality = "Please login to check eligibility"
     skills_e = [skill.strip() for skill in jobdet.skills.split(',')]
     if 'pk' in request.session:
@@ -1327,9 +1319,9 @@ def singlejob(request, pk2):
                 cand = Admin.objects.get(aid=request.session['pk'])
         # skills_e = [skill.strip() for skill in jobdet.skills.split(',')]
         if cand.log_id.user_type == "employer":
-            return render(request, 'singlejob.html', {'job_details': jobdet, 'company_details': companydet, 'liked': lik, 'loger': loger, 'skills': skills_e, 'requirements': requirements, 'responsibilities': responsibilities, 'date': app_date, 'score': 'X'})
+            return render(request, 'singlejob.html', {'job_details': jobdet, 'company_details': companydet, 'liked': lik, 'loger': loger, 'skills': skills_e, 'date': app_date, 'score': 'X'})
         if cand.log_id.user_type == "admin":
-            return render(request, 'singlejob.html', {'job_details': jobdet, 'company_details': companydet, 'liked': lik, 'loger': loger, 'skills': skills_e, 'requirements': requirements, 'responsibilities': responsibilities, 'date': app_date, 'score': 'X'})
+            return render(request, 'singlejob.html', {'job_details': jobdet, 'company_details': companydet, 'liked': lik, 'loger': loger, 'skills': skills_e, 'date': app_date, 'score': 'X'})
         for i in skills:
             for j in cand.skills.split(","):
                 if j not in i:
@@ -1339,7 +1331,7 @@ def singlejob(request, pk2):
             pdfFileObj = open("static/media/"+str(cand.Resume), 'rb')
             pdfReader = PyPDF2.PdfReader(pdfFileObj)
         except:
-            return render(request, 'singlejob.html', {'job_details': jobdet, 'company_details': companydet, 'liked': lik, 'loger': loger, 'skills': skills_e, 'requirements': requirements, 'responsibilities': responsibilities, 'date': app_date, 'score': 'Please submit your resume', 'skills_required': skills_required,'screening_questions':screening_questions})
+            return render(request, 'singlejob.html', {'job_details': jobdet, 'company_details': companydet, 'liked': lik, 'loger': loger, 'skills': skills_e, 'date': app_date, 'score': 'Please submit your resume', 'skills_required': skills_required, 'screening_questions': screening_questions})
         num_pages = len(pdfReader.pages)
         count = 0
         text = ""
@@ -1394,7 +1386,6 @@ def singlejob(request, pk2):
         # if jobdet['notice_period'].lower() in text:
         # 	quality += 1
 
-
     #######################################################################################
     if 'pk' in request.session:
         job = Jobs.objects.get(jobid=pk2)
@@ -1415,41 +1406,35 @@ def singlejob(request, pk2):
         job_description_vector = vectorizer.fit_transform([job_description])
         job_seeker_data_vector = vectorizer.transform([total_job_seeker_data])
 
-        cosine_sim_job_seeker = cosine_similarity(job_description_vector, job_seeker_data_vector)
+        cosine_sim_job_seeker = cosine_similarity(
+            job_description_vector, job_seeker_data_vector)
 
         job_matching_percentage = round(cosine_sim_job_seeker[0][0] * 100, 2)
         # print(f"Job Matching Percentage (Job Seeker Skills): {job_matching_percentage}%")
         #######################################################################################
 
-    
-    
-
         job_matcher = JobMatcher(jobseeker=job_seeker, job=job)
         match_percentage = job_matcher.calculate_match_percentage()
         matching_details = job_matcher.get_matching_details()
-    
-    
+
     # print(match_percentage)
     # print(matching_details)
     # context = {
     #     'match_percentage': match_percentage,
     #     'matching_details': matching_details,
     # }
-        job_matching_percentage = round((job_matching_percentage+match_percentage)/2,2)
+        job_matching_percentage = round(
+            (job_matching_percentage+match_percentage)/2, 2)
     else:
         job_matching_percentage = "Please login to check eligibility"
         matching_details = "No"
-    
 
-    return render(request, 'singlejob.html', {'job_details': jobdet, 'company_details': companydet, 'liked': lik, 'loger': loger, 'skills': skills_e, 'requirements': requirements, 'responsibilities': responsibilities, 'date': app_date, 'score': job_matching_percentage, 'skills_required': skills_required,'matching_details': matching_details,'screening_questions':screening_questions})
-
-
-    
-
+    return render(request, 'singlejob.html', {'job_details': jobdet, 'company_details': companydet, 'liked': lik, 'loger': loger, 'skills': skills_e, 'date': app_date, 'score': job_matching_percentage, 'skills_required': skills_required, 'matching_details': matching_details, 'screening_questions': screening_questions})
 
 
 def create_clusters_with_kmeans(job_seekers, num_clusters=5):
-    all_skills = [', '.join(job_seeker.pass_to_list()) for job_seeker in job_seekers]
+    all_skills = [', '.join(job_seeker.pass_to_list())
+                  for job_seeker in job_seekers]
 
     vectorizer = CountVectorizer()
     skills_matrix = vectorizer.fit_transform(all_skills)
@@ -1478,23 +1463,22 @@ def create_clusters_with_kmeans(job_seekers, num_clusters=5):
     return job_seekers, cluster_info
 
 
-
-
 def calculate_similarity(cluster_skills, job_skills):
     skill_set = set(cluster_skills + job_skills)
     your_vector = [1 if skill in cluster_skills else 0 for skill in skill_set]
     job_vector = [1 if skill in job_skills else 0 for skill in skill_set]
     similarity_score = cosine_similarity([your_vector], [job_vector])
     return similarity_score[0][0]
+
+
 def group_jobseekers_by_role():
     jobseekers_by_role = defaultdict(list)
-    
+
     jobseekers = JobSeeker.objects.all()
     for jobseeker in jobseekers:
         jobseekers_by_role[jobseeker.role].append(jobseeker.log_id.email)
-    
-    return dict(jobseekers_by_role)
 
+    return dict(jobseekers_by_role)
 
 
 def daily_mail():
@@ -1521,44 +1505,43 @@ def daily_mail():
             grouped_jobs[title].append(job_data)
         else:
             grouped_jobs[title] = [job_data]
-    
+
     role_email_list = []
     grouped_jobseekers = group_jobseekers_by_role()
-    
-   
-    for role ,email_list in grouped_jobseekers.items():
+
+    for role, email_list in grouped_jobseekers.items():
         job_eid = []
         job_titles = []
         job_locations = []
         job_company = []
-        
+
         if role is not None:
             job_list_for_role = grouped_jobs[role]
             for i in job_list_for_role:
                 job_eid.append(i['eid_id'])
                 job_titles.append(i['title'])
                 job_locations.append(i['location'])
-                
-        if len(job_eid)>0:
+
+        if len(job_eid) > 0:
             matching_employers = Employer.objects.filter(eid__in=job_eid)
-            ename_dict = {employer.eid: employer.ename for employer in matching_employers}
+            ename_dict = {
+                employer.eid: employer.ename for employer in matching_employers}
             job_company = [ename_dict[eid] for eid in job_eid]
-            message = render_to_string('daily-email.html', {  
+            message = render_to_string('daily-email.html', {
                 'suggestions': zip(job_company, job_titles, job_locations),
                 'suggestions_match': True
             })
             role_email_list.extend(email_list)
-            email = EmailMessage(email_subject, message, settings.EMAIL_HOST_USER, email_list)
+            email = EmailMessage(email_subject, message,
+                                 settings.EMAIL_HOST_USER, email_list)
             email.fail_silently = True
             email.content_subtype = "html"
             email.send()
 
-
-    
-    all_job_seekers = JobSeeker.objects.exclude(log_id__email__in=role_email_list)
-    clustered_job_seekers, cluster_info = create_clusters_with_kmeans(all_job_seekers)
-
-    
+    all_job_seekers = JobSeeker.objects.exclude(
+        log_id__email__in=role_email_list)
+    clustered_job_seekers, cluster_info = create_clusters_with_kmeans(
+        all_job_seekers)
 
     for cluster_label, info in cluster_info.items():
         cluster_skill_list = []
@@ -1568,30 +1551,34 @@ def daily_mail():
             cluster_skill_list.append(skill)
         for email_id in info['email_ids']:
             cluster_email_list.append(email_id)
-        jobs_with_scores = [(job['eid_id'], job['title'], job['location'], calculate_similarity(cluster_skill_list, job['skills'])) for job in jobs_data]
-        sorted_jobs = sorted(jobs_with_scores, key=lambda x: x[3], reverse=True)
+        jobs_with_scores = [(job['eid_id'], job['title'], job['location'], calculate_similarity(
+            cluster_skill_list, job['skills'])) for job in jobs_data]
+        sorted_jobs = sorted(
+            jobs_with_scores, key=lambda x: x[3], reverse=True)
         top_5_recommended_jobs = sorted_jobs[:5]
         recommended_eids = [eid for eid, _, _, _ in top_5_recommended_jobs]
-        recommended_titles = [title for _, title, _, _ in top_5_recommended_jobs]
-        recommended_locations = [location for _, _, location, _ in top_5_recommended_jobs]
+        recommended_titles = [title for _, title,
+                              _, _ in top_5_recommended_jobs]
+        recommended_locations = [location for _, _,
+                                 location, _ in top_5_recommended_jobs]
 
-        
         matching_employers = Employer.objects.filter(eid__in=recommended_eids)
-        ename_dict = {employer.eid: employer.ename for employer in matching_employers}
-        recommanded_company_names = [ename_dict[eid] for eid in recommended_eids]
-        
+        ename_dict = {
+            employer.eid: employer.ename for employer in matching_employers}
+        recommanded_company_names = [ename_dict[eid]
+                                     for eid in recommended_eids]
+
         message = render_to_string('daily-email.html', {
-            'name': 'Aditya',  
+            'name': 'Aditya',
             'suggestions': zip(recommanded_company_names, recommended_titles, recommended_locations),
             'suggestions_match': True
         })
 
-        email = EmailMessage(email_subject, message, settings.EMAIL_HOST_USER, cluster_email_list)
+        email = EmailMessage(email_subject, message,
+                             settings.EMAIL_HOST_USER, cluster_email_list)
         email.fail_silently = True
         email.content_subtype = "html"
         email.send()
-        
-        
 
 
 def singlecompany(request, pk2):
@@ -1607,13 +1594,14 @@ def get_job(request):
     if (request.method == "POST"):
         try:
             applic = Application()
-            applic.user_id = JobSeeker.objects.get(user_id=request.session['pk'])
+            applic.user_id = JobSeeker.objects.get(
+                user_id=request.session['pk'])
             applic.status = 0
             applic.job_id = Jobs.objects.get(jobid=request.POST['id'])
             applic.eid = applic.job_id.eid
             applic.screening_answer_one = request.POST['answer1']
             applic.screening_answer_two = request.POST['answer2']
-            applic.date_applied = timezone.localtime() 
+            applic.date_applied = timezone.localtime()
         # + timedelta(hours=5, minutes=30)
             applic.save()
             return JsonResponse({'message': 'Y'})
@@ -1621,11 +1609,10 @@ def get_job(request):
             print(e)
 
 
-
 def give_feedback(request, pk):
     if request.method == "POST":
         int_val = Interview.objects.get(int_id=pk)
-        applics = Application.objects.get(apply_id = int_val.apply_id.apply_id)
+        applics = Application.objects.get(apply_id=int_val.apply_id.apply_id)
         eid_id = applics.eid.eid
         applics.status = 7
         applics.save()
@@ -1682,30 +1669,36 @@ def give_feed(request, pk):
     if int_val.eid.logo:
         data['logo'] = int_val.eid.logo.url
     return render(request, 'give_feed.html', {'data': data})
+
+
 class MyTokenGenerator(PasswordResetTokenGenerator):
     def _make_hash_value(self, user, timestamp):
         return f"{user.email}-{timestamp}"
 
+
 my_token_generator = MyTokenGenerator()
-def token_is_valid(email_encoded,token, timestamp):
+
+
+def token_is_valid(email_encoded, token, timestamp):
     email_ = urlsafe_base64_decode(email_encoded)
 
     try:
         email = urlsafe_base64_decode(email_encoded).decode('utf-8')
-        
+
         user = Login.objects.get(email=email)
         if my_token_generator.check_token(user, token):
             timestamp_datetime = timezone.datetime.fromisoformat(timestamp)
-            
+
             time_difference = timezone.now() - timestamp_datetime
-            
+
             if time_difference <= timedelta(minutes=10):
                 return True
-    
+
     except (TypeError, ValueError, OverflowError, Login.DoesNotExist):
         pass
-    
+
     return False
+
 
 def password_reset_request(request):
     if request.method == "POST":
@@ -1716,8 +1709,9 @@ def password_reset_request(request):
             token = my_token_generator.make_token(user)
             timestamp = timezone.now().isoformat()
             parsed_url = urlparse(request.build_absolute_uri())
-            main_url = f"{parsed_url.scheme}://{parsed_url.netloc}" 
-            reset_link = reverse('main:password_reset_confirm', args=[email_encoded,token, timestamp])
+            main_url = f"{parsed_url.scheme}://{parsed_url.netloc}"
+            reset_link = reverse('main:password_reset_confirm', args=[
+                                 email_encoded, token, timestamp])
             subject = 'Password Reset Request'
             message = f'Click the following link to reset your password: {main_url}{reset_link}'
             from_email = 'your_email@example.com'
@@ -1728,10 +1722,12 @@ def password_reset_request(request):
         return JsonResponse({'error': 'User with this email does not exist'}, status=400)
     return JsonResponse({'error': 'Invalid request method'}, status=400)
 
-def password_reset_confirm(request,email_encoded, token, timestamp):
-    if not token_is_valid(email_encoded,token, timestamp):
+
+def password_reset_confirm(request, email_encoded, token, timestamp):
+    if not token_is_valid(email_encoded, token, timestamp):
         return HttpResponse('Invalid or expired password reset link.')
-    return render(request, 'password-reset.html',{'email_encoded':email_encoded})
+    return render(request, 'password-reset.html', {'email_encoded': email_encoded})
+
 
 def password_reset(request):
     if request.method == "POST":
@@ -1741,15 +1737,16 @@ def password_reset(request):
 
         if request.POST['fnew'] != request.POST['cnew']:
             return JsonResponse({'message': 'Both your password and your confirmation password must be exactly the same'})
-        
+
         if not re.fullmatch(r"^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{8,}$", request.POST['fnew']):
-            return JsonResponse({'message': 'Please enter a valid password'})        
+            return JsonResponse({'message': 'Please enter a valid password'})
         user.password = make_password(request.POST['fnew'])
         user.save()
         request.session['password'] = None
         return JsonResponse({'message': 'Password changed successfully'})
 
-def calculate_distance(origin,destination):
+
+def calculate_distance(origin, destination):
 
     try:
         url = f"https://nominatim.openstreetmap.org/search?format=json&q={origin}"
@@ -1780,21 +1777,31 @@ def calculate_distance(origin,destination):
         return distance
     except Exception as e:
         # return JsonResponse({'error': str(e)})
-        
+
         return "Error"
 
 
 def about_us(request):
-    return render(request,'about-us.html')
+    return render(request, 'about-us.html')
+
+
 def pricing(request):
-    return render(request,'pricing.html')
+    return render(request, 'pricing.html')
+
+
 def contact_us(request):
-    return render(request,'contact-us.html')
+    return render(request, 'contact-us.html')
+
+
 def faqs(request):
-    return render(request,'faqs.html')
+    return render(request, 'faqs.html')
+
+
 def signup(request):
-    return render(request,'sign-up.html')
+    return render(request, 'sign-up.html')
+
+
 def signin(request):
-    return render(request,'sign-in.html')
+    return render(request, 'sign-in.html')
 # def error_404_view(request, exception):
 #     return render(request, '404.html')
