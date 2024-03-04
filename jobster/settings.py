@@ -29,17 +29,25 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
+# Use different database based on the environment
+ENVIRONMENT = os.getenv('ENVIRONMENT', 'development')
+
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-b7#088%6h$a0*!lm!5^nc#@3b5mp95*lr13-w4b)+9c$-d!#o&'
+SECRET_KEY = os.getenv(
+    'SECRET_KEY', 'django-insecure-b7#088%6h$a0*!lm!5^nc#@3b5mp95*lr13-w4b)+9c$-d!#o&')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG', 'True').lower() == 'true'
 
-ALLOWED_HOSTS = ['*', 'http://13.231.178.59:8000/']
+# ALLOWED_HOSTS = ['*', 'http://13.231.178.59:8000/']
 
-CORS_ORIGIN_WHITELIST = [
-    'http://localhost:8000'
-]
+# CORS_ORIGIN_WHITELIST = [
+#     'http://localhost:8000'
+# ]
+ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS',
+                          'localhost,127.0.0.1').split(',')
+CORS_ALLOWED_ORIGINS = os.getenv(
+    'DJANGO_CORS_ALLOWED_ORIGINS', 'http://localhost:3000,http://127.0.0.1:3000').split(',')
 
 # Application definition
 
@@ -96,83 +104,26 @@ WSGI_APPLICATION = 'jobster.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'mpower',
-#         'USER': 'tejas',
-#         'PASSWORD': 'djangompower',
-#         'HOST': 'mpower.c4jlkgtzb4pz.ap-northeast-1.rds.amazonaws.com',
-#         'PORT': '3306',
-#     }
-# }
 
 DATABASES = {
+    'production': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': os.getenv('MYSQL_DB_NAME'),
+        'USER': os.getenv('MYSQL_DB_USER'),
+        'PASSWORD': os.getenv('MYSQL_DB_PASSWORD'),
+        'HOST': os.getenv('MYSQL_DB_HOST'),
+        'PORT': os.getenv('MYSQL_DB_PORT'),
+    },
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'mpo',
-        'USER': 'root',
-        'HOST': 'localhost',
-        'PORT': '3306',
-    }
-}
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'brthg6tkr5nbinhmb1xg',
-#         'USER': 'uyswy6f1k1jgaeq2',
-#         'PASSWORD':'KyBvlKwt6C0myXv6Ig0q',
-#         'HOST': 'brthg6tkr5nbinhmb1xg-mysql.services.clever-cloud.com',
-#         'PORT': '3306',
-#     }
-# }
-
-# DATABASES = {
-#      'default': {
-#          'ENGINE': 'django.db.backends.mysql',
-#          'NAME': 'mpower',
-#          'USER': 'tejas',
-#          'PASSWORD': 'djangompower',
-#          'HOST': 'mpower-db.cwj8xtndrcdf.ap-south-1.rds.amazonaws.com',
-#          'PORT': '3306',
-#      }
-# }
-
-DATABASES = {
-    # 'prod': {
-    #     'ENGINE': 'django.db.backends.mysql',
-    #     'NAME': 'mpower',
-    #     'USER': 'tejas',
-    #     'PASSWORD': 'djangompower',
-    #     'HOST': 'mpower-db.cwj8xtndrcdf.ap-south-1.rds.amazonaws.com',
-    #     'PORT': '3306',
-    # },
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'mpower',
-        'USER': 'user',
-        'PASSWORD': 'password',
-        'HOST': 'localhost',
-        'PORT': '3300',
+        'NAME': os.getenv('MYSQL_DB_NAME', 'mpower'),
+        'USER': os.getenv('MYSQL_DB_USER', 'user'),
+        'PASSWORD': os.getenv('MYSQL_DB_PASSWORD', 'password'),
+        'HOST': os.getenv('MYSQL_DB_HOST', 'localhost'),
+        'PORT': os.getenv('MYSQL_DB_PORT', '3300'),
     }
 }
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-#     }
-# }
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'railway',
-#         'USER': 'postgres',
-#         'PASSWORD': '10hvNZdmtE8kDlBe662t',
-#         'HOST': 'containers-us-west-190.railway.app',
-#         'PORT': '5781',
-#     }
-# }
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
@@ -229,8 +180,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_USE_TLS = True
-EMAIL_PORT = 587
-EMAIL_HOST_USER = "tejasprasad2003@gmail.com"
-EMAIL_HOST_PASSWORD = "acmacgscsmnjloex"
+EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.gmail.com')
+EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', "true").lower() == 'true'
+EMAIL_PORT = int(os.getenv('EMAIL_PORT', "587"))
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
