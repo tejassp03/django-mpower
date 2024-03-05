@@ -117,15 +117,15 @@ DATABASES = {
     },
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.getenv('MYSQL_DB_NAME', 'mpower'),
-        'USER': os.getenv('MYSQL_DB_USER', 'user'),
-        'PASSWORD': os.getenv('MYSQL_DB_PASSWORD', 'password'),
-        'HOST': os.getenv('MYSQL_DB_HOST', 'localhost'),
-        'PORT': os.getenv('MYSQL_DB_PORT', '3300'),
+        'NAME': 'mpower',
+        'USER': 'user',
+        'PASSWORD': 'password',
+        'HOST': 'localhost',
+        'PORT':  '3300',
     }
 }
 
-print(DATABASES['default'], ENVIRONMENT, DATABASES[ENVIRONMENT])
+DATABASES['default'] = DATABASES[ENVIRONMENT]
 
 
 # Password validation
