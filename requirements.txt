@@ -69,7 +69,7 @@ mdurl==0.1.2
 more-itertools==10.2.0
 multidict==6.0.5
 murmurhash==1.0.9
-mysqlclient==2.1.1
+mysqlclient==2.1
 nh3==0.2.15
 nltk==3.8.1
 numpy==1.24.1
@@ -130,4 +130,4 @@ social-auth-core==4.4.2
 sortedcontainers==2.4.0
 soupsieve==2.4
 spacy==3.5.3
-spacy-legacy==3.0.
+spacy-legacy==3.0.11
