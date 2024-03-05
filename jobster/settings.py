@@ -31,6 +31,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Use different database based on the environment
 ENVIRONMENT = os.getenv('ENVIRONMENT', 'development')
+print(ENVIRONMENT)
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv(
@@ -123,6 +124,8 @@ DATABASES = {
         'PORT': os.getenv('MYSQL_DB_PORT', '3300'),
     }
 }
+
+print(DATABASES['default'], ENVIRONMENT, DATABASES[ENVIRONMENT])
 
 
 # Password validation
