@@ -32,7 +32,7 @@ jobster/__pycache__
 *.key
 
 # Ignore database migrations
-**/migrations/
+# **/migrations/
 
 # Ignore local development database
 db.sqlite3
