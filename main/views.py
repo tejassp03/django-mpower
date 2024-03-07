@@ -83,49 +83,57 @@ def index(request):
         if 'location' in request.POST:
             longitude = request.POST['longitude']
             latitude = request.POST['latitude']
-
-        user = Login.objects.filter(email=request.POST.get('c_email', ''))
-        if not user.exists():
+        user = Login.objects.filter(email=request.POST['c_email'])
+        if (len(user) == 0):
             return JsonResponse({'message': 'X'})
+        else:
 
-        user = user.first()
-        if not check_password(request.POST.get('c_pass', ''), user.password):
-            return JsonResponse({'message': 'X'})
+            if (check_password(request.POST['c_pass'], user[0].password)):
+                if (request.POST['user'] == 'candidate' and JobSeeker.objects.filter(log_id=user[0].log_id)):
+                    jobseeker = JobSeeker.objects.get(log_id=user[0].log_id)
+                    if ((jobseeker.phone == None or jobseeker.phone == "" or len(jobseeker.phone) <= 4) and (jobseeker.location == None or jobseeker.location == "") and (jobseeker.experience == None or jobseeker.experience == "") and (jobseeker.skills == None or jobseeker.skills == "") and (jobseeker.basic_edu == None or jobseeker.basic_edu == "") and (jobseeker.master_edu == None or jobseeker.master_edu == "") and (jobseeker.other_qual == None or jobseeker.other_qual == "") and (jobseeker.dob == None or jobseeker.dob == "") and (jobseeker.Resume == "" or jobseeker.Resume == None) and (jobseeker.photo == "" or jobseeker.photo == None)):
+                        urlval = "/profile_completion/"+str(user[0].log_id)+"/"
+                        return JsonResponse({'message': 'Y', 'url': urlval})
+                    # return redirect('main:profilecompletion', pk=user[0].log_id)
+                elif (request.POST['user'] == 'employer' and Employer.objects.filter(log_id=user[0].log_id)):
+                    employer = Employer.objects.get(log_id=user[0].log_id)
+                    if ((employer.etype == None or employer.etype == "") and (employer.industry == None or employer.industry == "") and (employer.address == None or employer.address == "") and (employer.pincode == None or employer.pincode == "") and (employer.executive == None or employer.executive == "") and (employer.phone == None or employer.phone == "" or len(employer.phone) <= 4) and (employer.location == None or employer.location == "") and (employer.profile == None or employer.profile == "") and (employer.logo == "" or employer.logo == None)):
+                        urlval = "/emp_completion/"+str(user[0].log_id)+"/"
+                        return JsonResponse({'message': 'Y', 'url': urlval})
 
-        user_type = request.POST.get('user', '')
-        if user_type == 'candidate':
-            jobseeker = JobSeeker.objects.filter(log_id=user.log_id).first()
-            if jobseeker:
-                if not all([
-                    not jobseeker.phone,
-                    not jobseeker.location,
-                    not jobseeker.experience,
-                    not jobseeker.skills,
-                    not jobseeker.basic_edu,
-                    not jobseeker.master_edu,
-                    not jobseeker.other_qual,
-                    not jobseeker.dob,
-                    not jobseeker.Resume,
-                    not jobseeker.photo
-                ]):
-                    return JsonResponse({'message': 'Y', 'url': f"/profile_completion/{user.log_id}/"})
-        elif user_type == 'employer':
-            employer = Employer.objects.filter(log_id=user.log_id).first()
-            if employer:
-                if not all([
-                    not employer.etype,
-                    not employer.industry,
-                    not employer.address,
-                    not employer.pincode,
-                    not employer.executive,
-                    not employer.phone,
-                    not employer.location,
-                    not employer.profile,
-                    not employer.logo
-                ]):
-                    return JsonResponse({'message': 'Y', 'url': f"/emp_completion/{user.log_id}/"})
+                else:
+                    return JsonResponse({'message': 'X'})
+                request.session['email'] = request.POST['c_email']
+                request.session['password'] = user[0].password
+                user[0].status = 1
+                user[0].save()
+                if (request.POST['user'] == 'candidate'):
+                    empls = JobSeeker.objects.get(log_id=user[0].log_id)
+                    request.session['name'] = empls.name
+                    request.session['pk'] = empls.user_id
+                    request.session['type'] = "c"
+                    if (empls.photo):
+                        request.session['photo'] = empls.photo.url
+                    jobid = request.POST.get('jobid')
+                    if jobid:
+                        urlval = "/singlejob/"+jobid+"/"
+                    else:
+                        urlval = "/candidate/"+str(jobseeker.user_id)+"/"
 
-        return JsonResponse({'message': 'X'})
+                    # print(request.POST['jobid'])
+                    return JsonResponse({'message': 'Y', 'url': urlval})
+                else:
+                    emp = Employer.objects.get(log_id=user[0].log_id)
+                    request.session['name'] = emp.ename
+                    request.session['pk'] = emp.eid
+                    request.session['type'] = "e"
+                    if (emp.logo):
+                        request.session['photo'] = emp.logo.url
+                    urlval = "/employer/"+str(emp.eid)+"/"
+
+                    return JsonResponse({'message': 'Y', 'url': urlval})
+            else:
+                return JsonResponse({'message': 'X'})
 
     jobs = Jobs.objects.all()
     typ = jobs.values('fnarea').annotate(
