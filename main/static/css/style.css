@@ -7813,3 +7813,14 @@ main.show {
 .sig {
   margin-left: auto;
 }
+
+.button-custom-variant{
+  border-radius: 5px;
+  cursor: pointer;
+  min-width: 130px;
+  font: 700 14px / 40px "Roboto", sans-serif;
+  border: 1px solid var(--pxpMainColor);
+  margin: 0 5px;
+  text-transform: uppercase;
+  display: inline-block;
+}

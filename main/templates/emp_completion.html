@@ -121,40 +121,42 @@
               <!-- fieldsets -->
 
               <fieldset>
-                <h3>Setup your phone</h3>
-                <div class="form-row"> 
-                  <div class="form-group col-md-6 d-none">
-                    <input
-                      type="text"
-                      id="countryCode"
-                      class="form-control"
-                      placeholder="Country Code"
-                      name="code"
-                      readonly
-                    />
+                <div style="margin:auto;" id="get-otp-div">
+                  <h3>Setup your phone</h3>
+                  <div class="form-row d-flex justify-content-center"> 
+                    <div class="form-group col-md-6 d-none">
+                      <input
+                        type="text"
+                        id="countryCode"
+                        class="form-control"
+                        placeholder="Country Code"
+                        name="code"
+                        readonly
+                      />
+                    </div>
+                    <div class="form-group col-md-6 d-none">
+                      <input
+                        type="text"
+                        id="phoneNumber"
+                        class="form-control"
+                        placeholder="Phone Number"
+                        readonly
+                      />
+                    </div>
+                    <div class="form-group col-md-6 ml-2">
+                      <input
+                        type="tel"
+                        id="phone"
+                        class="form-control"
+                        placeholder="0000000000"
+                        name="mobile"
+                        maxlength="10"
+                      />
+                    </div>
                   </div>
-                  <div class="form-group col-md-6 d-none">
-                    <input
-                      type="text"
-                      id="phoneNumber"
-                      class="form-control"
-                      placeholder="Phone Number"
-                      readonly
-                    />
-                  </div>
-                  <div class="form-group col-md-6 ml-2">
-                    <input
-                      type="tel"
-                      id="phone"
-                      class="form-control"
-                      placeholder="0000000000"
-                      name="mobile"
-                      maxlength="10"
-                    />
-                  </div>
+                  <button type="button" class="action-but">Get OTP</button>
                 </div>
-                <button type="button" class="action-but">Get OTP</button>
-                <div id="hider" class="finde">
+                <div id="hider" class="finde" data-div-type="verify-otp">
                 <div class="done_text">
                   <h6>A secret code is sent to your phone. <br>Please enter it here.</h6> 
                 </div>
@@ -171,6 +173,13 @@
                   />
                  </div>
                 <button type="button" class="action-but2" style="color: green; background: white; border: 1px solid green">Verify</button>
+                <button
+                  type="button"
+                  class="resend-otp-button button-custom-variant"
+                  style="color:white; background: blue;"
+                >
+                  Resend OTP
+                </button>
             </div>
             <button type="button" class="next action-button" style="display: none" id="verifier">Continue</button>
               </fieldset>
@@ -187,6 +196,7 @@
                         <div class="container">
                             <div class="form-group">
                                 Employer Type: <select placeholder="Employer Type" name="etype" class="notnormal">
+                                <option>Select an option</option>
                                 <option value="Sole Proprietorship">Sole Proprietorship</option>
                                 <option value="Partnership">Partnership</option>
                                 <option value="Limited Liability Partnership">Limited Liability Partnership</option>
@@ -208,6 +218,7 @@
                         <div class="container">
                             <div class="form-group">
                                 Industry &nbsp; : &nbsp; <select placeholder="Industry" name="industry" class="notnormal">
+                                <option>Select an option</option>
                                 <option value="Aerospace & Defense">Aerospace & Defense</option>
                                 <option value="Apparel">Appare</option>
                                 <option value="Business Services">Business Services</option>
@@ -236,7 +247,7 @@
                   </div> 
 
                   <div class="form-group fg_2"> 
-                    <input type="text" class="form-control" placeholder="Executive" name="executive">
+                    <input type="text" class="form-control" placeholder="Designation" name="executive">
                   </div>
                   
                 <button type="button" class="action-button previous previous_button">Back</button> 
@@ -246,14 +257,14 @@
 
               <fieldset>
                 <h3>Please enter details</h3> 
-                <div class="form-group fg_2"> 
+                {% comment %} <div class="form-group fg_2"> 
                   <input type="text" class="form-control" placeholder="Address" name="address">
-                </div>
+                </div> {% endcomment %}
                   <div class="form-group fg_2">
                     <input type="text" class="form-control" placeholder="Pin Code" name="pincode">
                   </div> 
                   <div class="form-group fg_2"> 
-                    <input type="text" class="form-control" placeholder="Location" name="location">
+                    <input type="text" class="form-control" placeholder="City/State/Country" name="location">
                   </div>
                 <button type="button" class="action-button previous previous_button">Back</button> 
                 <button type="button" class="next action-button">Continue</button>   
@@ -264,13 +275,13 @@
                     <h4 style="text-align: center">Profile</h4>
                   <textarea type="text" class="form-control" name="profile" rows="7" cols="50"></textarea>
                 </div>
-                <div class="form-group fg_2">
+                {% comment %} <div class="form-group fg_2">
                   <input type="email" placeholder="Your Email" class="form-control" name="email" />
-                </div>
+                </div> {% endcomment %}
                 <div class="form-group fg_2">
-                  <input type="text" placeholder="Strengths (Optional)" class="form-control" name="strength" />
+                  <input type="text" placeholder="Strength (Optional)" class="form-control" name="strength" />
                   <input type="text" placeholder="Company Turnover (Optional)" class="form-control" name="turnover" />
-                  <input type="text" placeholder="Company Details (Optional)" class="form-control" name="details" />
+                  {% comment %} <input type="text" placeholder="Company Details (Optional)" class="form-control" name="details" /> {% endcomment %}
                 </div>
                 <button type="button" class="action-button previous previous_button">Back</button> 
                 <button  class="action-button" type="submit">Finish</button>  
@@ -595,14 +606,19 @@
                 }
             }
 
+            $(".resend-otp-button").click(function(){
+              $("#hider[data-div-type='verify-otp']").removeClass("finde2");
+              $("#hider[data-div-type='verify-otp']").addClass("finde");
+              $("#get-otp-div").removeClass("finde");
+              $("#get-otp-div").addClass("finde2");
+            })
+
             $('.action-but').click(function(){
               if (document.getElementById("phone").value == "") {
                 alert("Please enter a valid phone number");
                 return;
               }
-              if (!document.getElementById("hider").matches("finde")) {
-                document.getElementById("hider").setAttribute("class", "finde2");
-              }
+              
               let text1 = document.getElementById("countryCode").value;
               let text2 = document.getElementById("phone").value;
               let result = text1 + text2;
@@ -619,6 +635,10 @@
                     success: function( data ) 
                     {
                         alert(`OTP is ${data.OTP}`)
+                        $("#hider[data-div-type='verify-otp']").removeClass("finde");
+                        $("#hider[data-div-type='verify-otp']").addClass("finde2");
+
+                        $("#get-otp-div").addClass("finde");
                         $('.action-but2').css('display', 'inline-block');
                         document.getElementById('otp_val').value="";
                     }

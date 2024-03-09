@@ -985,9 +985,11 @@ def profile_completion(request, pk):
     if (len(Login.objects.filter(log_id=pk, user_type="candidate")) == 0):
         return redirect('main:index')
     educat = Course.objects.all()
+    master_educates = Course.objects.filter(course__istartswith="master")
+    bachelor_educates = Course.objects.filter(course__istartswith="bachelor")
     allskills = AllSkills.objects.all()
     roledetails = RoleDetails.objects.all()
-    return render(request, 'profile_completion.html', {'educat': educat, 'allskills': allskills, 'roledetails': roledetails})
+    return render(request, 'profile_completion.html', {'educat':educat, 'bachelor_educates': bachelor_educates, 'master_educates': master_educates, 'allskills': allskills, 'roledetails': roledetails})
 
 
 def pdf_reader(file):

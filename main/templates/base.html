@@ -66,11 +66,11 @@
                 <div class="modal-content">
                     <div class="modal-header" style="padding: 20px">
                         {% comment %} <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> {% endcomment %}
-                        <div class="tabs activer" id="tab01">
+                        <div class="tabs activer" id="tab01" data-sign-in-modal="candidate">
                             <input value="candidate" style="display: none" name="user"/>
                             <h6 class="font-weight-bold" style="margin-bottom: 0px !important">Candidate</h6>
                         </div>
-                        <div class="tabs" id="tab02">
+                        <div class="tabs" id="tab02" data-sign-in-modal="employer">
                             <input value="employer" style="display: none" name="user"/>
                             <h6 class="text-muted" style="margin-bottom: 0px !important">Employer</h6>
                         </div>
@@ -209,15 +209,15 @@
                 <div class="modal-content">
                     <div class="modal-header" style="padding: 20px; padding-bottom: 0px">
                         {% comment %} <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> {% endcomment %}
-                        <div class="tabs2 activer2" id="tab03">
+                        <div class="tabs2 activer2" id="tab03" data-sign-in-modal="candidate" >
                             <h6 class="font-weight-bold" style="margin-bottom: 0px !important">Candidate</h6>
                         </div>
-                        <div class="tabs2" id="tab04">
+                        <div class="tabs2" id="tab04" data-sign-in-modal="employer">
                             <h6 class="text-muted" style="margin-bottom: 0px !important">Employer</h6>
                         </div>
                     </div>
                     <div class="modal-body">
-                        <main id="tab031" class="fieldvals show">
+                        <main id="tab031" class="fieldvals show" data-sign-in-modal="candidate">
                         <div class="pxp-user-modal-fig text-center">
                             <img src="{% static 'images/signup-fig.png' %}" alt="Sign up">
                         </div>
@@ -253,7 +253,7 @@
                     </main>
                     </div>
                     <div class="modal-body">
-                        <main id="tab041" class="fieldvals">
+                        <main id="tab041" class="fieldvals" data-sign-in-modal="employer">
                         <div class="pxp-user-modal-fig text-center">
                             <img src="{% static 'images/signup-fig.png' %}" alt="Sign up">
                         </div>
@@ -378,6 +378,15 @@
                 $(this).children("h6").removeClass("text-muted");
                 $(this).children("h6").addClass("font-weight-bold");
                 $(this).addClass("activer");
+                modelType = $(this).data("sign-in-modal")
+
+                $(".fieldvals").removeClass("show");
+                $(`.fieldvals[data-sign-in-modal=${modelType}]`).addClass("show");
+                $(".tabs2").removeClass("activer2");
+                $(`.tabs2[data-sign-in-modal=${modelType}]`).addClass("activer2");
+                $(`.tabs2[data-sign-in-modal=${modelType}]`).children("h6").removeClass("text-muted");
+                $(`.tabs2[data-sign-in-modal=${modelType}]`).children("h6").addClass("font-weight-bold");
+
             
                 current_fs = $(".activer");
             
@@ -408,6 +417,7 @@
                 $(this).children("h6").removeClass("text-muted");
                 $(this).children("h6").addClass("font-weight-bold");
                 $(this).addClass("activer2");
+                //$(this).data("sign-in-modal")
             
                 current_fs = $(".activer2");
             

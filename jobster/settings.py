@@ -125,7 +125,7 @@ DATABASES = {
     }
 }
 
-DATABASES['default'] = DATABASES[ENVIRONMENT]
+# DATABASES['default'] = DATABASES[ENVIRONMENT]
 
 
 # Password validation
