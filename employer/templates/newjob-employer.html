@@ -576,7 +576,7 @@
                     }
                     finalQuestionsArray.push(value)
                 }
-                originalFormData.append("questions", finalQuestionsArray)
+                originalFormData.append("questions", finalQuestionsArray.join("%_n_%"))
                 $('#screeningQuestionsSubmit').prop('disabled', true);
 
 

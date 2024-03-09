@@ -324,7 +324,7 @@
                                             <div class="pxp-single-job-content-details mt-4 mt-lg-5">
                                                 <h4>Overview</h4>
                                                 <p id="desc" class="text-break"></p>
-                                                <div class="mt-4 text-break">
+                                                {% comment %} <div class="mt-4 text-break">
                                                     <h4>Responsibilities</h4>
                                                     <ul id="resp">
                                                     </ul>
@@ -332,7 +332,11 @@
                                                 <div class="mt-4 text-break">
                                                     <h4>Requirements</h4>
                                                     <ul id="requ"></ul>
-                                                </div>
+                                                </div> {% endcomment %}
+                                                <div class="mt-4 text-break">
+                                                    <h4>Questions</h4>
+                                                    <ul id="modal-job-questions"></ul>
+                                                </div> 
                                                 <div class="mt-4 text-break">
                                                     <h4>Skills</h4>
                                                     <ul id="skil"></ul>
@@ -635,36 +639,48 @@
                             lu.append(il);
                         }
                     }
-                    let resp=JSON.parse(data['info'])[0].responsibilities;
-                    let lur=document.getElementById('resp');
-                    while (lur.firstChild) {
-                        lur.removeChild(lur.lastChild);
-                    }
-                    if(resp)
+                    let questionsList = data['questions'];
+                    let questionsListNode=document.getElementById('modal-job-questions');
+                    questionsListNode.innerHTML = ""
+                    if(questionsList)
                     {
-                        resp=resp.split("\n");
-                        for(let i=0;i<resp.length;i++)
+                        for(let i=0;i<questionsList.length;i++)
                         {
                             let il=document.createElement('li');
-                            il.innerHTML=resp[i];
-                            lur.append(il);
+                            il.innerHTML=questionsList[i];
+                            questionsListNode.append(il);
                         }
                     }
-                    let reqr=JSON.parse(data['info'])[0].requirements;
-                    let luq=document.getElementById('requ');
-                    while (luq.firstChild) {
-                        luq.removeChild(luq.lastChild);
-                    }
-                    if(reqr)
-                    {
-                        reqr=reqr.split("\n");
-                        for(let i=0;i<reqr.length;i++)
-                        {
-                            let il=document.createElement('li');
-                            il.innerHTML=reqr[i];
-                            luq.append(il);
-                        }
-                    }
+                    //let resp=JSON.parse(data['info'])[0].responsibilities;
+                    //let lur=document.getElementById('resp');
+                    //while (lur.firstChild) {
+                    //    lur.removeChild(lur.lastChild);
+                    //}
+                    //if(resp)
+                    //{
+                    //    resp=resp.split("\n");
+                    //    for(let i=0;i<resp.length;i++)
+                    //    {
+                    //        let il=document.createElement('li');
+                    //        il.innerHTML=resp[i];
+                    //        lur.append(il);
+                    //    }
+                    //}
+                    //let reqr=JSON.parse(data['info'])[0].requirements;
+                    //let luq=document.getElementById('requ');
+                    //while (luq.firstChild) {
+                    //    luq.removeChild(luq.lastChild);
+                    //}
+                    //if(reqr)
+                    //{
+                    //    reqr=reqr.split("\n");
+                    //    for(let i=0;i<reqr.length;i++)
+                    //    {
+                    //        let il=document.createElement('li');
+                    //        il.innerHTML=reqr[i];
+                    //        luq.append(il);
+                    //    }
+                    //}
                 }
             })
         }

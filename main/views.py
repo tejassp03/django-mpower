@@ -989,7 +989,7 @@ def profile_completion(request, pk):
     bachelor_educates = Course.objects.filter(course__istartswith="bachelor")
     allskills = AllSkills.objects.all()
     roledetails = RoleDetails.objects.all()
-    return render(request, 'profile_completion.html', {'educat':educat, 'bachelor_educates': bachelor_educates, 'master_educates': master_educates, 'allskills': allskills, 'roledetails': roledetails})
+    return render(request, 'profile_completion.html', {'educat': educat, 'bachelor_educates': bachelor_educates, 'master_educates': master_educates, 'allskills': allskills, 'roledetails': roledetails})
 
 
 def pdf_reader(file):
@@ -1025,6 +1025,7 @@ def course_recommender(course_list):
 
 def emp_completion(request, pk):
     if request.method == "POST":
+        loger = Login.objects.get(log_id=pk)
         if (request.POST['code'] == "" and request.POST['mobile'] == "" and request.POST['etype'] == "" and request.POST['industry'] == "" and request.POST['executive'] == "" and len(request.FILES) == 0 and request.POST['address'] == "" and request.POST['pincode'] == "" and request.POST['location'] == "" and request.POST['profile'] == ""):
             messages.success(
                 request, 'Please enter at least one of the fields')
@@ -1034,7 +1035,7 @@ def emp_completion(request, pk):
         employer.etype = request.POST['etype']
         employer.industry = request.POST['industry']
         employer.executive = request.POST['executive']
-        employer.email = request.POST['email']
+        employer.email = loger.email
         employer.strength = request.POST.get('strength', "")
         employer.details = request.POST.get('details', "")
         employer.turnover = request.POST.get('turnover', "")
@@ -1065,12 +1066,10 @@ def emp_completion(request, pk):
             except:
                 pass
 
-        employer.address = request.POST['address']
         employer.pincode = request.POST['pincode']
         employer.location = request.POST['location']
         employer.profile = request.POST['profile']
         employer.save()
-        loger = Login.objects.get(log_id=pk)
         request.session['email'] = loger.email
         request.session['password'] = loger.password
         request.session['name'] = employer.ename
@@ -1124,7 +1123,7 @@ def returnvalue(phone):
 def get_otp(request, pk):
     if request.method == "GET":
         key = base64.b32encode(returnvalue(request.GET['phone']).encode())
-        OTP = pyotp.TOTP(key, interval=30)
+        OTP = pyotp.TOTP(key, interval=60)
         return JsonResponse({'OTP': OTP.now()})
     return JsonResponse({'OTP': 'X'})
 
@@ -1132,7 +1131,7 @@ def get_otp(request, pk):
 def verify_otp(request, pk):
     if (request.method == 'POST'):
         key = base64.b32encode(returnvalue(request.POST['phone']).encode())
-        OTP = pyotp.TOTP(key, interval=30)
+        OTP = pyotp.TOTP(key, interval=60)
         if OTP.verify(int(request.POST['OTP'])):
             return JsonResponse({'message': 'Phone number verified'})
     return JsonResponse({'message': 'Please enter correct OTP'})
@@ -1287,6 +1286,7 @@ def singlejob(request, pk2):
     # try:
     # print(pk2)
     screening_questions = ScreeningQuestions.objects.filter(job_id=pk2).first()
+    questionsList = screening_questions.questions.split('%_n_%') if screening_questions is not None else []
     # print(screening_questions.question_one)
     # except:
     #     pass
@@ -1341,7 +1341,7 @@ def singlejob(request, pk2):
             pdfFileObj = open("static/media/"+str(cand.Resume), 'rb')
             pdfReader = PyPDF2.PdfReader(pdfFileObj)
         except:
-            return render(request, 'singlejob.html', {'job_details': jobdet, 'company_details': companydet, 'liked': lik, 'loger': loger, 'skills': skills_e, 'date': app_date, 'score': 'Please submit your resume', 'skills_required': skills_required, 'screening_questions': screening_questions})
+            return render(request, 'singlejob.html', {'job_details': jobdet, 'company_details': companydet, 'liked': lik, 'loger': loger, 'skills': skills_e, 'date': app_date, 'score': 'Please submit your resume', 'skills_required': skills_required, 'screening_questions': questionsList})
         num_pages = len(pdfReader.pages)
         count = 0
         text = ""
@@ -1439,7 +1439,7 @@ def singlejob(request, pk2):
         job_matching_percentage = "Please login to check eligibility"
         matching_details = "No"
 
-    return render(request, 'singlejob.html', {'job_details': jobdet, 'company_details': companydet, 'liked': lik, 'loger': loger, 'skills': skills_e, 'date': app_date, 'score': job_matching_percentage, 'skills_required': skills_required, 'matching_details': matching_details, 'screening_questions': screening_questions})
+    return render(request, 'singlejob.html', {'job_details': jobdet, 'company_details': companydet, 'liked': lik, 'loger': loger, 'skills': skills_e, 'date': app_date, 'score': job_matching_percentage, 'skills_required': skills_required, 'matching_details': matching_details, 'screening_questions': questionsList})
 
 
 def create_clusters_with_kmeans(job_seekers, num_clusters=5):

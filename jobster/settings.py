@@ -122,6 +122,14 @@ DATABASES = {
         'PASSWORD': 'password',
         'HOST': 'localhost',
         'PORT':  '3300',
+    },
+    'development': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'mpower',
+        'USER': 'user',
+        'PASSWORD': 'password',
+        'HOST': 'localhost',
+        'PORT':  '3300',
     }
 }
 

@@ -297,7 +297,7 @@ def newjob(request, pk):
         job.save()
         screening_questions = ScreeningQuestions()
         screening_questions.job_id = job
-        screening_questions.questions = request.POST.get('questions', []).join(', ')
+        screening_questions.questions = request.POST.get('questions', "")
         screening_questions.save()
 
 
@@ -1008,9 +1008,11 @@ def jobapp(request, pk):
     jobinfo = Jobs.objects.filter(jobid=request.GET['jobid'])
     employer = Employer.objects.filter(eid=pk)
     image = ""
+    questionsObj = ScreeningQuestions.objects.filter(job_id=request.GET['jobid']).first()
+    questionsList = questionsObj.questions.split('%_n_%')
     if (employer[0].logo):
         image = str(employer[0].logo.url)
-    return JsonResponse({'logo': image, 'info': dumps(list(jobinfo.values()), default=str), 'company': dumps(list(employer.values()))})
+    return JsonResponse({'logo': image, 'questions':questionsList, 'info': dumps(list(jobinfo.values()), default=str), 'company': dumps(list(employer.values()))})
 
 
 def edit_job(request, pk):

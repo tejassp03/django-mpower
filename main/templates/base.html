@@ -305,17 +305,10 @@
                             <div id="whyhire" style="width: 200%;" >
                                 <input name="jobidval" style="display: none" />
                                 {% if screening_questions %}
-                                {% if screening_questions.question_one %}
-                                <label class="font-weight-bold text-break" for="question1" style="font-weight:bold;">Q1. {{screening_questions.question_one}}</label>
-                                <textarea id="answer1" name="answer1" class="form-control" style="width: 100%;" placeholder="write your response here...." required></textarea><br> 
-                                {% endif %}
-                                {% if screening_questions.question_two %}
-                                <label class="font-weight-bold text-break" for="question2" style="font-weight:bold;">Q2. {{screening_questions.question_two}}</label>
-                                <textarea id="answer2" name="answer2" class="form-control" style="width: 100%;" placeholder="write your response here...." required></textarea>
-                                {% endif %}
-                                {%else%}
-                                <h5 class="d-flex justify-content-center">Confirm to apply for job.</h5>
-                                <p>{{screening_questions.question_one}}</p>
+                                {% for question in screening_questions %}
+                                    <label class="font-weight-bold text-break" for="question1" style="font-weight:bold;">Q1. {{question}}</label>
+                                    <textarea id="answer1" name="answer1" class="form-control" style="width: 100%;" placeholder="write your response here...." required></textarea><br> 
+                                {% endfor %}
                                 {%endif%}
                             </div>
                         </div>
